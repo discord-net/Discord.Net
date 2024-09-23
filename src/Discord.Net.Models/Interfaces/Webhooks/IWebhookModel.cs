@@ -7,6 +7,5 @@ public partial interface IWebhookModel : IEntityModel<ulong>
     ulong? UserId { get; }
     string? Name { get; }
     string? Avatar { get; }
-    string? Token { get; }
     ulong? ApplicationId { get; }
 }

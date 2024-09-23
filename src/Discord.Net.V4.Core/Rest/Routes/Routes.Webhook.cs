@@ -1,3 +1,4 @@
+using Discord.Models;
 using Discord.Models.Json;
 using Discord.Utils;
 
@@ -22,11 +23,20 @@ public partial class Routes
     public static IApiOutRoute<Webhook> GetWebhook([IdHeuristic<IWebhook>] ulong webhookId) =>
         new ApiOutRoute<Webhook>(nameof(GetWebhook), RequestMethod.Get, $"webhooks/{webhookId}");
 
+    public static IApiOutRoute<T> GetWebhook<T>([IdHeuristic<IWebhook>] ulong webhookId)
+        where T : class, IWebhookModel
+        => new ApiOutRoute<T>(nameof(GetWebhook), RequestMethod.Get, $"webhooks/{webhookId}");
+
     public static IApiOutRoute<Webhook> GetWebhookWithToken(
         [IdHeuristic<IWebhook>] ulong webhookId,
         [IdHeuristic<ITokenPathProvider>] string token
-        ) =>
-        new ApiOutRoute<Webhook>(nameof(GetWebhookWithToken), RequestMethod.Get, $"webhooks/{webhookId}/{token}");
+    ) => new ApiOutRoute<Webhook>(nameof(GetWebhookWithToken), RequestMethod.Get, $"webhooks/{webhookId}/{token}");
+
+    public static IApiOutRoute<T> GetWebhookWithToken<T>(
+        [IdHeuristic<IWebhook>] ulong webhookId,
+        [IdHeuristic<ITokenPathProvider>] string token)
+        where T : class, IWebhookModel
+        => new ApiOutRoute<T>(nameof(GetWebhookWithToken), RequestMethod.Get, $"webhooks/{webhookId}/{token}");
 
     public static IApiInOutRoute<ModifyWebhookParams, Webhook>
         ModifyWebhook([IdHeuristic<IWebhook>] ulong webhookId, ModifyWebhookParams body) =>
@@ -35,8 +45,7 @@ public partial class Routes
 
     public static IApiInOutRoute<ModifyWebhookWithTokenParams, Webhook> ModifyWebhookWithToken(
         [IdHeuristic<IWebhook>] ulong webhookId,
-        [IdHeuristic<ITokenPathProvider>]
-        string token,
+        [IdHeuristic<ITokenPathProvider>] string token,
         ModifyWebhookWithTokenParams body) =>
         new ApiInOutRoute<ModifyWebhookWithTokenParams, Webhook>(nameof(ModifyWebhookWithToken), RequestMethod.Patch,
             $"webhooks/{webhookId}/{token}", body);
@@ -46,15 +55,13 @@ public partial class Routes
 
     public static IApiRoute DeleteWebhookWithToken(
         [IdHeuristic<IWebhook>] ulong webhookId,
-        [IdHeuristic<ITokenPathProvider>]
-        string token) =>
+        [IdHeuristic<ITokenPathProvider>] string token) =>
         new ApiRoute(nameof(DeleteWebhookWithToken), RequestMethod.Delete, $"webhooks/{webhookId}/{token}");
 
     // TODO: Add support for multipart/form-data
     public static IApiInOutRoute<ExecuteWebhookParams, Message> ExecuteWebhook(
         [IdHeuristic<IWebhook>] ulong webhookId,
-        [IdHeuristic<ITokenPathProvider>]
-        string token,
+        [IdHeuristic<ITokenPathProvider>] string token,
         ExecuteWebhookParams body,
         bool? wait = null,
         ulong? threadId = default
@@ -67,8 +74,7 @@ public partial class Routes
 
     public static IApiOutRoute<Message> GetWebhookMessage(
         [IdHeuristic<IWebhook>] ulong webhookId,
-        [IdHeuristic<ITokenPathProvider>]
-        string token,
+        [IdHeuristic<ITokenPathProvider>] string token,
         [IdHeuristic<IWebhookMessage>] ulong messageId,
         ulong? threadId = default) =>
         new ApiOutRoute<Message>(nameof(GetWebhookMessage), RequestMethod.Get,
@@ -79,8 +85,7 @@ public partial class Routes
     // TODO: Add support for multipart/form-data
     public static IApiInOutRoute<ModifyWebhookMessageParams, Message> ModifyWebhookMessage(
         [IdHeuristic<IWebhook>] ulong webhookId,
-        [IdHeuristic<ITokenPathProvider>]
-        string token,
+        [IdHeuristic<ITokenPathProvider>] string token,
         [IdHeuristic<IWebhookMessage>] ulong messageId, ModifyWebhookMessageParams body,
         [IdHeuristic<IThreadChannel>] ulong? threadId = default
     ) =>
@@ -90,8 +95,7 @@ public partial class Routes
 
     public static IApiRoute DeleteWebhookMessage(
         [IdHeuristic<IWebhook>] ulong webhookId,
-        [IdHeuristic<ITokenPathProvider>]
-        string token,
+        [IdHeuristic<ITokenPathProvider>] string token,
         [IdHeuristic<IWebhookMessage>] ulong messageId,
         [IdHeuristic<IThreadChannel>] ulong? threadId
     ) =>

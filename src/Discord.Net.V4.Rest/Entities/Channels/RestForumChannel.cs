@@ -8,7 +8,7 @@ public sealed partial class RestForumChannelActor :
     RestThreadableChannelActor,
     IForumChannelActor,
     IRestActor<RestForumChannelActor, ulong, RestForumChannel, IGuildForumChannelModel>,
-    IRestIncomingIntegrationChannelTrait
+    IRestIntegrationChannelTrait.WithIncoming
 {
     [SourceOfTruth] internal override ForumChannelIdentity Identity { get; }
 

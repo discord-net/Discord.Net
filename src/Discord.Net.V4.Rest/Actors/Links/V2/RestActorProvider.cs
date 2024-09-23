@@ -88,6 +88,26 @@ internal static class RestActorProvider
             HashCode.Combine(state1, state2),
             (client, id) => TActor.Factory(client, state1, state2, IIdentifiable<TId, TEntity, TActor, TModel>.Of(id))
         );
+    
+    internal static RestActorProvider<TId, TActor> GetOrCreate<TActor, TId, TEntity, TModel, T1, T2, T3>(
+        DiscordRestClient client,
+        Template<IIdentifiable<TId, TEntity, TActor, TModel>> template,
+        T1 state1,
+        T2 state2,
+        T3 state3
+    )
+        where TId : IEquatable<TId>
+        where TEntity : class, IEntity<TId>, IEntityOf<TModel>
+        where TModel : class, IEntityModel<TId>
+        where TActor :
+        class,
+        IActor<TId, TEntity>,
+        IFactory<TActor, DiscordRestClient, T1, T2, T3, IIdentifiable<TId, TEntity, TActor, TModel>>
+        => CreateStateful<TActor, TId, TEntity, TModel>(
+            client,
+            HashCode.Combine(state1, state2, state3),
+            (client, id) => TActor.Factory(client, state1, state2, state3, IIdentifiable<TId, TEntity, TActor, TModel>.Of(id))
+        );
 
     private static RestActorProvider<TId, TActor> CreateStateful<TActor, TId, TEntity, TModel>(
         DiscordRestClient client,

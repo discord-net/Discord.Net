@@ -167,10 +167,15 @@ public class SourceOfTruth : ISyntaxGenerationCombineTask<SourceOfTruth.Generati
             {
                 MethodDeclarationSyntax method => method.Identifier.ValueText,
                 PropertyDeclarationSyntax property => property.Identifier.ValueText,
+                IndexerDeclarationSyntax => "this",
                 _ => null
             };
 
-            if (sourceOfTruthName is null) continue;
+            if (sourceOfTruthName is null)
+            {
+                targetLogger.Warn($"{target.TypeSymbol}: Unknown SoT name: {target.MemberDeclarationSyntax}");
+                continue;
+            }
 
             if (target.TypeSymbol is not INamedTypeSymbol typeSymbol) continue;
 
@@ -199,7 +204,9 @@ public class SourceOfTruth : ISyntaxGenerationCombineTask<SourceOfTruth.Generati
 
             foreach (var iface in interfaces)
             {
-                var targetMembers = iface.GetMembers(sourceOfTruthName);
+                var targetMembers = sourceOfTruthName == "this" 
+                ? iface.GetMembers().Where(x => x is IPropertySymbol { IsIndexer: true}).ToImmutableArray()
+                : iface.GetMembers(sourceOfTruthName);
 
                 if (targetMembers.Length > 0)
                 {
@@ -238,7 +245,11 @@ public class SourceOfTruth : ISyntaxGenerationCombineTask<SourceOfTruth.Generati
                             if (validTargets.Add(member))
                                 targetLogger.Log($"{target.TypeSymbol}: adding target {member} ({iface})");
                             break;
-                        case IPropertySymbol property when target.MemberDeclarationSyntax is PropertyDeclarationSyntax:
+                        case IPropertySymbol property
+                            when target.MemberDeclarationSyntax
+                                is PropertyDeclarationSyntax
+                                or IndexerDeclarationSyntax:
+
                             if (!target.Semantic.Compilation.HasImplicitConversion(sourceOfTruthType, property.Type))
                             {
                                 targetLogger.Warn(
@@ -299,6 +310,45 @@ public class SourceOfTruth : ISyntaxGenerationCombineTask<SourceOfTruth.Generati
                     switch (validTarget)
                     {
                         case IPropertySymbol property:
+                            if (property.IsIndexer)
+                            {
+                                targetTypeDeclaration.Syntax = targetTypeDeclaration.Syntax.AddMembers(
+                                    SyntaxFactory.IndexerDeclaration(
+                                            [],
+                                            [],
+                                            SyntaxFactory.IdentifierName(property.Type.ToDisplayString()),
+                                            SyntaxFactory.ExplicitInterfaceSpecifier(
+                                                SyntaxFactory.IdentifierName(property.ContainingType.ToDisplayString())
+                                            ),
+                                            SyntaxFactory.Token(SyntaxKind.ThisKeyword),
+                                            SyntaxFactory.BracketedParameterList(
+                                                SyntaxFactory.SeparatedList(
+                                                    property.Parameters.Select(x =>
+                                                        SyntaxFactory.Parameter(
+                                                            new SyntaxList<AttributeListSyntax>(),
+                                                            new SyntaxTokenList(),
+                                                            SyntaxFactory.IdentifierName(x.Type.ToDisplayString()),
+                                                            SyntaxFactory.Identifier(x.Name),
+                                                            null
+                                                        )
+                                                    )
+                                                )
+                                            ),
+                                            null,
+                                            SyntaxFactory.ArrowExpressionClause(
+                                                SyntaxFactory.Token(SyntaxKind.EqualsGreaterThanToken),
+                                                SyntaxFactory.IdentifierName(property.Name)
+                                            ),
+                                            SyntaxFactory.Token(SyntaxKind.SemicolonToken)
+                                        )
+                                        .WithLeadingTrivia(
+                                            SyntaxFactory.Comment($"// {property.ToDisplayString()}")
+                                        )
+                                );
+
+                                break;
+                            }
+
                             targetTypeDeclaration.Syntax = targetTypeDeclaration.Syntax.AddMembers(
                                 SyntaxFactory.PropertyDeclaration([], [],
                                         SyntaxFactory.IdentifierName(property.Type.ToDisplayString()),

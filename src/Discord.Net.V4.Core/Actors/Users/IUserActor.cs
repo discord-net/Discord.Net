@@ -58,6 +58,7 @@ public partial interface IUserActor :
     [LinkExtension]
     private interface WithCurrentExtension
     {
+        [LinkMirror(OnlyBackLinks = true)]
         ICurrentUserActor Current { get; }
     }
 }

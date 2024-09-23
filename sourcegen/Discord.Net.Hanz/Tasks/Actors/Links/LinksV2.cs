@@ -47,14 +47,11 @@ public sealed class LinksV2 :
             return Actor.GetAttributes().SequenceEqual(other.Actor.GetAttributes());
         }
 
-        private INamedTypeSymbol? _coreActor;
-        private INamedTypeSymbol? _coreEntity;
-
         public INamedTypeSymbol GetCoreActor()
         {
             if (Assembly is AssemblyTarget.Core) return Actor;
 
-            return _coreActor ??= Hierarchy.GetHierarchy(Actor)
+            return Hierarchy.GetHierarchy(Actor, false)
                 .First(x =>
                     x.Type.ContainingAssembly.Name == "Discord.Net.V4.Core"
                     &&
@@ -66,7 +63,7 @@ public sealed class LinksV2 :
         {
             if (Assembly is AssemblyTarget.Core) return Entity;
 
-            return _coreEntity ??= Hierarchy.GetHierarchy(Entity)
+            return Hierarchy.GetHierarchy(Entity, false)
                 .First(x =>
                     x.Type.ContainingAssembly.Name == "Discord.Net.V4.Core"
                     &&
@@ -1490,31 +1487,28 @@ public sealed class LinksV2 :
         if (isClass)
         {
             // add core backlink 
-            if (filler.Assembly is not AssemblyTarget.Core && isClass)
-            {
-                var coreBase = syntax.BaseList?.Types
-                    .FirstOrDefault(x => x
-                        .Type
-                        .ToString()
-                        .StartsWith(filler.GetCoreActor().ToDisplayString())
-                    );
+            var coreBase = syntax.BaseList?.Types
+                .FirstOrDefault(x => x
+                    .Type
+                    .ToString()
+                    .StartsWith(filler.GetCoreActor().ToDisplayString())
+                );
 
-                backlink = (T) backlink
-                    .AddMembers(
-                        SyntaxFactory.ParseMemberDeclaration(
-                            $"TSource IBackLink<TSource, {filler.GetCoreActor()}, {filler.Id}, {filler.GetCoreEntity()}, {filler.Model}>.Source => Source;"
-                        )!
-                    )
-                    .AddBaseListTypes(
-                        SyntaxFactory.SimpleBaseType(
-                            SyntaxFactory.ParseTypeName(
-                                coreBase is not null
-                                    ? $"{coreBase}.BackLink<TSource>"
-                                    : $"{filler.GetCoreActor()}.BackLink<TSource>"
-                            )
+            backlink = (T) backlink
+                .AddMembers(
+                    SyntaxFactory.ParseMemberDeclaration(
+                        $"TSource IBackLink<TSource, {filler.GetCoreActor()}, {filler.Id}, {filler.GetCoreEntity()}, {filler.Model}>.Source => Source;"
+                    )!
+                )
+                .AddBaseListTypes(
+                    SyntaxFactory.SimpleBaseType(
+                        SyntaxFactory.ParseTypeName(
+                            coreBase is not null
+                                ? $"{coreBase}.BackLink<TSource>"
+                                : $"{filler.GetCoreActor()}.BackLink<TSource>"
                         )
-                    );
-            }
+                    )
+                );
 
             // add actor provider if path is empty
             if (path.Length == 0)

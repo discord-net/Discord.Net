@@ -5,9 +5,10 @@ namespace Discord.Net.Hanz.Utils;
 public static class TypeUtils
 {
     public static IEnumerable<ITypeSymbol> SelfAndContaingTypes(ITypeSymbol symbol)
+        => ContaingTypes(symbol).Prepend(symbol);
+    
+    public static IEnumerable<ITypeSymbol> ContaingTypes(ITypeSymbol symbol)
     {
-        yield return symbol;
-
         var current = symbol.ContainingType;
 
         while (current is not null)

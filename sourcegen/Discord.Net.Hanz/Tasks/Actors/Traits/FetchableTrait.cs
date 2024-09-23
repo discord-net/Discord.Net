@@ -142,6 +142,8 @@ public static class FetchableTrait
         {
             modifiers = modifiers.RemoveAt(modifiers.IndexOf(SyntaxKind.NewKeyword));
         }
+        
+        logger.Log($"{target.InterfaceSymbol}: {syntax.Identifier} += {fetchableInterface} ({apiOutInterface})");
 
         syntax = syntax.AddMembers(
             MethodDeclaration(
@@ -223,6 +225,7 @@ public static class FetchableTrait
 
         if (syntax.BaseList?.Types.All(x => !x.Type.IsEquivalentTo(fetchableInterface)) ?? true)
         {
+            logger.Log($"{target.InterfaceSymbol}: {syntax.Identifier} += base {fetchableInterface} ({apiOutInterface})");
             syntax = syntax
                 .AddBaseListTypes(
                     SimpleBaseType(fetchableInterface)
@@ -299,6 +302,9 @@ public static class FetchableTrait
                 continue;
             }
 
+            logger.Log($"{target.InterfaceSymbol}: {syntax.Identifier} < {baseFetchable}");
+
+            
             syntax = syntax.AddMembers(
                 MethodDeclaration(
                     [],
@@ -310,7 +316,7 @@ public static class FetchableTrait
                         TypeArgumentList(
                             SeparatedList(new TypeSyntax[]
                             {
-                                IsFetchableOfMany(baseFetchable)
+                                fetchMethod == "FetchManyRoute"
                                     ? GenericName(
                                         Identifier("IEnumerable"),
                                         TypeArgumentList(

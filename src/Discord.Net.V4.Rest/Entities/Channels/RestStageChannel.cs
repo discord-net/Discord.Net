@@ -8,7 +8,7 @@ public sealed partial class RestStageChannelActor :
     RestVoiceChannelActor,
     IStageChannelActor,
     IRestActor<RestStageChannelActor, ulong, RestStageChannel, IGuildStageChannelModel>,
-    IRestChannelFollowerIntegrationChannelTrait
+    IRestIntegrationChannelTrait.WithChannelFollower
 {
     [SourceOfTruth] public RestStageInstanceActor StageInstance { get; }
 

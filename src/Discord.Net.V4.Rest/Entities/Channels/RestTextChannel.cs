@@ -10,8 +10,7 @@ public partial class RestTextChannelActor :
     ITextChannelActor,
     IRestActor<RestTextChannelActor, ulong, RestTextChannel, IGuildTextChannelModel>,
     IRestMessageChannelTrait,
-    IRestIncomingIntegrationChannelTrait,
-    IRestChannelFollowerIntegrationChannelTrait
+    IRestIntegrationChannelTrait.WithIncoming.WithChannelFollower
 {
     [SourceOfTruth] internal override TextChannelIdentity Identity { get; }
 

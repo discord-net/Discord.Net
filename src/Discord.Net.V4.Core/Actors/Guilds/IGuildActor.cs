@@ -61,8 +61,6 @@ public partial interface IGuildActor :
         RequestOptions? options = null,
         CancellationToken token = default)
     {   
-        Channels[123]
-        
         return Client.RestApiClient.ExecuteAsync(
             Routes.LeaveGuild(Id),
             options ?? Client.DefaultRequestOptions,

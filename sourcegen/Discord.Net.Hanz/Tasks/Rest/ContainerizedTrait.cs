@@ -89,6 +89,31 @@ public sealed class ContainerizedTrait : ISyntaxGenerationTask<ContainerizedTrai
     public void Execute(SourceProductionContext context, GenerationTarget? target, Logger logger)
     {
         if (target is null) return;
+
+        var result =
+            $$"""
+              public partial interface {{target.Symbol.Name}}
+              {
+                  internal static readonly WeakDictionary<{{target.IdType}}, {{target.Symbol}}> _cache = new();
+                  
+                  internal static {{target.Symbol}} GetContainerized({{target.TraitSelfTarget}} target)
+                  {
+                      return _cache.GetOrAdd(target.Id, (actor, _) => new Container(target), target);
+                  }
+                  
+                  {{GenerateContainerType(target, logger).Replace("\n", "\n    ")}}
+              }
+              """;
+
+        foreach (var container in TypeUtils.ContaingTypes(target.Symbol))
+        {
+            result = $$"""
+                       public partial interface {{container.Name}}
+                       {
+                          {{result.WithNewlinePadding(4)}}
+                       }
+                       """;
+        }
         
         context.AddSource(
             $"TraitContainers/{target.Symbol.ToFullMetadataName()}",
@@ -98,17 +123,7 @@ public sealed class ContainerizedTrait : ISyntaxGenerationTask<ContainerizedTrai
             
             namespace {{target.Symbol.ContainingNamespace.ToDisplayString()}};
             
-            public partial interface {{target.Symbol.Name}}
-            {
-                internal static readonly WeakDictionary<{{target.IdType}}, {{target.Symbol}}> _cache = new();
-                
-                internal static {{target.Symbol}} GetContainerized({{target.TraitSelfTarget}} target)
-                {
-                    return _cache.GetOrAdd(target.Id, (actor, _) => new Container(target), target);
-                }
-                
-                {{GenerateContainerType(target, logger).Replace("\n", "\n    ")}}
-            }
+            {{result}}
             """
         );
     }

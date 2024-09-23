@@ -222,6 +222,8 @@ public static class LoadableTrait
                 !target.SemanticModel.Compilation.HasImplicitConversion(modelType, baseModelType)
             ) continue;
 
+            logger.Log($"{target.InterfaceSymbol} base loadable {baseLoadable}");
+
             CreateOverloadToFetchAsync(
                 ref syntax,
                 SyntaxFactory.GenericName(
@@ -270,6 +272,7 @@ public static class LoadableTrait
                            ?? throw new KeyNotFoundException($"Couldn't find entity syntax for {entityType}");
 
 
+        logger.Log($"{target.InterfaceSymbol}: {entityType} += fetchable {modelType}");
         FetchableTrait.DefineFetchableRoute(
             ref entitySyntax,
             target,

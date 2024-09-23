@@ -4,13 +4,12 @@ using Discord.Models;
 
 namespace Discord;
 
-[Loadable(nameof(Routes.GetWebhook))]
+[Loadable(nameof(Routes.GetWebhook), typeof(IIncomingWebhookModel))]
 [Modifiable<ModifyWebhookProperties>(nameof(Routes.ModifyWebhook))]
 [SuppressMessage("ReSharper", "PossibleInterfaceMemberAmbiguity")]
 public partial interface IIncomingWebhookActor :
     IGuildChannelWebhookActor,
-    IActor<ulong, IIncomingWebhook>,
-    IEntityProvider<IWebhookMessage, IMessageModel>
+    IActor<ulong, IIncomingWebhook>
 {
     IIncomingWebhookWithTokenActor this[string token] { get; }
 }

@@ -10,7 +10,7 @@ public sealed partial class RestMediaChannelActor :
     RestThreadableChannelActor,
     IMediaChannelActor,
     IRestActor<RestMediaChannelActor, ulong, RestMediaChannel, IGuildMediaChannelModel>,
-    IRestIncomingIntegrationChannelTrait
+    IRestIntegrationChannelTrait.WithIncoming
 {
     [SourceOfTruth] internal override MediaChannelIdentity Identity { get; }
 

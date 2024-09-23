@@ -6,22 +6,27 @@ namespace Discord.Rest;
 [ExtendInterfaceDefaults(typeof(IWebhookMessageActor))]
 public partial class RestWebhookMessageActor :
     RestMessageActor,
-    IWebhookMessageActor
+    IWebhookMessageActor,
+    IRestActor<RestWebhookMessageActor, ulong, RestWebhookMessage, IMessageModel>
 {
     [SourceOfTruth] public RestWebhookActor Webhook { get; }
 
+    public string Token { get; }
+    
     internal override MessageIdentity Identity { get; }
 
+    [TypeFactory(LastParameter = nameof(message))]
     public RestWebhookMessageActor(
         DiscordRestClient client,
         MessageChannelIdentity channel,
-        MessageIdentity message,
         WebhookIdentity webhook,
+        WebhookMessageIdentity message,
+        string token,
         GuildIdentity? guild = null
     ) : base(client, channel, message, guild)
     {
         Identity = message | this;
-
+        Token = token;
         Webhook = webhook.Actor ?? new(client, webhook);
     }
 

@@ -5,7 +5,7 @@ using Discord.Models.Json;
 
 namespace Discord;
 
-[Loadable(nameof(Routes.GetWebhook))]
+[Loadable(nameof(Routes.GetWebhook), typeof(IChannelFollowerWebhookModel))]
 [Modifiable<ModifyWebhookProperties>(nameof(Routes.ModifyWebhook))]
 [SuppressMessage("ReSharper", "PossibleInterfaceMemberAmbiguity")]
 public partial interface IChannelFollowerWebhookActor :

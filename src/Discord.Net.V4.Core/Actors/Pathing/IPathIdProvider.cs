@@ -1,4 +1,4 @@
 namespace Discord;
 
-public interface IPathIdProvider<out T> : IIdentifiable<T>
+public interface IPathIdProvider<out T>
     where T : IEquatable<T>;

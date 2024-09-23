@@ -2,6 +2,7 @@ using Discord.Models;
 
 namespace Discord.Rest;
 
+[Containerized, Trait]
 public partial interface IRestMessageChannelTrait :
     IMessageChannelTrait,
     IRestTraitProvider<RestChannelActor>

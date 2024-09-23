@@ -7,7 +7,7 @@ namespace Discord.Rest;
 
 [ExtendInterfaceDefaults]
 public sealed partial class RestStageInstanceActor :
-    RestActor<ulong, RestStageInstance, StageInstanceIdentity>,
+    RestActor<RestStageInstanceActor, ulong, RestStageInstance, IStageInstanceModel>,
     IStageInstanceActor
 {
     [SourceOfTruth] public RestStageChannelActor Channel { get; }
@@ -25,13 +25,13 @@ public sealed partial class RestStageInstanceActor :
     {
         Identity = instance | this;
 
-        Guild = guild.Actor ?? new(client, guild);
-        Channel = channel.Actor ?? new(client, Guild.Identity, channel);
+        Guild = client.Guilds[guild];
+        Channel = Guild.Channels.Stage[channel];
     }
 
     [SourceOfTruth]
-    internal RestStageInstance CreateEntity(IStageInstanceModel model)
-        => RestStageInstance.Construct(Client, new(Guild.Identity, Channel.Identity), model);
+    internal override RestStageInstance CreateEntity(IStageInstanceModel model)
+        => RestStageInstance.Construct(Client, this, model);
 }
 
 public sealed partial class RestStageInstance :
@@ -39,11 +39,9 @@ public sealed partial class RestStageInstance :
     IStageInstance,
     IRestConstructable<RestStageInstance, RestStageInstanceActor, IStageInstanceModel>
 {
-    public readonly record struct Context(GuildIdentity Guild, StageChannelIdentity Channel);
-
     public string Topic => Model.Topic;
 
-    public StagePrivacyLevel PrivacyLevel => (StagePrivacyLevel)Model.PrivacyLevel;
+    public StagePrivacyLevel PrivacyLevel => (StagePrivacyLevel) Model.PrivacyLevel;
 
     [SourceOfTruth] public RestGuildScheduledEventActor? Event { get; private set; }
 
@@ -54,17 +52,19 @@ public sealed partial class RestStageInstance :
 
     internal RestStageInstance(
         DiscordRestClient client,
-        GuildIdentity guild,
-        StageChannelIdentity channel,
-        IStageInstanceModel model
+        IStageInstanceModel model,
+        RestStageInstanceActor actor
     ) : base(client, model.Id)
     {
-        Actor = new(client, guild, channel, StageInstanceIdentity.Of(this));
+        Actor = actor;
         Model = model;
     }
 
-    public static RestStageInstance Construct(DiscordRestClient client, Context context, IStageInstanceModel model)
-        => new(client, context.Guild, context.Channel, model);
+    public static RestStageInstance Construct(
+        DiscordRestClient client,
+        RestStageInstanceActor actor,
+        IStageInstanceModel model
+    ) => new(client, model, actor);
 
     public ValueTask UpdateAsync(IStageInstanceModel model, CancellationToken token = default)
     {

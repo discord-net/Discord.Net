@@ -44,7 +44,7 @@ file sealed class CastedIdentifiable<
 
     public override int GetHashCode()
         => EqualityComparer<TId>.Default.GetHashCode(Id);
-    
+
     Type IIdentifiable<TId, TDestinationEntity, TDestinationModel>.EntityType => typeof(TSourceEntity);
 
     Type IIdentifiable<TId, TDestinationEntity, TDestinationModel>.ModelType => typeof(TSourceModel);
@@ -106,10 +106,10 @@ file sealed class CastedIdentifiable<
             return destinationEntity;
         }
     }
-    
+
 
     public IdentityDetail Detail => source.Detail;
-    
+
     public override int GetHashCode()
         => EqualityComparer<TId>.Default.GetHashCode(Id);
 
@@ -200,7 +200,7 @@ file sealed class Identifiable<TId, TEntity, TActor, TModel> :
 
     public override int GetHashCode()
         => EqualityComparer<TId>.Default.GetHashCode(Id);
-    
+
     public static implicit operator Identifiable<TId, TEntity, TActor, TModel>(TId id) => new(id);
     public static implicit operator Identifiable<TId, TEntity, TActor, TModel>(TEntity entity) => new(entity);
 
@@ -530,6 +530,16 @@ public interface IIdentifiable<TId, out TEntity, out TActor, out TModel> :
         => model is not null ? Of(model, factory) : null;
 
     IIdentifiable<TId, TNewEntity, TNewActor, TNewModel> Cast<TNewEntity, TNewActor, TNewModel>()
+        where TNewEntity : class, IEntity<TId>, IEntityOf<TNewModel>
+        where TNewActor : class, IActor<TId, TNewEntity>
+        where TNewModel : class, IEntityModel<TId>
+        => new CastedIdentifiable<TId, TEntity, TActor, TModel, TNewModel, TNewActor, TNewEntity>(this);
+
+    internal IIdentifiable<TId, TNewEntity, TNewActor, TNewModel> Cast
+        <TNewEntity, TNewActor, TNewModel>
+        (
+            Template<IIdentifiable<TId, TNewEntity, TNewActor, TNewModel>> template
+        )
         where TNewEntity : class, IEntity<TId>, IEntityOf<TNewModel>
         where TNewActor : class, IActor<TId, TNewEntity>
         where TNewModel : class, IEntityModel<TId>

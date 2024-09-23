@@ -3,7 +3,7 @@ using Discord.Rest;
 
 namespace Discord;
 
-[FetchableOfMany(nameof(Routes.GetGuildWebhooks))]
+//[FetchableOfMany(nameof(Routes.GetGuildWebhooks))]
 public partial interface IIncomingWebhook :
     IWebhook,
     IIncomingWebhookWithTokenActor,

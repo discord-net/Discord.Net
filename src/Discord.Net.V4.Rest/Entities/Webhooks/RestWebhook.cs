@@ -30,7 +30,7 @@ public partial class RestWebhook :
     IWebhook,
     IRestConstructable<RestWebhook, RestWebhookActor, IWebhookModel>
 {
-    public WebhookType Type => (WebhookType)Model.Type;
+    public WebhookType Type => (WebhookType) Model.Type;
 
     [SourceOfTruth] public RestUserActor? Creator { get; private set; }
 
@@ -46,7 +46,7 @@ public partial class RestWebhook :
     internal virtual IWebhookModel Model => _model;
 
     private IWebhookModel _model;
-    
+
     internal RestWebhook(
         DiscordRestClient client,
         IWebhookModel model,
@@ -64,13 +64,31 @@ public partial class RestWebhook :
             case IIncomingWebhookModel incomingModel:
                 return RestIncomingWebhook.Construct(
                     client,
-                    actor as RestIncomingWebhookActor,
-                    model
+                    actor as RestIncomingWebhookActor ??
+                    IRestIntegrationChannelTrait
+                        .WithIncoming
+                        .GetContainerized(
+                            client
+                                .Guilds[incomingModel.GuildId]
+                                .Channels[incomingModel.ChannelId]
+                        )
+                        .Webhooks
+                        .Incoming[model.Id],
+                    incomingModel
                 );
             case IChannelFollowerWebhookModel followerModel:
                 return RestChannelFollowerWebhook.Construct(
                     client,
-                    actor as RestChannelFollowerWebhookActor,
+                    actor as RestChannelFollowerWebhookActor ??
+                    IRestIntegrationChannelTrait
+                        .WithChannelFollower
+                        .GetContainerized(
+                            client
+                                .Guilds[followerModel.GuildId]
+                                .Channels[followerModel.ChannelId]
+                        )
+                        .Webhooks
+                        .ChannelFollower[model.Id],
                     followerModel
                 );
             default: return new(client, model, actor);

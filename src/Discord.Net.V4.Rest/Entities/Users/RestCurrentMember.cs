@@ -30,8 +30,7 @@ public sealed partial class RestCurrentMemberActor :
         VoiceState = voiceState?.Actor ?? new(
             client,
             Guild.Identity,
-            voiceState ?? CurrentUserVoiceStateIdentity.Of(member.Id),
-            Identity
+            voiceState ?? CurrentUserVoiceStateIdentity.Of(member.Id)
         );
     }
 

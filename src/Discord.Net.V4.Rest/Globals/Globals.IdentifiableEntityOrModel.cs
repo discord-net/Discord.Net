@@ -51,14 +51,17 @@ global using StageChannelIdentity = Discord.IIdentifiable<ulong, Discord.Rest.Re
 global using CategoryChannelIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestCategoryChannel, Discord.Rest.RestCategoryChannelActor, Discord.Models.IGuildCategoryChannelModel>;
 
 global using IntegrationChannelIdentity = Discord.IIdentifiable<ulong, Discord.IIntegrationChannel, Discord.Rest.IRestIntegrationChannelTrait, Discord.Models.IGuildChannelModel>;
-global using IncomingIntegrationChannelIdentity = Discord.IIdentifiable<ulong, Discord.IIntegrationChannel, Discord.Rest.IRestIncomingIntegrationChannelTrait, Discord.Models.IGuildChannelModel>;
-global using ChannelFollowerIntegrationChannelIdentity = Discord.IIdentifiable<ulong, Discord.IIntegrationChannel, Discord.Rest.IRestChannelFollowerIntegrationChannelTrait, Discord.Models.IGuildChannelModel>;
+global using IncomingIntegrationChannelIdentity = Discord.IIdentifiable<ulong, Discord.IIntegrationChannel, Discord.Rest.IRestIntegrationChannelTrait.WithIncoming, Discord.Models.IGuildChannelModel>;
+global using ChannelFollowerIntegrationChannelIdentity = Discord.IIdentifiable<ulong, Discord.IIntegrationChannel, Discord.Rest.IRestIntegrationChannelTrait.WithChannelFollower, Discord.Models.IGuildChannelModel>;
 
 #endregion
 
 #region Messages
 
 global using MessageIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestMessage, Discord.Rest.RestMessageActor, Discord.Models.IMessageModel>;
+global using WebhookMessageIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestWebhookMessage, Discord.Rest.RestWebhookMessageActor, Discord.Models.IMessageModel>;
+
+global using ReactionIdentity = Discord.IIdentifiable<Discord.DiscordEmojiId, Discord.Rest.Reactions.RestReaction, Discord.Rest.Reactions.RestReactionActor, Discord.Models.IReactionModel>;
 
 #endregion
 

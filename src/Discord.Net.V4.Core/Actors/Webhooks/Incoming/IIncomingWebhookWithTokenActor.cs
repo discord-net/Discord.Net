@@ -5,7 +5,7 @@ using Discord.Rest;
 namespace Discord;
 
 [
-    Loadable(nameof(Routes.GetWebhookWithToken)),
+    Loadable(nameof(Routes.GetWebhookWithToken), typeof(IIncomingWebhookModel)),
     Modifiable<ModifyWebhookWithTokenProperties>(nameof(Routes.ModifyWebhookWithToken)),
     Deletable(nameof(Routes.DeleteWebhookWithToken))
 ]
@@ -13,7 +13,7 @@ public partial interface IIncomingWebhookWithTokenActor :
     IIncomingWebhookActor,
     ITokenPathProvider
 {
-    [SourceOfTruth] new ulong Id { get; }
+    //[SourceOfTruth] new ulong Id { get; }
 
     IWebhookMessageActor.Indexable Messages { get; }
 
@@ -38,4 +38,6 @@ public partial interface IIncomingWebhookWithTokenActor :
             ? null
             : (Messages as IEntityProvider<IWebhookMessage, IMessageModel>).CreateEntity(model);
     }
+
+    IIncomingWebhookWithTokenActor IIncomingWebhookActor.this[string _] => this;
 }
