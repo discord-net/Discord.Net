@@ -12,8 +12,8 @@ public partial class RestWebhookMessageActor :
     [SourceOfTruth] public RestWebhookActor Webhook { get; }
 
     public string Token { get; }
-    
-    internal override MessageIdentity Identity { get; }
+
+    [SourceOfTruth] internal override WebhookMessageIdentity Identity { get; }
 
     [TypeFactory(LastParameter = nameof(message))]
     public RestWebhookMessageActor(
@@ -34,7 +34,7 @@ public partial class RestWebhookMessageActor :
     internal override RestWebhookMessage CreateEntity(IMessageModel model)
         => RestWebhookMessage.Construct(
             Client,
-            new(GuildIdentity, Channel.Identity, Webhook.Identity),
+            this,
             model
         );
 }
@@ -42,14 +42,10 @@ public partial class RestWebhookMessageActor :
 public sealed partial class RestWebhookMessage :
     RestMessage,
     IWebhookMessage,
-    IConstructable<RestWebhookMessage, IMessageModel, DiscordRestClient>,
     IRestConstructable<RestWebhookMessage, RestWebhookMessageActor, IMessageModel>
 {
-    public new readonly record struct Context(
-        GuildIdentity? Guild = null,
-        MessageChannelIdentity? Channel = null,
-        WebhookIdentity? Webhook = null
-    );
+    [SourceOfTruth]
+    public override RestWebhookActor Webhook => Actor.Webhook;
 
     [ProxyInterface(typeof(IWebhookMessageActor))]
     internal override RestWebhookMessageActor Actor { get; }
@@ -57,24 +53,15 @@ public sealed partial class RestWebhookMessage :
     internal RestWebhookMessage(
         DiscordRestClient client,
         IMessageModel model,
-        RestWebhookMessageActor? actor = null,
-        GuildIdentity? guild = null,
-        MessageChannelIdentity? channel = null,
-        WebhookIdentity? webhook = null
-    ) : base(client, model, actor, guild, channel)
+        RestWebhookMessageActor actor
+    ) : base(client, model, actor)
     {
-        Actor = actor ?? new(
-            client,
-            channel ?? MessageChannelIdentity.Of(model.ChannelId),
-            MessageIdentity.Of(this),
-            webhook ?? WebhookIdentity.Of(model.WebhookId ?? model.AuthorId),
-            guild
-        );
+        Actor = actor;
     }
 
-    public static RestWebhookMessage Construct(DiscordRestClient client, Context context, IMessageModel model)
-        => new(client, model, guild: context.Guild, channel: context.Channel, webhook: context.Webhook);
-
-    public new static RestWebhookMessage Construct(DiscordRestClient client, IMessageModel model)
-        => new(client, model);
+    public static RestWebhookMessage Construct(
+        DiscordRestClient client,
+        RestWebhookMessageActor actor,
+        IMessageModel model
+    ) => new(client, model, actor);
 }

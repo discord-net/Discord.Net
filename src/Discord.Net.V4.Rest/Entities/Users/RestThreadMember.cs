@@ -48,9 +48,7 @@ public sealed partial class RestGuildThreadMemberActor :
 
     [SourceOfTruth] public new RestGuildThreadChannelActor Thread { get; }
 
-    [SourceOfTruth] internal override GuildThreadMemberIdentity Identity => _identity;
-
-    private GuildThreadMemberIdentity _identity;
+    [SourceOfTruth] internal override GuildThreadMemberIdentity Identity { get; }
     
     [TypeFactory(LastParameter = nameof(threadMember))]
     public RestGuildThreadMemberActor(
@@ -61,17 +59,11 @@ public sealed partial class RestGuildThreadMemberActor :
         MemberIdentity? member = null
     ) : base(client, ThreadIdentity.Of(thread.Id), threadMember)
     {
-        _identity = threadMember | this;
+        Identity = threadMember | this;
 
         Guild = client.Guilds[guild];
         Thread = Guild.Threads[thread];
         Member = Guild.Members[member | threadMember];
-    }
-
-    internal void UpdateIdentity(IThreadMemberModel model)
-    {
-        if(_identity.Detail < IdentityDetail.EntityFactory)
-            _identity = GuildThreadMemberIdentity.Of(model, CreateEntity);
     }
 }
 

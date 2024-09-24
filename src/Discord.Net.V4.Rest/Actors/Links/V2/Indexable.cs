@@ -9,10 +9,13 @@ public partial class RestLinkTypeV2<TActor, TId, TEntity, TModel>
         RestLinkV2<TActor, TId, TEntity, TModel>(client, actorProvider),
         ILinkType<TActor, TId, TEntity, TModel>.Indexable
     {
-        public TActor this[TId id] => Specifically(id);
-        public TActor Specifically(TId id) => GetActor(id);
+        public virtual TActor this[TId id] => Specifically(id);
+        public virtual TActor Specifically(TId id) => GetActor(id);
 
-        internal TActor this[IIdentifiable<TId, TEntity, TActor, TModel> identity]
+        internal virtual TActor this[IIdentifiable<TId, TEntity, TActor, TModel> identity]
+            => Specifically(identity);
+        
+        internal virtual TActor Specifically(IIdentifiable<TId, TEntity, TActor, TModel> identity)
             => identity.Actor ?? this[identity.Id];
     }
 }

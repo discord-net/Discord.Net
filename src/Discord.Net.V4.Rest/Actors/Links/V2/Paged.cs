@@ -11,9 +11,9 @@ public partial class RestLinkTypeV2<TActor, TId, TEntity, TModel>
     ) :
         RestLinkV2<TActor, TId, TEntity, TModel>(client, actorProvider),
         ILinkType<TActor, TId, TEntity, TModel>.Paged<TParams>
-        where TParams : class, IPagingParams<TParams, IEnumerable<TModel>>
+        where TParams : class, IPagingParams
     {
-        public IAsyncPaged<TEntity> PagedAsync(TParams? args = default, RequestOptions? options = null)
+        public virtual IAsyncPaged<TEntity> PagedAsync(TParams? args = default, RequestOptions? options = null)
             => pagingProvider.CreatePagedAsync(args, options);
     }
     
@@ -29,7 +29,7 @@ public partial class RestLinkTypeV2<TActor, TId, TEntity, TModel>
         where TPagedModel : IEntityModel<TId>
         
     {
-        public IAsyncPaged<TPaged> PagedAsync(TParams? args = default, RequestOptions? options = null)
+        public virtual IAsyncPaged<TPaged> PagedAsync(TParams? args = default, RequestOptions? options = null)
             => pagingProvider.CreatePagedAsync(args, options);
     }
 

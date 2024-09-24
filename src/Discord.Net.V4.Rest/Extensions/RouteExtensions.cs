@@ -5,22 +5,36 @@ namespace Discord.Rest;
 
 internal static class RouteExtensions
 {
-    public static IPagingProvider<TParams, TEntity, TModel> AsPagingProvider
-        <TParams, TEntity, TModel>
+    public static EnumerableProviderDelegate<TEntity> ToEntityEnumerableProvider
+        <TActor, TId, TEntity, TModel>
         (
-            this IApiOutRoute<IEnumerable<TModel>> route,
-            DiscordRestClient client
+            this ApiModelProviderDelegate<IEnumerable<TModel>> provider,
+            Template<IIdentifiable<TId, TEntity, TActor, TModel>> template,
+            IActorProvider<TActor, TId> actorProvider
         )
-        where TModel : class, IModel
-        where TEntity : class, IEntityOf<TModel>
-        where TParams : class, IPagingParams<TParams, IEnumerable<TModel>>
-    {
-        return new RestPagingProvider<TModel, IEnumerable<TModel>, TParams, TEntity>(
-            client,
-            m => m,
-            
-        );
-    }
+        where TActor : class, IActor<TId, TEntity>, IEntityProvider<TEntity, TModel>
+        where TId : IEquatable<TId>
+        where TEntity : class, IEntity<TId, TModel>
+        where TModel : class, IEntityModel<TId>
+        => async (client, options, token) =>
+        {
+            var api = await provider(client, options, token);
+            return api.Select(x => actorProvider.GetActor(x.Id).CreateEntity(x))
+                .ToList()
+                .AsReadOnly();
+        };
+
+    public static EnumerableProviderDelegate<TEntity> ToEntityEnumerableProvider
+        <TEntity, TApi>
+        (
+            this ApiModelProviderDelegate<TApi> provider,
+            Func<TApi, IEnumerable<TEntity>> mapper
+        )
+        => async (client, options, token) =>
+        {
+            var api = await provider(client, options, token);
+            return mapper(api).ToList().AsReadOnly();
+        };
 
     public static ApiModelProviderDelegate<TModel> AsRequiredProvider<TModel>(this IApiOutRoute<TModel> route)
         where TModel : class

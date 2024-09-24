@@ -26,7 +26,7 @@ public partial class RestInviteActor :
 }
 
 public partial class RestInvite :
-    RestEntity<string>,
+    RestEntity<string, IInviteModel>,
     IInvite,
     IRestConstructable<RestInvite, RestInviteActor, IInviteModel>
 {

@@ -7,96 +7,54 @@ namespace Discord.Rest;
 
 public sealed partial class RestMessageInteractionMetadata(
     DiscordRestClient client,
-    MessageChannelIdentity channel,
-    IMessageInteractionMetadataModel model,
-    GuildIdentity? guild = null
+    RestMessage message,
+    IMessageInteractionMetadataModel model
 ) :
-    RestEntity<ulong>(client, model.Id),
-    IMessageInteractionMetadata,
-    IContextConstructable<RestMessageInteractionMetadata, IMessageInteractionMetadataModel,
-        RestMessageInteractionMetadata.Context, DiscordRestClient>
+    RestEntity<ulong, IMessageInteractionMetadataModel>(client, model.Id),
+    IMessageInteractionMetadata
 {
-    public readonly record struct Context(
-        MessageChannelIdentity Channel,
-        GuildIdentity? Guild = null
-    );
+    public InteractionType Type => (InteractionType) Model.Type;
 
-    public InteractionType Type => (InteractionType)Model.Type;
+    [SourceOfTruth] public RestUserActor User => Client.Users[Model.UserId];
 
-    [SourceOfTruth]
-    public RestUserActor User { get; }
-        = new(
-            client,
-            UserIdentity.FromReferenced<RestUser, DiscordRestClient>(
-                model,
-                model.UserId,
-                client
-            )
-        );
-
-    public IReadOnlyDictionary<ApplicationIntegrationType, ulong> AuthorizingIntegrationOwners { get; private set; }
-        = model.AuthorizingIntegrationOwners
-            .ToImmutableDictionary(x => (ApplicationIntegrationType)x.Key, x => x.Value);
-
-    [SourceOfTruth]
-    public RestMessageActor? OriginalResponseMessage { get; private set; }
-        = model.OriginalResponseMessageId.Map(
-            static (id, client, channel, guild)
-                => new RestMessageActor(client, channel, MessageIdentity.Of(id), guild),
-            client,
-            channel,
-            guild
+    public IReadOnlyDictionary<ApplicationIntegrationType, ulong> AuthorizingIntegrationOwners
+        => Computed(nameof(AuthorizingIntegrationOwners), model =>
+            model.AuthorizingIntegrationOwners.ToImmutableDictionary(
+                x => (ApplicationIntegrationType) x.Key,
+                x => x.Value)
         );
 
     [SourceOfTruth]
-    public RestMessageActor? InteractedMessage { get; private set; }
-        = model.InteractedMessageId.Map(
-            static (id, client, channel, guild)
-                => new RestMessageActor(client, channel, MessageIdentity.Of(id), guild),
-            client,
-            channel,
-            guild
+    public RestMessageActor? OriginalResponseMessage
+        => Computed(nameof(OriginalResponseMessage), model => 
+            model.OriginalResponseMessageId.HasValue
+                ? message.Channel.Messages[model.OriginalResponseMessageId.Value]
+                : null
         );
 
     [SourceOfTruth]
-    public RestMessageInteractionMetadata? TriggeringInteractionMetadata { get; }
-        = model.TriggeringInteractionMetadata is not null
-            ? Construct(client, new Context(channel, guild), model.TriggeringInteractionMetadata)
-            : null;
+    public RestMessageActor? InteractedMessage
+        => Computed(nameof(InteractedMessage), model => 
+            model.InteractedMessageId.HasValue
+                ? message.Channel.Messages[model.InteractedMessageId.Value]
+                : null
+        );
 
-    internal IMessageInteractionMetadataModel Model { get; set; } = model;
+    [SourceOfTruth]
+    public RestMessageInteractionMetadata? TriggeringInteractionMetadata
+        => Computed(nameof(TriggeringInteractionMetadata), model => 
+            model.TriggeringInteractionMetadata is not null
+                ? new RestMessageInteractionMetadata(Client, message, model.TriggeringInteractionMetadata)
+                : null
+        );
 
-    public static RestMessageInteractionMetadata Construct(
-        DiscordRestClient client,
-        Context context,
-        IMessageInteractionMetadataModel model
-    ) => new(client, context.Channel, model, context.Guild);
+    internal override IMessageInteractionMetadataModel Model => _model;
+
+    private IMessageInteractionMetadataModel _model = model;
 
     public ValueTask UpdateAsync(IMessageInteractionMetadataModel model, CancellationToken token = default)
     {
-        if (!DictEquality<int, ulong>.Instance.Equals(Model.AuthorizingIntegrationOwners,
-                model.AuthorizingIntegrationOwners))
-            AuthorizingIntegrationOwners = Model.AuthorizingIntegrationOwners
-                .ToImmutableDictionary(
-                    x => (ApplicationIntegrationType)x.Key,
-                    x => x.Value
-                );
-
-        OriginalResponseMessage = OriginalResponseMessage.UpdateFrom(
-            model.OriginalResponseMessageId,
-            RestMessageActor.Factory,
-            Client,
-            channel,
-            guild
-        );
-
-        InteractedMessage = InteractedMessage.UpdateFrom(
-            model.InteractedMessageId,
-            RestMessageActor.Factory,
-            Client,
-            channel,
-            guild
-        );
+        _model = model;
 
         return ValueTask.CompletedTask;
     }

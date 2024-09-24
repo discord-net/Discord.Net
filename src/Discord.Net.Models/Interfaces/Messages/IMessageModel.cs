@@ -15,10 +15,10 @@ public partial interface IMessageModel : IEntityModel<ulong>
     bool MentionsEveryone { get; }
     ulong[] MentionedUsers { get; }
     ulong[] MentionedRoles { get; }
-    ulong[] MentionedChannels { get; }
+    IEnumerable<IMentionedChannelModel> MentionedChannels { get; }
     IEnumerable<IAttachmentModel> Attachments { get; }
     IEnumerable<IEmbedModel> Embeds { get; }
-    IEnumerable<IReactionModel> Reactions { get; }
+    IEnumerable<DiscordEmojiId> Reactions { get; }
     bool IsPinned { get; }
     bool IsWebhook { get; }
     int Type { get; }
@@ -41,6 +41,8 @@ public partial interface IMessageModel : IEntityModel<ulong>
     int? Position { get; }
 
     IMessageRoleSubscriptionData? RoleSubscriptionData { get; }
+    
+    IPollModel? Poll { get; }
 }
 
 public interface IMessageRoleSubscriptionData

@@ -1,4 +1,7 @@
 namespace Discord;
 
-public interface IPathIdProvider<out T>
-    where T : IEquatable<T>;
+public interface IPathIdProvider<out TId>
+    where TId : IEquatable<TId>
+{
+    TId Id { get; }
+}

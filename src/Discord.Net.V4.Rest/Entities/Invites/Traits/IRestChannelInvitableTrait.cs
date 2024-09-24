@@ -7,15 +7,23 @@ public partial interface IRestChannelInvitableTrait :
     [SourceOfTruth]
     new RestChannelInviteActor.Enumerable.Indexable Invites => GetOrCreateTraitData(
         nameof(Invites),
-        channel => new RestChannelInviteActor.Enumerable.Indexable(
-            channel.Client,
-            RestActorProvider.GetOrCreate(
+        channel =>
+        {
+            var provider = RestActorProvider.GetOrCreate(
                 channel.Client,
                 Template.Of<ChannelInviteIdentity>(),
                 channel.Identity
-            ),
-            Routes.GetChannelInvites(channel.Id)
-                .AsRequiredProvider()
-        )
-    );
+            );
+
+            return new RestChannelInviteActor.Enumerable.Indexable(
+                channel.Client,
+                provider,
+                Routes.GetChannelInvites(channel.Id)
+                    .AsRequiredProvider()
+                    .ToEntityEnumerableProvider(
+                        Template.Of<ChannelInviteIdentity>(),
+                        provider
+                    )
+            );
+        });
 }

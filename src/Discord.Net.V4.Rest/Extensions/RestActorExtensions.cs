@@ -1,5 +1,4 @@
 using Discord.Models;
-using Discord.Rest.Actors;
 using Discord.Rest;
 using System.Diagnostics.CodeAnalysis;
 

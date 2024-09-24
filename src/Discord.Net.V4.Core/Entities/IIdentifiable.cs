@@ -16,9 +16,9 @@ file sealed class CastedIdentifiable<
     IIdentifiable<TId, TDestinationEntity, TDestinationModel>
     where TId : IEquatable<TId>
     where TSourceEntity : class, IEntity<TId>, IEntityOf<TSourceModel>
-    where TSourceModel : class, IEntityModel<TId>
+    where TSourceModel : class, IModel
     where TDestinationEntity : class, IEntity<TId>, IEntityOf<TDestinationModel>
-    where TDestinationModel : class, IEntityModel<TId>
+    where TDestinationModel : class, IModel
 {
     public TId Id => source.Id;
 
@@ -64,10 +64,10 @@ file sealed class CastedIdentifiable<
     where TId : IEquatable<TId>
     where TSourceEntity : class, IEntity<TId>, IEntityOf<TSourceModel>
     where TSourceActor : class, IActor<TId, TSourceEntity>
-    where TSourceModel : class, IEntityModel<TId>
+    where TSourceModel : class, IModel
     where TDestinationEntity : class, IEntity<TId>, IEntityOf<TDestinationModel>
     where TDestinationActor : class, IActor<TId, TDestinationEntity>
-    where TDestinationModel : class, IEntityModel<TId>
+    where TDestinationModel : class, IModel
 {
     public TId Id => source.Id;
 
@@ -126,7 +126,7 @@ file sealed class Identifiable<TId, TEntity, TActor, TModel> :
     IIdentifiable<TId, TEntity, TActor, TModel>
     where TId : IEquatable<TId>
     where TEntity : class, IEntity<TId>, IEntityOf<TModel>
-    where TModel : class, IEntityModel<TId>
+    where TModel : class, IModel
     where TActor : class, IActor<TId, TEntity>
 {
     public TId Id { get; }
@@ -179,11 +179,11 @@ file sealed class Identifiable<TId, TEntity, TActor, TModel> :
         Id = id;
     }
 
-    public Identifiable(TModel model, Func<TModel, TEntity> factory)
+    public Identifiable(TId id, TModel model, Func<TModel, TEntity> factory)
     {
         _model = model;
         _entityFactory = factory;
-        Id = model.Id;
+        Id = id;
     }
 
     public Identifiable(TEntity entity)
@@ -213,7 +213,7 @@ file sealed class Identifiable<TId, TEntity, TModel> :
     IIdentifiable<TId, TEntity, TModel>
     where TId : IEquatable<TId>
     where TEntity : class, IEntity<TId>, IEntityOf<TModel>
-    where TModel : class, IEntityModel<TId>
+    where TModel : class, IModel
 {
     public TId Id { get; }
 
@@ -254,11 +254,11 @@ file sealed class Identifiable<TId, TEntity, TModel> :
         Id = id;
     }
 
-    public Identifiable(TModel model, Func<TModel, TEntity> factory)
+    public Identifiable(TId id, TModel model, Func<TModel, TEntity> factory)
     {
         _model = model;
         _entityFactory = factory;
-        Id = model.Id;
+        Id = id;
     }
 
     public Identifiable(TEntity entity)
@@ -311,7 +311,7 @@ public interface IIdentifiable<TId, out TEntity, out TModel> :
     IIdentifiable<TId>
     where TId : IEquatable<TId>
     where TEntity : class, IEntity<TId>, IEntityOf<TModel>
-    where TModel : class, IEntityModel<TId>
+    where TModel : class, IModel
 {
     Type EntityType { get; }
     Type ModelType { get; }
@@ -327,88 +327,16 @@ public interface IIdentifiable<TId, out TEntity, out TModel> :
         IIdentifiable<TId, TEntity, TModel> left,
         TEntity right
     ) => left.MostSpecific(right);
-
-    // static IIdentifiable<TId, TEntity, TModel> FromReferenced<TConstruct, TClient>(
-    //     IModel model,
-    //     TId id,
-    //     TClient client)
-    //     where TConstruct : class, IConstructable<TConstruct, TModel, TClient>
-    //     where TClient : IDiscordClient
-    //     => model is IModelSource source
-    //         ? FromReferenced<TConstruct, TClient>(source, id, client)
-    //         : Of(id);
-    //
-    // static IIdentifiable<TId, TEntity, TModel> FromReferenced<TConstruct, TClient>(
-    //     IModelSource model,
-    //     TId id,
-    //     TClient client)
-    //     where TConstruct : class, IConstructable<TConstruct, TModel, TClient>
-    //     where TClient : IDiscordClient
-    //     => FromReferenced(
-    //         model,
-    //         id,
-    //         model => TConstruct.Construct(client, model) as TEntity ?? throw new InvalidOperationException(
-    //             $"{typeof(TConstruct)} is not constructable for {typeof(TEntity)}"
-    //         )
-    //     );
-    //
-    // static IIdentifiable<TId, TEntity, TModel> FromReferenced<TConstruct>(
-    //     IModel model,
-    //     TId id,
-    //     IDiscordClient client)
-    //     where TConstruct : class, IConstructable<TConstruct, TModel>
-    //     => model is IModelSource source
-    //         ? FromReferenced<TConstruct>(source, id, client)
-    //         : Of(id);
-    //
-    // static IIdentifiable<TId, TEntity, TModel> FromReferenced<TConstruct>(
-    //     IModelSource model,
-    //     TId id,
-    //     IDiscordClient client)
-    //     where TConstruct : class, IConstructable<TConstruct, TModel>
-    //     => FromReferenced(
-    //         model,
-    //         id,
-    //         model => TConstruct.Construct(client, model) as TEntity ?? throw new InvalidOperationException(
-    //             $"{typeof(TConstruct)} is not constructable for {typeof(TEntity)}"
-    //         )
-    //     );
-    //
-    // static IIdentifiable<TId, TEntity, TModel> FromReferenced(
-    //     IModel model,
-    //     TId id,
-    //     Func<TModel, TEntity> factory)
-    //     => model is IModelSource source
-    //         ? FromReferenced(source, id, factory)
-    //         : Of(id);
-    //
-    // static IIdentifiable<TId, TEntity, TModel> FromReferenced(
-    //     IModelSource model,
-    //     TId id,
-    //     Func<TModel, TEntity> factory)
-    // {
-    //     var referenced = model.GetReferencedEntityModel<TId, TModel>(id);
-    //
-    //     return referenced is null
-    //         ? Of(id)
-    //         : Of(referenced, factory);
-    // }
-
+    
     static IIdentifiable<TId, TEntity, TModel> Of(TId id)
         => new Identifiable<TId, TEntity, TModel>(id);
 
     static IIdentifiable<TId, TEntity, TModel> Of(TEntity entity)
         => new Identifiable<TId, TEntity, TModel>(entity);
 
-    static IIdentifiable<TId, TEntity, TModel> Of(TModel model, Func<TModel, TEntity> factory)
-        => new Identifiable<TId, TEntity, TModel>(model, factory);
-
-    static IIdentifiable<TId, TEntity, TModel>? OfNullable(TModel? model, Func<TModel, TEntity> factory)
-        => model is not null ? Of(model, factory) : null;
-
     IIdentifiable<TId, TNewEntity, TNewModel> Cast<TNewEntity, TNewModel>()
         where TNewEntity : class, IEntity<TId>, IEntityOf<TNewModel>
-        where TNewModel : class, IEntityModel<TId>
+        where TNewModel : class, IModel
         => new CastedIdentifiable<TId, TEntity, TModel, TNewModel, TNewEntity>(this);
 }
 
@@ -416,7 +344,7 @@ public interface IIdentifiable<TId, out TEntity, out TActor, out TModel> :
     IIdentifiable<TId, TEntity, TModel>
     where TId : IEquatable<TId>
     where TEntity : class, IEntity<TId>, IEntityOf<TModel>
-    where TModel : class, IEntityModel<TId>
+    where TModel : class, IModel
     where TActor : class, IActor<TId, TEntity>
 {
     TActor? Actor { get; }
@@ -446,74 +374,6 @@ public interface IIdentifiable<TId, out TEntity, out TActor, out TModel> :
         TActor right
     ) => left?.MostSpecific(right) ?? Of(right);
 
-    // new static IIdentifiable<TId, TEntity, TActor, TModel> FromReferenced<TConstruct, TClient>(
-    //     IModel model,
-    //     TId id,
-    //     TClient client
-    // )
-    //     where TConstruct : class, IConstructable<TConstruct, TModel, TClient>
-    //     where TClient : IDiscordClient
-    //     => model is IModelSource source
-    //         ? FromReferenced<TConstruct, TClient>(source, id, client)
-    //         : Of(id);
-    //
-    // new static IIdentifiable<TId, TEntity, TActor, TModel> FromReferenced<TConstruct, TClient>(
-    //     IModelSource model,
-    //     TId id,
-    //     TClient client
-    // )
-    //     where TConstruct : class, IConstructable<TConstruct, TModel, TClient>
-    //     where TClient : IDiscordClient
-    //     => FromReferenced(
-    //         model,
-    //         id,
-    //         model => TConstruct.Construct(client, model) as TEntity ?? throw new InvalidOperationException(
-    //             $"{typeof(TConstruct)} is not constructable for {typeof(TEntity)}"
-    //         )
-    //     );
-    //
-    // new static IIdentifiable<TId, TEntity, TActor, TModel> FromReferenced<TConstruct>(
-    //     IModel model,
-    //     TId id,
-    //     IDiscordClient client)
-    //     where TConstruct : class, IConstructable<TConstruct, TModel>
-    //     => model is IModelSource source
-    //         ? FromReferenced<TConstruct>(source, id, client)
-    //         : Of(id);
-    //
-    // new static IIdentifiable<TId, TEntity, TActor, TModel> FromReferenced<TConstruct>(
-    //     IModelSource model,
-    //     TId id,
-    //     IDiscordClient client)
-    //     where TConstruct : class, IConstructable<TConstruct, TModel>
-    //     => FromReferenced(
-    //         model,
-    //         id,
-    //         model => TConstruct.Construct(client, model) as TEntity ?? throw new InvalidOperationException(
-    //             $"{typeof(TConstruct)} is not constructable for {typeof(TEntity)}"
-    //         )
-    //     );
-    //
-    // new static IIdentifiable<TId, TEntity, TActor, TModel> FromReferenced(
-    //     IModel model,
-    //     TId id,
-    //     Func<TModel, TEntity> factory)
-    //     => model is IModelSource source
-    //         ? FromReferenced(source, id, factory)
-    //         : Of(id);
-    //
-    // new static IIdentifiable<TId, TEntity, TActor, TModel> FromReferenced(
-    //     IModelSource model,
-    //     TId id,
-    //     Func<TModel, TEntity> factory)
-    // {
-    //     var referenced = model.GetReferencedEntityModel<TId, TModel>(id);
-    //
-    //     return referenced is null
-    //         ? Of(id)
-    //         : Of(referenced, factory);
-    // }
-
     new static IIdentifiable<TId, TEntity, TActor, TModel> Of(TId id)
         => new Identifiable<TId, TEntity, TActor, TModel>(id);
 
@@ -522,12 +382,6 @@ public interface IIdentifiable<TId, out TEntity, out TActor, out TModel> :
 
     static IIdentifiable<TId, TEntity, TActor, TModel> Of(TActor actor)
         => new Identifiable<TId, TEntity, TActor, TModel>(actor);
-
-    new static IIdentifiable<TId, TEntity, TActor, TModel> Of(TModel model, Func<TModel, TEntity> factory)
-        => new Identifiable<TId, TEntity, TActor, TModel>(model, factory);
-
-    new static IIdentifiable<TId, TEntity, TActor, TModel>? OfNullable(TModel? model, Func<TModel, TEntity> factory)
-        => model is not null ? Of(model, factory) : null;
 
     IIdentifiable<TId, TNewEntity, TNewActor, TNewModel> Cast<TNewEntity, TNewActor, TNewModel>()
         where TNewEntity : class, IEntity<TId>, IEntityOf<TNewModel>
@@ -558,7 +412,7 @@ public static class IIdentifiableExtensions
     )
         where TId : IEquatable<TId>
         where TEntity : class, IEntity<TId>, IEntityOf<TModel>
-        where TModel : class, IEntityModel<TId>
+        where TModel : class, IModel
         where TActor : class, IActor<TId, TEntity>
     {
         if (self.Detail < other.Detail)
@@ -572,7 +426,7 @@ public static class IIdentifiableExtensions
     )
         where TId : IEquatable<TId>
         where TEntity : class, IEntity<TId>, IEntityOf<TModel>
-        where TModel : class, IEntityModel<TId>
+        where TModel : class, IModel
         where TActor : class, IActor<TId, TEntity>
     {
         if (self.Detail < other.Detail)
@@ -586,7 +440,7 @@ public static class IIdentifiableExtensions
     )
         where TId : IEquatable<TId>
         where TEntity : class, IEntity<TId>, IEntityOf<TModel>
-        where TModel : class, IEntityModel<TId>
+        where TModel : class, IModel
         where TActor : class, IActor<TId, TEntity>
     {
         if (self.Detail < IdentityDetail.Actor)
@@ -600,7 +454,7 @@ public static class IIdentifiableExtensions
     )
         where TId : IEquatable<TId>
         where TEntity : class, IEntity<TId>, IEntityOf<TModel>
-        where TModel : class, IEntityModel<TId>
+        where TModel : class, IModel
         where TActor : class, IActor<TId, TEntity>
     {
         if (self.Detail < IdentityDetail.Entity)
@@ -614,7 +468,7 @@ public static class IIdentifiableExtensions
     )
         where TId : IEquatable<TId>
         where TEntity : class, IEntity<TId>, IEntityOf<TModel>
-        where TModel : class, IEntityModel<TId>
+        where TModel : class, IModel
     {
         if (self.Detail < other.Detail)
             return other;
@@ -627,7 +481,7 @@ public static class IIdentifiableExtensions
     )
         where TId : IEquatable<TId>
         where TEntity : class, IEntity<TId>, IEntityOf<TModel>
-        where TModel : class, IEntityModel<TId>
+        where TModel : class, IModel
     {
         if (self.Detail < IdentityDetail.Entity)
             return IIdentifiable<TId, TEntity, TModel>.Of(other);
@@ -640,7 +494,7 @@ public static class IIdentifiableExtensions
     )
         where TId : IEquatable<TId>
         where TEntity : class, IEntity<TId>, IEntityOf<TModel>
-        where TModel : class, IEntityModel<TId>
+        where TModel : class, IModel
         where TActor : class, IActor<TId, TEntity>
     {
         if (self.Detail < IdentityDetail.Entity)
@@ -654,7 +508,7 @@ public static class IIdentifiableExtensions
     )
         where TId : IEquatable<TId>
         where TEntity : class, IEntity<TId>, IEntityOf<TModel>
-        where TModel : class, IEntityModel<TId>
+        where TModel : class, IModel
     {
         if (self.Detail < IdentityDetail.Entity)
             return IIdentifiable<TId, TEntity, TModel>.Of(other);

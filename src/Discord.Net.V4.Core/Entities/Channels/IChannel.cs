@@ -8,5 +8,5 @@ public partial interface IChannel :
     ISnowflakeEntity<IChannelModel>,
     IChannelActor
 {
-    ChannelType Type { get; }
+    [TypeHeuristic] ChannelType Type { get; }
 }

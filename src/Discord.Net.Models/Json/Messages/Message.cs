@@ -107,6 +107,8 @@ public sealed class Message :
     [JsonPropertyName("poll")]
     public Optional<Poll> Poll { get; set; }
 
+    IPollModel? IMessageModel.Poll => ~Poll;
+
     IMessageRoleSubscriptionData? IMessageModel.RoleSubscriptionData => ~RoleSubscriptionData;
     IMessageApplicationModel? IMessageModel.Application => ~Application;
 
@@ -123,13 +125,13 @@ public sealed class Message :
 
     ulong[] IMessageModel.MentionedRoles => RoleMentions;
 
-    ulong[] IMessageModel.MentionedChannels => ChannelMentions.Map(v => v.Select(x => x.Id).ToArray()) | [];
+    IEnumerable<IMentionedChannelModel> IMessageModel.MentionedChannels => ChannelMentions | [];
 
     IEnumerable<IAttachmentModel> IMessageModel.Attachments => Attachments | [];
 
     IEnumerable<IEmbedModel> IMessageModel.Embeds => Embeds;
 
-    IEnumerable<IReactionModel> IMessageModel.Reactions => Reactions | [];
+    IEnumerable<DiscordEmojiId> IMessageModel.Reactions => Reactions.Map(v => v.Select(x => x.Emoji)) | [];
     bool IMessageModel.IsWebhook => WebhookId.IsSpecified;
 
     int IMessageModel.Flags => ~Flags;

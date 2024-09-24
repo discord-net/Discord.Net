@@ -6,7 +6,7 @@ namespace Discord.Rest;
 public class RestPartialGuild(DiscordRestClient client, IPartialGuildModel model) :
     RestEntity<ulong>(client, model.Id),
     IPartialGuild,
-    IConstructable<RestPartialGuild, IPartialGuildModel, DiscordRestClient>
+    IModelConstructable<RestPartialGuild, IPartialGuildModel, DiscordRestClient>
 {
     public string Name => Model.Name;
 
@@ -35,7 +35,7 @@ public class RestPartialGuild(DiscordRestClient client, IPartialGuildModel model
     {
         return model switch
         {
-            IGuildModel guild => RestGuild.Construct(client, guild),
+            IGuildModel guild => RestGuild.Construct(client, client.Guilds[model.Id], guild),
             _ => new RestPartialGuild(client, model)
         };
     }

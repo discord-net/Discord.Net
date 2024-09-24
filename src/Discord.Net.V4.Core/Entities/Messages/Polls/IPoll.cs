@@ -3,8 +3,7 @@ using Discord.Models;
 namespace Discord;
 
 public partial interface IPoll :
-    ISnowflakeEntity,
-    IEntityOf<IPollModel>,
+    IEntity<ulong, IPollModel>,
     IPollActor
 {
     PollMedia Question { get; }

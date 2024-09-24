@@ -172,9 +172,168 @@ public sealed class LinksV2 :
         }
     }
 
+    private static void OverrideBaseLinkMembers(
+        ref TypeDeclarationSyntax syntax,
+        GenerationTarget target,
+        GenerationTarget baseTarget,
+        Logger logger)
+    {
+        // override provider
+        if (
+            syntax.ParameterList is not null &&
+            syntax.ParameterList.Parameters.Any(v => v.Type?.ToString() == "IActorProvider<TActor, TId>"))
+        {
+            var providerParameter = syntax.ParameterList.Parameters.FirstOrDefault(v =>
+                v.Type?.ToString() == "IActorProvider<TActor, TId>"
+            );
+
+            if (providerParameter is not null)
+            {
+                syntax = syntax.AddMembers(
+                    SyntaxFactory.ParseMemberDeclaration(
+                        $"internal override IActorProvider<TActor, TId> Provider {{ get; }} = {providerParameter.Identifier};"
+                    )!
+                );
+            }
+        }
+        else
+        {
+            syntax = syntax.AddMembers(
+                SyntaxFactory.ParseMemberDeclaration(
+                    "internal override IActorProvider<TActor, TId> Provider { get; }"
+                )!
+            );
+
+            syntax = syntax.ReplaceNodes(
+                syntax.DescendantNodes().OfType<ConstructorDeclarationSyntax>(),
+                (old, node) =>
+                {
+                    var providerParameter = node.ParameterList.Parameters.FirstOrDefault(v =>
+                        v.Type?.ToString() == "IActorProvider<TActor, TId>"
+                    );
+
+                    if (providerParameter is null) return node;
+
+                    var body = (node.Body ?? SyntaxFactory.Block())
+                        .AddStatements(
+                            SyntaxFactory.ExpressionStatement(
+                                SyntaxFactory.ParseExpression(
+                                    $"Provider = {providerParameter.Identifier}"
+                                )
+                            )
+                        );
+
+                    return node.WithBody(body);
+                }
+            );
+        }
+
+        // get actor
+        syntax = syntax.AddMembers(
+            SyntaxFactory.ParseMemberDeclaration(
+                """
+                public override TActor GetActor(TId id)
+                    => Provider.GetActor(id);
+                """
+            )!,
+            SyntaxFactory.ParseMemberDeclaration(
+                $$"""
+                  public override {{target.Entity}} CreateEntity({{baseTarget.Model}} model)
+                  {
+                      if(model is not {{target.Model}} ourModel)
+                          throw new InvalidOperationException($"Expected a model of type '{{target.Model}}', but got {model.GetType()}");
+                  
+                      return {{target.Entity}}.Construct(Client, GetActor(model.Id), ourModel);
+                  }
+                  """
+            )!
+        );
+
+        switch (syntax.Identifier.ValueText)
+        {
+            case "Indexable":
+                syntax = syntax.AddMembers(
+                    SyntaxFactory.ParseMemberDeclaration(
+                        "public override TActor this[TId id] => Specifically(id);"
+                    )!,
+                    SyntaxFactory.ParseMemberDeclaration(
+                        "public override TActor Specifically(TId id) => GetActor(id);"
+                    )!,
+                    SyntaxFactory.ParseMemberDeclaration(
+                        """
+                        internal override TActor this[IIdentifiable<TId, TEntity, TActor, TModel> identity]
+                            => Specifically(identity);
+                        """
+                    )!,
+                    SyntaxFactory.ParseMemberDeclaration(
+                        """
+                        internal override TActor Specifically(IIdentifiable<TId, TEntity, TActor, TModel> identity)
+                            => identity.Actor ?? this[identity.Id];
+                        """
+                    )!
+                );
+                break;
+            case "Enumerable":
+                syntax = syntax
+                    .AddMembers(
+                        SyntaxFactory.ParseMemberDeclaration(
+                            $"internal override EnumerableProviderDelegate<TEntity> EnumerableProvider {{ get; }}{(
+                                syntax.ParameterList?.Parameters
+                                        .FirstOrDefault(x => x.Type?.ToString() == "EnumerableProviderDelegate<TEntity>")
+                                    is { } providerParameter
+                                    ? $" = {providerParameter.Identifier};"
+                                    : string.Empty
+                            )}"
+                        )!,
+                        SyntaxFactory.ParseMemberDeclaration(
+                            """
+                            public override ITask<IReadOnlyCollection<TEntity>> AllAsync(
+                                RequestOptions? options = null,
+                                CancellationToken token = default
+                            ) => EnumerableProvider(Client, options, token);  
+                            """
+                        )!
+                    )
+                    .ReplaceNodes(
+                        syntax.DescendantNodes().OfType<ConstructorDeclarationSyntax>(),
+                        (old, node) =>
+                        {
+                            var providerParameter = node.ParameterList.Parameters.FirstOrDefault(v =>
+                                v.Type?.ToString() == "EnumerableProviderDelegate<TEntity>"
+                            );
+
+                            if (providerParameter is null) return node;
+
+                            var body = (node.Body ?? SyntaxFactory.Block())
+                                .AddStatements(
+                                    SyntaxFactory.ExpressionStatement(
+                                        SyntaxFactory.ParseExpression(
+                                            $"EnumerableProvider = {providerParameter.Identifier}"
+                                        )
+                                    )
+                                );
+
+                            return node.WithBody(body);
+                        }
+                    );
+                break;
+            case "Paged":
+                syntax = syntax.AddMembers(
+                    SyntaxFactory.ParseMemberDeclaration(
+                        """
+                        public override IAsyncPaged<TEntity> PagedAsync(TParams? args = default, RequestOptions? options = null)
+                            => pagingProvider.CreatePagedAsync(args, options);
+                        """
+                    )!
+                );
+                break;
+        }
+    }
+
     private static TypeDeclarationSyntax ProvideBaseListsAndImplementations(
         TypeDeclarationSyntax syntax,
         GenerationTarget target,
+        GenerationTarget? baseTarget,
         INamedTypeSymbol linkTypeForTarget,
         Logger logger)
     {
@@ -297,13 +456,17 @@ public sealed class LinksV2 :
                     coreLinkType = corePartType;
                 }
 
+                var baseLinkType = baseTarget?.Actor is not null
+                    ? $"{baseTarget.Actor}.{string.Join(".", path.Select(ToReferenceName))}"
+                    : linkType.ToDisplayString();
+
                 var baseList = SyntaxFactory.BaseList(
                     SyntaxFactory.SeparatedList((BaseTypeSyntax[])
                     [
                         classSyntax.ParameterList is not null
                             ? SyntaxFactory.PrimaryConstructorBaseType(
                                 SyntaxFactory.ParseTypeName(
-                                    linkType.ToDisplayString()
+                                    baseLinkType
                                 ),
                                 SyntaxFactory.ArgumentList(
                                     SyntaxFactory.SeparatedList(
@@ -316,7 +479,7 @@ public sealed class LinksV2 :
                             )
                             : SyntaxFactory.SimpleBaseType(
                                 SyntaxFactory.ParseTypeName(
-                                    linkType.ToDisplayString()
+                                    baseLinkType
                                 )
                             ),
                         SyntaxFactory.SimpleBaseType(
@@ -356,7 +519,7 @@ public sealed class LinksV2 :
                     .OfType<ConstructorDeclarationSyntax>()
                     .ToArray();
 
-                return syntax
+                syntax = syntax
                     .RemoveNodes(ctors, SyntaxRemoveOptions.KeepNoTrivia)!
                     .WithBaseList(
                         baseList
@@ -365,13 +528,13 @@ public sealed class LinksV2 :
                         SyntaxFactory.ParseMemberDeclaration(
                             $"""
                              {coreActor} IActorProvider<{coreActor}, ulong>.GetActor(ulong id) 
-                             => (this as IActorProvider<{coreActor}, ulong>).GetActor(client, id);
+                             => {(baseTarget is null ? $"(this as IActorProvider<{coreActor}, ulong>)." : string.Empty)}GetActor(id);
                              """
                         )!,
                         SyntaxFactory.ParseMemberDeclaration(
                             $"""
                              {coreEntity} IEntityProvider<{coreEntity}, {target.Model}>.CreateEntity({target.Model} model)
-                             => (this as IEntityProvider<{coreEntity}, {target.Model}>).CreateEntity(model);
+                             => {(baseTarget is null ? $"(this as IEntityProvider<{coreEntity}, {target.Model}>)." : string.Empty)}CreateEntity(model);
                              """
                         )!,
                         ..coreMembersToImplement
@@ -415,6 +578,11 @@ public sealed class LinksV2 :
                             )
                         )
                     ]);
+
+                if (baseTarget is not null)
+                    OverrideBaseLinkMembers(ref syntax, target, baseTarget, logger);
+
+                return syntax;
             default: return syntax;
         }
     }
@@ -482,6 +650,14 @@ public sealed class LinksV2 :
                     continue;
                 }
 
+                var baseTarget = target.Actor.BaseType is not null
+                    ? targets.FirstOrDefault(x =>
+                        x is not null &&
+                        x.Actor.Equals(target.Actor.BaseType, SymbolEqualityComparer.Default)
+                    )
+                    : null;
+
+
                 var linkTypes = linkTypeSyntax
                     .Members
                     .OfType<TypeDeclarationSyntax>()
@@ -489,7 +665,7 @@ public sealed class LinksV2 :
                     .Select(x => ProvideDefaultImplementation(x, target, targetLogger))
                     .Select(x =>
                     {
-                        x = ProvideBaseListsAndImplementations(x, target, linkTypeForTarget, targetLogger);
+                        x = ProvideBaseListsAndImplementations(x, target, baseTarget, linkTypeForTarget, targetLogger);
 
                         if (target.Assembly is not AssemblyTarget.Core)
                         {
@@ -499,6 +675,7 @@ public sealed class LinksV2 :
                                     ProvideBaseListsAndImplementations(
                                         node,
                                         target,
+                                        baseTarget,
                                         linkTypeForTarget,
                                         targetLogger
                                     )
@@ -612,7 +789,6 @@ public sealed class LinksV2 :
                                 )
                             );
 
-
                         pageLinkType = pageLinkType
                             .ReplaceNodes(
                                 pageLinkType
@@ -622,12 +798,16 @@ public sealed class LinksV2 :
                                 {
                                     return node.Identifier.ValueText switch
                                     {
-                                        "TParams" => SyntaxFactory.IdentifierName(
-                                            attribute.AttributeClass!.TypeArguments[0]
-                                                .ToDisplayString()),
-                                        "TPaged" => SyntaxFactory.IdentifierName(attribute.AttributeClass!
-                                            .TypeArguments[1]
-                                            .ToDisplayString()),
+                                        "TParams" when attribute.AttributeClass!.TypeArguments.Length >= 1
+                                            => SyntaxFactory.IdentifierName(attribute.AttributeClass!
+                                                .TypeArguments[0]
+                                                .ToDisplayString()
+                                            ),
+                                        "TPaged" when attribute.AttributeClass!.TypeArguments.Length >= 2
+                                            => SyntaxFactory.IdentifierName(attribute.AttributeClass!
+                                                .TypeArguments[1]
+                                                .ToDisplayString()
+                                            ),
                                         _ => node
                                     };
                                 }
@@ -752,7 +932,7 @@ public sealed class LinksV2 :
                     )!
                     .WithParameterList(null);
 
-                ApplyHierarchicalRoot(ref syntax, target, targets, targetLogger);
+                LinkHierarcicalRoots.ApplyHierarchicalRoot(ref syntax, target, targets, targetLogger, context);
                 LinkExtensions.Process(ref syntax, target, targets, targetLogger);
 
                 results[target] = syntax;
@@ -769,77 +949,6 @@ public sealed class LinksV2 :
                 var syntax = result.Value;
 
                 var targetLogger = logger.WithSemanticContext(target.SemanticModel);
-
-                // TODO: we need to overload stuff to prevent ambiguous references.
-                if (target.Assembly is AssemblyTarget.Core && false)
-                {
-                    var directParents = targets
-                        .Where(x =>
-                            x is not null &&
-                            target.Actor.Interfaces.Contains(x.Actor)
-                        )
-                        .ToArray();
-
-                    if (directParents.Length > 0)
-                    {
-                        syntax = syntax
-                            .ReplaceNodes(
-                                syntax.DescendantNodes()
-                                    .OfType<TypeDeclarationSyntax>(),
-                                (old, node) =>
-                                {
-                                    var path = old.AncestorsAndSelf()
-                                        .OfType<TypeDeclarationSyntax>()
-                                        .TakeWhile(x => x.Identifier.ValueText != syntax.Identifier.ValueText)
-                                        .Reverse()
-                                        .Select(ToReferenceName)
-                                        .ToArray();
-
-                                    foreach (var parent in directParents)
-                                    {
-                                        if (parent is null) continue;
-
-                                        if (!results.TryGetValue(parent, out var parentSyntax))
-                                            continue;
-
-                                        var i = 0;
-                                        var parentNode = parentSyntax;
-                                        for (; i != path.Length; i++)
-                                        {
-                                            parentNode = parentNode
-                                                .Members
-                                                .OfType<TypeDeclarationSyntax>()
-                                                .FirstOrDefault(x => ToReferenceName(x) == path[i]);
-
-                                            if (parentNode is null) break;
-                                        }
-
-                                        if (i != path.Length) continue;
-
-                                        var pathStr = string.Join(".", path);
-
-                                        var baseName = $"{parent.Actor}.{pathStr}";
-
-                                        if (node.BaseList?.Types.Any(x => x.ToString() == baseName) ?? false)
-                                            continue;
-
-                                        node = (TypeDeclarationSyntax) node
-                                            .AddBaseListTypes(
-                                                SyntaxFactory.SimpleBaseType(
-                                                    SyntaxFactory.ParseTypeName(
-                                                        baseName
-                                                    )
-                                                )
-                                            );
-
-                                        targetLogger.Log($"{target.Actor} --> {pathStr} += {parent.Actor}");
-                                    }
-
-                                    return node;
-                                }
-                            );
-                    }
-                }
 
                 var ancestors = results
                     .Where(x =>
@@ -936,7 +1045,7 @@ public sealed class LinksV2 :
         }
     }
 
-    private static string ToReferenceName<T>(T syntax)
+    public static string ToReferenceName<T>(T syntax)
         where T : TypeDeclarationSyntax
     {
         return $"{syntax.Identifier}{
@@ -1016,400 +1125,6 @@ public sealed class LinksV2 :
                 syntax.Members.RemoveAt(i).Insert(i, child)
             );
         }
-    }
-
-    private static void ApplyHierarchicalRoot<T>(
-        ref T syntax,
-        GenerationTarget target,
-        ImmutableArray<GenerationTarget?> targets,
-        Logger logger
-    )
-        where T : TypeDeclarationSyntax
-    {
-        var hierarchyAttribute =
-            target.GetCoreActor()
-            .GetAttributes()
-            .FirstOrDefault(x => x.AttributeClass?.Name == "LinkHierarchicalRootAttribute");
-
-        if (hierarchyAttribute is null) return;
-
-        var types = hierarchyAttribute.NamedArguments
-            .FirstOrDefault(x => x.Key == "Types")
-            .Value;
-
-        if (types.Kind is TypedConstantKind.Array)
-        {
-            foreach (var t in types.Values)
-            {
-                logger.Log($"- {t.Kind} : {t.Value?.GetType()}");
-            }
-        }
-
-        var children = types.Kind is not TypedConstantKind.Error
-            ? (
-                types.Kind switch
-                {
-                    TypedConstantKind.Array => types.Values.Select(x => (INamedTypeSymbol) x.Value!),
-                    _ => (INamedTypeSymbol[]) types.Value!
-                }
-            )
-            .Select(x => targets
-                .FirstOrDefault(y =>
-                    y is not null
-                    &&
-                    y.GetCoreActor().Equals(x, SymbolEqualityComparer.Default)
-                )
-            )
-            .OfType<GenerationTarget>()
-            .ToArray()
-            : targets
-                .Where(x => x is not null && Hierarchy.Implements(x.GetCoreActor(), target.GetCoreActor()))
-                .OfType<GenerationTarget>()
-                .ToArray();
-
-        logger.Log($"{target.Actor}: {children.Length} hierarchical link targets");
-
-        if (children.Length == 0) return;
-
-        foreach (var child in children)
-        {
-            logger.Log($" - {child.Actor}");
-        }
-        
-        if (target.Assembly is AssemblyTarget.Core)
-        {
-            syntax = (T) syntax.AddMembers(
-                SyntaxFactory.ParseMemberDeclaration(
-                    $$"""
-                      public interface Hierarchy
-                      {
-                          {{
-                              string.Join(
-                                  Environment.NewLine,
-                                  children
-                                      .Select(x =>
-                                      {
-                                          var name = string.Join(
-                                              string.Empty,
-                                              ToNameParts(GetFriendlyName(x.Actor))
-                                                  .Except(ToNameParts(GetFriendlyName(target.Actor)))
-                                          );
-
-                                          return SyntaxFactory.ParseMemberDeclaration(
-                                              $"Discord.ILink<{x.Actor}, {x.Id}, {x.Entity}, {x.Model}> {name} {{ get; }}"
-                                          )!;
-                                      })
-                              )
-                          }}
-                      }  
-                      """
-                )!
-            );
-        }
-
-        syntax = syntax
-            .ReplaceNodes(
-                syntax.DescendantNodes().OfType<T>(),
-                (old, node) =>
-                {
-                    if (node.Identifier.ValueText == "Hierarchy")
-                        return node;
-
-                    if (node.Identifier.ValueText is "BackLink") return node;
-
-                    var anscestors = old.AncestorsAndSelf()
-                        .OfType<T>()
-                        .ToList();
-
-                    var path = string.Join(
-                        ".",
-                        anscestors
-                            .TakeWhile(x => x.Identifier.ValueText != target.Actor.Name)
-                            .Select(x =>
-                                $"{x.Identifier}{
-                                    (x.TypeParameterList?.Parameters.Count > 0
-                                        ? $"{x.TypeParameterList.WithParameters(
-                                            SyntaxFactory.SeparatedList(
-                                                x.TypeParameterList.Parameters
-                                                    .Select(x => x
-                                                        .WithVarianceKeyword(default)
-                                                    )
-                                            )
-                                        )}"
-                                        : string.Empty)
-                                }"
-                            )
-                            .Reverse()
-                    );
-
-                    logger.Log($"{target.Actor} += {children.Length} children to {path}");
-                    foreach (var ancestor in anscestors)
-                    {
-                        logger.Log($" - {ancestor.Identifier}");
-                    }
-
-                    var props = children.Select(x =>
-                    {
-                        var name = string.Join(
-                            string.Empty,
-                            ToNameParts(GetFriendlyName(x.Actor))
-                                .Except(ToNameParts(GetFriendlyName(target.Actor)))
-                        );
-
-                        var result = new StringBuilder()
-                            .AppendLine(
-                                old is ClassDeclarationSyntax
-                                    ? $"public virtual {x.Actor}.{path} {name} {{ get; }}"
-                                    : $"new {x.Actor}.{path} {name} {{ get; }}"
-                            );
-
-                        if (target.Assembly is not AssemblyTarget.Core && anscestors.Count >= 1)
-                        {
-                            result.AppendLine(
-                                $"{x.GetCoreActor()}.{path} {target.GetCoreActor()}.{path}.Hierarchy.{name} => {name};"
-                            );
-                        }
-                        else
-                        {
-                            result.AppendLine(
-                                $"Discord.ILink<{x.Actor}, {x.Id}, {x.Entity}, {x.Model}> {(target.Assembly is AssemblyTarget.Core ? target.Actor : target.GetCoreActor())}.Hierarchy.{name} => {name};"
-                            );
-                        }
-
-                        return result.ToString();
-                    });
-
-                    var hierarchy = (T) SyntaxFactory.ParseMemberDeclaration(
-                        $$"""
-                          public {{(old is ClassDeclarationSyntax ? "class" : "interface")}} Hierarchy : {{path}}
-                          {
-                              {{
-                                  string.Join(
-                                      Environment.NewLine,
-                                      props
-                                  )
-                              }}
-                          }
-                          """
-                    )!;
-
-                    hierarchy = (T) hierarchy
-                        .AddBaseListTypes(
-                            SyntaxFactory.SimpleBaseType(
-                                SyntaxFactory.ParseTypeName(
-                                    target.Assembly is AssemblyTarget.Core
-                                        ? $"{target.Actor}.Hierarchy"
-                                        : $"{target.GetCoreActor()}.{path}.Hierarchy"
-                                )
-                            )
-                        );
-
-                    var ctors = old.Members
-                        .OfType<ConstructorDeclarationSyntax>()
-                        .Select(x => x.ParameterList)
-                        .Prepend(old.ParameterList)
-                        .ToArray();
-
-                    if (old is ClassDeclarationSyntax)
-                    {
-                        foreach
-                        (
-                            var ctor
-                            in ctors
-                        )
-                        {
-                            if (ctor is null) continue;
-
-                            hierarchy = (T) hierarchy.AddMembers(
-                                SyntaxFactory.ParseMemberDeclaration(
-                                    $$"""
-                                      public Hierarchy{{ctor
-                                          .AddParameters(children
-                                              .Select(x => {
-                                                  var name = string.Join(
-                                                      string.Empty,
-                                                      ToNameParts(GetFriendlyName(x.Actor))
-                                                          .Except(ToNameParts(GetFriendlyName(target.Actor)))
-                                                  );
-
-                                                  name = $"{char.ToLower(name[0])}{name.Substring(1)}";
-
-                                                  return SyntaxFactory.Parameter(
-                                                      [],
-                                                      [],
-                                                      SyntaxFactory.ParseTypeName(
-                                                          $"{x.Actor}.{path}"
-                                                      ),
-                                                      SyntaxFactory.Identifier(name),
-                                                      null
-                                                  );
-                                              })
-                                              .ToArray()
-                                          )
-                                          .NormalizeWhitespace()
-                                      }} : base({{string.Join(", ", ctor.Parameters.Select(x => x.Identifier))}})
-                                      {
-                                         {{
-                                             string.Join(
-                                                 Environment.NewLine,
-                                                 children.Select(x => {
-                                                     var name = string.Join(
-                                                         string.Empty,
-                                                         ToNameParts(GetFriendlyName(x.Actor))
-                                                             .Except(ToNameParts(GetFriendlyName(target.Actor)))
-                                                     );
-
-                                                     return $"{name} = {char.ToLower(name[0])}{name.Substring(1)};";
-                                                 })
-                                             )
-                                         }}
-                                      }
-                                      """
-                                )!
-                            );
-                        }
-                    }
-
-                    AddBackLink(ref hierarchy, target, logger, false, false, transformer: backlink =>
-                    {
-                        backlink = (T) backlink
-                            .WithOpenBraceToken(SyntaxFactory.Token(SyntaxKind.OpenBraceToken))
-                            .WithCloseBraceToken(SyntaxFactory.Token(SyntaxKind.CloseBraceToken))
-                            .WithSemicolonToken(default)
-                            .AddMembers(
-                                children.SelectMany(x =>
-                                {
-                                    var name = string.Join(
-                                        string.Empty,
-                                        ToNameParts(GetFriendlyName(x.Actor))
-                                            .Except(ToNameParts(GetFriendlyName(target.Actor)))
-                                    );
-
-                                    if (target.Assembly is AssemblyTarget.Core)
-                                    {
-                                        return (MemberDeclarationSyntax[])
-                                        [
-                                            SyntaxFactory.ParseMemberDeclaration(
-                                                $"new {x.Actor}.{path}.BackLink<TSource> {name} {{ get; }}"
-                                            )!,
-                                            SyntaxFactory.ParseMemberDeclaration(
-                                                $"{x.Actor}.{path} {target.Actor}.{path}.Hierarchy.{name} => {name};"
-                                            )!
-                                        ];
-                                    }
-
-                                    return (MemberDeclarationSyntax[])
-                                    [
-                                        SyntaxFactory.ParseMemberDeclaration(
-                                            $"public override {x.Actor}.{path}.BackLink<TSource> {name} {{ get; }}"
-                                        )!,
-                                        SyntaxFactory.ParseMemberDeclaration(
-                                            $"{x.GetCoreActor()}.{path}.BackLink<TSource> {target.GetCoreActor()}.{path}.Hierarchy.BackLink<TSource>.{name} => {name};"
-                                        )!
-                                    ];
-                                }).ToArray()
-                            );
-
-                        if (target.Assembly is AssemblyTarget.Core) return backlink;
-
-                        backlink = backlink
-                            .RemoveNodes(
-                                backlink.Members.OfType<ConstructorDeclarationSyntax>(),
-                                SyntaxRemoveOptions.KeepNoTrivia
-                            )!;
-
-                        foreach (var ctor in ctors)
-                        {
-                            if (ctor is null) continue;
-
-                            backlink = (T) backlink
-                                .AddMembers(
-                                    SyntaxFactory.ParseMemberDeclaration(
-                                        $$"""
-                                          public BackLink{{ctor
-                                              .WithParameters(
-                                                  SyntaxFactory.SeparatedList([
-                                                      SyntaxFactory.Parameter(
-                                                          [],
-                                                          [],
-                                                          SyntaxFactory.ParseTypeName("TSource"),
-                                                          SyntaxFactory.Identifier("source"),
-                                                          null
-                                                      ),
-                                                      ..ctor.Parameters,
-                                                      ..children
-                                                          .Select(x => {
-                                                              var name = string.Join(
-                                                                  string.Empty,
-                                                                  ToNameParts(GetFriendlyName(x.Actor))
-                                                                      .Except(ToNameParts(GetFriendlyName(target.Actor)))
-                                                              );
-
-                                                              name = $"{char.ToLower(name[0])}{name.Substring(1)}";
-
-                                                              return SyntaxFactory.Parameter(
-                                                                  [],
-                                                                  [],
-                                                                  SyntaxFactory.ParseTypeName(
-                                                                      $"{x.Actor}.{path}.BackLink<TSource>"
-                                                                  ),
-                                                                  SyntaxFactory.Identifier(name),
-                                                                  null
-                                                              );
-                                                          })
-                                                  ])
-                                              )
-                                              .NormalizeWhitespace()
-                                          }} : base({{
-                                              string.Join(
-                                                  ", ",
-                                                  ctor.Parameters
-                                                      .Select(x => x.Identifier.ValueText)
-                                                      .Concat(children.Select(x => {
-                                                          var name = string.Join(
-                                                              string.Empty,
-                                                              ToNameParts(GetFriendlyName(x.Actor))
-                                                                  .Except(ToNameParts(GetFriendlyName(target.Actor)))
-                                                          );
-
-                                                          return $"{char.ToLower(name[0])}{name.Substring(1)}";
-                                                      }))
-                                              )
-                                          }})
-                                          {
-                                              Source = source;
-                                             {{
-                                                 string.Join(
-                                                     Environment.NewLine,
-                                                     children.Select(x => {
-                                                         var name = string.Join(
-                                                             string.Empty,
-                                                             ToNameParts(GetFriendlyName(x.Actor))
-                                                                 .Except(ToNameParts(GetFriendlyName(target.Actor)))
-                                                         );
-
-                                                         return $"{name} = {char.ToLower(name[0])}{name.Substring(1)};";
-                                                     })
-                                                 )
-                                             }}
-                                          }
-                                          """
-                                    )!
-                                );
-                        }
-
-                        return backlink;
-                    });
-
-                    return node
-                        .WithOpenBraceToken(SyntaxFactory.Token(SyntaxKind.OpenBraceToken))
-                        .WithCloseBraceToken(SyntaxFactory.Token(SyntaxKind.CloseBraceToken))
-                        .WithSemicolonToken(default)
-                        .AddMembers(
-                            hierarchy
-                        );
-                }
-            );
     }
 
     public static void AddBackLink<T>(
@@ -1640,7 +1355,7 @@ public sealed class LinksV2 :
         }
     }
 
-    private static string[] ToNameParts(string str)
+    public static string[] ToNameParts(string str)
     {
         var sb = new StringBuilder();
 

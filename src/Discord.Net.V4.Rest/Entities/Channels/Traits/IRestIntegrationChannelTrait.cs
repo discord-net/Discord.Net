@@ -94,6 +94,8 @@ public partial interface IRestIntegrationChannelTrait :
             IGuildChannelWebhookActor.Enumerable.Indexable IIntegrationChannelTrait.Webhooks => Webhooks;
             IGuildChannelWebhookActor.Enumerable.Indexable.WithIncoming.WithChannelFollower 
                 IIntegrationChannelTrait.WithIncoming.WithChannelFollower.Webhooks => Webhooks;
+            IGuildChannelWebhookActor.Enumerable.Indexable.WithIncoming 
+                IIntegrationChannelTrait.WithIncoming.Webhooks => Webhooks;
         }
     }
 

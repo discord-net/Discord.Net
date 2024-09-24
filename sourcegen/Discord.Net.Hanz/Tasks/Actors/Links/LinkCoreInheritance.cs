@@ -87,14 +87,6 @@ public class LinkCoreInheritance
 
         logger.Log($"{parsedSymbol}: {directAncestors.Length} ancestors");
 
-        // var reimplementedMembers = new Dictionary<
-        //     INamedTypeSymbol,
-        //     Dictionary<
-        //         INamedTypeSymbol,
-        //         HashSet<ISymbol>
-        //     >
-        // >(SymbolEqualityComparer.Default);
-
         var allTypeMembers = GetFullTypeMembersList(parsedSymbol)
             .ToImmutableHashSet<INamedTypeSymbol>(SymbolEqualityComparer.Default);
 
@@ -318,6 +310,7 @@ public class LinkCoreInheritance
                                 memberSyntax,
                                 ourOverload,
                                 theirOverload
+                                //FormatOverload(memberSyntax, member, conflictingType, anscestorPart)!
                             );
 
                         // if (!reimplementedMembers.TryGetValue(type, out var impls))
@@ -368,8 +361,11 @@ public class LinkCoreInheritance
     private static MemberDeclarationSyntax? FormatOverload(
         MemberDeclarationSyntax templateSyntax,
         ISymbol member,
-        ITypeSymbol type)
+        ITypeSymbol type,
+        ITypeSymbol? interfaceSelector = null)
     {
+        interfaceSelector ??= member.ContainingType;
+        
         switch (templateSyntax)
         {
             case MethodDeclarationSyntax methodSyntax:
@@ -379,7 +375,7 @@ public class LinkCoreInheritance
                     .WithExplicitInterfaceSpecifier(
                         SyntaxFactory.ExplicitInterfaceSpecifier(
                             SyntaxFactory.IdentifierName(
-                                member.ContainingType.ToDisplayString()
+                                interfaceSelector.ToDisplayString()
                             )
                         )
                     )
@@ -411,7 +407,7 @@ public class LinkCoreInheritance
                     .WithExplicitInterfaceSpecifier(
                         SyntaxFactory.ExplicitInterfaceSpecifier(
                             SyntaxFactory.IdentifierName(
-                                member.ContainingType.ToDisplayString()
+                                interfaceSelector.ToDisplayString()
                             )
                         )
                     )
@@ -429,7 +425,7 @@ public class LinkCoreInheritance
                     .WithExplicitInterfaceSpecifier(
                         SyntaxFactory.ExplicitInterfaceSpecifier(
                             SyntaxFactory.IdentifierName(
-                                member.ContainingType.ToDisplayString()
+                                interfaceSelector.ToDisplayString()
                             )
                         )
                     )

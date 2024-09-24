@@ -10,6 +10,8 @@ public partial interface IMessage :
     ISnowflakeEntity<IMessageModel>,
     IMessageActor
 {
+    new IPoll? Poll { get; }
+    
     [SourceOfTruth]
     new IReactionActor.Defined.Indexable.BackLink<IMessageActor> Reactions { get; }
     
@@ -126,11 +128,11 @@ public partial interface IMessage :
     /// </returns>
     IReadOnlyCollection<Embed> Embeds { get; }
 
-    IChannelActor.Defined MentionedChannels { get; }
+    IReadOnlyDictionary<ulong, IMentionedChannel> MentionedChannels { get; }
 
-    IRoleActor.Defined MentionedRoles { get; }
+    IReadOnlyCollection<ulong> MentionedRoles { get; }
 
-    IUserActor.Defined MentionedUsers { get; }
+    IReadOnlyDictionary<ulong, IUserActor> MentionedUsers { get; }
 
     /// <summary>
     ///     Gets the activity associated with a message.
@@ -147,13 +149,7 @@ public partial interface IMessage :
     /// <summary>
     ///     Gets the application associated with a message.
     /// </summary>
-    /// <remarks>
-    ///     Sent with Rich-Presence-related chat embeds.
-    /// </remarks>
-    /// <returns>
-    ///     A message's application, if any is associated.
-    /// </returns>
-    MessageApplication? Application { get; }
+    IApplicationActor? Application { get; }
 
     /// <summary>
     ///     Gets the reference to the original message if it is a crosspost, channel follow add, pin, or reply message.

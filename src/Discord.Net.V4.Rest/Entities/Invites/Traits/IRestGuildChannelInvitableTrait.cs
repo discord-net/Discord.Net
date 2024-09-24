@@ -7,17 +7,26 @@ public partial interface IRestGuildChannelInvitableTrait :
     [SourceOfTruth]
     new RestGuildChannelInviteActor.Enumerable.Indexable.BackLink<RestGuildChannelActor> Invites
         => GetOrCreateTraitData(nameof(Invites), channel =>
-            new RestGuildChannelInviteActor.Enumerable.Indexable.BackLink<RestGuildChannelActor>(
-                channel,
-                channel.Client,
-                RestActorProvider.GetOrCreate(
+            {
+                var provider = RestActorProvider.GetOrCreate(
                     channel.Client,
                     Template.Of<GuildChannelInviteIdentity>(),
                     channel.Guild.Identity,
                     channel.Identity
-                ),
-                IGuildChannelInvite.FetchManyRoute(channel)
-                    .AsRequiredProvider()
-            )
+                );
+
+                return new RestGuildChannelInviteActor.Enumerable.Indexable.BackLink<RestGuildChannelActor>(
+                    channel,
+                    channel.Client,
+                    provider,
+                    IGuildChannelInvite
+                        .FetchManyRoute(channel)
+                        .AsRequiredProvider()
+                        .ToEntityEnumerableProvider(
+                            Template.Of<GuildChannelInviteIdentity>(),
+                            provider
+                        )
+                );
+            }
         );
 }

@@ -42,7 +42,7 @@ internal static class RestActorProvider
         IActor<TId, TEntity>,
         IFactory<TActor, DiscordRestClient, IIdentifiable<TId, TEntity, TActor, TModel>>
     {
-        return (RestActorProvider<TId, TActor>)_rootProviders.GetOrAdd(
+        return (RestActorProvider<TId, TActor>) _rootProviders.GetOrAdd(
             typeof(TActor),
             (client, _) => new RestActorProvider<TId, TActor>(
                 client,
@@ -69,7 +69,7 @@ internal static class RestActorProvider
             HashCode.Combine(state),
             (client, id) => TActor.Factory(client, state, IIdentifiable<TId, TEntity, TActor, TModel>.Of(id))
         );
-    
+
     internal static RestActorProvider<TId, TActor> GetOrCreate<TActor, TId, TEntity, TModel, T1, T2>(
         DiscordRestClient client,
         Template<IIdentifiable<TId, TEntity, TActor, TModel>> template,
@@ -88,7 +88,7 @@ internal static class RestActorProvider
             HashCode.Combine(state1, state2),
             (client, id) => TActor.Factory(client, state1, state2, IIdentifiable<TId, TEntity, TActor, TModel>.Of(id))
         );
-    
+
     internal static RestActorProvider<TId, TActor> GetOrCreate<TActor, TId, TEntity, TModel, T1, T2, T3>(
         DiscordRestClient client,
         Template<IIdentifiable<TId, TEntity, TActor, TModel>> template,
@@ -106,13 +106,14 @@ internal static class RestActorProvider
         => CreateStateful<TActor, TId, TEntity, TModel>(
             client,
             HashCode.Combine(state1, state2, state3),
-            (client, id) => TActor.Factory(client, state1, state2, state3, IIdentifiable<TId, TEntity, TActor, TModel>.Of(id))
+            (client, id) => TActor.Factory(client, state1, state2, state3,
+                IIdentifiable<TId, TEntity, TActor, TModel>.Of(id))
         );
 
     private static RestActorProvider<TId, TActor> CreateStateful<TActor, TId, TEntity, TModel>(
         DiscordRestClient client,
         int key,
-        Func<DiscordRestClient,TId,TActor> factory
+        Func<DiscordRestClient, TId, TActor> factory
     )
         where TId : IEquatable<TId>
         where TEntity : class, IEntity<TId>, IEntityOf<TModel>
@@ -121,7 +122,7 @@ internal static class RestActorProvider
         class,
         IActor<TId, TEntity>
     {
-        return (RestActorProvider<TId, TActor>)_stateProviders.GetOrAdd(
+        return (RestActorProvider<TId, TActor>) _stateProviders.GetOrAdd(
             key,
             (client, _) => new RestActorProvider<TId, TActor>(
                 client,

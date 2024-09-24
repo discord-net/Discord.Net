@@ -4,11 +4,9 @@ namespace Discord;
 
 public partial interface IInteractionWithTokenActor :
     IAbstractionActor<string>,
-    ITokenPathProvider,
-    IPathIdProvider<ulong>
+    ITokenPathProvider
 {
     IInteractionMessageActor.Indexable Responses { get; }
 
-    ulong IIdentifiable<ulong>.Id => Client.Applications.Current.Id;
     string IIdentifiable<string>.Id => Token;
 }

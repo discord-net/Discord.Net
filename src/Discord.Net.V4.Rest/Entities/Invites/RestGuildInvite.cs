@@ -6,7 +6,7 @@ namespace Discord.Rest;
 public partial class RestGuildInviteActor :
     RestInviteActor,
     IGuildInviteActor,
-    IRestActor<string, RestGuildInvite, GuildInviteIdentity, IInviteModel>
+    IRestActor<RestGuildInviteActor, string, RestGuildInvite, IInviteModel>
 {
     [SourceOfTruth] public RestGuildActor Guild { get; }
 
@@ -35,7 +35,13 @@ public partial class RestGuildInvite :
     IGuildInvite,
     IRestConstructable<RestGuildInvite, RestGuildInviteActor, IInviteModel>
 {
-    [SourceOfTruth] public RestGuildScheduledEventActor? GuildScheduledEvent { get; private set; }
+    [SourceOfTruth]
+    public RestGuildScheduledEventActor? GuildScheduledEvent
+        => Computed(nameof(GuildScheduledEvent), model => 
+            model.ScheduledEventId.HasValue 
+                ? Actor.Guild.ScheduledEvents[model.ScheduledEventId.Value]
+                : null
+        );
 
     [ProxyInterface] internal override RestGuildInviteActor Actor { get; }
 
@@ -46,11 +52,6 @@ public partial class RestGuildInvite :
     ) : base(client, model, actor)
     {
         Actor = actor;
-
-        GuildScheduledEvent = model.ScheduledEventId.Map(
-            (id, guild) => guild.ScheduledEvents[id],
-            actor.Guild
-        );
     }
 
     public static RestGuildInvite Construct(DiscordRestClient client, RestGuildInviteActor actor, IInviteModel model)

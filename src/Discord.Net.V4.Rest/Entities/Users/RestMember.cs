@@ -86,8 +86,9 @@ public partial class RestMember :
 
         Roles = new(
             this,
+            client,
             actor.Roles,
-            new(client, actor.Roles, model.RoleIds)
+            model.RoleIds
         );
     }
 

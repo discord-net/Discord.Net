@@ -9,7 +9,7 @@ public abstract partial class RestActor<TSelf, TId, TEntity, TModel> :
     where TId : IEquatable<TId>
     where TEntity : RestEntity<TId>, IEntity<TId, TModel>, IRestConstructable<TEntity, TSelf, TModel>
     where TSelf : RestActor<TSelf, TId, TEntity, TModel>
-    where TModel : class, IEntityModel<TId>
+    where TModel : class, IModel
 {
     public DiscordRestClient Client { get; }
 
@@ -111,7 +111,7 @@ public interface IRestActor<out TSelf, TId, out TEntity, TModel> :
     IRestTraitProvider<TSelf>
     where TId : IEquatable<TId>
     where TEntity : class, IEntity<TId, TModel>
-    where TModel : class, IEntityModel<TId>
+    where TModel : class, IModel
     where TSelf : class, IRestActor<TSelf, TId, TEntity, TModel>
 {
     internal IIdentifiable<TId, TEntity, TSelf, TModel> Identity { get; }
@@ -122,7 +122,7 @@ public interface IRestActor<out TId, out TEntity, in TModel> :
     IEntityProvider<TEntity, TModel>
     where TId : IEquatable<TId>
     where TEntity : IEntity<TId, TModel>
-    where TModel : IEntityModel<TId>;
+    where TModel : IModel;
 
 public interface IRestActor<out TId, out TEntity> :
     IActor<TId, TEntity>,

@@ -29,10 +29,11 @@ public partial class RestGuildTemplateFromGuildActor :
     [SourceOfTruth]
     public RestGuildActor Guild { get; }
     
+    [TypeFactory]
     public RestGuildTemplateFromGuildActor(
         DiscordRestClient client,
         GuildIdentity guild,
-        GuildTemplateIdentity tempalte
+        GuildTemplateFromGuildIdentity tempalte
     ) : base(client, tempalte)
     {
         Guild = client.Guilds[guild];

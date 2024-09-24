@@ -41,7 +41,12 @@ public sealed partial class RestGuildChannelInvite :
     IRestConstructable<RestGuildChannelInvite, RestGuildChannelInviteActor, IInviteModel>
 {
     [SourceOfTruth]
-    public RestGuildScheduledEventActor? GuildScheduledEvent { get; }
+    public RestGuildScheduledEventActor? GuildScheduledEvent
+        => Computed(nameof(GuildScheduledEvent), model => 
+            model.ScheduledEventId.HasValue 
+                ? Actor.Guild.ScheduledEvents[model.ScheduledEventId.Value]
+                : null
+        );
     
     [ProxyInterface] internal override RestGuildChannelInviteActor Actor { get; }
 
@@ -52,10 +57,6 @@ public sealed partial class RestGuildChannelInvite :
     ) : base(client, model, actor)
     {
         Actor = actor;
-
-        GuildScheduledEvent = model.ScheduledEventId.HasValue
-            ? actor.Guild.ScheduledEvents[model.ScheduledEventId.Value]
-            : null;
     }
 
     public static RestGuildChannelInvite Construct(

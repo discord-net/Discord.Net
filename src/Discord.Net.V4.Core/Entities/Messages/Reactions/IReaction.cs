@@ -8,6 +8,6 @@ public interface IReaction :
     int NormalCount { get; }
     int SuperReactionsCount { get; }
     bool HasReacted { get; }
-    bool hasSuperReacted { get; }
+    bool HasSuperReacted { get; }
     IReadOnlyCollection<Color> SuperReactionColors { get; }
 }

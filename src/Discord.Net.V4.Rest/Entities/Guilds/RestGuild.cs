@@ -12,9 +12,11 @@ public sealed partial class RestGuildActor :
     RestActor<RestGuildActor, ulong, RestGuild, IGuildModel>,
     IGuildActor
 {
+    [SourceOfTruth] public RestGuildSoundboardSoundActor.Enumerable.Indexable Sounds { get; }
+
     [SourceOfTruth]
     public RestGuildTemplateFromGuildActor.Enumerable.Indexable.BackLink<RestGuildActor> Templates { get; }
-    
+
     [SourceOfTruth]
     public RestGuildChannelActor.Enumerable.Indexable.Hierarchy.BackLink<RestGuildActor> Channels { get; }
 
@@ -40,11 +42,33 @@ public sealed partial class RestGuildActor :
     [TypeFactory]
     public RestGuildActor(
         DiscordRestClient client,
-        GuildIdentity guild,
-        CurrentMemberIdentity? currentMember = null
+        GuildIdentity guild
     ) : base(client, guild)
     {
         Identity = guild | this;
+
+        Sounds = new(
+            client,
+            RestActorProvider.GetOrCreate(client, Discord.Template.Of<GuildSoundboardSoundIdentity>(), Identity),
+            IGuildSoundboardSound.FetchManyRoute(this)
+                .AsRequiredProvider()
+                .ToEntityEnumerableProvider(
+                    Discord.Template.Of<GuildSoundboardSoundIdentity>(),
+                    RestActorProvider.GetOrCreate(client, Discord.Template.Of<GuildSoundboardSoundIdentity>(), Identity)
+                )
+        );
+
+        Templates = new(
+            this,
+            client,
+            RestActorProvider.GetOrCreate(client, Discord.Template.Of<GuildTemplateFromGuildIdentity>(), Identity),
+            IGuildTemplate.FetchManyRoute(this)
+                .AsRequiredProvider()
+                .ToEntityEnumerableProvider(
+                    Discord.Template.Of<GuildTemplateIdentity>(),
+                    RestActorProvider.GetOrCreate(client, Discord.Template.Of<GuildTemplateFromGuildIdentity>(), Identity)
+                )
+        );
     }
 
     [SourceOfTruth]
@@ -129,7 +153,7 @@ public sealed partial class RestGuild :
     {
         _model = model;
         Actor = actor;
-        
+
         var identity = GuildIdentity.Of(this);
 
         if (model is IModelSourceOfMultiple<IRoleModel> roles)
@@ -140,7 +164,7 @@ public sealed partial class RestGuild :
 
         if (model is IModelSourceOfMultiple<IGuildStickerModel> stickers)
             actor.Stickers.AddModelSources(Discord.Template.Of<GuildStickerIdentity>(), stickers);
-       
+
 
         AFKChannel = model.AFKChannelId
             .Map(

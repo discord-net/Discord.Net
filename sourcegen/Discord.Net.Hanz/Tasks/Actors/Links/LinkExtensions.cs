@@ -136,6 +136,8 @@ public sealed class LinkExtensions
                     type.Append($".{path}");
                     result.AppendLine($"{member.Property.Type} {target.Actor}.{extension}.{name} => {name};");
                     break;
+                case true when member.IsBackLinkMirror && path is null:
+                    break;
                 case true when member.IsBackLinkMirror && path != "BackLink<TSource>":
                     // no need to override
                     return default;

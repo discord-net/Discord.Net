@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public sealed class MessageMentionedChannel
+public sealed class MessageMentionedChannel : IMentionedChannelModel
 {
     [JsonPropertyName("id")]
     public ulong Id { get; set; }
@@ -11,8 +11,8 @@ public sealed class MessageMentionedChannel
     public ulong GuildId { get; set; }
 
     [JsonPropertyName("type")]
-    public int ChannelType { get; set; }
+    public int Type { get; set; }
 
     [JsonPropertyName("name")]
-    public required string ChannelName { get; set; }
+    public required string Name { get; set; }
 }

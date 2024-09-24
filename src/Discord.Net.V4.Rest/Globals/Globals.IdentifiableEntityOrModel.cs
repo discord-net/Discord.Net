@@ -1,4 +1,11 @@
 
+#region Soundboard
+
+global using SoundboardSoundIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestSoundboardSound, Discord.Rest.RestSoundboardSoundActor, Discord.Models.ISoundboardSoundModel>;
+global using GuildSoundboardSoundIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestGuildSoundboardSound, Discord.Rest.RestGuildSoundboardSoundActor, Discord.Models.IGuildSoundboardSoundModel>;
+
+#endregion
+
 #region Guilds
 
 global using GuildIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestGuild, Discord.Rest.RestGuildActor, Discord.Models.IGuildModel>;
@@ -7,6 +14,7 @@ global using GuildEmoteIdentity = Discord.IIdentifiable<ulong, Discord.Rest.Rest
 global using BanIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestBan, Discord.Rest.RestBanActor, Discord.Models.IBanModel>;
 global using IntegrationIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestIntegration, Discord.Rest.RestIntegrationActor, Discord.Models.IIntegrationModel>;
 global using GuildTemplateIdentity = Discord.IIdentifiable<string, Discord.Rest.RestGuildTemplate, Discord.Rest.RestGuildTemplateActor, Discord.Models.IGuildTemplateModel>;
+global using GuildTemplateFromGuildIdentity = Discord.IIdentifiable<string, Discord.Rest.RestGuildTemplate, Discord.Rest.RestGuildTemplateFromGuildActor, Discord.Models.IGuildTemplateModel>;
 
 #endregion
 
@@ -61,7 +69,10 @@ global using ChannelFollowerIntegrationChannelIdentity = Discord.IIdentifiable<u
 global using MessageIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestMessage, Discord.Rest.RestMessageActor, Discord.Models.IMessageModel>;
 global using WebhookMessageIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestWebhookMessage, Discord.Rest.RestWebhookMessageActor, Discord.Models.IMessageModel>;
 
-global using ReactionIdentity = Discord.IIdentifiable<Discord.DiscordEmojiId, Discord.Rest.Reactions.RestReaction, Discord.Rest.Reactions.RestReactionActor, Discord.Models.IReactionModel>;
+global using ReactionIdentity = Discord.IIdentifiable<Discord.DiscordEmojiId, Discord.Rest.RestReaction, Discord.Rest.RestReactionActor, Discord.Models.IReactionModel>;
+
+global using PollIdentity = Discord.IIdentifiable<ulong, Discord.Rest.RestPoll, Discord.Rest.RestPollActor, Discord.Models.IPollModel>;
+global using PollAnswerIdentity = Discord.IIdentifiable<int, Discord.Rest.RestPollAnswer, Discord.Rest.RestPollAnswerActor, Discord.Models.IPollAnswerModel>;
 
 #endregion
 
