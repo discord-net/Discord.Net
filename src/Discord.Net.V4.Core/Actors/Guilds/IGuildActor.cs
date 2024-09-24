@@ -15,6 +15,10 @@ public partial interface IGuildActor :
         IGuildThreadChannelActor.Indexable.WithActive.BackLink<IGuildActor>>,
     IInvitableTrait<IGuildInviteActor, IGuildInvite>
 {
+    [return: TypeHeuristic(nameof(Sounds))]
+    IGuildSoundboardSoundActor Sound(ulong id) => Sounds[id];
+    IGuildSoundboardSoundActor.Enumerable.Indexable Sounds { get; }
+    
     [return: TypeHeuristic(nameof(Templates))]
     IGuildTemplateFromGuildActor Template(string code) => Templates[code];
     IGuildTemplateFromGuildActor.Enumerable.Indexable.BackLink<IGuildActor> Templates { get; }

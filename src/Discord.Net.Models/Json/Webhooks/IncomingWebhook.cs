@@ -13,4 +13,7 @@ public sealed class IncomingWebhook : Webhook, IIncomingWebhookModel
     
     [JsonPropertyName("url")]
     public required string Url { get; set; }
+    
+    [JsonPropertyName("token")]
+    public required string Token { get; set; }
 }

@@ -28,9 +28,6 @@ public class Webhook : IWebhookModel, IModelSource, IModelSourceOf<IUserModel?>
     [JsonPropertyName("avatar")]
     public string? Avatar { get; set; }
 
-    [JsonPropertyName("token")]
-    public string? Token { get; set; }
-
     [JsonPropertyName("application_id")]
     public ulong? ApplicationId { get; set; }
     
