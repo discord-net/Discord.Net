@@ -93,6 +93,9 @@ public class Guild :
     public Optional<ulong?> SafetyAlertsChannelId { get; set; }
 
     public IEnumerable<ulong> RoleIds => Roles.Select(x => x.Id);
+    IEnumerable<ulong> IGuildModel.EmoteIds => Emojis.Select(x => x.Id);
+    IEnumerable<ulong> IGuildModel.StickerIds => Stickers.Map(v => v.Select(x => x.Id)) | [];
+
     int? IGuildModel.MaxPresence => ~MaxPresences;
     int? IGuildModel.MaxMembers => ~MaxMembers;
     bool IGuildModel.PremiumProgressBarEnabled => PremiumProgressBarEnabled;

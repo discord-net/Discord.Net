@@ -98,6 +98,17 @@ public abstract partial class RestActor<TSelf, TId, TEntity, TModel> :
         lock(Identity) _modelQueue.Enqueue(model);
     }
 
+    internal async ValueTask AddModelSourceAsync(TModel model, CancellationToken token = default)
+    {
+        if (TryGetBoundEntity(out var entity) && entity is IUpdatable<TModel> updatable)
+        {
+            await updatable.UpdateAsync(model, token);
+            return;
+        }
+        
+        lock(Identity) _modelQueue.Enqueue(model);
+    }
+
     internal virtual TEntity CreateEntity(TModel model)
         => TEntity.Construct(Client, (TSelf)this, model);
 

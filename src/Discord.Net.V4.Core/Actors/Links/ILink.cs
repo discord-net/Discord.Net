@@ -9,4 +9,4 @@ public interface ILink<out TActor, in TId, out TEntity, in TModel> :
     where TActor : class, IActor<TId, TEntity>
     where TEntity : class, IEntity<TId, TModel>
     where TId : IEquatable<TId>
-    where TModel : IEntityModel<TId>;
+    where TModel : IModel;

@@ -14,6 +14,7 @@ public sealed partial class RestBanActor :
 
     internal override BanIdentity Identity { get; }
 
+    [TypeFactory(LastParameter = nameof(ban))]
     public RestBanActor(
         DiscordRestClient client,
         GuildIdentity guild,

@@ -27,6 +27,8 @@ public partial interface IGuildModel : IPartialGuildModel
     bool PremiumProgressBarEnabled { get; }
     ulong? SafetyAlertsChannelId { get; }
     IEnumerable<ulong> RoleIds { get; }
+    IEnumerable<ulong> EmoteIds { get; }
+    IEnumerable<ulong> StickerIds { get; }
 }
 
 public interface IWelcomeScreenModel

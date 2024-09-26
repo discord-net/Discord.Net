@@ -5,6 +5,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 using System.Collections.Concurrent;
 using System.Collections.Immutable;
 using System.Reflection;
+using Discord.Net.Hanz.Tasks.Actors.V3;
 
 namespace Discord.Net.Hanz;
 
@@ -13,7 +14,8 @@ public sealed class Hanz : IIncrementalGenerator
 {
     public static LoggingOptions LoggerOptions { get; private set; } = new(LogLevel.Information);
 
-    private static Logger _rootLogger = new(LogLevel.Information, Path.Combine(Logger.LogDirectory, "root.log"));
+    public static Logger DefaultLogger = new(LogLevel.Information, Logger.LogDirectory);
+    public static Logger RootLogger = new(LogLevel.Information, Path.Combine(Logger.LogDirectory, "root.log"));
     private static Logger _perfLogger = new(LogLevel.Information, Path.Combine(Logger.LogDirectory, "perf.log"));
 
 
@@ -86,7 +88,7 @@ public sealed class Hanz : IIncrementalGenerator
                 }
                 catch (Exception ex)
                 {
-                    _rootLogger.Log(LogLevel.Error, $"Failed to run generation task {task}: {ex}");
+                    RootLogger.Log(LogLevel.Error, $"Failed to run generation task {task}: {ex}");
                     throw;
                 }
                 finally
@@ -106,7 +108,7 @@ public sealed class Hanz : IIncrementalGenerator
             }
             catch (Exception ex)
             {
-                _rootLogger.Log(LogLevel.Error, $"Failed to run generation task {task}: {ex}");
+                RootLogger.Log(LogLevel.Error, $"Failed to run generation task {task}: {ex}");
                 throw;
             }
             finally
@@ -117,7 +119,7 @@ public sealed class Hanz : IIncrementalGenerator
             }
         });
 
-        _rootLogger.Log($"Registered {task.GetType().Name} task");
+        RootLogger.Log($"Registered {task.GetType().Name} task");
     }
 
     public static void RegisterCombineTask<T>(IncrementalGeneratorInitializationContext context,
@@ -145,7 +147,7 @@ public sealed class Hanz : IIncrementalGenerator
                 }
                 catch (Exception ex)
                 {
-                    _rootLogger.Log(LogLevel.Error, $"Failed to run generation task {task}: {ex}");
+                    RootLogger.Log(LogLevel.Error, $"Failed to run generation task {task}: {ex}");
                     throw;
                 }
             }
@@ -161,7 +163,7 @@ public sealed class Hanz : IIncrementalGenerator
             }
             catch (Exception ex)
             {
-                _rootLogger.Log(LogLevel.Error, $"Failed to run generation task {task}: {ex}");
+                RootLogger.Log(LogLevel.Error, $"Failed to run generation task {task}: {ex}");
                 logger.Flush();
                 throw;
             }
@@ -176,7 +178,7 @@ public sealed class Hanz : IIncrementalGenerator
             }
         });
 
-        _rootLogger.Log($"Registered {task.GetType().Name} task");
+        RootLogger.Log($"Registered {task.GetType().Name} task");
     }
 
     private static bool IsGenerationTask(Type type)
@@ -191,7 +193,7 @@ public sealed class Hanz : IIncrementalGenerator
     {
         try
         {
-            _rootLogger.DeleteLogFile();
+            RootLogger.DeleteLogFile();
 
             var options = context.AnalyzerConfigOptionsProvider.Select((options, _) => GetLoggingOptions(options));
 
@@ -251,8 +253,10 @@ public sealed class Hanz : IIncrementalGenerator
                     logger.Flush();
                 }
             );
+            
+            LinksV3.Register(context);
 
-            _rootLogger.Flush();
+            RootLogger.Flush();
         }
         catch (Exception x)
         {
@@ -286,9 +290,9 @@ public sealed class Hanz : IIncrementalGenerator
 
         if (TryGetProjectName(options, out var projectName) && projectName is not null)
         {
-            _rootLogger = new Logger(logLevel,
+            RootLogger = new Logger(logLevel,
                 Path.Combine(Logger.LogDirectory, projectName, "global.log"));
-            _rootLogger.DeleteLogFile();
+            RootLogger.DeleteLogFile();
         }
 
         return new LoggingOptions(logLevel);

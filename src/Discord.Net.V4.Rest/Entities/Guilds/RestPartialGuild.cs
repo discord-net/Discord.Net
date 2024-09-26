@@ -4,7 +4,7 @@ namespace Discord.Rest;
 
 [ExtendInterfaceDefaults]
 public class RestPartialGuild(DiscordRestClient client, IPartialGuildModel model) :
-    RestEntity<ulong>(client, model.Id),
+    RestEntity<ulong, IPartialGuildModel>(client, model.Id),
     IPartialGuild,
     IModelConstructable<RestPartialGuild, IPartialGuildModel, DiscordRestClient>
 {
@@ -29,7 +29,7 @@ public class RestPartialGuild(DiscordRestClient client, IPartialGuildModel model
 
     public int? PremiumSubscriptionCount => Model.PremiumSubscriptionCount;
 
-    internal virtual IPartialGuildModel Model { get; } = model;
+    internal override IPartialGuildModel Model { get; } = model;
 
     public static RestPartialGuild Construct(DiscordRestClient client, IPartialGuildModel model)
     {

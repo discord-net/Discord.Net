@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using System.Text;
+using Discord.Net.Hanz.Tasks.Actors.V3.Types;
 using Discord.Net.Hanz.Tasks.Traits;
 using Discord.Net.Hanz.Utils;
 using Microsoft.CodeAnalysis;
@@ -11,6 +12,7 @@ namespace Discord.Net.Hanz.Tasks.Actors;
 public sealed class LinksV2 :
     ISyntaxGenerationCombineTask<LinksV2.GenerationTarget>
 {
+    
     public enum AssemblyTarget
     {
         Core,
@@ -74,7 +76,8 @@ public sealed class LinksV2 :
 
     public bool IsValid(SyntaxNode node, CancellationToken token = default)
     {
-        return node is TypeDeclarationSyntax;
+        return false;
+        //return node is TypeDeclarationSyntax;
     }
 
     public GenerationTarget? GetTargetForGeneration(
@@ -490,6 +493,21 @@ public sealed class LinksV2 :
                         )
                     ])
                 );
+
+                if (baseTarget is not null)
+                {
+                    baseList = baseList.AddTypes(
+                        SyntaxFactory.SimpleBaseType(
+                            SyntaxFactory.ParseTypeName(
+                                coreLinkType.ToDisplayString()
+                                    .Replace(
+                                        coreLinkTypeForTarget.ToDisplayString(),
+                                        $"Discord.ILinkType<{target.Actor}, {target.Id}, {target.Entity}, {target.Model}>"
+                                    )
+                            )
+                        )
+                    );
+                }
 
                 logger.Log($"{target.Actor} -> {linkType} <> {baseList}");
                 logger.Log($"{target.Actor} -> {coreLinkType} <> {baseList}");
