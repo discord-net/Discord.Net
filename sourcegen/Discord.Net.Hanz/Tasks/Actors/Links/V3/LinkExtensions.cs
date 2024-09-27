@@ -17,11 +17,14 @@ public static class LinkExtensions
         IPropertySymbol symbol,
         bool isLinkMirror,
         bool isBackLinkMirror,
-        LinksV3.Target? propertyTypeTarget)
+        LinksV3.Target? propertyTypeTarget,
+        Extension? overloadedBase)
     {
+        public bool IsOverload => Symbol.ExplicitInterfaceImplementations.Length > 0;
         public string Name => MemberUtils.GetMemberName(Symbol);
         public IPropertySymbol Symbol { get; } = symbol;
         public LinksV3.Target? PropertyTypeTarget { get; } = propertyTypeTarget;
+        public Extension? OverloadedBase { get; } = overloadedBase;
         public bool IsLinkMirror { get; } = isLinkMirror;
         public bool IsBackLinkMirror { get; } = isBackLinkMirror;
     }
@@ -34,7 +37,7 @@ public static class LinkExtensions
         if (target.Extensions is null || target.Extensions.Count == 0) return string.Empty;
 
         var extensionPath = path.Select(x => LinksV3.FormatTypeName(x.Symbol)).ToImmutableList();
-        
+
         return string.Join(
             Environment.NewLine,
             target.Extensions
@@ -60,7 +63,7 @@ public static class LinkExtensions
         Logger logger)
     {
         logger.Log($"{target.LinkTarget.Actor}: Building extension {extension.Name} ({string.Join(".", path)})");
-        
+
         var nextExtensions = extensions.Remove(extension);
         var nextPath = path.Add(extension.Name);
         var kind = target.LinkTarget.Assembly is LinkActorTargets.AssemblyTarget.Core ? "interface" : "class";
@@ -74,7 +77,12 @@ public static class LinkExtensions
                 $"{target.LinkTarget.Actor}.{extension.Name}"
             ]);
         }
-        
+
+        foreach (var baseExtension in extension.Properties.Select(x => x.OverloadedBase).OfType<Extension>())
+        {
+            bases.Add($"{baseExtension.Symbol.ContainingType}{LinksV3.FormatPath(path)}.{baseExtension.Name}");
+        }
+
         return
             $$"""
               public {{kind}} {{extension.Name}}{{(
@@ -88,7 +96,7 @@ public static class LinkExtensions
                           .Join(
                               Environment.NewLine,
                               extension.Properties.Select(x =>
-                                  FormatExtensionProperty(target, pathWithoutExtensions, extension, x, logger)
+                                  FormatExtensionProperty(target, pathWithoutExtensions, path.Count == 0, extension, x, logger)
                               )
                           )
                           .WithNewlinePadding(4)
@@ -108,12 +116,13 @@ public static class LinkExtensions
                       LinksV3
                           .BuildBackLink(
                               target,
+                              path.Add(extension.Name),
                               pathWithoutExtensions,
                               string
                                   .Join(
                                       Environment.NewLine,
                                       extension.Properties.Select(x =>
-                                          FormatExtensionProperty(target, pathWithoutExtensions, extension, x, logger, true)
+                                          FormatExtensionProperty(target, pathWithoutExtensions, path.Count == 0, extension, x, logger, true)
                                       )
                                   )
                                   .WithNewlinePadding(4)
@@ -127,11 +136,20 @@ public static class LinkExtensions
     private static string FormatExtensionProperty(
         LinksV3.Target target,
         ImmutableList<string> path,
+        bool isRoot,
         Extension extension,
         ExtensionProperty property,
         Logger logger,
         bool isBackLink = false)
     {
+        if (property is {IsOverload: true, OverloadedBase: null})
+        {
+            logger.Warn($"{target.LinkTarget.Actor}: extension '{extension.Name}' has overload property with no base extension");
+            return string.Empty;
+        }
+
+        var needsNew = !property.IsOverload && extension.Properties.Any(x => x.IsOverload && x.Name == property.Name);
+        
         if (property.IsBackLinkMirror)
         {
             if (!isBackLink)
@@ -141,7 +159,8 @@ public static class LinkExtensions
 
             if (property.PropertyTypeTarget is null)
             {
-                logger.Warn($"{target.LinkTarget.Actor}: {extension.Name}.{property.Name} -> no property target on backlink mirror");
+                logger.Warn(
+                    $"{target.LinkTarget.Actor}: {extension.Name}.{property.Name} -> no property target on backlink mirror");
                 return string.Empty;
             }
 
@@ -155,15 +174,29 @@ public static class LinkExtensions
         {
             if (property.PropertyTypeTarget is null)
             {
-                logger.Warn($"{target.LinkTarget.Actor}: {extension.Name}.{property.Name} -> no property target on link mirror");
+                logger.Warn(
+                    $"{target.LinkTarget.Actor}: {extension.Name}.{property.Name} -> no property target on link mirror");
                 return string.Empty;
             }
-
-            if (path.Count == 0)
+            
+            if (property.IsOverload)
             {
-                return $"{property.PropertyTypeTarget.FormattedCoreLink} {property.Name} {{ get; }}";
+                var type = path.Count == 0
+                    ? property.PropertyTypeTarget.FormattedCoreLink
+                    : $"{property.PropertyTypeTarget.LinkTarget.Actor}{LinksV3.FormatPath(path)}";
+
+                var from =
+                    $"{property.OverloadedBase!.Symbol.ContainingType}{LinksV3.FormatPath(path)}.{property.OverloadedBase.Name}";
+                
+                return
+                    $"{type} {from}.{property.Name} => {property.Name};";
             }
             
+            if (path.Count == 0)
+            {
+                return $"{(needsNew ? "new " : string.Empty)}{property.PropertyTypeTarget.FormattedCoreLink} {property.Name} {{ get; }}";
+            }
+
             return
                 $$"""
                   new {{property.PropertyTypeTarget.LinkTarget.Actor}}{{LinksV3.FormatPath(path)}} {{property.Name}} { get; }
@@ -171,12 +204,20 @@ public static class LinkExtensions
                   """;
         }
 
-        if (path.Count == 0)
+        if (isRoot && !isBackLink)
         {
+            if (property.Symbol.ExplicitInterfaceImplementations.Length > 0)
+            {
+                if (property.OverloadedBase is null) return string.Empty;
+                
+                return
+                    $"{property.Symbol.Type} {property.OverloadedBase.Symbol.ContainingType}.{property.OverloadedBase.Name}.{property.Name} => {property.Name};";
+            }
+
             return
-                $"{property.Symbol.Type} {property.Name} {{ get; }}";
+                $"{(needsNew ? "new " : string.Empty)}{property.Symbol.Type} {property.Name} {{ get; }}";
         }
-        
+
         // TODO: in non-core, we need the implementation
         return string.Empty;
     }
@@ -211,18 +252,36 @@ public static class LinkExtensions
 
         foreach (var propertySymbol in symbol.GetMembers().OfType<IPropertySymbol>())
         {
+            Extension? overloadedBase = null;
+
+            if (propertySymbol.ExplicitInterfaceImplementations.Length > 0)
+            {
+                var baseExtension = getTarget(
+                    propertySymbol.ExplicitInterfaceImplementations[0]
+                        .ContainingType
+                        .ContainingType
+                );
+
+                overloadedBase = baseExtension?.Extensions?.FirstOrDefault(
+                    x => x.Symbol.Equals(
+                        propertySymbol.ExplicitInterfaceImplementations[0].ContainingType,
+                        SymbolEqualityComparer.Default
+                    )
+                );
+            }
+
             var attribute = propertySymbol.GetAttributes()
                 .FirstOrDefault(x => x.AttributeClass?.Name == "LinkMirrorAttribute");
 
             var propertyTarget = propertySymbol.Type is INamedTypeSymbol named ? getTarget(named) : null;
-            
+
             if (
                 propertySymbol.Type.TypeKind is TypeKind.Unknown &&
                 propertyTarget is null)
             {
                 var propTypeStr = propertySymbol.Type.ToDisplayString();
                 var prefix = target.LinkTarget.Assembly.ToString();
-                
+
                 var actorPart = propTypeStr
                     .Split(['.'], StringSplitOptions.RemoveEmptyEntries)
                     .FirstOrDefault(x => x.StartsWith(prefix) && (x.EndsWith("Actor") || x.EndsWith("Trait")));
@@ -248,14 +307,15 @@ public static class LinkExtensions
                     propertyTarget = target;
                 }
             }
-            
+
             properties.Add(new ExtensionProperty(
                 propertySymbol,
                 attribute is not null,
                 attribute?.NamedArguments
                     .FirstOrDefault(x => x.Key == "OnlyBackLinks")
                     .Value.Value as bool? == true,
-                propertyTarget
+                propertyTarget,
+                overloadedBase
             ));
         }
 

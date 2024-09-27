@@ -41,8 +41,8 @@ public partial interface IGuildThreadChannelActor :
     [LinkExtension]
     private interface WithNestedThreadsExtension
     {
-        PagedPublicArchivedThreads PublicArchivedThreads { get; }
-        PagedPrivateArchivedThreads PrivateArchivedThreads { get; }
-        PagedJoinedPrivateArchivedThreads JoinedPrivateArchivedThreads { get; }
+        IGuildThreadChannelActor.Paged<PagePublicArchivedThreadsParams> PublicArchivedThreads { get; }
+        IGuildThreadChannelActor.Paged<PagePrivateArchivedThreadsParams> PrivateArchivedThreads { get; }
+        IGuildThreadChannelActor.Paged<PageJoinedPrivateArchivedThreadsParams> JoinedPrivateArchivedThreads { get; }
     }
 }

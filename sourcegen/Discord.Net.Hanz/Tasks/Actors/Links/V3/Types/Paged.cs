@@ -28,4 +28,6 @@ public class Paged : ILinkTypeProcessor
             ]);
         }
     }
+    
+    public string? CreateProvider(LinksV3.Target target, Logger logger) => null;
 }

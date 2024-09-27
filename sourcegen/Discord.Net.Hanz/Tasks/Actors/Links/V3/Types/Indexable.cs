@@ -27,4 +27,6 @@ public class Indexable : ILinkTypeProcessor
             ]);
         }
     }
+    
+    public string? CreateProvider(LinksV3.Target target, Logger logger) => null;
 }

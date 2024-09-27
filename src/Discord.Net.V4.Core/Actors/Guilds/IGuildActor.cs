@@ -33,11 +33,11 @@ public partial interface IGuildActor :
 
     [return: TypeHeuristic(nameof(Bans))]
     IBanActor Ban(ulong userId) => Bans[userId];
-    IBanActor.PagedGuildBans.Indexable.BackLink<IGuildActor> Bans { get; }
+    IBanActor.Paged<PageGuildBansParams>.Indexable.BackLink<IGuildActor> Bans { get; }
 
     [return: TypeHeuristic(nameof(Members))]
     IMemberActor Member(ulong id) => Members[id];
-    IMemberActor.PagedGuildMembers.Indexable.WithCurrent Members { get; }
+    IMemberActor.Paged<PageGuildMembersParams>.Indexable.WithCurrent Members { get; }
 
     [return: TypeHeuristic(nameof(Emotes))]
     IGuildEmoteActor Emote(ulong id) => Emotes[id];

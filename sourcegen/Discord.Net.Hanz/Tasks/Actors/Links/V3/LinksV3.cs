@@ -39,9 +39,10 @@ public sealed class LinksV3
         public Schematic Schematic { get; } = schematic;
         public List<Target> Ancestors { get; } = ancestors;
         public List<LinkExtensions.Extension>? Extensions { get; set; }
+        public Target[]? Hierarchy { get; set; }
 
         public string FormattedCoreLinkType
-            => $"Discord.ILinkTypeV3<{LinkTarget.Actor}, {LinkTarget.Id}, {LinkTarget.Entity}, {LinkTarget.Model}>";
+            => $"Discord.ILinkType<{LinkTarget.Actor}, {LinkTarget.Id}, {LinkTarget.Entity}, {LinkTarget.Model}>";
 
         public string FormattedCoreLink
             => $"Discord.ILink<{LinkTarget.Actor}, {LinkTarget.Id}, {LinkTarget.Entity}, {LinkTarget.Model}>";
@@ -51,6 +52,38 @@ public sealed class LinksV3
             return LinkTarget.Equals(other.LinkTarget) &&
                    Schematic.Equals(other.Schematic) &&
                    Ancestors.SequenceEqual(other.Ancestors);
+        }
+
+        public void Log(Logger logger)
+        {
+            logger.Log($"Target: {LinkTarget.Actor} | {LinkTarget.Id} | {LinkTarget.Entity} | {LinkTarget.Entity}");
+            
+            logger.Log($" - Ancestors: {Ancestors.Count}");
+
+            foreach (var ancestor in Ancestors)
+            {
+                logger.Log($"    - {ancestor.LinkTarget.Actor}");
+            }
+            
+            logger.Log($" - Extensions: {Extensions?.Count ?? 0}");
+
+            if (Extensions is not null)
+            {
+                foreach (var extension in Extensions)
+                {
+                    logger.Log($"    - {extension.Name}");
+                }
+            }
+            
+            logger.Log($" - Hierarchy: {Hierarchy?.Length ?? 0}");
+
+            if (Hierarchy is not null)
+            {
+                foreach (var type in Hierarchy)
+                {
+                    logger.Log($"    - {type.LinkTarget.Actor}");
+                }
+            }
         }
     }
 
@@ -75,21 +108,39 @@ public sealed class LinksV3
             )
             .Where(x => x is not null);
 
+        var actors = context.SyntaxProvider.CreateSyntaxProvider(
+                LinkActorTargets.IsValid,
+                LinkActorTargets.GetTargetForGeneration
+            )
+            .Where(x => x is not null)
+            .Collect();
+
         var provider =
             schematics
-                .Combine(context.SyntaxProvider
-                    .CreateSyntaxProvider(
-                        LinkActorTargets.IsValid,
-                        LinkActorTargets.GetTargetForGeneration
-                    )
-                    .Where(x => x is not null)
-                    .Collect()
-                )
+                .Combine(actors)
                 .SelectMany(GetTarget!)
                 .Select(GenerateLinks);
 
+        context.RegisterSourceOutput(actors, GenerateAliases!);
         context.RegisterSourceOutput(provider, GenerateSource);
         context.RegisterSourceOutput(schematics, GenerateSchematics!);
+    }
+
+    private static void GenerateAliases(SourceProductionContext context, ImmutableArray<LinkTarget> targets)
+    {
+        var aliases = targets
+            .Select(x =>
+                $"""
+                 global using {GetFriendlyName(x.Actor)}Link = Discord.ILink<{x.Actor}, {x.Id}, {x.Entity}, {x.Model}>;
+                 global using {GetFriendlyName(x.Actor)}LinkType = Discord.ILinkType<{x.Actor}, {x.Id}, {x.Entity}, {x.Model}>;
+                 """
+            )
+            .ToArray();
+
+        context.AddSource(
+            "LinksV3/Aliases",
+            string.Join(Environment.NewLine, aliases)
+        );
     }
 
     private static void GenerateSchematics(
@@ -146,7 +197,7 @@ public sealed class LinksV3
                         .Select(x =>
                             Generate(
                                 x,
-                                type.Symbol.Name == "ILinkTypeV3" ? path : path.Add(type)
+                                type.Symbol.Name == "ILinkType" ? path : path.Add(type)
                             )
                         )
                         .ToArray<MemberDeclarationSyntax>()
@@ -218,15 +269,23 @@ public sealed class LinksV3
                 ancestors
             );
 
+            var logger = Logger.WithSemanticContext(link.SemanticModel);
+
             result.Extensions = LinkExtensions.GetExtensions(result, symbol =>
-                results.TryGetValue(symbol, out var existing)
-                    ? existing
-                    : target.Actors.FirstOrDefault(x => x.GetCoreActor().Equals(symbol, SymbolEqualityComparer.Default))
-                        is { } actor
-                        ? CreateTarget(actor)
-                        : null,
-                Logger.WithSemanticContext(link.SemanticModel)
+                    results.TryGetValue(symbol, out var existing)
+                        ? existing
+                        : target.Actors.FirstOrDefault(x =>
+                                x.GetCoreActor().Equals(symbol, SymbolEqualityComparer.Default))
+                            is { } actor
+                            ? CreateTarget(actor)
+                            : null,
+                logger
             );
+
+            result.Hierarchy = LinkHierarchy
+                .GetHierarchy(result, target.Actors, logger)
+                ?.Select(CreateTarget)
+                .ToArray();
 
             return result;
         }
@@ -238,7 +297,7 @@ public sealed class LinksV3
 
         var kind = target.LinkTarget.Assembly is LinkActorTargets.AssemblyTarget.Core ? "interface" : "class";
 
-        logger.Log($"{target.LinkTarget.Actor}: generating {kind} links...");
+        target.Log(logger);
 
         var linkMembers = string.Join(
             Environment.NewLine,
@@ -257,6 +316,16 @@ public sealed class LinksV3
             $$"""
               public partial {{kind}} {{target.LinkTarget.Actor.Name}}
               {
+                  {{
+                      string
+                          .Join(
+                              Environment.NewLine,
+                              Processors.Values
+                                  .Select(x => x.CreateProvider(target, logger))
+                                  .Where(x => x is not null)
+                          )
+                          .WithNewlinePadding(4)
+                  }}
                   {{linkMembers}}
                   {{
                       LinkExtensions
@@ -267,6 +336,7 @@ public sealed class LinksV3
                       BuildBackLink(target, ImmutableList<string>.Empty)
                           .WithNewlinePadding(4)
                   }}
+                  {{LinkHierarchy.BuildHierarchy(target, ImmutableList<string>.Empty)}}
               }
               """;
     }
@@ -334,6 +404,18 @@ public sealed class LinksV3
                           .WithNewlinePadding(4)
                   }}
                   {{BuildBackLink(target, type, path).WithNewlinePadding(4)}}
+                  {{
+                      LinkHierarchy
+                          .BuildHierarchy(
+                              target,
+                              path.Add(type)
+                                  .Select(x =>
+                                      FormatTypeName(x.Symbol)
+                                  )
+                                  .ToImmutableList()
+                          )
+                          .WithNewlinePadding(4)
+                  }}
               }
               """;
     }
@@ -341,8 +423,11 @@ public sealed class LinksV3
     public static string BuildBackLink(
         Target target,
         ImmutableList<string> path,
+        ImmutableList<string>? ancestorPath = null,
         string? extraMembers = null)
     {
+        ancestorPath ??= path;
+
         var kind = target.LinkTarget.Assembly is LinkActorTargets.AssemblyTarget.Core ? "interface" : "class";
 
         var backlinkBaseType =
@@ -372,7 +457,7 @@ public sealed class LinksV3
             {
                 members.Add(
                     ancestor.Ancestors.Count > 0
-                        ? $"TSource {ancestor.LinkTarget.Actor}{FormatPath(path)}.BackLink<TSource>.Source => Source;"
+                        ? $"TSource {ancestor.LinkTarget.Actor}{FormatPath(ancestorPath)}.BackLink<TSource>.Source => Source;"
                         : $"TSource Discord.IBackLink<TSource, {ancestor.LinkTarget.Actor}, {ancestor.LinkTarget.Id}, {ancestor.LinkTarget.Entity}, {ancestor.LinkTarget.Model}>.Source => Source;"
                 );
             }
@@ -398,6 +483,7 @@ public sealed class LinksV3
     ) => BuildBackLink(
         target,
         path.Add(type).Select(x => FormatTypeName(x.Symbol)).ToImmutableList(),
+        null,
         extraMembers
     );
 
@@ -427,5 +513,14 @@ public sealed class LinksV3
         if (path.Count == 0) return string.Empty;
 
         return $".{string.Join(".", path)}";
+    }
+
+    public static string GetFriendlyName(ITypeSymbol symbol)
+    {
+        if (symbol.TypeKind is TypeKind.Interface)
+            return symbol.Name.Remove(0, 1).Replace("Actor", string.Empty);
+
+        return symbol.Name.Replace("Actor", string.Empty).Replace("Gateway", string.Empty)
+            .Replace("Rest", string.Empty);
     }
 }

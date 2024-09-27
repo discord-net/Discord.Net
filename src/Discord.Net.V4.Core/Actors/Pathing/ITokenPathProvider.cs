@@ -5,5 +5,5 @@ public interface ITokenPathProvider :
 {
     string Token { get; }
 
-    string IPathIdProvider<string>.Id => Token;
+    string IPathIdProvider<string>.PathId => Token;
 }

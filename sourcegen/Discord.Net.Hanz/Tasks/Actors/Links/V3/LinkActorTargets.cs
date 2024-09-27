@@ -34,7 +34,6 @@ public class LinkActorTargets
         public INamedTypeSymbol Actor { get; } = actor;
         public INamedTypeSymbol Model { get; } = model;
         public ITypeSymbol Id { get; } = id;
-
         public AssemblyTarget Assembly { get; } = assembly;
 
         public bool Equals(GenerationTarget other)

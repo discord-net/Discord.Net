@@ -17,5 +17,5 @@ public partial interface IGuildScheduledEventActor :
     IGuildRelationship,
     IActor<ulong, IGuildScheduledEvent>
 {
-    IGuildScheduledEventUserActor.PagedGuildScheduledEventUsers RSVPs { get; }
+    IGuildScheduledEventUserActor.Paged<PageGuildScheduledEventUsersParams> RSVPs { get; }
 }

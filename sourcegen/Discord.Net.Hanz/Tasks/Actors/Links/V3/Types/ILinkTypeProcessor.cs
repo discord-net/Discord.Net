@@ -10,4 +10,6 @@ public interface ILinkTypeProcessor
         LinkSchematics.Entry type,
         ImmutableList<LinkSchematics.Entry> path
     );
+
+    string? CreateProvider(LinksV3.Target target, Logger logger);
 }
