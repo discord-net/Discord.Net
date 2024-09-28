@@ -293,7 +293,7 @@ public sealed class DiscriminatedUnion
 
             jsonContext.RequestedNoConverterTypeInfos.Add(root);
 
-            if (!jsonContext.AdditionalConverters.Add($"Discord.Converters.{converter.Syntax.Identifier.ValueText}_{converter.Property.Name}"))
+            if (!jsonContext.AdditionalConverters.Add($"Discord.Converters.{converter.Syntax.Identifier.ValueText}"))
                 return;
 
             var filename = $"GeneratedConverters/{root.Name}_{converter.Property.Name}Union";
@@ -423,7 +423,7 @@ public sealed class DiscriminatedUnion
                 SyntaxFactory.Token(SyntaxKind.PublicKeyword),
                 SyntaxFactory.Token(SyntaxKind.SealedKeyword)
             ),
-            SyntaxFactory.Identifier($"{symbol.Name}UnionConverter"),
+            SyntaxFactory.Identifier($"{symbol.Name}UnionConverter_{property.Name}"),
             null,
             SyntaxFactory.BaseList(
                 SyntaxFactory.SeparatedList<BaseTypeSyntax>((BaseTypeSyntax[])
@@ -456,11 +456,22 @@ public sealed class DiscriminatedUnion
             return null;
         }
 
+        var unionPropertyType = property.Type;
+        var wasNullable = false;
+
+        if (unionPropertyType is INamedTypeSymbol {Name: "Nullable", TypeArguments.Length: 1} nullable)
+        {
+            unionPropertyType = nullable.TypeArguments[0];
+            wasNullable = true;
+        }
+        else if (unionPropertyType.NullableAnnotation is NullableAnnotation.Annotated)
+            unionPropertyType = unionPropertyType.WithNullableAnnotation(NullableAnnotation.None);
+        
         var table =
             notNullCases.Length > 0
                 ? SyntaxFactory.ParseMemberDeclaration(
                     $$"""
-                      private static readonly Dictionary<{{property.Type.ToDisplayString()}}, Type> _lookupTable = new()
+                      private static readonly Dictionary<{{unionPropertyType.ToDisplayString()}}, Type> _lookupTable = new()
                       {
                           {{
                               string.Join(
@@ -511,7 +522,7 @@ public sealed class DiscriminatedUnion
                                       : string.Empty
                               )}}
 
-                              if (!_lookupTable.TryGetValue(delimiter, out var unionType))
+                              if (!_lookupTable.TryGetValue(delimiter{{(wasNullable ? ".Value" : string.Empty)}}, out var unionType))
                               return {{(
                                   presentNoMatchCase is not null
                                       ? $"root.Deserialize<{presentNoMatchCase.Type.ToDisplayString()}>(options)"

@@ -23,9 +23,4 @@
       <Link>sourcegen_supremacy.png</Link>
     </None>
   </ItemGroup>
-
-  <ItemGroup>
-    <AdditionalFiles Include="AnalyzerReleases.Unshipped.md" />
-  </ItemGroup>
-
 </Project>

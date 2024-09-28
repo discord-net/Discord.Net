@@ -1,6 +1,9 @@
 namespace Discord.Models;
 
-public interface IApplicationCommandOptionChoiceModel<out T> : IApplicationCommandOptionChoiceModel
+public interface IApplicationCommandOptionChoiceModel<
+    [OneOf(typeof(long), typeof(string), typeof(double))]
+    out T
+> : IApplicationCommandOptionChoiceModel
     where T : notnull
 {
     new T Value { get; }

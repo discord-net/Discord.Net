@@ -21,7 +21,7 @@ public interface IPathable
                 $"Expected {GetType()} to implement {typeof(T)}"
             );
 
-        return provider.Id;
+        return provider.PathId;
     }
 
     internal IIdentifiable<TId, TEntity, TActor, TModel> RequireIdentity<TActor, TId, TEntity, TModel>(

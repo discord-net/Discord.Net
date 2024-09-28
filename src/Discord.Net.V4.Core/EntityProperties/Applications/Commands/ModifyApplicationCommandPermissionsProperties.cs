@@ -5,7 +5,7 @@ namespace Discord;
 public sealed class ModifyApplicationCommandPermissionsProperties :
     IEntityProperties<ModifyApplicationCommandPermissionsParams>
 {
-    public required IEnumerable<ApplicationCommandPermissions> Permissions { get; set; }
+    public IEnumerable<ApplicationCommandPermissions> Permissions { get; set; } = [];
     
     public ModifyApplicationCommandPermissionsParams ToApiModel(ModifyApplicationCommandPermissionsParams? existing = default)
     {

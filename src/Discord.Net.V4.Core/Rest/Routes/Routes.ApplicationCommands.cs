@@ -135,21 +135,21 @@ public partial class Routes
         bucket: (ScopeType.Guild, guildId)
     );
 
-    public static IApiOutRoute<IEnumerable<ApplicationCommandPermissions>> GetGuildApplicationCommandPermissions(
+    public static IApiOutRoute<IEnumerable<GuildApplicationCommandPermission>> GetGuildApplicationCommandPermissions(
         [IdHeuristic<IApplication>] ulong applicationId,
         [IdHeuristic<IGuild>] ulong guildId
-    ) => new ApiOutRoute<IEnumerable<ApplicationCommandPermissions>>(
+    ) => new ApiOutRoute<IEnumerable<GuildApplicationCommandPermission>>(
         nameof(GetGuildApplicationCommandPermissions),
         RequestMethod.Get,
         $"applications/{applicationId}/guilds/{guildId}/commands/permissions",
         (ScopeType.Guild, guildId)
     );
 
-    public static IApiOutRoute<ApplicationCommandPermissions> GetApplicationCommandPermissions(
+    public static IApiOutRoute<Discord.Models.Json.GuildApplicationCommandPermission> GetApplicationCommandPermissions(
         [IdHeuristic<IApplication>] ulong applicationId,
         [IdHeuristic<IGuild>] ulong guildId,
         [IdHeuristic<IApplicationCommand>] ulong commandId
-    ) => new ApiOutRoute<ApplicationCommandPermissions>(
+    ) => new ApiOutRoute<GuildApplicationCommandPermission>(
         nameof(GetGuildApplicationCommandPermissions),
         RequestMethod.Get,
         $"applications/{applicationId}/guilds/{guildId}/commands/{commandId}/permissions",
@@ -158,7 +158,7 @@ public partial class Routes
 
     public static IApiInOutRoute<
         ModifyApplicationCommandPermissionsParams,
-        Discord.Models.Json.ApplicationCommandPermissions
+        Discord.Models.Json.GuildApplicationCommandPermission
     > ModifyApplicationCommandPermissions(
         [IdHeuristic<IApplication>] ulong applicationId,
         [IdHeuristic<IGuild>] ulong guildId,
@@ -166,7 +166,7 @@ public partial class Routes
         ModifyApplicationCommandPermissionsParams body
     ) => new ApiInOutRoute<
         ModifyApplicationCommandPermissionsParams,
-        Discord.Models.Json.ApplicationCommandPermissions
+        Discord.Models.Json.GuildApplicationCommandPermission
     >(
         nameof(ModifyApplicationCommandPermissions),
         RequestMethod.Put,

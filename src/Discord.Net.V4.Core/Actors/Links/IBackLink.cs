@@ -8,7 +8,7 @@ public interface IBackLink<out TSource, out TActor, in TId, out TEntity, in TMod
     where TActor : class, IActor<TId, TEntity>
     where TEntity : class, IEntity<TId, TModel>
     where TId : IEquatable<TId>
-    where TModel : IEntityModel<TId>
+    where TModel : IModel
 {
     internal TSource Source { get; }
 }

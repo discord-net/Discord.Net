@@ -41,6 +41,12 @@ public sealed class LinksV3
         public List<LinkExtensions.Extension>? Extensions { get; set; }
         public Target[]? Hierarchy { get; set; }
 
+        public List<Target> EntityAssignableAncestors { get; } = ancestors
+            .Where(ancestor => 
+                ancestor.LinkTarget.Entity.Equals(linkTarget.Entity, SymbolEqualityComparer.Default) || 
+                Net.Hanz.Hierarchy.Implements(linkTarget.Entity, ancestor.LinkTarget.Entity)
+            ).ToList();
+
         public string FormattedCoreLinkType
             => $"Discord.ILinkType<{LinkTarget.Actor}, {LinkTarget.Id}, {LinkTarget.Entity}, {LinkTarget.Model}>";
 
@@ -57,14 +63,14 @@ public sealed class LinksV3
         public void Log(Logger logger)
         {
             logger.Log($"Target: {LinkTarget.Actor} | {LinkTarget.Id} | {LinkTarget.Entity} | {LinkTarget.Entity}");
-            
+
             logger.Log($" - Ancestors: {Ancestors.Count}");
 
             foreach (var ancestor in Ancestors)
             {
                 logger.Log($"    - {ancestor.LinkTarget.Actor}");
             }
-            
+
             logger.Log($" - Extensions: {Extensions?.Count ?? 0}");
 
             if (Extensions is not null)
@@ -74,7 +80,7 @@ public sealed class LinksV3
                     logger.Log($"    - {extension.Name}");
                 }
             }
-            
+
             logger.Log($" - Hierarchy: {Hierarchy?.Length ?? 0}");
 
             if (Hierarchy is not null)
@@ -118,8 +124,7 @@ public sealed class LinksV3
         var provider =
             schematics
                 .Combine(actors)
-                .SelectMany(GetTarget!)
-                .Select(GenerateLinks);
+                .SelectMany(GetTarget!);
 
         context.RegisterSourceOutput(actors, GenerateAliases!);
         context.RegisterSourceOutput(provider, GenerateSource);
@@ -154,7 +159,11 @@ public sealed class LinksV3
 
               namespace {{schematic.Root.Symbol.ContainingNamespace}};
 
+              #pragma warning disable CS0108
+              #pragma warning disable CS0109
               {{Generate(schematic.Root, ImmutableList<LinkType>.Empty).NormalizeWhitespace()}}
+              #pragma warning restore CS0108
+              #pragma warning restore CS0109
               """
         );
 
@@ -206,45 +215,51 @@ public sealed class LinksV3
         }
     }
 
-    private static void GenerateSource(SourceProductionContext context, GenerativeTarget target)
+    private static void GenerateSource(SourceProductionContext context, Target target)
     {
         context.AddSource(
-            $"LinksV3/{target.Target.LinkTarget.Actor.ToFullMetadataName()}",
+            $"LinksV3/{target.LinkTarget.Actor.ToFullMetadataName()}",
             $"""
              {
                  string.Join(
                      Environment.NewLine,
-                     target.Target.LinkTarget.Syntax
+                     target.LinkTarget.Syntax
                          .GetUsingDirectives()
-                         .Concat(target.Target.Schematic.Root.Syntax.GetUsingDirectives())
+                         .Concat(target.Schematic.Root.Syntax.GetUsingDirectives())
                          .Distinct()
                  )
              }
 
-             namespace {target.Target.LinkTarget.Actor.ContainingNamespace};
+             namespace {target.LinkTarget.Actor.ContainingNamespace};
 
-             {target.Syntax.NormalizeWhitespace()}
+             #pragma warning disable CS0108
+             #pragma warning disable CS0109
+             {Run(target)}
+             #pragma warning restore CS0108
+             #pragma warning restore CS0109
              """
         );
     }
-
-    private static GenerativeTarget GenerateLinks(Target target, CancellationToken token)
-        => new(
-            target,
-            (TypeDeclarationSyntax) SyntaxFactory.ParseMemberDeclaration(
-                Run(target)
-            )!
-        );
 
     private static IEnumerable<Target> GetTarget(
         (Schematic Schematic, ImmutableArray<LinkTarget> Actors) target,
         CancellationToken token)
     {
+        var logger = Logger.WithSemanticContext(target.Schematic.Semantic)
+            .GetSubLogger("Targets")
+            .WithCleanLogFile();
         var results = new Dictionary<INamedTypeSymbol, Target>(SymbolEqualityComparer.Default);
 
-        foreach (var actor in target.Actors)
+        try
         {
-            yield return CreateTarget(actor);
+            foreach (var actor in target.Actors)
+            {
+                yield return CreateTarget(actor);
+            }
+        }
+        finally
+        {
+            logger.Flush();
         }
 
         yield break;
@@ -269,8 +284,6 @@ public sealed class LinksV3
                 ancestors
             );
 
-            var logger = Logger.WithSemanticContext(link.SemanticModel);
-
             result.Extensions = LinkExtensions.GetExtensions(result, symbol =>
                     results.TryGetValue(symbol, out var existing)
                         ? existing
@@ -293,52 +306,57 @@ public sealed class LinksV3
 
     private static string Run(Target target)
     {
-        var logger = Logger.WithSemanticContext(target.Schematic.Semantic);
+        var logger = Logger.WithSemanticContext(target.Schematic.Semantic)
+            .GetSubLogger("Generation")
+            .GetSubLogger($"{target.LinkTarget.Actor.Name}")
+            .WithCleanLogFile();
 
-        var kind = target.LinkTarget.Assembly is LinkActorTargets.AssemblyTarget.Core ? "interface" : "class";
+        try
+        {
+            var kind = target.LinkTarget.Assembly is LinkActorTargets.AssemblyTarget.Core ? "interface" : "class";
 
-        target.Log(logger);
+            target.Log(logger);
 
-        var linkMembers = string.Join(
-            Environment.NewLine,
-            target.Schematic.Root.Children
-                .Select(x =>
-                    BuildLinkType(
-                        x,
-                        ImmutableList<LinkType>.Empty,
-                        target,
-                        logger
+            var linkMembers = string.Join(
+                Environment.NewLine,
+                target.Schematic.Root.Children
+                    .Select(x =>
+                        BuildLinkType(
+                            x,
+                            ImmutableList<LinkType>.Empty,
+                            target,
+                            logger
+                        )
                     )
-                )
-        ).WithNewlinePadding(4);
+            ).WithNewlinePadding(4);
 
-        return
-            $$"""
-              public partial {{kind}} {{target.LinkTarget.Actor.Name}}
-              {
-                  {{
-                      string
-                          .Join(
-                              Environment.NewLine,
-                              Processors.Values
-                                  .Select(x => x.CreateProvider(target, logger))
-                                  .Where(x => x is not null)
-                          )
-                          .WithNewlinePadding(4)
-                  }}
-                  {{linkMembers}}
-                  {{
-                      LinkExtensions
-                          .FormatExtensions(ImmutableList<LinkType>.Empty, target, logger)
-                          .WithNewlinePadding(4)
-                  }}
-                  {{
-                      BuildBackLink(target, ImmutableList<string>.Empty)
-                          .WithNewlinePadding(4)
-                  }}
-                  {{LinkHierarchy.BuildHierarchy(target, ImmutableList<string>.Empty)}}
-              }
-              """;
+            return
+                $$"""
+                  public partial {{kind}} {{target.LinkTarget.Actor.Name}}
+                  {
+                      {{
+                          LinkRelationships
+                              .GenerateRelationship(target)
+                              .WithNewlinePadding(4)
+                      }}
+                      {{linkMembers}}
+                      {{
+                          LinkExtensions
+                              .FormatExtensions(ImmutableList<LinkType>.Empty, target, logger)
+                              .WithNewlinePadding(4)
+                      }}
+                      {{
+                          BuildBackLink(target, ImmutableList<string>.Empty)
+                              .WithNewlinePadding(4)
+                      }}
+                      {{LinkHierarchy.BuildHierarchy(target, ImmutableList<string>.Empty)}}
+                  }
+                  """;
+        }
+        finally
+        {
+            logger.Flush();
+        }
     }
 
     private static string BuildLinkType(
@@ -360,8 +378,11 @@ public sealed class LinksV3
         {
             $"{target.FormattedCoreLinkType}{FormatPath(path.Add(type))}"
         };
+        
+        if(path.Count > 0)
+            bases.Add($"{target.LinkTarget.Actor}{FormatPath(path)}");
 
-        foreach (var ancestor in target.Ancestors)
+        foreach (var ancestor in target.EntityAssignableAncestors)
         {
             bases.Add($"{ancestor.LinkTarget.Actor}{FormatPath(path.Add(type))}");
             logger.Log($"{type.Symbol} += {ancestor.LinkTarget.Actor} -> {type.Symbol}");
@@ -369,13 +390,19 @@ public sealed class LinksV3
 
         var members = new List<string>();
 
-        if (target.Ancestors.Count > 0)
+        if (path.Count > 0)
+        {
+            // add the root implementation to ours
+            bases.Add($"{target.LinkTarget.Actor}.{FormatTypeName(type.Symbol)}");
+        }
+        
+        if (target.EntityAssignableAncestors.Count > 0)
         {
             // we need to redefine the link members
             if (Processors.TryGetValue(type.Symbol.Name, out var processor))
                 processor.AddOverrideMembers(members, target, type, path);
 
-            foreach (var ancestor in target.Ancestors)
+            foreach (var ancestor in target.EntityAssignableAncestors)
             {
                 members.AddRange([
                     $"{ancestor.LinkTarget.Actor} Discord.IActorProvider<{ancestor.LinkTarget.Actor}, {ancestor.LinkTarget.Id}>.GetActor({ancestor.LinkTarget.Id} id) => (this as IActorProvider<{target.LinkTarget.Actor}, {target.LinkTarget.Id}>).GetActor(id);"
@@ -392,7 +419,7 @@ public sealed class LinksV3
               )}}{{
               (
                   type.Syntax.ConstraintClauses.Count > 0
-                      ? $"{Environment.NewLine}{string.Join(Environment.NewLine, type.Syntax.ConstraintClauses)}"
+                      ? $"{Environment.NewLine}    {string.Join(Environment.NewLine, type.Syntax.ConstraintClauses).WithNewlinePadding(4)}"
                       : string.Empty
               )}}
               {
@@ -439,27 +466,43 @@ public sealed class LinksV3
             backlinkBaseType
         };
 
-        foreach (var ancestor in target.Ancestors)
+        foreach (var ancestor in target.EntityAssignableAncestors)
         {
-            bases.Add($"{ancestor.LinkTarget.Actor}{FormatPath(path)}.BackLink<TSource>");
+            bases.Add($"{ancestor.LinkTarget.Actor}{FormatClosestPath(ancestor, path)}.BackLink<TSource>");
         }
 
         var members = new List<string>();
 
-        if (target.Ancestors.Count > 0)
+        var willHaveRedefinedSource = target.EntityAssignableAncestors.Count > 0;
+
+        if (willHaveRedefinedSource)
         {
             members.AddRange([
                 "new TSource Source { get; }",
                 $"TSource {backlinkBaseType}.Source => Source;"
             ]);
-
-            foreach (var ancestor in target.Ancestors)
+        }
+        
+        if (target.EntityAssignableAncestors.Count > 0)
+        {
+            foreach (var ancestor in target.EntityAssignableAncestors)
             {
                 members.Add(
-                    ancestor.Ancestors.Count > 0
+                    ancestor.EntityAssignableAncestors.Count > 0
                         ? $"TSource {ancestor.LinkTarget.Actor}{FormatPath(ancestorPath)}.BackLink<TSource>.Source => Source;"
                         : $"TSource Discord.IBackLink<TSource, {ancestor.LinkTarget.Actor}, {ancestor.LinkTarget.Id}, {ancestor.LinkTarget.Entity}, {ancestor.LinkTarget.Model}>.Source => Source;"
                 );
+            }
+        }
+
+        if (path.Count > 1)
+        {
+            foreach (var part in path)
+            {
+                bases.Add($"{target.LinkTarget.Actor}.{part}.BackLink<TSource>");
+                
+                if(willHaveRedefinedSource)
+                    members.Add($"TSource {target.LinkTarget.Actor}.{part}.BackLink<TSource>.Source => Source;");
             }
         }
 
@@ -515,12 +558,47 @@ public sealed class LinksV3
         return $".{string.Join(".", path)}";
     }
 
+    public static string FormatClosestPath(
+        Target target,
+        ImmutableList<string> path,
+        bool includeExtension = true,
+        bool includeSchematic = true,
+        bool includeHierarchy = true)
+    {
+        if (path.Count == 0) return string.Empty;
+
+        var final = ImmutableList<string>.Empty;
+
+        var node = target.Schematic.Root;
+
+        foreach (var part in path)
+        {
+            var isExtensionPart = target.Extensions?.Any(v => v.Name == part) ?? false;
+            var isSchematicPart = node.Children.Any(x => FormatTypeName(x.Symbol) == part);
+            var isHierarchyPart = target.Hierarchy?.Any(x => GetFriendlyName(x.LinkTarget.Actor) == part) ?? false;
+
+            if (isExtensionPart && includeExtension)
+                final = final.Add(part);
+            else if (isSchematicPart && includeSchematic)
+                final = final.Add(part);
+            else if (isHierarchyPart && includeHierarchy)
+                final = final.Add(part);
+        }
+
+        return FormatPath(final);
+    }
+
     public static string GetFriendlyName(ITypeSymbol symbol)
     {
-        if (symbol.TypeKind is TypeKind.Interface)
-            return symbol.Name.Remove(0, 1).Replace("Actor", string.Empty);
+        var name = symbol.Name;
 
-        return symbol.Name.Replace("Actor", string.Empty).Replace("Gateway", string.Empty)
+        if (symbol.TypeKind is TypeKind.Interface)
+            name = symbol.Name.Remove(0, 1);
+
+        return name
+            .Replace("Trait", string.Empty)
+            .Replace("Actor", string.Empty)
+            .Replace("Gateway", string.Empty)
             .Replace("Rest", string.Empty);
     }
 }

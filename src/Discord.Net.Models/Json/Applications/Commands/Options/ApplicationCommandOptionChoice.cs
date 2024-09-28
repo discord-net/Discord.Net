@@ -2,7 +2,9 @@ using System.Text.Json.Serialization;
 
 namespace Discord.Models.Json;
 
-public sealed class ApplicationCommandOptionChoice<T> : IApplicationCommandOptionChoiceModel<T>
+public sealed class ApplicationCommandOptionChoice<
+    [OneOf(typeof(long), typeof(string), typeof(double))] T
+> : IApplicationCommandOptionChoiceModel<T>
     where T : notnull
 {
     [JsonPropertyName("name")]

@@ -200,10 +200,14 @@ public sealed class TraitComponents : ISyntaxGenerationTask<TraitComponents.Gene
 
               namespace {{target.Trait.ContainingNamespace.ToDisplayString()}};
 
+              #pragma warning disable CS0108
+              #pragma warning disable CS0109
               public partial interface {{target.Trait.Name}}
               {
                   {{extensions.WithNewlinePadding(4)}}
               }
+              #pragma warning restore CS0108
+              #pragma warning restore CS0109
               """
         );
     }
@@ -237,30 +241,28 @@ public sealed class TraitComponents : ISyntaxGenerationTask<TraitComponents.Gene
         {
             var name = component.Component.Name.Replace("Component", string.Empty);
 
-            var members = string.Join(
-                Environment.NewLine,
-                component
-                    .LinkExtensions
-                    .Select(x =>
+            var members = component
+                .LinkExtensions
+                .Select(x =>
+                {
+                    var linkType = x.Key.Type.ToDisplayString();
+                    var containingType = x.Key.ContainingType.ToDisplayString();
+
+                    if (path is not null)
                     {
-                        var linkType = x.Key.Type.ToDisplayString();
-                        var containingType = x.Key.ContainingType.ToDisplayString();
+                        linkType += $".{string.Join(".", path)}";
+                        containingType += $".{string.Join(".", path)}";
+                    }
 
-                        if (path is not null)
-                        {
-                            linkType += $".{string.Join(".", path)}";
-                            containingType += $".{string.Join(".", path)}";
-                        }
-
-                        var getter = x.Value.Getter is not null
-                            ? $"=> {x.Value.Getter};"
-                            : "{ get; }";
+                    var getter = x.Value.Getter is not null
+                        ? $"=> {x.Value.Getter};"
+                        : "{ get; }";
                                                     
-                        return
-                            $"new {linkType}.{x.Value.Type.Name} {x.Key.Name} {getter}{Environment.NewLine}" +
-                            $"{linkType} {containingType}.{x.Key.Name} => {x.Key.Name};";
-                    })
-            );
+                    return
+                        $"new {linkType}.{x.Value.Type.Name} {x.Key.Name} {getter}{Environment.NewLine}" +
+                        $"{linkType} {containingType}.{x.Key.Name} => {x.Key.Name};";
+                })
+                .ToList();
 
             var childTypes = component.Children.Count == 0
                 ? string.Empty
@@ -276,12 +278,22 @@ public sealed class TraitComponents : ISyntaxGenerationTask<TraitComponents.Gene
                     )
                 );
 
+            if (path?.Count > 0)
+            {
+                bases = bases.Append($"{target.Trait}.{name}");
+
+                foreach (var ext in component.LinkExtensions)
+                {
+                    members.Add($"{ext.Key.Type.ToDisplayString()}.{ext.Value.Type.Name} {target.Trait}.{name}.{ext.Key.Name} => {ext.Key.Name};");
+                }
+            }
+
             return $$"""
                      public interface {{name}}{{(
                          bases is not null ? $" : {string.Join(", ", bases)}" : string.Empty
                      )}}
                      {
-                         {{members.WithNewlinePadding(4)}}
+                         {{string.Join(Environment.NewLine, members).WithNewlinePadding(4)}}
                          {{childTypes}}
                      }
                      """.WithNewlinePadding(depth * 4);

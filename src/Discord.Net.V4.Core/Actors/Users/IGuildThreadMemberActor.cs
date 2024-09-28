@@ -8,7 +8,7 @@ public partial interface IGuildThreadMemberActor :
     [SourceOfTruth] new IGuildThreadChannelActor Thread { get; }
 
     [LinkExtension]
-    private interface WithCurrentMemberExtension : IThreadMemberActor.WithCurrentMemberExtension
+    protected new interface WithCurrentMemberExtension : IThreadMemberActor.WithCurrentMemberExtension
     {
         new IGuildThreadMemberActor Current { get; }
 
@@ -16,7 +16,7 @@ public partial interface IGuildThreadMemberActor :
     }
 
     [LinkExtension]
-    private interface WithPagedVariantExtension : IThreadMemberActor.WithPagedVariantExtension
+    protected new interface WithPagedVariantExtension : IThreadMemberActor.WithPagedVariantExtension
     {
         new IGuildThreadMemberActor.Paged<PageThreadMembersParams>.Indexable AsPaged { get; }
 

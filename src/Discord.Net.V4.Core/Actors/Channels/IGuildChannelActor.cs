@@ -18,6 +18,7 @@ namespace Discord;
 ]
 public partial interface IGuildChannelActor :
     IGuildRelationship,
+    IChannelActor,
     IActor<ulong, IGuildChannel>
 {
     [BackLink<IGuildActor>]

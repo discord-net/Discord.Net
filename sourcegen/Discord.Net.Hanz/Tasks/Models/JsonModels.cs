@@ -79,6 +79,56 @@ public static class JsonModels
         return (nameAttribute.ConstructorArguments[0].Value as string)!;
     }
 
+    private static IEnumerable<JsonModelTarget> FormatGenericTarget(
+        JsonModelTarget target, 
+        INamedTypeSymbol named,
+        Logger logger)
+    {
+        var variance = new List<ITypeSymbol[]>();
+
+        foreach (var genericParameter in named.TypeParameters)
+        {
+            var oneOf = genericParameter.GetAttributes()
+                .FirstOrDefault(x => x.AttributeClass?.Name == "OneOfAttribute")
+                ?.ConstructorArguments
+                .FirstOrDefault()
+                .Values.Select(x => (ITypeSymbol) x.Value!)
+                .ToArray();
+
+            if (oneOf is null || oneOf.Length == 0) yield break;
+
+            variance.Add(oneOf);
+        }
+
+        var indexMaps = variance.Select(x => x.Length).ToArray();
+
+        for (var i = 0; i != indexMaps.Sum(); i++)
+        {
+            var symbol = named.Construct(
+                variance
+                    .Select((x, pos) =>
+                    {
+                        if (i == 0)
+                            return x[0];
+                        
+                        if (pos == 0)
+                            return x[i % x.Length];
+
+                        var offset = indexMaps.Take(pos).Sum();
+                        if (i < offset || offset == 0)
+                            return x[0];
+
+                        return x[(int) Math.Floor((double) i / offset)];
+                    })
+                    .ToArray()
+            );
+            
+            logger.Log($"{target.TypeSymbol}: {i + 1}/{indexMaps.Sum()} -> {symbol}");
+
+            yield return new JsonModelTarget(target.Syntax, symbol, target.SemanticModel);
+        }
+    }
+
     public static void Execute(
         SourceProductionContext context,
         (ImmutableArray<JsonModelTarget?> Left, Compilation Right) input,
@@ -116,6 +166,13 @@ public static class JsonModels
         var targets = potentialTargets
             .Where(x => x is not null && IsSpeculativeJsonModel(x.TypeSymbol))
             .Cast<JsonModelTarget>()
+            .SelectMany(x =>
+            {
+                if (x.TypeSymbol is not INamedTypeSymbol {IsGenericType: true} generic)
+                    return [x];
+
+                return FormatGenericTarget(x, generic, logger);
+            })
             .ToArray();
 
         var jsonContext = new Context(
@@ -226,7 +283,7 @@ public static class JsonModels
             logger.Warn("Failed to add user type info factory");
             return;
         }
-        
+
         logger.Log("Using the following additional converters:");
 
         foreach (var converter in jsonContext.AdditionalConverters)
@@ -522,11 +579,13 @@ public static class JsonModels
 
         if (converters.Count > 0)
         {
-            options.Add($"Converters = [{string.Join(", ", converters.Select(x => $"typeof({x})"))}]");
+            options.Add(
+                $"Converters = [{Environment.NewLine}    {string.Join($",{Environment.NewLine}", converters.Select(x => $"typeof({x})")).WithNewlinePadding(4)}]"
+            );
         }
 
         return options.Count > 0
-            ? $"[System.Text.Json.Serialization.JsonSourceGenerationOptions({string.Join(", ", options)})]"
+            ? $"[System.Text.Json.Serialization.JsonSourceGenerationOptions({Environment.NewLine}    {string.Join($",{Environment.NewLine}", options).WithNewlinePadding(4)}{Environment.NewLine})]"
             : null;
     }
 
@@ -804,7 +863,7 @@ public static class JsonModels
                                     )
                                 )
                             );
-                        
+
                         continue;
                     }
 

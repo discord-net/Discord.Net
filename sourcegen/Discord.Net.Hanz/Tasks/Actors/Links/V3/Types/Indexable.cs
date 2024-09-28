@@ -15,9 +15,17 @@ public class Indexable : ILinkTypeProcessor
             $"new {target.LinkTarget.Actor} Specifically({target.LinkTarget.Id} id) => (this as IActorProvider<{target.LinkTarget.Actor}, {target.LinkTarget.Id}>).GetActor(id);"
         ]);
 
-        foreach (var ancestor in target.Ancestors)
+        if (path.Count > 0)
         {
-            var overrideType = ancestor.Ancestors.Count > 0
+            members.AddRange([
+                $"{target.LinkTarget.Actor} {target.LinkTarget.Actor}.{LinksV3.FormatTypeName(type.Symbol)}.this[{target.LinkTarget.Id} id] => this[id];",
+                $"{target.LinkTarget.Actor} {target.LinkTarget.Actor}.{LinksV3.FormatTypeName(type.Symbol)}.Specifically({target.LinkTarget.Id} id) => Specifically(id);"
+            ]);
+        }
+
+        foreach (var ancestor in target.EntityAssignableAncestors)
+        {
+            var overrideType = ancestor.EntityAssignableAncestors.Count > 0
                 ? $"{ancestor.LinkTarget.Actor}{LinksV3.FormatPath(path.Add(type))}"
                 : $"{ancestor.FormattedCoreLinkType}.Indexable";
 

@@ -15,10 +15,17 @@ public class Enumerable : ILinkTypeProcessor
             $"new ITask<IReadOnlyCollection<{target.LinkTarget.Entity}>> AllAsync(RequestOptions? options = null, CancellationToken token = default);",
             $"ITask<IReadOnlyCollection<{target.LinkTarget.Entity}>> {target.FormattedCoreLinkType}.Enumerable.AllAsync(RequestOptions? options, CancellationToken token) => AllAsync(options, token);",
         ]);
-
-        foreach (var ancestor in target.Ancestors)
+        
+        if (path.Count > 0)
         {
-            var overrideType = ancestor.Ancestors.Count > 0
+            members.AddRange([
+                $"ITask<IReadOnlyCollection<{target.LinkTarget.Entity}>> {target.LinkTarget.Actor}.{LinksV3.FormatTypeName(type.Symbol)}.AllAsync(RequestOptions? options, CancellationToken token) => AllAsync(options, token);"
+            ]);
+        }
+
+        foreach (var ancestor in target.EntityAssignableAncestors)
+        {
+            var overrideType = ancestor.EntityAssignableAncestors.Count > 0
                 ? $"{ancestor.LinkTarget.Actor}{LinksV3.FormatPath(path.Add(type))}"
                 : $"{ancestor.FormattedCoreLinkType}.Enumerable";
 

@@ -29,8 +29,12 @@ public partial interface IGuildThreadChannelActor :
     IThreadChannelActor,
     IGuildRelationship
 {
-    [SourceOfTruth]
-    new IGuildThreadMemberActor.Enumerable.Indexable.WithCurrentMember.BackLink<IGuildThreadChannelActor> Members { get; }
+    //[SourceOfTruth]
+    new IGuildThreadMemberActor.Enumerable.Indexable.WithCurrentMember.WithPagedVariant.BackLink<IGuildThreadChannelActor> Members { get; }
+    //
+    // override 
+
+    IThreadMemberActor.Enumerable.Indexable.WithCurrentMember.WithPagedVariant.BackLink<IThreadChannelActor> IThreadChannelActor.Members => Members;
 
     [LinkExtension]
     private interface WithActiveExtension

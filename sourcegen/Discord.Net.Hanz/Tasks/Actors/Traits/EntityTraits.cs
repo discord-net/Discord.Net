@@ -228,7 +228,11 @@ public sealed class EntityTraits : ISyntaxGenerationCombineTask<EntityTraits.Gen
 
                   namespace {{target.InterfaceSymbol.ContainingNamespace}};
 
+                  #pragma warning disable CS0108
+                  #pragma warning disable CS0109
                   {{syntax.NormalizeWhitespace()}}
+                  #pragma warning restore CS0108
+                  #pragma warning restore CS0109
                   """
             );
         }

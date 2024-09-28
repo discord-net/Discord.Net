@@ -15,9 +15,16 @@ public class Paged : ILinkTypeProcessor
             $"IAsyncPaged<{pagedType}> {target.FormattedCoreLinkType}.{LinksV3.FormatTypeName(type.Symbol)}.PagedAsync(TParams? args, RequestOptions? options) => PagedAsync(args, options);",
         ]);
         
-        foreach (var ancestor in target.Ancestors)
+        if (path.Count > 0)
         {
-            var overrideType = ancestor.Ancestors.Count > 0
+            members.AddRange([
+                $"IAsyncPaged<{pagedType}> {target.LinkTarget.Actor}.{LinksV3.FormatTypeName(type.Symbol)}.PagedAsync(TParams? args, RequestOptions? options) => PagedAsync(args, options);"
+            ]);
+        }
+        
+        foreach (var ancestor in target.EntityAssignableAncestors)
+        {
+            var overrideType = ancestor.EntityAssignableAncestors.Count > 0
                 ? $"{ancestor.LinkTarget.Actor}{LinksV3.FormatPath(path.Add(type))}"
                 : $"{ancestor.FormattedCoreLinkType}.{LinksV3.FormatTypeName(type.Symbol)}";
 
