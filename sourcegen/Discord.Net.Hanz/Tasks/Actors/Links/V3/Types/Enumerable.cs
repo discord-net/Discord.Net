@@ -8,18 +8,111 @@ namespace Discord.Net.Hanz.Tasks.Actors.V3.Types;
 
 public class Enumerable : ILinkTypeProcessor
 {
-    public void AddOverrideMembers(List<string> members, LinksV3.Target target, LinkSchematics.Entry type,
+    public ConstructorRequirements AddImplementation(
+        List<string> members,
+        LinksV3.Target target,
+        LinkSchematics.Entry type,
         ImmutableList<LinkSchematics.Entry> path)
     {
+        var fetchableOfManyInterface = target.LinkTarget.GetCoreEntity()
+            .AllInterfaces
+            .FirstOrDefault(x => x.Name == "IFetchableOfMany");
+
+        var canUseFetchable =
+            fetchableOfManyInterface?
+                .TypeArguments
+                .ElementAtOrDefault(1)?
+                .Equals(target.LinkTarget.Model, SymbolEqualityComparer.Default)
+            ?? false;
+
+        var overrideTarget = target.EntityAssignableAncestors.Count > 0
+            ? $"{target.LinkTarget.GetCoreActor()}{LinksV3.FormatPath(path.Add(type))}"
+            : $"{target.FormattedCoreLinkType}.Enumerable";
+
+        var apiProviderType = $"ApiModelProviderDelegate<IEnumerable<{target.LinkTarget.Model}>>";
+
+        var extraArgs = GetExtraParameters(target);
+        var formattedExtraArgs = FormatExtraParameters(extraArgs);
+        var formattedInvocationParameters = extraArgs.Count == 0
+            ? string.Empty
+            : $", {string.Join(", ", extraArgs.Select(x => $"{x.Name}: {x.Name}"))}";
+
+        var fetchModels = canUseFetchable
+            ? $"await {target.LinkTarget.GetCoreEntity()}.FetchManyRoute(_path{formattedInvocationParameters}).AsRequiredProvider()(Client, options, token)"
+            : "await _apiProvider(Client, options, token);";
+
         members.AddRange([
-            $"new ITask<IReadOnlyCollection<{target.LinkTarget.Entity}>> AllAsync(RequestOptions? options = null, CancellationToken token = default);",
-            $"ITask<IReadOnlyCollection<{target.LinkTarget.Entity}>> {target.FormattedCoreLinkType}.Enumerable.AllAsync(RequestOptions? options, CancellationToken token) => AllAsync(options, token);",
+            canUseFetchable 
+                ? "private readonly IPathable _path;"
+                : $"private readonly {apiProviderType} _apiProvider;",
+            $$"""
+              public async ITask<IReadOnlyCollection<{{target.LinkTarget.Entity}}>> AllAsync({{formattedExtraArgs}}RequestOptions? options = null, CancellationToken token = default)
+              {
+                  var models = {{fetchModels}}
+                  
+                  if (models is null) return [];
+                  
+                  return models.Select(CreateEntity).ToList().AsReadOnly();
+              }
+              """,
+            $"ITask<IReadOnlyCollection<{target.LinkTarget.GetCoreEntity()}>> {overrideTarget}.AllAsync(RequestOptions? options, CancellationToken token = default) => AllAsync(options, token);"
         ]);
-        
+
+//         members.Add(
+//             canUseFetchable
+//                 ? $$"""
+//                     public Enumerable(
+//                         Discord{{target.LinkTarget.Assembly}}Client client,
+//                         {{target.FormattedActorProvider}} provider,
+//                         IPathable path)
+//                     { 
+//                         Client = client;
+//                         Provider = provider;
+//                         
+//                         _path = path;
+//                     }    
+//                     """
+//                 : $$"""
+//                     public Enumerable(
+//                         Discord{{target.LinkTarget.Assembly}}Client client,
+//                         {{target.FormattedActorProvider}} provider,
+//                         {{apiProviderType}} apiProvider)
+//                     {
+//                         Client = client;
+//                         Provider = provider;
+//                         _apiProvider = apiProvider;
+//                     }    
+//                     """
+//         );
+
+        return canUseFetchable
+            ? new ConstructorRequirements().Require("_path", "IPathable")
+            : new ConstructorRequirements().Require("_apiProvider", apiProviderType);
+    }
+
+    public void AddOverrideMembers(
+        List<string> members,
+        LinksV3.Target target,
+        LinkSchematics.Entry type,
+        ImmutableList<LinkSchematics.Entry> path)
+    {
+        var extraParameters = GetExtraParameters(target);
+
+        if (target.EntityAssignableAncestors.Count == 0 && extraParameters.Count == 0) return;
+
+        members.AddRange([
+            $"new ITask<IReadOnlyCollection<{target.LinkTarget.Entity}>> AllAsync({FormatExtraParameters(extraParameters)}RequestOptions? options = null, CancellationToken token = default);",
+            $"ITask<IReadOnlyCollection<{target.LinkTarget.Entity}>> {target.FormattedLinkType}.Enumerable.AllAsync(RequestOptions? options, CancellationToken token) => AllAsync(options: options, token: token);",
+        ]);
+
         if (path.Count > 0)
         {
+            var formattedInvocationParameters = extraParameters.Count == 0
+                ? string.Empty
+                : $"{string.Join(", ", extraParameters.Select(x => $"{x.Name}: {x.Name}"))}, ";
+
             members.AddRange([
-                $"ITask<IReadOnlyCollection<{target.LinkTarget.Entity}>> {target.LinkTarget.Actor}.{LinksV3.FormatTypeName(type.Symbol)}.AllAsync(RequestOptions? options, CancellationToken token) => AllAsync(options, token);"
+                $"ITask<IReadOnlyCollection<{target.LinkTarget.Entity}>> {target.LinkTarget.Actor}.{LinksV3.FormatTypeName(type.Symbol)}.AllAsync({FormatExtraParameters(extraParameters, defaults: false)}RequestOptions? options, CancellationToken token) => AllAsync({formattedInvocationParameters}options: options, token: token);"
             ]);
         }
 
@@ -27,127 +120,100 @@ public class Enumerable : ILinkTypeProcessor
         {
             var overrideType = ancestor.EntityAssignableAncestors.Count > 0
                 ? $"{ancestor.LinkTarget.Actor}{LinksV3.FormatPath(path.Add(type))}"
-                : $"{ancestor.FormattedCoreLinkType}.Enumerable";
+                : $"{ancestor.FormattedLinkType}.Enumerable";
+
+            var ancestorExtraParameters = GetExtraParameters(ancestor);
+
+            var matching = ancestorExtraParameters
+                .Where(x => extraParameters.Any(y =>
+                    y.Name == x.Name &&
+                    y.Type.Equals(x.Type, SymbolEqualityComparer.Default))
+                )
+                .ToList();
+
+            var formattedAncestorInvocationParameters = matching.Count == 0
+                ? string.Empty
+                : $"{string.Join(", ", matching.Select(x => $"{x.Name}: {x.Name}"))}, ";
 
             members.AddRange([
-                $"ITask<IReadOnlyCollection<{ancestor.LinkTarget.Entity}>> {overrideType}.AllAsync(RequestOptions? options, CancellationToken token) => AllAsync(options, token);"
+                $"ITask<IReadOnlyCollection<{ancestor.LinkTarget.Entity}>> {overrideType}.AllAsync({FormatExtraParameters(ancestorExtraParameters, defaults: false)}RequestOptions? options, CancellationToken token) => AllAsync({formattedAncestorInvocationParameters}options: options, token: token);"
             ]);
         }
+    }
+
+    private static List<IParameterSymbol> GetExtraParameters(LinksV3.Target target)
+    {
+        if (target.LinkTarget.Assembly is not LinkActorTargets.AssemblyTarget.Core)
+        {
+            var fetchableOfManyMethod = target.LinkTarget.GetCoreEntity()
+                .GetMembers("FetchManyRoute")
+                .OfType<IMethodSymbol>()
+                .FirstOrDefault();
+
+            if (fetchableOfManyMethod is null || fetchableOfManyMethod.Parameters.Length == 1) return [];
+
+            return fetchableOfManyMethod
+                .Parameters
+                .Skip(1)
+                .Where(x => x.HasExplicitDefaultValue)
+                .ToList();
+        }
+
+        var fetchableOfManyAttribute = target.LinkTarget.GetCoreEntity()
+            .GetAttributes()
+            .FirstOrDefault(x => x.AttributeClass?.Name == "FetchableOfManyAttribute");
+
+        if (fetchableOfManyAttribute is null) return [];
+
+        if (EntityTraits.GetNameOfArgument(fetchableOfManyAttribute) is not MemberAccessExpressionSyntax
+            routeMemberAccess)
+            return [];
+
+        var route = EntityTraits.GetRouteSymbol(
+            routeMemberAccess,
+            target.LinkTarget.SemanticModel.Compilation.GetSemanticModel(routeMemberAccess.SyntaxTree)
+        );
+
+        return route is IMethodSymbol method && ParseExtraArgs(method, target) is { } extra
+            ? extra
+            : [];
+
+        static List<IParameterSymbol> ParseExtraArgs(IMethodSymbol symbol, LinksV3.Target target)
+        {
+            var args = new List<IParameterSymbol>();
+
+            foreach (var parameter in symbol.Parameters)
+            {
+                var heuristic = parameter.GetAttributes()
+                    .FirstOrDefault(x => x.AttributeClass?.Name == "IdHeuristicAttribute");
+
+                if (heuristic is not null)
+                {
+                    continue;
+                }
+
+                if (parameter.Name is "id") continue;
+
+                if (!parameter.HasExplicitDefaultValue) continue;
+
+                args.Add(parameter);
+            }
+
+            return args;
+        }
+    }
+
+    private static string FormatExtraParameters(List<IParameterSymbol> parameters, bool defaults = true)
+    {
+        if (parameters.Count == 0) return string.Empty;
+
+        return $"{string.Join(", ", parameters
+            .Select(x => $"{x.Type} {x.Name}{(defaults ? $" = {SyntaxUtils.CreateLiteral(x.Type, x.ExplicitDefaultValue)}" : string.Empty)}")
+        )}, ";
     }
 
     public string? CreateProvider(LinksV3.Target target, Logger logger)
     {
         return null;
-        
-        var entityAttributes = target.LinkTarget.GetCoreEntity().GetAttributes();
-
-        var fetchableOfMany = entityAttributes
-            .Where(x => x.AttributeClass?.Name == "FetchableOfManyAttribute")
-            .ToArray();
-
-        if (fetchableOfMany.Length == 0) return null;
-
-        var results = new List<string>();
-        
-        foreach (var attribute in fetchableOfMany)
-        {
-            if (EntityTraits.GetNameOfArgument(attribute) is not MemberAccessExpressionSyntax routeMemberAccess)
-                continue;
-
-            var route = EntityTraits.GetRouteSymbol(
-                routeMemberAccess,
-                target.LinkTarget.SemanticModel.Compilation.GetSemanticModel(routeMemberAccess.SyntaxTree)
-            );
-
-            if (route is null) continue;
-            
-            results.Add(GenerateFetchableProvider(route, target, logger));
-        }
-
-        if (results.Count == 0) return null;
-
-        return string.Join(Environment.NewLine, results);
-    }
-
-    private static string GenerateFetchableProvider(
-        ISymbol route, 
-        LinksV3.Target target,
-        Logger logger)
-    {
-        var name = MemberUtils.GetMemberName(route);
-
-        logger.Log($"{target.LinkTarget.Actor}: fetchable {name}");
-
-        var extraArgs = route is IMethodSymbol method && ParseExtraArgs(method, target) is { } extra
-            ? extra
-            : [];
-
-        return
-            $$"""
-              public class {{name}}EnumerableProvider : Discord.IEnumerableLinkProvider<{{target.LinkTarget.Entity}}>
-              {
-                  private readonly {{target.FormattedCoreLink}} _link;
-                  private readonly IApiOutRoute<IEnumerable<{{target.LinkTarget.Model}}>> _route;
-                  
-                  internal {{name}}EnumerableProvider(
-                      {{target.FormattedCoreLink}} link,
-                      IApiOutRoute<IEnumerable<{{target.LinkTarget.Model}}>> route)
-                  {
-                      _link = link;
-                      _route = route;
-                  }
-              
-                  public async ITask<IReadOnlyCollection<{{target.LinkTarget.Entity}}>> AllAsync(
-                      RequestOptions? options = null, 
-                      CancellationToken token = default)
-                  {
-                      var models = await _link.Client.RestApiClient.ExecuteAsync(
-                          _route,
-                          options,
-                          token
-                      );
-                      
-                      if (models is null) return [];
-                      
-                      return models
-                          .Select(model => _link.GetActor(model.Id).CreateEntity(model))
-                          .ToList()
-                          .AsReadOnly();
-                  }
-                  
-                  public static {{name}}EnumerableProvider Create({{target.FormattedCoreLink}} link{{(
-                      extraArgs.Count > 0
-                        ? $", {string.Join(", ", extraArgs.Select(x => $"{x.Type} {x.Name} = {SyntaxUtils.CreateLiteral(x.Type, x.ExplicitDefaultValue)}"))}"
-                        : string.Empty
-                  )}})
-                  {
-                      return new(link, )
-                  }
-              }
-              """;
-    }
-
-    private static List<IParameterSymbol>? ParseExtraArgs(IMethodSymbol method, LinksV3.Target target)
-    {
-        var args = new List<IParameterSymbol>();
-
-        foreach (var parameter in method.Parameters)
-        {
-            var heuristic = parameter.GetAttributes()
-                .FirstOrDefault(x => x.AttributeClass?.Name == "IdHeuristicAttribute");
-
-            if (heuristic is not null)
-            {
-                continue;
-            }
-            
-            if(parameter.Name is "id") continue;
-            
-            if(!parameter.HasExplicitDefaultValue) continue;
-            
-            args.Add(parameter);
-        }
-        
-        return args.Count > 0 ? args : null;
     }
 }

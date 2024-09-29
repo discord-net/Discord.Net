@@ -69,13 +69,16 @@ public sealed class Logger : ILogger, IEquatable<Logger>
     }
 
     public Logger WithSemanticContext(SemanticModel model)
+        => WithCompilationContext(model.Compilation);
+    
+    public Logger WithCompilationContext(Compilation compilation)
     {
-        if (_logFilePath.Contains(model.Compilation.Assembly.Name))
+        if (_logFilePath.Contains(compilation.Assembly.Name))
             return this;
 
         var name = Path.Combine(
             LogDirectory,
-            model.Compilation.Assembly.Name,
+            compilation.Assembly.Name,
             Path.GetFileName(_logFilePath)
         );
 

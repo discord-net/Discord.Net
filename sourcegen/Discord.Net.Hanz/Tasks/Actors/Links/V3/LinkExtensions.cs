@@ -331,7 +331,7 @@ public static class LinkExtensions
 
                 if (actorPart is not null)
                 {
-                    var actorSymbol = target.Schematic.Semantic.Compilation
+                    var actorSymbol = target.Schematic.Compilation
                         .GetTypeByMetadataName(
                             $"Discord{(prefix is not "Core" ? $".{prefix}" : string.Empty)}.{actorPart}"
                         );

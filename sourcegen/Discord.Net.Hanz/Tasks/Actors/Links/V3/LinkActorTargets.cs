@@ -71,18 +71,24 @@ public class LinkActorTargets
         return node is TypeDeclarationSyntax;
     }
 
+    public static AssemblyTarget? GetAssemblyTarget(
+        Compilation compilation)
+    {
+        return compilation.Assembly.Name switch
+        {
+            "Discord.Net.V4.Core" => AssemblyTarget.Core,
+            "Discord.Net.V4.Rest" => AssemblyTarget.Rest,
+            _ => null
+        };
+    }
+    
     public static GenerationTarget? GetTargetForGeneration(
         GeneratorSyntaxContext context,
         CancellationToken token = default)
     {
         if (!AllowedAssemblies.Contains(context.SemanticModel.Compilation.Assembly.Name)) return null;
 
-        var assembly = context.SemanticModel.Compilation.Assembly.Name switch
-        {
-            "Discord.Net.V4.Core" => AssemblyTarget.Core,
-            "Discord.Net.V4.Rest" => AssemblyTarget.Rest,
-            _ => throw new NotSupportedException()
-        };
+        var assembly = GetAssemblyTarget(context.SemanticModel.Compilation) ?? throw new NotSupportedException();
 
         if (context.Node is not TypeDeclarationSyntax syntax)
             return null;

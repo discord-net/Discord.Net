@@ -11,5 +11,12 @@ public interface ILinkTypeProcessor
         ImmutableList<LinkSchematics.Entry> path
     );
 
+    ConstructorRequirements AddImplementation(
+        List<string> members,
+        LinksV3.Target target,
+        LinkSchematics.Entry type,
+        ImmutableList<LinkSchematics.Entry> path
+    );
+    
     string? CreateProvider(LinksV3.Target target, Logger logger);
 }

@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using System.Text;
+using Discord.Net.Hanz.Tasks.Actors.V3.Impl;
 using Discord.Net.Hanz.Tasks.Actors.V3.Types;
 using Discord.Net.Hanz.Utils;
 using Microsoft.CodeAnalysis;
@@ -16,7 +17,7 @@ using LinkType = LinkSchematics.Entry;
 
 public sealed class LinksV3
 {
-    private static readonly Dictionary<string, ILinkTypeProcessor> Processors = new()
+    public static readonly Dictionary<string, ILinkTypeProcessor> Processors = new()
     {
         {nameof(Indexable), new Indexable()},
         {nameof(Enumerable), new Enumerable()},
@@ -24,34 +25,70 @@ public sealed class LinksV3
         {nameof(Paged), new Paged()}
     };
 
+    private static readonly Dictionary<LinkActorTargets.AssemblyTarget, ILinkImplementer> _implementers = new()
+    {
+        {LinkActorTargets.AssemblyTarget.Rest, new RestLinkImplementer()}
+    };
 
-    private static Logger Logger =>
+
+    public static Logger Logger =>
         Hanz.DefaultLogger.GetSubLogger(nameof(LinksV3));
 
     public sealed class Target(
         LinkTarget linkTarget,
         Schematic schematic,
-        List<Target> ancestors
+        List<Target> ancestors,
+        List<Target> children
     ) :
         IEquatable<Target>
     {
         public LinkTarget LinkTarget { get; } = linkTarget;
         public Schematic Schematic { get; } = schematic;
         public List<Target> Ancestors { get; } = ancestors;
+        public List<Target> Children { get; } = children;
         public List<LinkExtensions.Extension>? Extensions { get; set; }
         public Target[]? Hierarchy { get; set; }
 
         public List<Target> EntityAssignableAncestors { get; } = ancestors
-            .Where(ancestor => 
-                ancestor.LinkTarget.Entity.Equals(linkTarget.Entity, SymbolEqualityComparer.Default) || 
+            .Where(ancestor =>
+                ancestor.LinkTarget.Entity.Equals(linkTarget.Entity, SymbolEqualityComparer.Default) ||
                 Net.Hanz.Hierarchy.Implements(linkTarget.Entity, ancestor.LinkTarget.Entity)
             ).ToList();
 
-        public string FormattedCoreLinkType
+        public Target? BaseTarget
+            => LinkTarget.Actor.TypeKind is TypeKind.Class && LinkTarget.Actor.BaseType is not null
+                ? Ancestors.FirstOrDefault(x =>
+                    x.LinkTarget.Actor.Equals(LinkTarget.Actor.BaseType, SymbolEqualityComparer.Default)
+                )
+                : null;
+
+        public string FormattedLinkType
             => $"Discord.ILinkType<{LinkTarget.Actor}, {LinkTarget.Id}, {LinkTarget.Entity}, {LinkTarget.Model}>";
+
+        public string FormattedCoreLinkType
+            =>
+                $"Discord.ILinkType<{LinkTarget.GetCoreActor()}, {LinkTarget.Id}, {LinkTarget.GetCoreEntity()}, {LinkTarget.Model}>";
 
         public string FormattedCoreLink
             => $"Discord.ILink<{LinkTarget.Actor}, {LinkTarget.Id}, {LinkTarget.Entity}, {LinkTarget.Model}>";
+
+        public string FormattedRestLinkType =>
+            $"Discord.Rest.IRestLinkType<{LinkTarget.Actor}, {LinkTarget.Id}, {LinkTarget.Entity}, {LinkTarget.Model}>";
+
+        public string FormattedActorProvider
+            => $"Discord.IActorProvider<{LinkTarget.Actor}, {LinkTarget.Id}>";
+
+        public string FormattedCoreActorProvider
+            => $"Discord.IActorProvider<{LinkTarget.GetCoreActor()}, {LinkTarget.Id}>";
+
+        public string FormattedRestActorProvider
+            => $"Discord.Rest.RestActorProvider<{LinkTarget.Actor}, {LinkTarget.Id}>";
+
+        public string FormattedEntityProvider
+            => $"Discord.IEntityProvider<{LinkTarget.Entity}, {LinkTarget.Model}>";
+
+        public string FormattedCoreEntityProvider
+            => $"Discord.IEntityProvider<{LinkTarget.GetCoreEntity()}, {LinkTarget.Model}>";
 
         public bool Equals(Target other)
         {
@@ -63,6 +100,8 @@ public sealed class LinksV3
         public void Log(Logger logger)
         {
             logger.Log($"Target: {LinkTarget.Actor} | {LinkTarget.Id} | {LinkTarget.Entity} | {LinkTarget.Entity}");
+
+            logger.Log($" - Base Target?: {BaseTarget?.LinkTarget.Actor.ToDisplayString() ?? "none"}");
 
             logger.Log($" - Ancestors: {Ancestors.Count}");
 
@@ -112,7 +151,25 @@ public sealed class LinksV3
                 LinkSchematics.IsPotentialSchematic,
                 LinkSchematics.MapSchematic
             )
-            .Where(x => x is not null);
+            .Combine(context.CompilationProvider.Select(LinkSchematics.MapNonCoreSchematic))
+            .Select((pair, _) => pair.Left ?? pair.Right)
+            .Where(x => x is not null)
+            .Collect()
+            .SelectMany((x, _) =>
+            {
+                var set = new HashSet<string>();
+                var result = new List<Schematic>();
+
+                foreach (var schematic in x)
+                {
+                    if (schematic is null) continue;
+
+                    if (set.Add(schematic.Root.Symbol.ToDisplayString()))
+                        result.Add(schematic);
+                }
+
+                return result;
+            });
 
         var actors = context.SyntaxProvider.CreateSyntaxProvider(
                 LinkActorTargets.IsValid,
@@ -152,6 +209,8 @@ public sealed class LinksV3
         SourceProductionContext context,
         Schematic schematic)
     {
+        if (schematic.Compilation.Assembly.Name is not "Discord.Net.V4.Core") return;
+
         context.AddSource(
             $"LinksV3/{schematic.Root.Symbol.ToFullMetadataName()}",
             $$"""
@@ -217,6 +276,12 @@ public sealed class LinksV3
 
     private static void GenerateSource(SourceProductionContext context, Target target)
     {
+        var logger = Logger
+            .WithCompilationContext(target.Schematic.Compilation)
+            .GetSubLogger("Sources");
+
+        logger.Log($"Generating {target.LinkTarget.Actor}...");
+
         context.AddSource(
             $"LinksV3/{target.LinkTarget.Actor.ToFullMetadataName()}",
             $"""
@@ -239,19 +304,29 @@ public sealed class LinksV3
              #pragma warning restore CS0109
              """
         );
+
+        logger.Flush();
     }
 
     private static IEnumerable<Target> GetTarget(
         (Schematic Schematic, ImmutableArray<LinkTarget> Actors) target,
         CancellationToken token)
     {
-        var logger = Logger.WithSemanticContext(target.Schematic.Semantic)
+        var logger = Logger.WithCompilationContext(target.Schematic.Compilation)
             .GetSubLogger("Targets")
             .WithCleanLogFile();
+
+        Logger
+            .WithCompilationContext(target.Schematic.Compilation)
+            .GetSubLogger("Sources")
+            .DeleteLogFile(true);
+
         var results = new Dictionary<INamedTypeSymbol, Target>(SymbolEqualityComparer.Default);
 
         try
         {
+            logger.Log($"Processing {target.Actors.Length} actors...");
+
             foreach (var actor in target.Actors)
             {
                 yield return CreateTarget(actor);
@@ -269,19 +344,35 @@ public sealed class LinksV3
             if (results.TryGetValue(link.Actor, out var value))
                 return value;
 
-            var ancestors = target.Actors
-                .Where(x => Hierarchy.Implements(link.Actor, x.Actor))
-                .Select(x =>
-                    results.TryGetValue(x.Actor, out var existing)
-                        ? existing
-                        : results[x.Actor] = CreateTarget(x)
-                )
-                .ToList();
-
             var result = results[link.Actor] = new(
                 link,
                 target.Schematic,
-                ancestors
+                [],
+                []
+            );
+
+            result.Ancestors.AddRange(
+                target.Actors
+                    .Where(x => Hierarchy.Implements(link.Actor, x.Actor))
+                    .Select(x =>
+                        results.TryGetValue(x.Actor, out var existing)
+                            ? existing
+                            : results[x.Actor] = CreateTarget(x)
+                    )
+            );
+
+            result.Children.AddRange(
+                target.Actors
+                    .Where(x =>
+                        Hierarchy.Implements(x.Actor, link.Actor)
+                        &&
+                        !x.Actor.Equals(link.Actor, SymbolEqualityComparer.Default)
+                    )
+                    .Select(x =>
+                        results.TryGetValue(x.Actor, out var existing)
+                            ? existing
+                            : results[x.Actor] = CreateTarget(x)
+                    )
             );
 
             result.Extensions = LinkExtensions.GetExtensions(result, symbol =>
@@ -306,14 +397,16 @@ public sealed class LinksV3
 
     private static string Run(Target target)
     {
-        var logger = Logger.WithSemanticContext(target.Schematic.Semantic)
+        var logger = Logger.WithCompilationContext(target.Schematic.Compilation)
             .GetSubLogger("Generation")
             .GetSubLogger($"{target.LinkTarget.Actor.Name}")
             .WithCleanLogFile();
 
         try
         {
-            var kind = target.LinkTarget.Assembly is LinkActorTargets.AssemblyTarget.Core ? "interface" : "class";
+            var kind = target.LinkTarget.Assembly is LinkActorTargets.AssemblyTarget.Core
+                ? "interface"
+                : "class";
 
             target.Log(logger);
 
@@ -353,6 +446,11 @@ public sealed class LinksV3
                   }
                   """;
         }
+        catch (Exception x)
+        {
+            logger.Warn($"Failed to generate targets: {x}");
+            return string.Empty;
+        }
         finally
         {
             logger.Flush();
@@ -367,52 +465,77 @@ public sealed class LinksV3
     {
         logger.Log($" - {type.Symbol}");
 
-        var kind = target.LinkTarget.Assembly is LinkActorTargets.AssemblyTarget.Core ? "interface" : "class";
+        var isCore = target.LinkTarget.Assembly is LinkActorTargets.AssemblyTarget.Core;
 
         var childrenLinks = string.Join(
             Environment.NewLine,
             type.Children.Select(v => BuildLinkType(v, path.Add(type), target, logger))
         ).WithNewlinePadding(4);
 
-        var bases = new List<string>
-        {
-            $"{target.FormattedCoreLinkType}{FormatPath(path.Add(type))}"
-        };
-        
-        if(path.Count > 0)
-            bases.Add($"{target.LinkTarget.Actor}{FormatPath(path)}");
-
-        foreach (var ancestor in target.EntityAssignableAncestors)
-        {
-            bases.Add($"{ancestor.LinkTarget.Actor}{FormatPath(path.Add(type))}");
-            logger.Log($"{type.Symbol} += {ancestor.LinkTarget.Actor} -> {type.Symbol}");
-        }
-
+        var bases = new List<string>();
         var members = new List<string>();
 
-        if (path.Count > 0)
+        if (isCore)
         {
-            // add the root implementation to ours
-            bases.Add($"{target.LinkTarget.Actor}.{FormatTypeName(type.Symbol)}");
-        }
-        
-        if (target.EntityAssignableAncestors.Count > 0)
-        {
-            // we need to redefine the link members
-            if (Processors.TryGetValue(type.Symbol.Name, out var processor))
-                processor.AddOverrideMembers(members, target, type, path);
+            bases.Add($"{target.FormattedLinkType}{FormatPath(path.Add(type))}");
+
+            if (path.Count > 0)
+                bases.Add($"{target.LinkTarget.Actor}{FormatPath(path)}");
 
             foreach (var ancestor in target.EntityAssignableAncestors)
             {
-                members.AddRange([
-                    $"{ancestor.LinkTarget.Actor} Discord.IActorProvider<{ancestor.LinkTarget.Actor}, {ancestor.LinkTarget.Id}>.GetActor({ancestor.LinkTarget.Id} id) => (this as IActorProvider<{target.LinkTarget.Actor}, {target.LinkTarget.Id}>).GetActor(id);"
-                ]);
+                bases.Add($"{ancestor.LinkTarget.Actor}{FormatPath(path.Add(type))}");
+                logger.Log($"{type.Symbol} += {ancestor.LinkTarget.Actor} -> {type.Symbol}");
+            }
+
+            if (path.Count > 0)
+            {
+                // add the root implementation to ours
+                bases.Add($"{target.LinkTarget.Actor}.{FormatTypeName(type.Symbol)}");
+            }
+
+            if (Processors.TryGetValue(type.Symbol.Name, out var processor))
+                processor.AddOverrideMembers(members, target, type, path);
+            
+            if (target.EntityAssignableAncestors.Count > 0)
+            {
+                foreach (var ancestor in target.EntityAssignableAncestors)
+                {
+                    members.AddRange([
+                        $"{ancestor.LinkTarget.Actor} Discord.IActorProvider<{ancestor.LinkTarget.Actor}, {ancestor.LinkTarget.Id}>.GetActor({ancestor.LinkTarget.Id} id) => (this as IActorProvider<{target.LinkTarget.Actor}, {target.LinkTarget.Id}>).GetActor(id);"
+                    ]);
+                }
+            }
+        }
+        else
+        {
+            var implementationLinkType = target.LinkTarget.Assembly switch
+            {
+                LinkActorTargets.AssemblyTarget.Rest => target.FormattedRestLinkType,
+                _ => null
+            };
+            
+            if (implementationLinkType is null) return string.Empty;
+            
+            bases.AddRange([
+                $"{target.LinkTarget.GetCoreActor()}{FormatPath(path.Add(type))}",
+                implementationLinkType
+            ]);
+            
+            if (target.BaseTarget is not null)
+            {
+                bases.Insert(0, $"{target.BaseTarget.LinkTarget.Actor}{FormatPath(path.Add(type))}");
+            }
+
+            if (_implementers.TryGetValue(target.LinkTarget.Assembly, out var implementer))
+            {
+                implementer.Implement(members, target, type, path);
             }
         }
 
         return
             $$"""
-              public {{kind}} {{FormatTypeName(type.Symbol)}}{{(
+              public interface {{FormatTypeName(type.Symbol)}}{{(
                   bases.Count > 0
                       ? $" :{Environment.NewLine}    {string.Join($",{Environment.NewLine}", bases).WithNewlinePadding(4)}"
                       : string.Empty
@@ -453,9 +576,7 @@ public sealed class LinksV3
         ImmutableList<string>? ancestorPath = null,
         string? extraMembers = null)
     {
-        ancestorPath ??= path;
-
-        var kind = target.LinkTarget.Assembly is LinkActorTargets.AssemblyTarget.Core ? "interface" : "class";
+        var usedAncestorPath = ancestorPath ?? path;
 
         var backlinkBaseType =
             $"Discord.IBackLink<TSource, {target.LinkTarget.Actor}, {target.LinkTarget.Id}, {target.LinkTarget.Entity}, {target.LinkTarget.Model}>";
@@ -482,14 +603,14 @@ public sealed class LinksV3
                 $"TSource {backlinkBaseType}.Source => Source;"
             ]);
         }
-        
+
         if (target.EntityAssignableAncestors.Count > 0)
         {
             foreach (var ancestor in target.EntityAssignableAncestors)
             {
                 members.Add(
                     ancestor.EntityAssignableAncestors.Count > 0
-                        ? $"TSource {ancestor.LinkTarget.Actor}{FormatPath(ancestorPath)}.BackLink<TSource>.Source => Source;"
+                        ? $"TSource {ancestor.LinkTarget.Actor}{FormatPath(usedAncestorPath)}.BackLink<TSource>.Source => Source;"
                         : $"TSource Discord.IBackLink<TSource, {ancestor.LinkTarget.Actor}, {ancestor.LinkTarget.Id}, {ancestor.LinkTarget.Entity}, {ancestor.LinkTarget.Model}>.Source => Source;"
                 );
             }
@@ -500,15 +621,18 @@ public sealed class LinksV3
             foreach (var part in path)
             {
                 bases.Add($"{target.LinkTarget.Actor}.{part}.BackLink<TSource>");
-                
-                if(willHaveRedefinedSource)
+
+                if (willHaveRedefinedSource)
                     members.Add($"TSource {target.LinkTarget.Actor}.{part}.BackLink<TSource>.Source => Source;");
             }
         }
 
+        if(_implementers.TryGetValue(target.LinkTarget.Assembly, out var implementer))
+            implementer.ImplementBackLink(members, target, path, ancestorPath, extraMembers);
+        
         return
             $$"""
-              public {{kind}} BackLink<{{(kind is "interface" ? "out " : string.Empty)}}TSource> :
+              public interface BackLink<out TSource> :
                   {{string.Join($",{Environment.NewLine}", bases).WithNewlinePadding(4)}}
                   where TSource : class, IPathable
               {

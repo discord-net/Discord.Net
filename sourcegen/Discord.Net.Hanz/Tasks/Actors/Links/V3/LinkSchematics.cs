@@ -8,12 +8,12 @@ public static class LinkSchematics
     public class Schematic : IEquatable<Schematic>
     {
         public Entry Root { get; }
-        public SemanticModel Semantic { get; }
+        public Compilation Compilation { get; }
 
-        public Schematic(Entry root, SemanticModel semantic)
+        public Schematic(Entry root, Compilation compilation)
         {
             Root = root;
-            Semantic = semantic;
+            Compilation = compilation;
         }
 
         public bool Equals(Schematic other)
@@ -55,20 +55,87 @@ public static class LinkSchematics
 
         if (context.SemanticModel.GetDeclaredSymbol(syntax) is not INamedTypeSymbol symbol) return null;
 
-        var logger = Hanz.RootLogger
-            .GetSubLogger(nameof(LinkSchematics))
+        var logger = LinksV3.Logger
             .WithSemanticContext(context.SemanticModel)
+            .GetSubLogger(nameof(LinkSchematics))
             .WithCleanLogFile();
 
         logger.Log($"Processing {symbol}...");
 
+        try
+        {
+            var lookup = new Dictionary<string, Entry>();
+
+            var root = GetEntry(symbol, symbol, lookup, token, logger);
+
+            if (root is null) return null;
+
+            return new Schematic(root, context.SemanticModel.Compilation);
+        }
+        finally
+        {
+            logger.Flush();
+        }
+    }
+
+    public static Schematic? MapNonCoreSchematic(Compilation compilation, CancellationToken token)
+    {
+        if (LinkActorTargets.GetAssemblyTarget(compilation) is LinkActorTargets.AssemblyTarget.Core)
+            return null;
+
+        var logger = LinksV3.Logger
+            .WithCompilationContext(compilation)
+            .GetSubLogger(nameof(LinkSchematics))
+            .WithCleanLogFile();
+
+        try
+        {
+            var symbol = compilation.GetTypeByMetadataName("Discord.ILinkType`4");
+
+            if (symbol is null)
+            {
+                logger.Log("Failed to find ILinkType`4");
+                return null;
+            }
+
+            return MapSchematic(symbol, compilation, token, logger);
+        }
+        catch (Exception x)
+        {
+            logger.Warn($"Failed to map non-core schematic: {x}");
+            return null;
+        }
+        finally
+        {
+            logger.Flush();
+        }
+    }
+    
+    public static Schematic? MapSchematic(
+        INamedTypeSymbol symbol,
+        Compilation compilation,
+        CancellationToken token,
+        Logger? logger = null)
+    {
         var lookup = new Dictionary<string, Entry>();
 
-        var root = GetEntry(symbol, symbol, lookup, token, logger);
+        logger ??= LinksV3.Logger
+            .GetSubLogger(nameof(LinkSchematics))
+            .WithCompilationContext(compilation)
+            .WithCleanLogFile();
 
-        if (root is null) return null;
+        try
+        {
+            var root = GetEntry(symbol, symbol, lookup, token, logger);
 
-        return new Schematic(root, context.SemanticModel);
+            if (root is null) return null;
+
+            return new Schematic(root, compilation);
+        }
+        finally
+        {
+            logger.Flush();
+        }
     }
 
     private static Entry? GetEntry(
@@ -76,7 +143,7 @@ public static class LinkSchematics
         INamedTypeSymbol symbol,
         Dictionary<string, Entry> lookup,
         CancellationToken token,
-        Logger logger)
+        Logger? logger = null)
     {
         var attribute = symbol.GetAttributes()
             .FirstOrDefault(IsLinkSchematicAttribute);
@@ -87,7 +154,7 @@ public static class LinkSchematics
             .FirstOrDefault(x => x.Key == "Children")
             .Value;
 
-        logger.Log($"{symbol}: Children?: {children.Kind}");
+        logger?.Log($"{symbol}: Children?: {children.Kind}");
 
         HashSet<Entry> childrenEntries = new();
 
