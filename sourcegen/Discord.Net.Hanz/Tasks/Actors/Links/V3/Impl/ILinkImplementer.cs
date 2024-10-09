@@ -1,21 +1,27 @@
 using System.Collections.Immutable;
+using Discord.Net.Hanz.Tasks.Actors.V3.Types;
 
 namespace Discord.Net.Hanz.Tasks.Actors.V3.Impl;
 
 public interface ILinkImplementer
 {
-    void Implement(
+    ConstructorRequirements? ImplementLink(
         List<string> members,
         LinksV3.Target target,
         LinkSchematics.Entry type,
-        ImmutableList<LinkSchematics.Entry> path
+        ImmutableList<LinkSchematics.Entry> path,
+        Logger logger
     );
 
-    void ImplementBackLink(
+    ConstructorRequirements? ImplementBackLink(
+        ConstructorRequirements? requirements,
         List<string> members,
         LinksV3.Target target,
-        ImmutableList<string> path,
-        ImmutableList<string>? ancestorPath = null,
-        string? extraMembers = null
+        LinkSchematics.Entry type,
+        ImmutableList<LinkSchematics.Entry> path,
+        Logger logger
     );
+    
+    ConstructorRequirements? ImplementHierarchy();
+    ConstructorRequirements? ImplementExtensions();
 }

@@ -638,8 +638,22 @@ public static class JsonModels
             yield break;
         }
 
-        var jsonGenerator = ((IIncrementalGenerator) Activator.CreateInstance(stjSourceGenerator)).AsSourceGenerator();
+        var sourceGen = Activator.CreateInstance(stjSourceGenerator);
 
+        var jsonGenerator = sourceGen switch
+        {
+            IIncrementalGenerator inc => inc.AsSourceGenerator(),
+            ISourceGenerator src => src,
+            _ => null
+        };
+        
+        if (jsonGenerator is null)
+        {
+            logger.Warn("STJ sourcegen is null");
+            logger.Warn($"{stjSourceGenerator}");
+            yield break;
+        }
+        
         var driverResult = CSharpGeneratorDriver
             .Create(jsonGenerator)
             .RunGenerators(compilation)

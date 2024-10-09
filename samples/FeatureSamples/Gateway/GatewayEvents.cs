@@ -18,7 +18,7 @@ public class GatewayEvents
         // client.GatewayResumed += MyHandler;
         // client.Ready += MyHandler;
     }
-
+    
     private static ValueTask ClientOnReady(GatewayCurrentUser currentUser, IReadOnlySet<ulong> guilds)
     {
         Console.WriteLine($"Ready! {currentUser.Username} | {guilds.Count} guilds");

@@ -66,7 +66,6 @@ public static class LinkExtensions
 
         var nextExtensions = extensions.Remove(extension);
         var nextPath = path.Add(extension.Name);
-        var kind = target.LinkTarget.Assembly is LinkActorTargets.AssemblyTarget.Core ? "interface" : "class";
 
         var bases = new List<string>();
 
@@ -92,7 +91,7 @@ public static class LinkExtensions
 
         return
             $$"""
-              public {{kind}} {{extension.Name}}{{(
+              public interface {{extension.Name}}{{(
                   bases.Count > 0
                       ? $" :{Environment.NewLine}    {string.Join($",{Environment.NewLine}", bases).WithNewlinePadding(4)}"
                       : string.Empty

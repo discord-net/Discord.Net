@@ -5,33 +5,74 @@ namespace Discord.Net.Hanz.Tasks.Actors.V3.Impl;
 
 public class RestLinkImplementer : ILinkImplementer
 {
-    public void ImplementBackLink(
+    public ConstructorRequirements? ImplementBackLink(
+        ConstructorRequirements? requirements,
         List<string> members,
         LinksV3.Target target, 
-        ImmutableList<string> path, 
-        ImmutableList<string>? ancestorPath = null,
-        string? extraMembers = null)
+        LinkSchematics.Entry type,
+        ImmutableList<LinkSchematics.Entry> path, Logger logger)
     {
-//         var typeName = $"__Rest{LinksV3.GetFriendlyName(target.LinkTarget.Actor)}BackLink{path.Count}";
-//         
-//         members.Add(
-//             $$"""
-//               public static void 
-//               """
-//         );
+        var ctorParams = new Dictionary<string, string>()
+        {
+            {"source", "TSource"},
+            {"client", $"Discord{target.LinkTarget.Assembly}Client"},
+            {"provider", target.FormattedActorProvider}
+        };
 
+        if (requirements?.MembersWhoNeedInitialization.Count > 0)
+        {
+            foreach (var entry in requirements.MembersWhoNeedInitialization)
+            {
+                ctorParams.Add(entry.Key, entry.Value);
+            }
+        }
+
+        members.Add(
+            $$"""
+              internal static {{LinksV3.FormatTypeName(type.Symbol)}}.BackLink<TSource> Create(
+                  {{
+                      string.Join(
+                          $",{Environment.NewLine}",
+                          ctorParams.Select(x => $"{x.Value} {x.Key}")
+                      ).WithNewlinePadding(4)
+                  }}
+              ) => new __RestInternal{{LinksV3.FormatTypeName(type.Symbol)}}.__RestInternalBackLink{{type.Symbol.Name}}<TSource>(
+                  {{
+                      string.Join(
+                          $",{Environment.NewLine}",
+                          ctorParams.Keys
+                      ).WithNewlinePadding(4)
+                  }}
+              );
+              """
+            );
+
+        return requirements;
+    }
+
+    public ConstructorRequirements? ImplementHierarchy()
+    {
+        throw new NotImplementedException();
+    }
+
+    public ConstructorRequirements? ImplementExtensions()
+    {
+        throw new NotImplementedException();
     }
     
-    public void Implement(
+    public ConstructorRequirements? ImplementLink(
         List<string> members,
         LinksV3.Target target,
         LinkSchematics.Entry type,
-        ImmutableList<LinkSchematics.Entry> path)
+        ImmutableList<LinkSchematics.Entry> path,
+        Logger logger)
     {
         members.AddRange([
             CreateClassImplementation(target, type, path, out var constructorRequirements),
             GenerateCreateMethod(target, type, path, constructorRequirements)
         ]);
+
+        return constructorRequirements;
     }
 
     private string GenerateCreateMethod(
@@ -111,10 +152,10 @@ public class RestLinkImplementer : ILinkImplementer
             : string.Empty;
 
         var typeName = $"__RestInternal{LinksV3.FormatTypeName(type.Symbol)}";
-
+        
         members.Add(
             $$"""
-              public {{typeName}}(
+              public __RestInternal{{type.Symbol.Name}}(
                   Discord{{target.LinkTarget.Assembly}}Client client,
                   {{target.FormattedActorProvider}} provider{{additionalConstructorArguments}}
               )
@@ -143,19 +184,76 @@ public class RestLinkImplementer : ILinkImplementer
             ]);
         }
 
+        members.Add(CreateBackLink(target, type, path, constructorRequirements));
+        
         return
             $$"""
-              private sealed class __RestInternal{{LinksV3.FormatTypeName(type.Symbol)}} : 
-                  {{target.LinkTarget.Actor}}{{LinksV3.FormatPath(path.Add(type))}}
+              private class __RestInternal{{LinksV3.FormatTypeName(type.Symbol)}} : 
+                  {{target.LinkTarget.Actor}}{{LinksV3.FormatPath(path.Add(type))}}{{(
+                      type.Syntax.ConstraintClauses.Count > 0
+                          ? $"{Environment.NewLine}    {string.Join(Environment.NewLine, type.Syntax.ConstraintClauses).WithNewlinePadding(4)}"
+                          : string.Empty
+                  )}}
               {
                   {{string.Join(Environment.NewLine, members).WithNewlinePadding(4)}}
               }
               """;
     }
 
-    private static string CreateBackLink()
+    private static string CreateBackLink(
+        LinksV3.Target target,
+        LinkSchematics.Entry type,
+        ImmutableList<LinkSchematics.Entry> path,
+        ConstructorRequirements? constructorRequirements)
     {
+        var ident = LinksV3.FormatTypeName(type.Symbol);
+
+        var additionalArgs = constructorRequirements?.MembersWhoNeedInitialization?.Count > 0
+            ? $",{Environment.NewLine}{string.Join(
+                $",{Environment.NewLine}",
+                constructorRequirements.MembersWhoNeedInitialization
+                    .Select(x => $"{x.Value} {x.Key}")
+            )}".WithNewlinePadding(4)
+            : string.Empty;
         
+        var additionalBaseArgs = constructorRequirements?.MembersWhoNeedInitialization?.Count > 0
+            ? $",{string.Join(
+                ", ",
+                constructorRequirements.MembersWhoNeedInitialization
+                    .Keys
+            )}".WithNewlinePadding(4)
+            : string.Empty;
+
+        var backlinkBaseInterface =
+            $"{target.LinkTarget.Actor}{LinksV3.FormatPath(path.Add(type))}.BackLink<TSource>";
+                    
+        var members = new List<string>();
+
+        members.Add(
+            $"TSource {backlinkBaseInterface}.Source => Source;"
+        );
+        
+        return 
+            $$"""
+            internal sealed class __RestInternalBackLink{{type.Symbol.Name}}<TSource> : 
+                {{target.LinkTarget.Actor}}{{LinksV3.FormatPath(path.Add(type))}}.__RestInternal{{ident}},
+                {{backlinkBaseInterface}}
+                where TSource : class, IPathable
+            {
+                internal TSource Source { get; }
+            
+                public __RestInternalBackLink{{type.Symbol.Name}}(
+                    TSource source, 
+                    DiscordRestClient client,
+                    {{target.FormattedActorProvider}} provider{{additionalArgs}}
+                ) : base(client, provider{{additionalBaseArgs}})
+                {
+                    Source = source;
+                }
+                
+                {{string.Join(Environment.NewLine, members).WithNewlinePadding(4)}}
+            }
+            """;
     }
     
     private static string ToParameterLower(string name)

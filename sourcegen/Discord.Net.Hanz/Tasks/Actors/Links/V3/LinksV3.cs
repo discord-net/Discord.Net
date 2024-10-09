@@ -49,7 +49,7 @@ public sealed class LinksV3
         public List<LinkExtensions.Extension>? Extensions { get; set; }
         public Target[]? Hierarchy { get; set; }
 
-        public List<Target> EntityAssignableAncestors { get; } = ancestors
+        public List<Target> EntityAssignableAncestors => Ancestors
             .Where(ancestor =>
                 ancestor.LinkTarget.Entity.Equals(linkTarget.Entity, SymbolEqualityComparer.Default) ||
                 Net.Hanz.Hierarchy.Implements(linkTarget.Entity, ancestor.LinkTarget.Entity)
@@ -110,6 +110,13 @@ public sealed class LinksV3
                 logger.Log($"    - {ancestor.LinkTarget.Actor}");
             }
 
+            logger.Log($" - Entity Assignable Ancestors: {EntityAssignableAncestors.Count}");
+
+            foreach (var ancestor in EntityAssignableAncestors)
+            {
+                logger.Log($"    - {ancestor.LinkTarget.Actor}");
+            }
+            
             logger.Log($" - Extensions: {Extensions?.Count ?? 0}");
 
             if (Extensions is not null)
@@ -128,6 +135,13 @@ public sealed class LinksV3
                 {
                     logger.Log($"    - {type.LinkTarget.Actor}");
                 }
+            }
+            
+            logger.Log($" - Interfaces: {LinkTarget.Actor.AllInterfaces.Length}");
+
+            foreach (var iface in LinkTarget.Actor.AllInterfaces)
+            {
+                logger.Log($"   - {iface}");
             }
         }
     }
@@ -474,7 +488,8 @@ public sealed class LinksV3
 
         var bases = new List<string>();
         var members = new List<string>();
-
+        ConstructorRequirements? constructorRequirements = null;
+        
         if (isCore)
         {
             bases.Add($"{target.FormattedLinkType}{FormatPath(path.Add(type))}");
@@ -529,7 +544,8 @@ public sealed class LinksV3
 
             if (_implementers.TryGetValue(target.LinkTarget.Assembly, out var implementer))
             {
-                implementer.Implement(members, target, type, path);
+                constructorRequirements = implementer
+                    .ImplementLink(members, target, type, path, logger);
             }
         }
 
@@ -553,7 +569,7 @@ public sealed class LinksV3
                           .FormatExtensions(path.Add(type), target, logger)
                           .WithNewlinePadding(4)
                   }}
-                  {{BuildBackLink(target, type, path).WithNewlinePadding(4)}}
+                  {{BuildBackLink(target, type, path, logger, constructorRequirements: constructorRequirements).WithNewlinePadding(4)}}
                   {{
                       LinkHierarchy
                           .BuildHierarchy(
@@ -594,7 +610,9 @@ public sealed class LinksV3
 
         var members = new List<string>();
 
-        var willHaveRedefinedSource = target.EntityAssignableAncestors.Count > 0;
+        var willHaveRedefinedSource = 
+            target.EntityAssignableAncestors.Count > 0 || 
+            target.LinkTarget.Assembly is not LinkActorTargets.AssemblyTarget.Core;
 
         if (willHaveRedefinedSource)
         {
@@ -602,6 +620,18 @@ public sealed class LinksV3
                 "new TSource Source { get; }",
                 $"TSource {backlinkBaseType}.Source => Source;"
             ]);
+        }
+
+        if (target.LinkTarget.Assembly is not LinkActorTargets.AssemblyTarget.Core)
+        {
+            var coreBase = $"{target.LinkTarget.GetCoreActor()}{FormatPath(path)}.BackLink<TSource>";
+            bases.Add(coreBase);
+            
+            members.Add(
+                target.EntityAssignableAncestors.Count > 0
+                    ? $"TSource {coreBase}.Source => Source;"
+                    : $"TSource Discord.IBackLink<TSource, {target.LinkTarget.GetCoreActor()}, {target.LinkTarget.Id}, {target.LinkTarget.GetCoreEntity()}, {target.LinkTarget.Model}>.Source => Source;"
+            );
         }
 
         if (target.EntityAssignableAncestors.Count > 0)
@@ -627,9 +657,6 @@ public sealed class LinksV3
             }
         }
 
-        if(_implementers.TryGetValue(target.LinkTarget.Assembly, out var implementer))
-            implementer.ImplementBackLink(members, target, path, ancestorPath, extraMembers);
-        
         return
             $$"""
               public interface BackLink<out TSource> :
@@ -646,13 +673,35 @@ public sealed class LinksV3
         Target target,
         LinkType type,
         ImmutableList<LinkType> path,
-        string? extraMembers = null
-    ) => BuildBackLink(
-        target,
-        path.Add(type).Select(x => FormatTypeName(x.Symbol)).ToImmutableList(),
-        null,
-        extraMembers
-    );
+        Logger logger,
+        string? extraMembers = null,
+        ConstructorRequirements? constructorRequirements = null)
+    {
+        if (_implementers.TryGetValue(target.LinkTarget.Assembly, out var implementer))
+        {
+            var members = new List<string>();
+            
+            implementer.ImplementBackLink(
+                constructorRequirements,
+                members,
+                target,
+                type,
+                path,
+                logger
+            );
+
+            extraMembers = extraMembers is null 
+                ? string.Join(Environment.NewLine, members) 
+                : $"{extraMembers}{Environment.NewLine}{string.Join(Environment.NewLine, members)}";
+        }
+        
+        return BuildBackLink(
+            target,
+            path.Add(type).Select(x => FormatTypeName(x.Symbol)).ToImmutableList(),
+            null,
+            extraMembers
+        );
+    }
 
     public static string FormatTypeName(INamedTypeSymbol symbol)
     {
