@@ -46,6 +46,7 @@ public static class LinkExtensions
                         target,
                         x,
                         target.Extensions.ToImmutableList(),
+                        ImmutableList<Extension>.Empty,
                         extensionPath,
                         extensionPath,
                         logger
@@ -57,14 +58,15 @@ public static class LinkExtensions
     private static string BuildExtension(
         LinksV3.Target target,
         Extension extension,
-        ImmutableList<Extension> extensions,
+        ImmutableList<Extension> children,
+        ImmutableList<Extension> parents,
         ImmutableList<string> path,
         ImmutableList<string> pathWithoutExtensions,
         Logger logger)
     {
         logger.Log($"{target.LinkTarget.Actor}: Building extension {extension.Name} ({string.Join(".", path)})");
 
-        var nextExtensions = extensions.Remove(extension);
+        var nextExtensions = children.Remove(extension);
         var nextPath = path.Add(extension.Name);
 
         var bases = new List<string>();
@@ -121,7 +123,15 @@ public static class LinkExtensions
                               Environment.NewLine,
                               nextExtensions
                                   .Select(x =>
-                                      BuildExtension(target, x, nextExtensions, nextPath, pathWithoutExtensions, logger)
+                                      BuildExtension(
+                                          target,
+                                          x,
+                                          nextExtensions,
+                                          parents.Add(extension),
+                                          nextPath,
+                                          pathWithoutExtensions,
+                                          logger
+                                      )
                                   )
                           )
                           .WithNewlinePadding(4)
@@ -152,6 +162,19 @@ public static class LinkExtensions
                           )
                           .WithNewlinePadding(4)
                   }}
+                  {{(
+                      LinksV3.Implementers.TryGetValue(target.LinkTarget.Assembly, out var implementer)
+                          ? implementer.ImplementExtension(
+                              target,
+                              extension,
+                              children,
+                              parents,
+                              path,
+                              pathWithoutExtensions,
+                              logger
+                          ).WithNewlinePadding(4)
+                          : string.Empty
+                  )}}
               }
               """;
     }
@@ -183,12 +206,12 @@ public static class LinkExtensions
                     $"{target.LinkTarget.Actor}: {extension.Name}.{property.Name} -> no property target on backlink mirror");
                 return string.Empty;
             }
-            
+
             if (!isBackLink && isRoot)
             {
                 return $"{property.PropertyTypeTarget.LinkTarget.Actor} {property.Name} {{ get; }}";
-            } 
-            
+            }
+
             if (isBackLink && isRoot)
             {
                 return
@@ -204,7 +227,7 @@ public static class LinkExtensions
         if (property.IsLinkMirror)
         {
             if (isBackLink) return string.Empty;
-            
+
             if (property.PropertyTypeTarget is null)
             {
                 logger.Warn(

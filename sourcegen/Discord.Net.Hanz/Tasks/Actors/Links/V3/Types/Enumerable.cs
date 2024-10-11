@@ -38,7 +38,7 @@ public class Enumerable : ILinkTypeProcessor
             : $", {string.Join(", ", extraArgs.Select(x => $"{x.Name}: {x.Name}"))}";
 
         var fetchModels = canUseFetchable
-            ? $"await {target.LinkTarget.GetCoreEntity()}.FetchManyRoute(_path{formattedInvocationParameters}).AsRequiredProvider()(Client, options, token)"
+            ? $"await {target.LinkTarget.GetCoreEntity()}.FetchManyRoute(_path{formattedInvocationParameters}).AsRequiredProvider()(Client, options, token);"
             : "await _apiProvider(Client, options, token);";
 
         members.AddRange([
@@ -55,7 +55,7 @@ public class Enumerable : ILinkTypeProcessor
                   return models.Select(CreateEntity).ToList().AsReadOnly();
               }
               """,
-            $"ITask<IReadOnlyCollection<{target.LinkTarget.GetCoreEntity()}>> {overrideTarget}.AllAsync(RequestOptions? options, CancellationToken token = default) => AllAsync(options, token);"
+            $"ITask<IReadOnlyCollection<{target.LinkTarget.GetCoreEntity()}>> {overrideTarget}.AllAsync(RequestOptions? options, CancellationToken token) => AllAsync(options, token);"
         ]);
 
 //         members.Add(

@@ -21,7 +21,18 @@ public interface ILinkImplementer
         ImmutableList<LinkSchematics.Entry> path,
         Logger logger
     );
+
+    string CreateRootBackLink(LinksV3.Target target, Logger logger);
     
     ConstructorRequirements? ImplementHierarchy();
-    ConstructorRequirements? ImplementExtensions();
+
+    string ImplementExtension(
+        LinksV3.Target target,
+        LinkExtensions.Extension extension,
+        ImmutableList<LinkExtensions.Extension> children,
+        ImmutableList<LinkExtensions.Extension> parents,
+        ImmutableList<string> path,
+        ImmutableList<string> pathWithoutExtensions,
+        Logger logger
+    );
 }

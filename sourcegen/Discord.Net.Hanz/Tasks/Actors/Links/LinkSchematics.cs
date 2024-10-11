@@ -27,6 +27,16 @@ public static class LinkSchematics
         AttributeData attribute
     ) : IEquatable<Entry>
     {
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                var hashCode = Children.Count.GetHashCode();
+                hashCode = (hashCode * 397) ^ Symbol.ToDisplayString().GetHashCode();
+                return hashCode;
+            }
+        }
+
         public HashSet<Entry> Children { get; } = children;
 
         public INamedTypeSymbol Symbol { get; } = symbol;

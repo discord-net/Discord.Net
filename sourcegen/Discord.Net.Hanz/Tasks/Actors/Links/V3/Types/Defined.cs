@@ -10,7 +10,22 @@ public class Defined : ILinkTypeProcessor
         LinkSchematics.Entry type, 
         ImmutableList<LinkSchematics.Entry> path)
     {
-        return new ConstructorRequirements();
+        var overrideTarget = target.EntityAssignableAncestors.Count > 0
+            ? $"{target.LinkTarget.GetCoreActor()}{LinksV3.FormatPath(path.Add(type))}"
+            : $"{target.FormattedCoreLinkType}.Defined";
+        
+        members.AddRange([
+            $"public IReadOnlyCollection<{target.LinkTarget.Id}> Ids {{ get; }}",
+            $"IReadOnlyCollection<{target.LinkTarget.Id}> {overrideTarget}.Ids => Ids;",
+        ]);
+
+        return new ConstructorRequirements()
+        {
+            MembersWhoNeedInitialization =
+            {
+                {"Ids", $"IReadOnlyCollection<{target.LinkTarget.Id}>"}
+            }
+        };
     }
     
     public void AddOverrideMembers(List<string> members, LinksV3.Target target, LinkSchematics.Entry type, ImmutableList<LinkSchematics.Entry> path)

@@ -23,7 +23,14 @@ public partial class RestGroupChannelActor :
     {
         Identity = channel | this;
 
-        Recipients = new(this, client, client.Users);
+        Recipients = RestUserActor
+            .Indexable
+            .BackLink<RestGroupChannelActor>
+            .Create(
+                this,
+                client,
+                client.Users
+            );
     }
 
     [SourceOfTruth]
@@ -59,11 +66,16 @@ public partial class RestGroupChannel :
         _model = model;
         Actor = actor;
 
-        Recipients = new(
-            actor,
-            actor.Recipients,
-            new(client, client.Users, model.Recipients.ToList().AsReadOnly())
-        );
+        Recipients = RestUserActor
+            .Defined
+            .Indexable
+            .BackLink<RestGroupChannelActor>
+            .Create(
+                actor,
+                client,
+                actor.Recipients,
+                model.Recipients.ToList().AsReadOnly()
+            );
 
         if (model is IModelSourceOfMultiple<IUserModel> users)
         {

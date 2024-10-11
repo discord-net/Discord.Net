@@ -4,7 +4,7 @@ using Discord.Models.Json;
 namespace Discord.Rest;
 
 [ExtendInterfaceDefaults]
-public sealed partial class RestBanActor :
+public partial class RestBanActor :
     RestActor<RestBanActor, ulong, RestBan, IBanModel>,
     IBanActor
 {

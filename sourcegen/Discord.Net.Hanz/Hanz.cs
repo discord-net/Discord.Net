@@ -5,6 +5,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 using System.Collections.Concurrent;
 using System.Collections.Immutable;
 using System.Reflection;
+using Discord.Net.Hanz.Tasks.Actors.Links.V4;
 using Discord.Net.Hanz.Tasks.Actors.V3;
 
 namespace Discord.Net.Hanz;
@@ -254,7 +255,8 @@ public sealed class Hanz : IIncrementalGenerator
                 }
             );
             
-            LinksV3.Register(context);
+            //LinksV3.Register(context);
+            LinksV4.Register(context);
 
             RootLogger.Flush();
         }

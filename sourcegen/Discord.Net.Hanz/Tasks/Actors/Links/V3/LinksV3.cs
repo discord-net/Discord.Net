@@ -25,7 +25,7 @@ public sealed class LinksV3
         {nameof(Paged), new Paged()}
     };
 
-    private static readonly Dictionary<LinkActorTargets.AssemblyTarget, ILinkImplementer> _implementers = new()
+    public static readonly Dictionary<LinkActorTargets.AssemblyTarget, ILinkImplementer> Implementers = new()
     {
         {LinkActorTargets.AssemblyTarget.Rest, new RestLinkImplementer()}
     };
@@ -51,8 +51,8 @@ public sealed class LinksV3
 
         public List<Target> EntityAssignableAncestors => Ancestors
             .Where(ancestor =>
-                ancestor.LinkTarget.Entity.Equals(linkTarget.Entity, SymbolEqualityComparer.Default) ||
-                Net.Hanz.Hierarchy.Implements(linkTarget.Entity, ancestor.LinkTarget.Entity)
+                ancestor.LinkTarget.Entity.Equals(LinkTarget.Entity, SymbolEqualityComparer.Default) ||
+                Net.Hanz.Hierarchy.Implements(LinkTarget.Entity, ancestor.LinkTarget.Entity)
             ).ToList();
 
         public Target? BaseTarget
@@ -62,6 +62,11 @@ public sealed class LinksV3
                 )
                 : null;
 
+        public string FormattedBackLinkType
+            => $"Discord.IBackLink<TSource, {LinkTarget.Actor}, {LinkTarget.Id}, {LinkTarget.Entity}, {LinkTarget.Model}>";
+        public string FormattedCoreBackLinkType
+            => $"Discord.IBackLink<TSource, {LinkTarget.GetCoreActor()}, {LinkTarget.Id}, {LinkTarget.GetCoreEntity()}, {LinkTarget.Model}>";
+        
         public string FormattedLinkType
             => $"Discord.ILinkType<{LinkTarget.Actor}, {LinkTarget.Id}, {LinkTarget.Entity}, {LinkTarget.Model}>";
 
@@ -437,6 +442,10 @@ public sealed class LinksV3
                     )
             ).WithNewlinePadding(4);
 
+            var rootBackLink = Implementers.TryGetValue(target.LinkTarget.Assembly, out var implementer)
+                ? implementer.CreateRootBackLink(target, logger)
+                : BuildBackLink(target, ImmutableList<string>.Empty);
+            
             return
                 $$"""
                   public partial {{kind}} {{target.LinkTarget.Actor.Name}}
@@ -453,8 +462,7 @@ public sealed class LinksV3
                               .WithNewlinePadding(4)
                       }}
                       {{
-                          BuildBackLink(target, ImmutableList<string>.Empty)
-                              .WithNewlinePadding(4)
+                          rootBackLink.WithNewlinePadding(4)
                       }}
                       {{LinkHierarchy.BuildHierarchy(target, ImmutableList<string>.Empty)}}
                   }
@@ -542,10 +550,18 @@ public sealed class LinksV3
                 bases.Insert(0, $"{target.BaseTarget.LinkTarget.Actor}{FormatPath(path.Add(type))}");
             }
 
-            if (_implementers.TryGetValue(target.LinkTarget.Assembly, out var implementer))
+            if (Implementers.TryGetValue(target.LinkTarget.Assembly, out var implementer))
             {
                 constructorRequirements = implementer
                     .ImplementLink(members, target, type, path, logger);
+            }
+
+            if (path.Count > 0)
+            {
+                foreach (var entry in path.Add(type))
+                {
+                    bases.Add($"{target.LinkTarget.Actor}.{FormatTypeName(entry.Symbol)}");
+                }
             }
         }
 
@@ -656,7 +672,7 @@ public sealed class LinksV3
                     members.Add($"TSource {target.LinkTarget.Actor}.{part}.BackLink<TSource>.Source => Source;");
             }
         }
-
+        
         return
             $$"""
               public interface BackLink<out TSource> :
@@ -677,7 +693,7 @@ public sealed class LinksV3
         string? extraMembers = null,
         ConstructorRequirements? constructorRequirements = null)
     {
-        if (_implementers.TryGetValue(target.LinkTarget.Assembly, out var implementer))
+        if (Implementers.TryGetValue(target.LinkTarget.Assembly, out var implementer))
         {
             var members = new List<string>();
             

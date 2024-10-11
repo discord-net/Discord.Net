@@ -1,5 +1,9 @@
 using System.Collections.Immutable;
+using System.Text;
 using Discord.Net.Hanz.Tasks.Actors.V3.Types;
+using Discord.Net.Hanz.Utils;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Discord.Net.Hanz.Tasks.Actors.V3.Impl;
 
@@ -8,10 +12,12 @@ public class RestLinkImplementer : ILinkImplementer
     public ConstructorRequirements? ImplementBackLink(
         ConstructorRequirements? requirements,
         List<string> members,
-        LinksV3.Target target, 
+        LinksV3.Target target,
         LinkSchematics.Entry type,
         ImmutableList<LinkSchematics.Entry> path, Logger logger)
     {
+        //if(path.Count == 0)
+
         var ctorParams = new Dictionary<string, string>()
         {
             {"source", "TSource"},
@@ -29,14 +35,14 @@ public class RestLinkImplementer : ILinkImplementer
 
         members.Add(
             $$"""
-              internal static {{LinksV3.FormatTypeName(type.Symbol)}}.BackLink<TSource> Create(
+              internal static {{target.LinkTarget.Actor}}{{LinksV3.FormatPath(path.Add(type))}}.BackLink<TSource> Create(
                   {{
                       string.Join(
                           $",{Environment.NewLine}",
                           ctorParams.Select(x => $"{x.Value} {x.Key}")
                       ).WithNewlinePadding(4)
                   }}
-              ) => new __RestInternal{{LinksV3.FormatTypeName(type.Symbol)}}.__RestInternalBackLink{{type.Symbol.Name}}<TSource>(
+              ) => new {{ToRestImplementationName(type, path)}}.{{ToRestImplementationName(type, path)}}BackLink<TSource>(
                   {{
                       string.Join(
                           $",{Environment.NewLine}",
@@ -45,9 +51,86 @@ public class RestLinkImplementer : ILinkImplementer
                   }}
               );
               """
-            );
+        );
 
         return requirements;
+    }
+
+    public string CreateRootBackLink(LinksV3.Target target, Logger logger)
+    {
+        var members = new List<string>();
+
+        var ctors = target.LinkTarget.Actor
+            .GetMembers()
+            .OfType<IMethodSymbol>()
+            .Where(x => x.MethodKind is MethodKind.Constructor);
+
+
+        foreach (var methodSymbol in ctors)
+        {
+            var access = methodSymbol.DeclaredAccessibility switch
+            {
+                Accessibility.Public => "public",
+                Accessibility.Private => "private",
+                _ => "internal"
+            };
+
+            var parameters = methodSymbol.Parameters.Length > 0
+                ? $",{Environment.NewLine}{
+                    string.Join(
+                        $",{Environment.NewLine}",
+                        methodSymbol
+                            .Parameters
+                            .Select(x =>
+                                $"{x.Type} {x.Name}{(
+                                    x.HasExplicitDefaultValue
+                                        ? $" = {SyntaxUtils.CreateLiteral(x.Type, x.ExplicitDefaultValue)}"
+                                        : string.Empty
+                                )}"
+                            )
+                    )
+                }".WithNewlinePadding(4)
+                : string.Empty;
+
+            var baseArgs = methodSymbol.Parameters.Length > 0
+                ? string.Join(
+                    $", ",
+                    methodSymbol.Parameters.Select(x => x.Name)
+                )
+                : string.Empty;
+
+            members.Add(
+                $$"""
+                  {{access}} BackLink(
+                      TSource source{{parameters}}
+                  ) : base({{baseArgs}})
+                  {
+                      Source = source;
+                  }
+                  """
+            );
+        }
+
+        members.AddRange([
+            $"TSource {target.FormattedCoreBackLinkType}.Source => Source;",
+            $"TSource {target.FormattedBackLinkType}.Source => Source;",
+            $"{target.LinkTarget.GetCoreActor()} {target.FormattedCoreActorProvider}.GetActor({target.LinkTarget.Id} id) => this;",
+            $"{target.LinkTarget.Actor} {target.FormattedActorProvider}.GetActor({target.LinkTarget.Id} id) => this;",
+        ]);
+
+        return
+            $$"""
+              internal sealed class BackLink<TSource> : 
+                  {{target.LinkTarget.Actor}},
+                  {{target.LinkTarget.GetCoreActor()}}.BackLink<TSource>,
+                  {{target.FormattedBackLinkType}}
+                  where TSource : class, IPathable
+              {
+                  internal TSource Source { get; }
+              
+                  {{string.Join(Environment.NewLine, members).WithNewlinePadding(4)}}
+              }
+              """;
     }
 
     public ConstructorRequirements? ImplementHierarchy()
@@ -55,11 +138,44 @@ public class RestLinkImplementer : ILinkImplementer
         throw new NotImplementedException();
     }
 
-    public ConstructorRequirements? ImplementExtensions()
+    public string ImplementExtension(
+        LinksV3.Target target,
+        LinkExtensions.Extension extension,
+        ImmutableList<LinkExtensions.Extension> children,
+        ImmutableList<LinkExtensions.Extension> parents,
+        ImmutableList<string> path,
+        ImmutableList<string> pathWithoutExtensions,
+        Logger logger)
     {
-        throw new NotImplementedException();
+        var ident = $"__RestExt{string.Join(string.Empty, path)}{extension.Name}";
+
+        var bases = new List<string>()
+        {
+            $"{target.LinkTarget.Actor}{LinksV3.FormatPath(path)}.{extension.Name}"
+        };
+
+        if (parents.Count == 0)
+        {
+            if (pathWithoutExtensions.Count > 0)
+            {
+                bases.Insert(0, $"{target.LinkTarget.Actor}{LinksV3.FormatPath(pathWithoutExtensions)}.__RestLink{string.Join(string.Empty, pathWithoutExtensions)}");
+            }
+        }
+        else
+        {
+            bases.Insert(0, $"{target.LinkTarget.Actor}{LinksV3.FormatPath(path)}.__RestExt{string.Join(string.Empty, path)}");
+        }
+        
+        return
+            $$"""
+            internal class {{ident}} : 
+                {{string.Join($",{Environment.NewLine}", bases).WithNewlinePadding(4)}}
+            {
+                
+            }
+            """;
     }
-    
+
     public ConstructorRequirements? ImplementLink(
         List<string> members,
         LinksV3.Target target,
@@ -97,14 +213,14 @@ public class RestLinkImplementer : ILinkImplementer
 
         return
             $$"""
-              internal static {{LinksV3.FormatTypeName(type.Symbol)}} Create(
+              internal static {{target.LinkTarget.Actor}}{{LinksV3.FormatPath(path.Add(type))}} Create(
                   {{
                       string.Join(
                           $",{Environment.NewLine}",
                           ctorParams.Select(x => $"{x.Value} {x.Key}")
                       ).WithNewlinePadding(4)
                   }}
-              ) => new __RestInternal{{LinksV3.FormatTypeName(type.Symbol)}}(
+              ) => new {{ToRestImplementationName(type, path)}}(
                   {{
                       string.Join(
                           $",{Environment.NewLine}",
@@ -131,31 +247,35 @@ public class RestLinkImplementer : ILinkImplementer
                 constructorRequirements += processor.AddImplementation(members, target, type, path);
         }
 
-        var additionalConstructorArguments = constructorRequirements?.MembersWhoNeedInitialization.Count > 0
+        var hasExtraParameters = constructorRequirements?.MembersWhoNeedInitialization.Count > 0;
+
+        var additionalConstructorArguments = hasExtraParameters
             ? $",{Environment.NewLine}{
                 string.Join(
                     $",{Environment.NewLine}",
-                    constructorRequirements.MembersWhoNeedInitialization
+                    constructorRequirements!.MembersWhoNeedInitialization
                         .Select(x => $"{x.Value} {ToParameterLower(x.Key)}"))
             }".WithNewlinePadding(4)
             : string.Empty;
 
-        var additionalInitializers = constructorRequirements?.MembersWhoNeedInitialization.Count > 0
+        var additionalInitializers = hasExtraParameters
             ? $"{Environment.NewLine}{
                 string.Join(
                     Environment.NewLine,
-                    constructorRequirements.MembersWhoNeedInitialization.Select(x =>
+                    constructorRequirements!.MembersWhoNeedInitialization.Select(x =>
                         $"{x.Key} = {ToParameterLower(x.Key)};"
                     )
                 )
             }".WithNewlinePadding(4)
             : string.Empty;
 
-        var typeName = $"__RestInternal{LinksV3.FormatTypeName(type.Symbol)}";
-        
-        members.Add(
+        var typeName = ToRestImplementationName(type, path);
+
+        members.AddRange([
+            $"public Discord{target.LinkTarget.Assembly}Client Client {{ get; }}",
+            $"internal {target.FormattedActorProvider} Provider {{ get; }}",
             $$"""
-              public __RestInternal{{type.Symbol.Name}}(
+              public {{typeName}}(
                   Discord{{target.LinkTarget.Assembly}}Client client,
                   {{target.FormattedActorProvider}} provider{{additionalConstructorArguments}}
               )
@@ -164,13 +284,9 @@ public class RestLinkImplementer : ILinkImplementer
                   Provider = provider;{{additionalInitializers}}
               }
               """
-        );
-
-        if (target.EntityAssignableAncestors.Count == 0)
-            members.Add($"public Discord{target.LinkTarget.Assembly}Client Client {{ get; }}");
+        ]);
 
         members.AddRange([
-            $"internal {target.FormattedActorProvider} Provider {{ get; }}",
             $"{target.FormattedActorProvider} {target.FormattedRestLinkType}.Provider => Provider;",
             $"{target.LinkTarget.GetCoreActor()} {target.FormattedCoreActorProvider}.GetActor({target.LinkTarget.Id} id) => Provider.GetActor(id);"
         ]);
@@ -185,15 +301,11 @@ public class RestLinkImplementer : ILinkImplementer
         }
 
         members.Add(CreateBackLink(target, type, path, constructorRequirements));
-        
+
         return
             $$"""
-              private class __RestInternal{{LinksV3.FormatTypeName(type.Symbol)}} : 
-                  {{target.LinkTarget.Actor}}{{LinksV3.FormatPath(path.Add(type))}}{{(
-                      type.Syntax.ConstraintClauses.Count > 0
-                          ? $"{Environment.NewLine}    {string.Join(Environment.NewLine, type.Syntax.ConstraintClauses).WithNewlinePadding(4)}"
-                          : string.Empty
-                  )}}
+              private class {{typeName}} : 
+                  {{target.LinkTarget.Actor}}{{LinksV3.FormatPath(path.Add(type))}}
               {
                   {{string.Join(Environment.NewLine, members).WithNewlinePadding(4)}}
               }
@@ -206,61 +318,75 @@ public class RestLinkImplementer : ILinkImplementer
         ImmutableList<LinkSchematics.Entry> path,
         ConstructorRequirements? constructorRequirements)
     {
-        var ident = LinksV3.FormatTypeName(type.Symbol);
-
         var additionalArgs = constructorRequirements?.MembersWhoNeedInitialization?.Count > 0
             ? $",{Environment.NewLine}{string.Join(
                 $",{Environment.NewLine}",
                 constructorRequirements.MembersWhoNeedInitialization
                     .Select(x => $"{x.Value} {x.Key}")
-            )}".WithNewlinePadding(4)
+            )}".WithNewlinePadding(8)
             : string.Empty;
-        
+
         var additionalBaseArgs = constructorRequirements?.MembersWhoNeedInitialization?.Count > 0
-            ? $",{string.Join(
+            ? $", {string.Join(
                 ", ",
                 constructorRequirements.MembersWhoNeedInitialization
                     .Keys
-            )}".WithNewlinePadding(4)
+            )}".WithNewlinePadding(8)
             : string.Empty;
 
         var backlinkBaseInterface =
             $"{target.LinkTarget.Actor}{LinksV3.FormatPath(path.Add(type))}.BackLink<TSource>";
-                    
+
         var members = new List<string>();
 
         members.Add(
             $"TSource {backlinkBaseInterface}.Source => Source;"
         );
-        
-        return 
+
+        var typeName = $"{ToRestImplementationName(type, path)}BackLink";
+
+        return
             $$"""
-            internal sealed class __RestInternalBackLink{{type.Symbol.Name}}<TSource> : 
-                {{target.LinkTarget.Actor}}{{LinksV3.FormatPath(path.Add(type))}}.__RestInternal{{ident}},
-                {{backlinkBaseInterface}}
-                where TSource : class, IPathable
-            {
-                internal TSource Source { get; }
-            
-                public __RestInternalBackLink{{type.Symbol.Name}}(
-                    TSource source, 
-                    DiscordRestClient client,
-                    {{target.FormattedActorProvider}} provider{{additionalArgs}}
-                ) : base(client, provider{{additionalBaseArgs}})
-                {
-                    Source = source;
-                }
-                
-                {{string.Join(Environment.NewLine, members).WithNewlinePadding(4)}}
-            }
-            """;
+              internal sealed class {{typeName}}<TSource> : 
+                  {{target.LinkTarget.Actor}}{{LinksV3.FormatPath(path.Add(type))}}.{{ToRestImplementationName(type, path)}},
+                  {{backlinkBaseInterface}}
+                  where TSource : class, IPathable
+              {
+                  internal TSource Source { get; }
+              
+                  public {{typeName}}(
+                      TSource source, 
+                      DiscordRestClient client,
+                      {{target.FormattedActorProvider}} provider{{additionalArgs}}
+                  ) : base(client, provider{{additionalBaseArgs}})
+                  {
+                      Source = source;
+                  }
+                  
+                  {{string.Join(Environment.NewLine, members).WithNewlinePadding(4)}}
+              }
+              """;
     }
-    
+
     private static string ToParameterLower(string name)
     {
         if (name.StartsWith("_"))
             name = name.Substring(1);
 
         return $"{char.ToLower(name[0])}{name.Substring(1)}";
+    }
+
+    private static string ToRestImplementationName(
+        LinkSchematics.Entry type,
+        ImmutableList<LinkSchematics.Entry> path)
+    {
+        var sb = new StringBuilder();
+
+        foreach (var entry in path.Add(type))
+        {
+            sb.Append(entry.Symbol.Name);
+        }
+
+        return $"__RestLink{sb}";
     }
 }
