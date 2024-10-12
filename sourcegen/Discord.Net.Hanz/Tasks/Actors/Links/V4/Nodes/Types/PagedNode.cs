@@ -20,11 +20,9 @@ public class PagedNode(LinkTarget target, LinkSchematics.Entry entry) : LinkType
     {
         RedefinesLinkMembers = GetEntityAssignableAncestors(context).Length > 0;
 
-        ImplementationMembers.Clear();
-
-        ImplementationMembers.Add(
-            (PagingProviderType, "PagingProvider", null)
-        );
+        Properties.Clear();
+        Properties.Add(new("PagingProvider", PagingProviderType));
+        
 
         base.Visit(context, logger);
     }

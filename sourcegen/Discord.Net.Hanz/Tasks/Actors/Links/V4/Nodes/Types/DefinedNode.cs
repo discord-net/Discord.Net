@@ -1,3 +1,4 @@
+using Discord.Net.Hanz.Tasks.Actors.Links.V4.SourceTypes;
 using Discord.Net.Hanz.Tasks.Actors.V3;
 using LinkTarget = Discord.Net.Hanz.Tasks.Actors.V3.LinkActorTargets.GenerationTarget;
 
@@ -7,13 +8,11 @@ public class DefinedNode(LinkTarget target, LinkSchematics.Entry entry) : LinkTy
 {
     private protected override void Visit(NodeContext context, Logger logger)
     {
-        ImplementationMembers.Clear();
+        Properties.Clear();
         
         RedefinesLinkMembers = GetEntityAssignableAncestors(context).Length > 0;
         
-        ImplementationMembers.AddRange([
-            ($"IReadOnlyCollection<{Target.Id}>", "Ids", null)
-        ]);
+        Properties.Add(new Property("Ids", $"IReadOnlyCollection<{Target.Id}>"));
         
         base.Visit(context, logger);
     }

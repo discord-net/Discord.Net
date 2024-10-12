@@ -275,7 +275,7 @@ public class LinkExtensionNode :
         {
             if (IsTemplate)
             {
-                return [$"{property.PropertyTarget!.FormattedCoreLink} {property.Name} {{ get; }}"];
+                return [$"{property.PropertyTarget!.FormattedLink} {property.Name} {{ get; }}"];
             }
 
             var path = FormatRelativeTypePath(x => x is LinkTypeNode or BackLinkNode);
@@ -289,7 +289,7 @@ public class LinkExtensionNode :
             return
             [
                 $"new {property.PropertyTarget!.Target.Actor}{path} {property.Name} {{ get; }}",
-                $"{property.PropertyTarget!.FormattedCoreLink} {Target.Actor}.{GetTypeName()}.{property.Name} => {property.Name};"
+                $"{property.PropertyTarget!.FormattedLink} {Target.Actor}.{GetTypeName()}.{property.Name} => {property.Name};"
             ];
         }
 

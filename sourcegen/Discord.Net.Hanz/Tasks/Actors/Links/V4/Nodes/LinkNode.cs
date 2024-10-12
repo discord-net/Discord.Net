@@ -46,8 +46,11 @@ public abstract class LinkNode : IEquatable<LinkNode>
         =>
             $"Discord.ILinkType<{Target.GetCoreActor()}, {Target.Id}, {Target.GetCoreEntity()}, {Target.Model}>";
 
-    public string FormattedCoreLink
+    public string FormattedLink
         => $"Discord.ILink<{Target.Actor}, {Target.Id}, {Target.Entity}, {Target.Model}>";
+
+    public string FormattedCoreLink
+        => $"Discord.ILink<{Target.GetCoreActor()}, {Target.Id}, {Target.GetCoreEntity()}, {Target.Model}>";
 
     public string FormattedRestLinkType =>
         $"Discord.Rest.IRestLinkType<{Target.Actor}, {Target.Id}, {Target.Entity}, {Target.Model}>";
@@ -111,6 +114,52 @@ public abstract class LinkNode : IEquatable<LinkNode>
                 })
                 .OfType<LinkNode>();
         }
+    }
+
+    public bool SemanticEquals(LinkNode node)
+    {
+        return
+            GetType() == node.GetType()
+            && (this, node) switch
+            {
+                (LinkTypeNode a, LinkTypeNode b) =>
+                (
+                    a.Entry.Symbol.ToDisplayString().Equals(b.Entry.Symbol.ToDisplayString())
+                ),
+                (ITypeImplementerNode a, ITypeImplementerNode b) =>
+                (
+                    a.WillGenerateImplementation == b.WillGenerateImplementation &&
+                    a.GetTypeName().Equals(b.GetTypeName()) &&
+                    a.ImplementationClassName.Equals(b.ImplementationClassName)
+                ),
+                (ITypeProducerNode a, ITypeProducerNode b) =>
+                (
+                    a.GetTypeName().Equals(b.GetTypeName())
+                ),
+                _ => true
+            };
+        // &&
+        // (
+        //     this is not LinkTypeNode a ||
+        //     node is not LinkTypeNode b ||
+        //     a.Entry.Symbol.ToDisplayString().Equals(b.Entry.Symbol.ToDisplayString())
+        // )
+        // &&
+        // (
+        //     this is not ITypeImplementerNode c ||
+        //     node is not ITypeImplementerNode d ||
+        //     (
+        //         c.WillGenerateImplementation == d.WillGenerateImplementation &&
+        //         c.GetTypeName().Equals(d.GetTypeName()) &&
+        //         c.ImplementationClassName.Equals(d.ImplementationClassName)
+        //     )
+        // )
+        // &&
+        // (
+        //     this is not ITypeProducerNode e ||
+        //     node is not ITypeProducerNode f ||
+        //     e.GetTypeName().Equals(f.GetTypeName())
+        // );
     }
 
     public IEnumerable<IEnumerable<LinkNode>> ParentsProduct
@@ -369,7 +418,7 @@ public abstract class LinkNode : IEquatable<LinkNode>
 
         var a = name.Substring(0, lowerCount);
         var b = name.Substring(lowerCount);
-        
+
         return $"{a.ToLower()}{b}";
     }
 }

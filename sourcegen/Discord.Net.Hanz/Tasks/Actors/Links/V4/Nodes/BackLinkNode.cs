@@ -1,4 +1,5 @@
 using Discord.Net.Hanz.Tasks.Actors.Links.V4.Nodes.Types;
+using Discord.Net.Hanz.Tasks.Actors.Links.V4.SourceTypes;
 using Discord.Net.Hanz.Tasks.Actors.V3;
 using Discord.Net.Hanz.Utils;
 using Microsoft.CodeAnalysis;
@@ -12,6 +13,9 @@ public class BackLinkNode(LinkTarget target) :
 {
     public bool IsTemplate
         => Parent is ActorNode;
+
+    public bool WillGenerateImplementation
+        => RootActorNode is not null && Target.Assembly is not LinkActorTargets.AssemblyTarget.Core;
 
     public bool IsClass => !IsCore && IsTemplate;
 
@@ -36,22 +40,16 @@ public class BackLinkNode(LinkTarget target) :
             )
         }BackLink";
 
-    public List<(string Type, string Name, string? Default)> RequiredMembers { get; }
-        = [("TSource", "Source", null)];
+    public Constructor? Constructor { get; private set; }
 
-    public List<(string Type, string Name, string? Default)> ConstructorMembers { get; } = [];
-
-    public List<string> SpecialMembers { get; } = [];
-    public List<string> SpecialInitializations { get; } = [];
+    public List<Property> Properties { get; } = [];
 
     public List<BackLinkNode> InheritedBackLinks { get; } = [];
 
     private protected override void Visit(NodeContext context, Logger logger)
     {
         InheritedBackLinks.Clear();
-        ConstructorMembers.Clear();
-        SpecialMembers.Clear();
-        SpecialInitializations.Clear();
+        Properties.Clear();
 
         HasImplementation = Target.Assembly is not LinkActorTargets.AssemblyTarget.Core;
         RedefinesSource = HasImplementation || GetEntityAssignableAncestors(context).Length > 0;
@@ -66,61 +64,52 @@ public class BackLinkNode(LinkTarget target) :
             RedefinesSource |= relative.RedefinesSource;
         }
 
-        ConstructorMembers.AddRange(RequiredMembers);
+        //ConstructorMembers.AddRange(RequiredMembers);
+        Properties.Add(new("Source", "TSource"));
+
 
         if (!IsCore)
         {
             switch (Parent)
             {
-                case LinkHierarchyNode linkHierarchy:
-                    SpecialMembers.AddRange(
-                        linkHierarchy.HierarchyNodes
-                            .SelectMany(IEnumerable<string> (x) =>
-                            {
-                                var type =
-                                    $"{x.Target.Actor}{linkHierarchy.FormatRelativeTypePath()}.BackLink<TSource>";
-                                var name = LinksV4.GetFriendlyName(x.Target.Actor);
-
-                                return
-                                [
-                                    $"internal override {type} {name} {{ get; }}",
-                                    $"{type} {FormatAsTypePath()}.{name} => {name}"
-                                ];
-                            })
-                    );
-
-                    SpecialInitializations.AddRange(
-                        linkHierarchy.HierarchyNodes.Select(x =>
-                            $"{LinksV4.GetFriendlyName(x.Target.Actor)} = {ToParameterName(LinksV4.GetFriendlyName(x.Target.Actor))};"
-                        )
-                    );
-
-                    ConstructorMembers.AddRange(
-                        [
-                            ..linkHierarchy
-                                .ConstructorMembers
-                                .Where(x => linkHierarchy
-                                    .HierarchyNodes
-                                    .All(y => LinksV4
-                                            .GetFriendlyName(y.Target.Actor) != x.Name
-                                    )
-                                ),
-                            ..linkHierarchy.HierarchyNodes.Select(x =>
-                                (
-                                    $"{x.Target.Actor}{linkHierarchy.FormatRelativeTypePath()}.BackLink<TSource>",
+                case LinkHierarchyNode hierarchy:
+                    Properties.AddRange(
+                        hierarchy.HierarchyNodes
+                            .Select(x =>
+                                new Property(
                                     LinksV4.GetFriendlyName(x.Target.Actor),
-                                    (string?) null
+                                    hierarchy.IsTemplate
+                                        ? x.FormattedBackLinkType
+                                        : $"{x.Target.Actor}{hierarchy.FormatRelativeTypePath()}.BackLink<TSource>",
+                                    isOverride: true
+
+                                    // x.Name,
+                                    // hierarchy.IsTemplate  ? x.$"{x.Type}.BackLink<TSource>",
+                                    // x.HasSetter,
+                                    // isOverride: true
                                 )
                             )
-                        ]
                     );
-
-                    break;
-                case ITypeImplementerNode parentImplementer:
-                    ConstructorMembers.AddRange(parentImplementer.ConstructorMembers);
                     break;
             }
         }
+
+        Constructor = new(
+            ImplementationClassName,
+            Properties
+                .Select(x =>
+                    new ConstructorParamter(
+                        ToParameterName(x.Name),
+                        x.Type,
+                        null,
+                        x)
+                )
+                .ToList(),
+            Parents
+                .OfType<ITypeImplementerNode>()
+                .FirstOrDefault(x => x.WillGenerateImplementation)
+                ?.Constructor
+        );
     }
 
     private void CreateBackLinkInterface(
@@ -171,15 +160,54 @@ public class BackLinkNode(LinkTarget target) :
         switch (Parent)
         {
             case LinkHierarchyNode hierarchy:
-                members.UnionWith(hierarchy.GetFormattedProperties(true));
+                members.UnionWith(hierarchy
+                    .CartesianHierarchyNodes
+                    .Prepend(hierarchy)
+                    .SelectMany(IEnumerable<string> (node) => node
+                        .HierarchyNodes
+                        .SelectMany(IEnumerable<string> (x) =>
+                        {
+                            var type = node.IsTemplate
+                                ? x.FormattedBackLinkType
+                                : $"{x.Target.Actor}{node.FormatRelativeTypePath()}.BackLink<TSource>";
 
-                if (!hierarchy.IsTemplate)
-                {
-                    var hierarchyBackLink = $"{Target.Actor}.Hierarchy.BackLink<TSource>";
+                            var name = LinksV4.GetFriendlyName(x.Target.Actor);
 
-                    if (hierarchy.Children.OfType<BackLinkNode>().FirstOrDefault() is {RedefinesSource: true})
-                        members.Add($"TSource {hierarchyBackLink}.Source => Source;");
-                }
+                            var overrideType = node.IsTemplate
+                                ? x.FormattedLink
+                                : $"{x.Target.Actor}{node.FormatRelativeTypePath()}";
+
+                            var results = new List<string>();
+
+                            if (node == hierarchy)
+                                results.Add($"new {type} {name} {{ get;}}");
+                            else
+                                results.Add(
+                                    $"{type} {node.FormatAsTypePath()}.BackLink<TSource>.{name} => {name};"
+                                );
+
+                            results.Add($"{overrideType} {node.FormatAsTypePath()}.{name} => {name};");
+
+                            if (!IsCore)
+                            {
+                                var coreType = node.IsTemplate
+                                    ? x.FormattedCoreLink
+                                    : $"{x.Target.GetCoreActor()}{node.FormatRelativeTypePath()}";
+                                
+                                var coreOverrideType = node.IsTemplate
+                                    ? x.FormattedCoreBackLinkType
+                                    : $"{x.Target.GetCoreActor()}{node.FormatRelativeTypePath()}.BackLink<TSource>";
+
+                                results.AddRange([
+                                    $"{coreOverrideType} {Target.GetCoreActor()}{node.FormatRelativeTypePath()}.Hierarchy.BackLink<TSource>.{name} => {name};",
+                                    $"{coreType} {Target.GetCoreActor()}{node.FormatRelativeTypePath()}.Hierarchy.{name} => {name};"
+                                ]);
+                            }
+
+                            return results;
+                        })
+                    )
+                );
 
                 break;
             case LinkExtensionNode extension:
@@ -229,7 +257,6 @@ public class BackLinkNode(LinkTarget target) :
                 CreateImplementation(members, bases, context, logger);
         }
 
-
         var kind = IsClass ? "class" : "interface";
         var name = IsClass ? GetTypeName() : "BackLink<out TSource>";
 
@@ -261,27 +288,87 @@ public class BackLinkNode(LinkTarget target) :
         // var ancestors = GetAncestors(context);
         var backLinkMembers = new List<string>()
         {
-            "internal TSource Source { get; }",
             $"TSource {FormatAsTypePath()}.Source => Source;"
         };
+
+        backLinkMembers.AddRange(Properties.Select(x => x.Format()));
+
+        switch (Parent)
+        {
+            case LinkHierarchyNode hierarchy:
+                backLinkMembers.AddRange(
+                    hierarchy.HierarchyNodes.Select(x =>
+                    {
+                        var type = hierarchy.IsTemplate
+                            ? x.FormattedBackLinkType
+                            : $"{x.Target.Actor}{hierarchy.FormatRelativeTypePath()}.BackLink<TSource>";
+
+                        var name = LinksV4.GetFriendlyName(x.Target.Actor);
+
+                        return $"{type} {FormatAsTypePath()}.{name} => {name};";
+                    })
+                );
+                
+                // foreach (var relative in GetRelativeNodes().OfType<LinkHierarchyNode>())
+                // {
+                //     foreach (var hierarchyNode in hierarchy.HierarchyNodes)
+                //     {
+                //         var type = relative.IsTemplate 
+                //             ? hierarchyNode.FormattedLink 
+                //             : $"{hierarchyNode.Target.Actor}{hierarchyNode.FormatRelativeTypePath()}";
+                //         var name = LinksV4.GetFriendlyName(hierarchyNode.Target.Actor);
+                //
+                //         members.Add($"{type} {hierarchyNode.FormatAsTypePath()}.{name} => {name}");
+                //     }
+                // }
+                // backLinkMembers.AddRange(
+                //     hierarchy.GetRelativeNodes().OfType<LinkHierarchyNode>()
+                //         .SelectMany(relative => relative
+                //             .HierarchyNodes
+                //             .SelectMany(IEnumerable<string> (node) =>
+                //             {
+                //                 var type = relative.IsTemplate 
+                //                     ? node.FormattedBackLinkType 
+                //                     : $"{node.Target.Actor}{node.FormatRelativeTypePath()}.BackLink<TSource>";
+                //                 
+                //                 var coreType = relative.IsTemplate 
+                //                     ? node.FormattedCoreBackLinkType 
+                //                     : $"{node.Target.GetCoreActor()}{node.FormatRelativeTypePath()}.BackLink<TSource>";
+                //                 
+                //                 var name = LinksV4.GetFriendlyName(node.Target.Actor);
+                //
+                //                 return [
+                //                     $"{type} {node.FormatAsTypePath()}.BackLink<TSource>.{name} => {name}",
+                //                     $"{coreType} {Target.GetCoreActor()}{node.FormatRelativeTypePath()}.Hierarchy.{name} => {name}"
+                //                 ];
+                //             })
+                //         )
+                // );
+                break;
+        }
 
         var backlinkBases = new List<string>()
         {
             FormatAsTypePath()
         };
 
-        List<(string Type, string Name, string? Default)> baseCtorParameters = [];
+        //List<(string Type, string Name, string? Default)> baseCtorParameters = [];
 
-        if (Parent is ITypeImplementerNode implementer)
+        if (Parent is ITypeImplementerNode {WillGenerateImplementation: true} implementer)
         {
-            baseCtorParameters = implementer.ConstructorMembers;
+            //baseCtorParameters = implementer.ConstructorMembers;
 
             Parent.GetPathGenerics(out var parentGenerics, out _);
+
             backlinkBases.Insert(0, $"{Target.Actor}.{implementer.ImplementationClassName}{(
                 parentGenerics.Count > 0
                     ? $"<{string.Join(", ", parentGenerics)}>"
                     : string.Empty
             )}");
+        }
+        else if (RootActorNode.WillGenerateImplementation)
+        {
+            backlinkBases.Insert(0, $"{Target.Actor}.{RootActorNode.ImplementationClassName}");
         }
 
         GetPathGenerics(out var generics, out var constraints);
@@ -303,59 +390,27 @@ public class BackLinkNode(LinkTarget target) :
             )
         }BackLink";
 
-        var ctorParams = string.Join(
-            $",{Environment.NewLine}",
-            ConstructorMembers
-                .GroupBy(x => x.Name)
-                .Select(x => x.First())
-                .Select(x =>
-                    $"{x.Type} {ToParameterName(x.Name)}{(x.Default is not null ? $" = {x.Default}" : string.Empty)}"
-                )
-        );
+        if (Constructor is not null)
+            backLinkMembers.Add(Constructor.Format());
 
-        var baseArgs = baseCtorParameters
-            .GroupBy(x => x.Name)
-            .Select(x => x.First())
-            .Select(x => ToParameterName(x.Name))
-            .ToArray();
-
-        backLinkMembers.AddRange(
-            SpecialMembers
-        );
-
-        backLinkMembers.Add(
-            $$"""
-              public {{typeName}}(
-                  {{ctorParams.WithNewlinePadding(4)}}
-              ){{(
-                  baseCtorParameters.Count > 0
-                      ? $" : base({string.Join(", ", baseArgs)})"
-                      : string.Empty
-              )}}
-              {
-                  Source = source;{{(
-                      SpecialInitializations.Count > 0
-                          ? $"{Environment.NewLine}{
-                              string.Join(
-                                  Environment.NewLine,
-                                  SpecialInitializations
-                              )}".WithNewlinePadding(4)
-                          : string.Empty
-                  )}}
-              }
-              """
-        );
+        var ctorParams = Constructor?.GetActualParameters() ?? [];
 
         members.Add(
             $$"""
-              internal static {{FormatAsTypePath()}} Create
-              (
-                  {{ctorParams.WithNewlinePadding(4)}}
-              ) => new {{Target.Actor}}.{{typeName}}<{{string.Join(", ", generics)}}>(source{{(
-                  baseCtorParameters.Count > 0
-                      ? $", {string.Join(", ", baseArgs)}"
+              internal static {{FormatAsTypePath()}} Create({{(
+                  ctorParams.Count > 0
+                      ? $"{Environment.NewLine}{string.Join(
+                          $",{Environment.NewLine}",
+                          ctorParams.Select(x =>
+                              x.Format()
+                          )
+                      )}".WithNewlinePadding(4) + Environment.NewLine
                       : string.Empty
-              )}});
+              )}}) => new {{Target.Actor}}.{{typeName}}<{{string.Join(", ", generics)}}>({{(
+              ctorParams.Count > 0
+                  ? string.Join(", ", ctorParams.Select(x => x.Name))
+                  : string.Empty
+          )}});
               """
         );
 

@@ -1,5 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
+using Discord.Net.Hanz.Tasks.Actors.Links.V4.SourceTypes;
 using Discord.Net.Hanz.Tasks.Actors.V3;
+using Microsoft.CodeAnalysis;
 using LinkTarget = Discord.Net.Hanz.Tasks.Actors.V3.LinkActorTargets.GenerationTarget;
 using LinkSpecificMember = (string Type, string Name, string? Default);
 using LinkSpecificMembers = System.Collections.Generic.List<(string Type, string Name, string? Default)>;
@@ -15,6 +17,9 @@ public abstract class LinkTypeNode :
 
     public bool RedefinesLinkMembers { get; protected set; }
 
+    public bool WillGenerateImplementation
+        => RootActorNode is not null && Target.Assembly is not LinkActorTargets.AssemblyTarget.Core;
+
     public string ImplementationClassName
         => $"__{Target.Assembly}Link{
             string.Join(
@@ -27,11 +32,12 @@ public abstract class LinkTypeNode :
             )
         }";
 
+    public Constructor? Constructor { get; private set; }
+
+    public List<Property> Properties { get; } = [];
+
     public IEnumerable<LinkTypeNode> ParentLinks
         => Parents.OfType<LinkTypeNode>();
-
-    public LinkSpecificMembers InstanceImplementationMembers { get; } = [];
-    public Dictionary<LinkTypeNode, HashSet<LinkSpecificMember>> AllImplmenetationMembers { get; } = [];
 
     protected string? ImplementationLinkType => Target.Assembly switch
     {
@@ -41,7 +47,6 @@ public abstract class LinkTypeNode :
 
     public LinkTypeNode? ImplementationBase { get; private set; }
     public LinkTypeNode? ImplementationChild { get; private set; }
-
 
     protected LinkTypeNode(
         LinkTarget target,
@@ -94,16 +99,12 @@ public abstract class LinkTypeNode :
                 )}"
             );
         }
-
-        var memberModifier = ImplementationBase is not null
-            ? "override "
-            : ImplementationChild is not null
-                ? "virtual "
-                : string.Empty;
-
-        classMembers.AddRange([
-            $"{FormattedActorProvider} {FormattedRestLinkType}.Provider => ActorProvider;"
-        ]);
+        else if (RootActorNode.WillGenerateImplementation)
+        {
+            classBases.Insert(0,
+                $"{Target.Actor}.{RootActorNode.ImplementationClassName}"
+            );
+        }
 
         CreateImplementation(classMembers, classBases, context, logger);
 
@@ -112,89 +113,10 @@ public abstract class LinkTypeNode :
             parentLinkNode.CreateImplementation(classMembers, classBases, context, logger);
         }
 
-        var allLinkMembers = AllImplmenetationMembers.Values
-            .SelectMany(x => x)
-            .Union(InstanceImplementationMembers)
-            .GroupBy(x => x.Name)
-            .Select(x => x.First())
-            .ToArray();
+        classMembers.AddRange(Properties.Select(x => x.Format()));
 
-        classMembers.AddRange([
-            $"internal {memberModifier}{Target.Actor} GetActor({Target.Id} id) => ActorProvider.GetActor(id);",
-            $"{Target.Actor} {FormattedActorProvider}.GetActor({Target.Id} id) => GetActor(id);",
-            $"{Target.GetCoreActor()} {FormattedCoreActorProvider}.GetActor({Target.Id} id) => GetActor(id);",
-        ]);
-
-        var entityFactoryImpl = Target.Model
-            .AllInterfaces
-            .Any(x => x.Name == "IEntityModel")
-            ? "GetActor(model.Id).CreateEntity(model);"
-            : "EntityProvider.CreateEntity(model);";
-
-        classMembers.AddRange([
-            $"internal {memberModifier}{Target.Entity} CreateEntity({Target.Model} model) => {entityFactoryImpl}",
-            $"{Target.Entity} {FormattedEntityProvider}.CreateEntity({Target.Model} model) => CreateEntity(model);",
-            $"{Target.GetCoreEntity()} {FormattedCoreEntityProvider}.CreateEntity({Target.Model} model) => CreateEntity(model);",
-        ]);
-
-        foreach (var instanceImplementationMember in InstanceImplementationMembers)
-        {
-            var isField = instanceImplementationMember.Name.StartsWith("_");
-
-            var modifier = instanceImplementationMember.Name is "Client"
-                ? "public"
-                : isField
-                    ? "private readonly"
-                    : "internal";
-
-            var tail = isField ? ";" : " { get; }";
-
-            classMembers.Add(
-                $"{modifier} {memberModifier}{instanceImplementationMember.Type} {instanceImplementationMember.Name}{tail}");
-        }
-
-        classMembers.Add(
-            $$"""
-              internal {{ImplementationClassName}}(
-                  {{(
-                      allLinkMembers.Length > 0
-                          ? string.Join(
-                              $",{Environment.NewLine}",
-                              allLinkMembers.Select(x =>
-                                  $"{x.Type} {ToParameterName(x.Name)}{(x.Default is not null ? $" = {x.Default}" : string.Empty)}"
-                              )
-                          ).WithNewlinePadding(4)
-                          : string.Empty
-                  )}}
-              ){{(
-                  ImplementationBase is not null ? $" : base({(
-                      allLinkMembers.Length > 0
-                          ? string.Join(
-                              ", ",
-                              allLinkMembers.Select(x =>
-                                  ToParameterName(x.Name)
-                              )
-                          )
-                          : string.Empty
-                  )})" : string.Empty
-              )}}
-              {
-                  {{(
-                      InstanceImplementationMembers.Count > 0
-                          ? string.Join(
-                              Environment.NewLine,
-                              InstanceImplementationMembers
-                                  .GroupBy(x => x.Name)
-                                  .Select(x => x.First())
-                                  .Select(x =>
-                                      $"{x.Name} = {ToParameterName(x.Name)};"
-                                  )
-                          ).WithNewlinePadding(4)
-                          : string.Empty
-                  )}}     
-              }
-              """
-        );
+        if (Constructor is not null)
+            classMembers.Add(Constructor.Format());
 
         GetPathGenerics(out var generics, out var constraints);
 
@@ -215,24 +137,26 @@ public abstract class LinkTypeNode :
               """
         );
 
+        var constructorParamters = Constructor?.GetActualParameters() ?? [];
+
         members.Add(
             $$"""
               internal static {{FormatAsTypePath()}} Create(
                   {{(
-                      allLinkMembers.Length > 0
+                      constructorParamters.Count > 0
                           ? string.Join(
                               $",{Environment.NewLine}",
-                              allLinkMembers.Select(x =>
-                                  $"{x.Type} {ToParameterName(x.Name)}{(x.Default is not null ? $" = {x.Default}" : string.Empty)}"
+                              constructorParamters.Select(x =>
+                                  x.Format()
                               )
                           ).WithNewlinePadding(4)
                           : string.Empty
                   )}}
               ) => new {{Target.Actor}}.{{ImplementationClassName}}{{formattedGenerics}}({{(
-                  allLinkMembers.Length > 0
+                  constructorParamters.Count > 0
                       ? string.Join(
                           $", ",
-                          allLinkMembers.Select(x =>
+                          constructorParamters.Select(x =>
                               ToParameterName(x.Name)
                           )
                       )
@@ -242,60 +166,55 @@ public abstract class LinkTypeNode :
         );
     }
 
-    internal virtual LinkSpecificMembers ImplementationMembers { get; } = [];
-
     private protected override void Visit(NodeContext context, Logger logger)
     {
         if (Target.Assembly is not LinkActorTargets.AssemblyTarget.Core)
         {
-            InstanceImplementationMembers.Clear();
-            AllImplmenetationMembers.Clear();
-
             var hasBase = context.TryGetBaseTarget(Target, out var baseTarget);
             var hasChild = context.TryGetChildTarget(Target, out var childTarget);
 
-            if (hasBase && GetNodeWithEquivalentPathing(baseTarget) is LinkTypeNode baseNode)
+            if (hasBase && GetNodeWithEquivalentPathing(baseTarget) is LinkTypeNode
+                {
+                    WillGenerateImplementation: true
+                } baseNode)
                 ImplementationBase = baseNode;
             else ImplementationBase = null;
 
-            if (hasChild && GetNodeWithEquivalentPathing(childTarget) is LinkTypeNode childNode)
+            if (hasChild && GetNodeWithEquivalentPathing(childTarget) is LinkTypeNode
+                {
+                    WillGenerateImplementation: true
+                } childNode)
                 ImplementationChild = childNode;
             else ImplementationChild = null;
 
-            if (!hasBase)
-            {
-                InstanceImplementationMembers.Add(($"Discord{Target.Assembly}Client", "Client", null));
-            }
+            var rootProperties = new List<Property>();
 
-            InstanceImplementationMembers.Add((FormattedActorProvider, "ActorProvider", null));
+            rootProperties.AddRange(Properties);
+            rootProperties.AddRange(
+                Parents
+                    .OfType<LinkTypeNode>()
+                    .SelectMany(x => x.Properties)
+            );
 
-            InstanceImplementationMembers.AddRange(ImplementationMembers);
+            Properties.Clear();
+            Properties.AddRange(
+                rootProperties.GroupBy(x => x.Name).Select(x => x.First())
+            );
 
-            foreach (var parentLink in Parents.OfType<LinkTypeNode>())
-            {
-                InstanceImplementationMembers.AddRange(parentLink.ImplementationMembers);
-            }
-
-            if (hasBase)
-            {
-                var current = baseTarget;
-
-                do
-                {
-                    if (GetNodeWithEquivalentPathing(current) is LinkTypeNode node)
-                    {
-                        if (!AllImplmenetationMembers.TryGetValue(node, out var linkMembers))
-                            AllImplmenetationMembers[node] = linkMembers = new();
-
-                        linkMembers.UnionWith(node.ImplementationMembers);
-                    }
-                } while (context.TryGetBaseTarget(current.Target, out current));
-            }
-
-            if (!Target.Model.AllInterfaces.Any(x => x.Name == "IEntityModel"))
-            {
-                InstanceImplementationMembers.Add((FormattedEntityProvider, "EntityProvider", null));
-            }
+            Constructor = new(
+                ImplementationClassName,
+                Properties
+                    .Select(x =>
+                        new ConstructorParamter(
+                            ToParameterName(x.Name),
+                            x.Type,
+                            null,
+                            x
+                        )
+                    )
+                    .ToList(),
+                RootActorNode?.Constructor
+            );
         }
     }
 
@@ -409,11 +328,11 @@ public abstract class LinkTypeNode :
     public string GetTypeName()
         => LinksV4.FormatTypeName(Entry.Symbol);
 
-    LinkSpecificMembers ITypeImplementerNode.RequiredMembers
-        => InstanceImplementationMembers;
-
-    LinkSpecificMembers ITypeImplementerNode.ConstructorMembers
-        => Parent is ITypeImplementerNode parentImplementer
-            ? [..parentImplementer.ConstructorMembers, ..InstanceImplementationMembers]
-            : InstanceImplementationMembers;
+    // LinkSpecificMembers ITypeImplementerNode.RequiredMembers
+    //     => InstanceImplementationMembers;
+    //
+    // LinkSpecificMembers ITypeImplementerNode.ConstructorMembers
+    //     => Parent is ITypeImplementerNode parentImplementer
+    //         ? [..parentImplementer.ConstructorMembers, ..InstanceImplementationMembers]
+    //         : InstanceImplementationMembers;
 }

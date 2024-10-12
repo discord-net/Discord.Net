@@ -16,15 +16,13 @@ public class EnumerableNode(LinkTarget target, LinkSchematics.Entry entry) : Lin
     
     private protected override void Visit(NodeContext context, Logger logger)
     {
-        ImplementationMembers.Clear();
+        Properties.Clear();
         ExtraParameters.Clear();
         
         ExtraParameters.AddRange(GetExtraParameters(Target));
         RedefinesLinkMembers = GetEntityAssignableAncestors(context).Length > 0 || ExtraParameters.Count > 0;
         
-        ImplementationMembers.AddRange([
-            (EnumerableProviderDelegateType, "EnumerableProvider", null)
-        ]);
+        Properties.Add(new("EnumerableProvider", EnumerableProviderDelegateType));
         
         base.Visit(context, logger);
     }
