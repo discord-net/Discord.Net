@@ -1,9 +1,10 @@
-<p align="center">
-  <a href="https://discordnet.dev/" title="Click to visit the documentation!">
-    <img src="https://raw.githubusercontent.com/discord-net/Discord.Net/dev/docs/marketing/logo/SVG/Combinationmark%20White%20Border.svg" alt="Logo">
-  </a>
-    <br />
-    <br />
+<div align="center">
+
+  ![Discord.NET Logo](/docs/marketing/logo/SVG/Combinationmark.svg#gh-light-mode-only)
+  ![Discord.NET Logo](/docs/marketing/logo/SVG/Combinationmark%20White.svg#gh-dark-mode-only)
+
+  <br/>
+  
   <a href="https://www.nuget.org/packages/Discord.Net/">
     <img src="https://img.shields.io/nuget/vpre/Discord.Net.svg?maxAge=2592000?style=plastic" alt="NuGet">
   </a>
@@ -19,19 +20,24 @@
   <a href="https://discord.gg/dnet">
     <img src="https://img.shields.io/discord/848176216011046962?logo=discord&logoColor=white&label=discord&color=%235865F2" alt="Discord">
   </a>
-</p>
+
+  #
+  
+</div>
 Discord.Net is an unofficial .NET API Wrapper for the Discord API (https://discord.com).
 
 ## 📄 Documentation
 
-- https://discordnet.dev
+Documentation can be found at https://docs.discordnet.dev/index.html
 
 ## 🩷 Supporting Discord.Net
 
 Discord.Net is an MIT-licensed open source project with its development made possible entirely by volunteers. 
 If you'd like to support our efforts financially, please consider:
 
-- [Contributing on Open Collective](https://opencollective.com/discordnet).
+- [Open Collective](https://opencollective.com/discordnet)
+- [GitHub Sponsors](https://github.com/sponsors/quinchs)
+- [PayPal](https://paypal.me/quinchs)
 
 ## 📥 Installation
 
