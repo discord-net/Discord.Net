@@ -1,3 +1,4 @@
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,11 +22,11 @@ namespace Discord.Commands
             {
                 var args = new object[parameters.Length];
                 for (int i = 0; i < parameters.Length; i++)
-                    args[i] = GetMember(commands, services, parameters[i].ParameterType, typeInfo);
+                    args[i] = GetMember(commands, services, parameters[i].ParameterType, typeInfo, parameters[i].GetCustomAttributes());
                 var obj = InvokeConstructor<T>(constructor, args, typeInfo);
 
                 foreach (var property in properties)
-                    property.SetValue(obj, GetMember(commands, services, property.PropertyType, typeInfo));
+                    property.SetValue(obj, GetMember(commands, services, property.PropertyType, typeInfo, null));
                 return obj;
             };
         }
@@ -64,13 +65,20 @@ namespace Discord.Commands
             }
             return result.ToArray();
         }
-        private static object GetMember(CommandService commands, IServiceProvider services, Type memberType, TypeInfo ownerType)
+        private static object GetMember(CommandService commands, IServiceProvider services, Type memberType, TypeInfo ownerType, IEnumerable<object> attributes)
         {
             if (memberType == typeof(CommandService))
                 return commands;
             if (memberType == typeof(IServiceProvider) || memberType == services.GetType())
                 return services;
-            var service = services.GetService(memberType);
+
+            var keyedAttribute = attributes?.FirstOrDefault(x => x.GetType() == typeof(FromKeyedServicesAttribute));
+            object service;
+            if (keyedAttribute != null)
+                service = services.GetKeyedServices(memberType, ((FromKeyedServicesAttribute)keyedAttribute).Key).First();
+            else
+                service = services.GetService(memberType);
+
             if (service != null)
                 return service;
             throw new InvalidOperationException($"Failed to create \"{ownerType.FullName}\", dependency \"{memberType.Name}\" was not found.");
