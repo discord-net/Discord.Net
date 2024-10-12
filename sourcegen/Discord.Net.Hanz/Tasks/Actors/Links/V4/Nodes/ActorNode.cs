@@ -9,6 +9,9 @@ public class ActorNode :
     LinkNode,
     ITypeProducerNode
 {
+    public LinkSchematics.Schematic Schematic { get; }
+    public List<string> AdditionalTypes { get; } = [];
+    
     public ActorNode(LinkTarget target, LinkSchematics.Schematic schematic) : base(target)
     {
         Schematic = schematic;
@@ -17,12 +20,7 @@ public class ActorNode :
         
         LinkExtensionNode.AddTo(target, this);
         LinkHierarchyNode.AddTo(target, this);
-    }
-
-    public LinkSchematics.Schematic Schematic { get; }
-
-    private protected override void Visit(NodeContext context, Logger logger)
-    {
+        
         foreach (var entry in Schematic.Root.Children)
         {
             if (LinkTypeNode.TryGetNode(Target, entry, out var node))
@@ -32,18 +30,27 @@ public class ActorNode :
         }
     }
 
+
+    private protected override void Visit(NodeContext context, Logger logger)
+    {
+        
+    }
+
     public override string Build(NodeContext context, Logger logger)
     {
+        AdditionalTypes.Clear();
+        
         var kind = Target.Actor.TypeKind.ToString().ToLower();
 
+        var children = BuildChildren(context, logger);
+        
         return
             $$"""
               {{CreateView()}}
               public partial {{kind}} {{Target.Actor.Name}}
               {
-                  {{
-                      BuildChildren(context, logger).WithNewlinePadding(4)
-                  }}
+                  {{children.WithNewlinePadding(4)}}
+                  {{string.Join(Environment.NewLine, AdditionalTypes).WithNewlinePadding(4)}}
               }
               """;
     }

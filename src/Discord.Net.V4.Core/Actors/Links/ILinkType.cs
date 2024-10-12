@@ -41,7 +41,7 @@ public partial interface ILinkType<out TActor, TId, out TEntity, in TModel> :
     [LinkSchematic(Children = [nameof(Indexable)])]
     public partial interface Paged<out TPaged, in TParams> :
         ISpecifiedLinkType<TActor, TId, TEntity, TModel>
-        where TParams : IPagingParams
+        where TParams : class, IPagingParams
     {
         IAsyncPaged<TPaged> PagedAsync(TParams? args = default, RequestOptions? options = null);
     }

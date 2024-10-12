@@ -9,27 +9,45 @@ namespace Discord.Net.Hanz.Tasks.Actors.Links.V4.Nodes.Types;
 
 public class EnumerableNode(LinkTarget target, LinkSchematics.Entry entry) : LinkTypeNode(target, entry)
 {
+    public List<IParameterSymbol> ExtraParameters { get; } = [];
+
+    public string EnumerableProviderDelegateType
+        => $"Func<{(ExtraParameters.Count > 0 ? $"{string.Join(", ", ExtraParameters.Select(x => x.Type))}, " : string.Empty)}RequestOptions?, CancellationToken, ITask<IReadOnlyCollection<{Target.Entity}>>>";
+    
+    private protected override void Visit(NodeContext context, Logger logger)
+    {
+        ImplementationMembers.Clear();
+        ExtraParameters.Clear();
+        
+        ExtraParameters.AddRange(GetExtraParameters(Target));
+        RedefinesLinkMembers = GetEntityAssignableAncestors(context).Length > 0 || ExtraParameters.Count > 0;
+        
+        ImplementationMembers.AddRange([
+            (EnumerableProviderDelegateType, "EnumerableProvider", null)
+        ]);
+        
+        base.Visit(context, logger);
+    }
+
     protected override void AddMembers(List<string> members, NodeContext context, Logger logger)
     {
+        if (!RedefinesLinkMembers) return;
+        
         var ancestors = GetEntityAssignableAncestors(context);
         
-        var extraParameters = GetExtraParameters(Target);
-        
-        if (ancestors.Length == 0 && extraParameters.Count == 0) return;
-        
         members.AddRange([
-            $"new ITask<IReadOnlyCollection<{Target.Entity}>> AllAsync({FormatExtraParameters(extraParameters)}RequestOptions? options = null, CancellationToken token = default);",
+            $"new ITask<IReadOnlyCollection<{Target.Entity}>> AllAsync({FormatExtraParameters(ExtraParameters)}RequestOptions? options = null, CancellationToken token = default);",
             $"ITask<IReadOnlyCollection<{Target.Entity}>> {FormattedLinkType}.Enumerable.AllAsync(RequestOptions? options, CancellationToken token) => AllAsync(options: options, token: token);",
         ]);
         
         if (ParentLinks.Any())
         {
-            var formattedInvocationParameters = extraParameters.Count == 0
+            var formattedInvocationParameters = ExtraParameters.Count == 0
                 ? string.Empty
-                : $"{string.Join(", ", extraParameters.Select(x => $"{x.Name}: {x.Name}"))}, ";
+                : $"{string.Join(", ", ExtraParameters.Select(x => $"{x.Name}: {x.Name}"))}, ";
         
             members.AddRange([
-                $"ITask<IReadOnlyCollection<{Target.Entity}>> {Target.Actor}.{LinksV3.FormatTypeName(Entry.Symbol)}.AllAsync({FormatExtraParameters(extraParameters, defaults: false)}RequestOptions? options, CancellationToken token) => AllAsync({formattedInvocationParameters}options: options, token: token);"
+                $"ITask<IReadOnlyCollection<{Target.Entity}>> {Target.Actor}.{LinksV3.FormatTypeName(Entry.Symbol)}.AllAsync({FormatExtraParameters(ExtraParameters, defaults: false)}RequestOptions? options, CancellationToken token) => AllAsync({formattedInvocationParameters}options: options, token: token);"
             ]);
         }
         
@@ -45,7 +63,7 @@ public class EnumerableNode(LinkTarget target, LinkSchematics.Entry entry) : Lin
             var ancestorExtraParameters = GetExtraParameters(ancestor.Target);
         
             var matching = ancestorExtraParameters
-                .Where(x => extraParameters.Any(y =>
+                .Where(x => ExtraParameters.Any(y =>
                     y.Name == x.Name &&
                     y.Type.Equals(x.Type, SymbolEqualityComparer.Default))
                 )
@@ -61,9 +79,87 @@ public class EnumerableNode(LinkTarget target, LinkSchematics.Entry entry) : Lin
         }
     }
 
-    protected override string CreateImplementation(NodeContext context, Logger logger)
+    protected override void CreateImplementation(
+        List<string> members,
+        List<string> bases,
+        NodeContext context,
+        Logger logger)
     {
-        return string.Empty;
+        switch (Target.Assembly)
+        {
+            case LinkActorTargets.AssemblyTarget.Rest:
+                CreateRestImplementation(members, bases, context, logger);
+                break;
+        }
+    }
+
+    private void CreateRestImplementation(
+        List<string> members,
+        List<string> bases,
+        NodeContext context,
+        Logger logger)
+    {
+        var memberModifier = Overloads(ImplementationBase)
+            ? "override "
+            : Overloads(ImplementationChild)
+                ? "virtual "
+                : string.Empty;
+
+        var formattedExtraParameters = FormatExtraParameters(ExtraParameters);
+        var formattedExtraArgs = ExtraParameters.Count > 0
+            ? $"{string.Join(", ", ExtraParameters.Select(x => x.Name))}, "
+            : string.Empty;
+        
+        members.AddRange([
+            $"""
+            public {memberModifier}ITask<IReadOnlyCollection<{Target.Entity}>> AllAsync({formattedExtraParameters}RequestOptions? options = null, CancellationToken token = default)
+                => EnumerableProvider({formattedExtraArgs}options, token);
+            """,
+            $"""
+            ITask<IReadOnlyCollection<{Target.Entity}>> {FormattedLinkType}.Enumerable.AllAsync(RequestOptions? options, CancellationToken token)
+                => AllAsync(options: options, token: token);
+            """
+        ]);
+
+        if (RedefinesLinkMembers)
+        {
+            members.Add(
+                $"""
+                ITask<IReadOnlyCollection<{Target.Entity}>> {FormatAsTypePath()}.AllAsync({formattedExtraArgs}RequestOptions? options, CancellationToken token)
+                    => AllAsync({formattedExtraArgs}options: options, token: token);
+                """
+            );
+        }
+        else
+        {
+            members.AddRange([
+                $"""
+                 ITask<IReadOnlyCollection<{Target.Entity}>> {FormattedLinkType}.Enumerable.AllAsync(RequestOptions? options, CancellationToken token)
+                     => AllAsync(options: options, token: token);
+                 """,
+                $"""
+                 ITask<IReadOnlyCollection<{Target.GetCoreEntity()}>> {FormattedCoreLinkType}.Enumerable.AllAsync(RequestOptions? options, CancellationToken token)
+                     => AllAsync(options: options, token: token);
+                 """
+            ]);
+        }
+    }
+
+    private bool Overloads(LinkNode? other)
+    {
+        if (other is not EnumerableNode otherEnumerable)
+            return false;
+        
+        if (otherEnumerable.ExtraParameters.Count != ExtraParameters.Count)
+            return false;
+
+        for (var i = 0; i < otherEnumerable.ExtraParameters.Count; i++)
+        {
+            if (!otherEnumerable.ExtraParameters[i].Type.Equals(ExtraParameters[i].Type, SymbolEqualityComparer.Default))
+                return false;
+        }
+
+        return true;
     }
     
     private static List<IParameterSymbol> GetExtraParameters(LinkTarget target)

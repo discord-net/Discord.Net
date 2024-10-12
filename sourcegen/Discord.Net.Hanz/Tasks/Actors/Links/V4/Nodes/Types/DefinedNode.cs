@@ -5,12 +5,25 @@ namespace Discord.Net.Hanz.Tasks.Actors.Links.V4.Nodes.Types;
 
 public class DefinedNode(LinkTarget target, LinkSchematics.Entry entry) : LinkTypeNode(target, entry)
 {
+    private protected override void Visit(NodeContext context, Logger logger)
+    {
+        ImplementationMembers.Clear();
+        
+        RedefinesLinkMembers = GetEntityAssignableAncestors(context).Length > 0;
+        
+        ImplementationMembers.AddRange([
+            ($"IReadOnlyCollection<{Target.Id}>", "Ids", null)
+        ]);
+        
+        base.Visit(context, logger);
+    }
+
     protected override void AddMembers(List<string> members, NodeContext context, Logger logger)
     {
+        if (!RedefinesLinkMembers) return;
+        
         var ancestors = GetEntityAssignableAncestors(context);
-
-        if (ancestors.Length == 0) return;
-
+        
         members.AddRange([
             $"new IReadOnlyCollection<{Target.Id}> Ids {{ get; }}",
             $"IReadOnlyCollection<{Target.Id}> {FormattedLinkType}.Defined.Ids => Ids;",
@@ -39,8 +52,30 @@ public class DefinedNode(LinkTarget target, LinkSchematics.Entry entry) : LinkTy
         }
     }
 
-    protected override string CreateImplementation(NodeContext context, Logger logger)
+    protected override void CreateImplementation(
+        List<string> members,
+        List<string> bases,
+        NodeContext context,
+        Logger logger)
     {
-        return string.Empty;
+        switch (Target.Assembly)
+        {
+            case LinkActorTargets.AssemblyTarget.Rest:
+                CreateRestImplementation(members, bases, context, logger);
+                break;
+        }   
+    }
+
+    private void CreateRestImplementation(
+        List<string> members,
+        List<string> bases,
+        NodeContext context,
+        Logger logger)
+    {
+        var overrideType = RedefinesLinkMembers ? FormatAsTypePath() : $"{FormattedCoreLinkType}.Defined";
+        members.AddRange([
+            $"IReadOnlyCollection<{Target.Id}> {FormattedLinkType}.Defined.Ids => Ids;",
+            $"IReadOnlyCollection<{Target.Id}> {overrideType}.Ids => Ids;"
+        ]);
     }
 }

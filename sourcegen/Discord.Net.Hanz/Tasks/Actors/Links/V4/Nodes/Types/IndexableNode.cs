@@ -5,12 +5,17 @@ namespace Discord.Net.Hanz.Tasks.Actors.Links.V4.Nodes.Types;
 
 public class IndexableNode(LinkTarget target, LinkSchematics.Entry entry) : LinkTypeNode(target, entry)
 {
+    private protected override void Visit(NodeContext context, Logger logger)
+    {
+        RedefinesLinkMembers = GetEntityAssignableAncestors(context).Length > 0;
+        
+        base.Visit(context, logger);
+    }
+
     protected override void AddMembers(List<string> members, NodeContext context, Logger logger)
     {
-        var ancestors = GetEntityAssignableAncestors(context);
-        
-        if (ancestors.Length == 0) return;
-        
+        if(!RedefinesLinkMembers) return;
+
         members.AddRange([
             $"new {Target.Actor} this[{Target.Id} id] => (this as IActorProvider<{Target.Actor}, {Target.Id}>).GetActor(id);",
             $"new {Target.Actor} Specifically({Target.Id} id) => (this as IActorProvider<{Target.Actor}, {Target.Id}>).GetActor(id);"
@@ -24,7 +29,7 @@ public class IndexableNode(LinkTarget target, LinkSchematics.Entry entry) : Link
             ]);
         }
 
-        foreach (var ancestor in ancestors)
+        foreach (var ancestor in GetEntityAssignableAncestors(context))
         {
             var overrideType =
                 $"{(ancestor.GetEntityAssignableAncestors(context).Length > 0 ? $"{ancestor.Target.Actor}{FormatRelativeTypePath()}" : ancestor.FormattedLinkType)}.Indexable";
@@ -36,8 +41,35 @@ public class IndexableNode(LinkTarget target, LinkSchematics.Entry entry) : Link
         }
     }
 
-    protected override string CreateImplementation(NodeContext context, Logger logger)
+    protected override void CreateImplementation(
+        List<string> members,
+        List<string> bases,
+        NodeContext context,
+        Logger logger)
     {
-        return string.Empty;
+        switch (Target.Assembly)
+        {
+            case LinkActorTargets.AssemblyTarget.Rest:
+                CreateRestImplementation(members, bases, context, logger);
+                break;
+        }
+    }
+
+    private void CreateRestImplementation(
+        List<string> members,
+        List<string> bases,
+        NodeContext context,
+        Logger logger)
+    {
+        var memberModifier = ImplementationBase is not null
+            ? "override "
+            : ImplementationChild is not null
+                ? "virtual "
+                : string.Empty;
+
+        members.AddRange([
+            $"public {memberModifier}{Target.Actor} this[{Target.Id} id] => GetActor(id);",
+            $"public {memberModifier}{Target.Actor} Specifically({Target.Id} id) => GetActor(id);"
+        ]);
     }
 }

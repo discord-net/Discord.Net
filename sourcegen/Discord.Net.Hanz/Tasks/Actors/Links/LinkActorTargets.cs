@@ -65,23 +65,87 @@ public class LinkActorTargets
                 ).Type;
         }
     }
-    
+
     public static bool IsValid(SyntaxNode node, CancellationToken token = default)
     {
         return node is TypeDeclarationSyntax;
     }
 
     public static AssemblyTarget? GetAssemblyTarget(
-        Compilation compilation)
+        Compilation compilation
+    ) => GetAssemblyTarget(compilation.Assembly.Name);
+
+    public static AssemblyTarget? GetAssemblyTarget(string name)
     {
-        return compilation.Assembly.Name switch
+        return name switch
         {
             "Discord.Net.V4.Core" => AssemblyTarget.Core,
             "Discord.Net.V4.Rest" => AssemblyTarget.Rest,
             _ => null
         };
     }
-    
+
+    public static GenerationTarget? GetTargetForSymbol(
+        INamedTypeSymbol symbol,
+        Compilation compilation,
+        CancellationToken token = default)
+    {
+        if (!AllowedAssemblies.Contains(symbol.ContainingAssembly.Name)) return null;
+
+        var assembly = GetAssemblyTarget(symbol.ContainingAssembly.Name) ?? throw new NotSupportedException();
+
+        if (symbol.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax(token) is not TypeDeclarationSyntax syntax)
+            return null;
+        
+        var actorType = assembly switch
+        {
+            AssemblyTarget.Core => "IActor",
+            AssemblyTarget.Rest => "IRestActor",
+            _ => throw new NotSupportedException()
+        };
+
+        var actorInterface = Hierarchy.GetHierarchy(symbol)
+            .Select(x => x.Type)
+            .FirstOrDefault(x => x.Name == actorType && x is {TypeArguments.Length: 2});
+
+        if (syntax.Modifiers.IndexOf(SyntaxKind.PartialKeyword) == -1)
+        {
+            return null;
+        }
+        
+        if (actorInterface is null)
+            return null;
+
+        // don't apply to entities
+        if (
+            actorInterface.TypeArguments[1].Equals(symbol, SymbolEqualityComparer.Default) ||
+            actorInterface.TypeArguments[1] is not INamedTypeSymbol entity ||
+            symbol.AllInterfaces.Contains(entity))
+            return null;
+
+        var entityOfInterface = Hierarchy.GetHierarchy(actorInterface.TypeArguments[1])
+            .Select(x => x.Type)
+            .FirstOrDefault(x => x is {Name: "IEntityOf", TypeArguments.Length: 1});
+
+        if (entityOfInterface?.TypeArguments.FirstOrDefault() is not INamedTypeSymbol model)
+            return null;
+
+        if (!compilation.ContainsSyntaxTree(syntax.SyntaxTree))
+        {
+            compilation = compilation.AddSyntaxTrees(syntax.SyntaxTree);
+        }
+        
+        return new GenerationTarget(
+            compilation.GetSemanticModel(syntax.SyntaxTree),
+            syntax,
+            entity,
+            symbol,
+            model,
+            actorInterface.TypeArguments[0],
+            assembly
+        );
+    }
+
     public static GenerationTarget? GetTargetForGeneration(
         GeneratorSyntaxContext context,
         CancellationToken token = default)

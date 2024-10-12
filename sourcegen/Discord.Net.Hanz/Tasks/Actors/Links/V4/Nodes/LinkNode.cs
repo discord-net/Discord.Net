@@ -95,9 +95,11 @@ public abstract class LinkNode : IEquatable<LinkNode>
                                 .FirstOrDefault(y =>
                                     y.GetType() == node.GetType() &&
                                     (
-                                        (y is not LinkTypeNode a || node is not LinkTypeNode b || a.Entry.Equals(b.Entry))
+                                        (y is not LinkTypeNode a || node is not LinkTypeNode b ||
+                                         a.Entry.Equals(b.Entry))
                                         &&
-                                        (y is not ITypeProducerNode c || node is not ITypeProducerNode d || c.GetTypeName().Equals(d.GetTypeName()))
+                                        (y is not ITypeProducerNode c || node is not ITypeProducerNode d ||
+                                         c.GetTypeName().Equals(d.GetTypeName()))
                                     )
                                 ) is not { } linkNode
                         ) return null;
@@ -124,6 +126,29 @@ public abstract class LinkNode : IEquatable<LinkNode>
             .Select(index => arr
                 .Where((_, i) => (index & (1 << i)) != 0)
             );
+    }
+
+    public void GetPathGenerics(out List<string> generics, out List<string> constraints)
+    {
+        generics = [];
+        constraints = [];
+
+        foreach (var parent in Parents.Prepend(this))
+        {
+            switch (parent)
+            {
+                case LinkTypeNode linkType:
+                    if (!linkType.Entry.Symbol.IsGenericType) continue;
+
+                    generics.AddRange(linkType.Entry.Symbol.TypeParameters.Select(x => x.Name));
+                    constraints.AddRange(linkType.Entry.Syntax.ConstraintClauses.Select(x => x.ToString()));
+                    break;
+                case BackLinkNode backLink:
+                    generics.Add("TSource");
+                    constraints.Add("where TSource : class, IPathable");
+                    break;
+            }
+        }
     }
 
     internal LinkNode AddChild(LinkNode node)
@@ -156,8 +181,8 @@ public abstract class LinkNode : IEquatable<LinkNode>
             return string.Empty;
 
         var path = FormatTypePath(predicate);
-        
-        if(path == string.Empty) return string.Empty;
+
+        if (path == string.Empty) return string.Empty;
 
         return $"{path}.{typeProducer.GetTypeName()}";
     }
@@ -179,11 +204,18 @@ public abstract class LinkNode : IEquatable<LinkNode>
             if (parent is ActorNode) continue;
 
             node = node.Children.FirstOrDefault(x =>
-                x.GetType() == parent.GetType() &&
+                x.GetType() == parent.GetType()
+                &&
                 (
-                    x is not LinkTypeNode a || 
+                    x is not LinkTypeNode a ||
                     parent is not LinkTypeNode b ||
                     a.Entry.Symbol.Equals(b.Entry.Symbol, SymbolEqualityComparer.Default)
+                )
+                &&
+                (
+                    x is not ITypeProducerNode c ||
+                    parent is not ITypeProducerNode d ||
+                    c.GetTypeName().Equals(d.GetTypeName())
                 )
             );
 
@@ -316,5 +348,28 @@ public abstract class LinkNode : IEquatable<LinkNode>
             ITypeProducerNode typeProducer => $"{typeProducer.GetTypeName()} ({GetType()})",
             _ => GetType().ToString()
         };
+    }
+
+    protected string ToParameterName(string name)
+    {
+        if (name == string.Empty) return name;
+
+        if (name.StartsWith("_"))
+            name = name.Substring(1);
+
+        int lowerCount = 0;
+        for (; lowerCount != name.Length; lowerCount++)
+        {
+            if (char.IsLower(name[lowerCount]))
+                break;
+        }
+
+        if (lowerCount > 1)
+            lowerCount--;
+
+        var a = name.Substring(0, lowerCount);
+        var b = name.Substring(lowerCount);
+        
+        return $"{a.ToLower()}{b}";
     }
 }
