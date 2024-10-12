@@ -26,11 +26,11 @@ namespace Discord.Rest;
 
 public sealed partial class DiscordRestClient : IDiscordClient
 {
-    
     [SourceOfTruth]
     public RestGuildActor
-        .Paged<RestPartialGuild, IPartialGuildModel, PageUserGuildsParams, IEnumerable<IPartialGuildModel>>
-        .Indexable Guilds { get; }
+        .Paged<RestPartialGuild, PageUserGuildsParams>
+        .Indexable
+        Guilds { get; }
 
     [SourceOfTruth] public RestChannelActor.Indexable.Hierarchy Channels { get; }
 

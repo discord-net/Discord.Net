@@ -1,5 +1,6 @@
 using Discord.Net.Hanz.Tasks.Actors.Links.V4.Nodes;
 using Discord.Net.Hanz.Tasks.Actors.V3;
+using Discord.Net.Hanz.Utils;
 using Microsoft.CodeAnalysis;
 
 namespace Discord.Net.Hanz.Tasks.Actors.Links.V4;
@@ -9,11 +10,12 @@ public sealed class LinkGraph : IEquatable<LinkGraph>
     public Dictionary<INamedTypeSymbol, ActorNode> Nodes { get; }
 
     public NodeContext Context { get; }
-    
+
     public Compilation Compilation { get; }
     public LinkSchematics.Schematic Schematic { get; }
 
-    public LinkGraph(Dictionary<INamedTypeSymbol, ActorNode> nodes, Compilation compilation, LinkSchematics.Schematic schematic)
+    public LinkGraph(Dictionary<INamedTypeSymbol, ActorNode> nodes, Compilation compilation,
+        LinkSchematics.Schematic schematic)
     {
         Nodes = nodes;
         Compilation = compilation;
@@ -30,7 +32,7 @@ public sealed class LinkGraph : IEquatable<LinkGraph>
             logger.Log($" - {node.Key}:");
             LogNode(node.Value, 1);
         }
-        
+
         void LogNode(LinkNode node, int depth)
         {
             logger.Log($"{"".PadLeft(depth * 2)} - {node}");
@@ -40,15 +42,17 @@ public sealed class LinkGraph : IEquatable<LinkGraph>
             }
         }
     }
-    
+
     public void Visit(Logger logger)
     {
         foreach (var node in Nodes.Values)
         {
-            node.VisitTree(Context, logger);
+            var nodeLogger = logger.GetSubLogger(node.Target.Actor.ToFullMetadataName()).WithCleanLogFile();
+            node.VisitTree(Context, nodeLogger);
+            nodeLogger.Flush();
         }
     }
-    
+
     public bool Equals(LinkGraph? other)
     {
         if (other is null) return false;

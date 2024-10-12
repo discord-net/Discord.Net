@@ -66,7 +66,7 @@ public class LinksV4
     private static void GenerateSource(SourceProductionContext context, LinkGraph graph)
     {
         var logger = Logger.WithCompilationContext(graph.Compilation)
-            .GetSubLogger("Debug")
+            .GetSubLogger("Build")
             .WithCleanLogFile();
         
         graph.Log(logger);
@@ -151,13 +151,8 @@ public class LinksV4
         CancellationToken token)
     {
         var logger = Logger.WithCompilationContext(targets.Schematic.Compilation)
-            .GetSubLogger("Targets")
+            .GetSubLogger("VisitStep")
             .WithCleanLogFile();
-
-        Logger
-            .WithCompilationContext(targets.Schematic.Compilation)
-            .GetSubLogger("Sources")
-            .DeleteLogFile(true);
 
         var nodes = new Dictionary<INamedTypeSymbol, ActorNode>(SymbolEqualityComparer.Default);
         
@@ -169,6 +164,7 @@ public class LinksV4
         
         var graph = new LinkGraph(nodes, targets.Schematic.Compilation, targets.Schematic);
         graph.Visit(logger);
+        logger.Flush();
         return graph;
     }
 

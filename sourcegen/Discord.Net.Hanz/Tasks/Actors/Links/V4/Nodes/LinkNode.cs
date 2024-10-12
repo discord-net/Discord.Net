@@ -129,8 +129,7 @@ public abstract class LinkNode : IEquatable<LinkNode>
                 (ITypeImplementerNode a, ITypeImplementerNode b) =>
                 (
                     a.WillGenerateImplementation == b.WillGenerateImplementation &&
-                    a.GetTypeName().Equals(b.GetTypeName()) &&
-                    a.ImplementationClassName.Equals(b.ImplementationClassName)
+                    a.GetTypeName().Equals(b.GetTypeName())
                 ),
                 (ITypeProducerNode a, ITypeProducerNode b) =>
                 (

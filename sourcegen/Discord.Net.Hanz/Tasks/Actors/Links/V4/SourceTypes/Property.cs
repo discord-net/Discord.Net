@@ -12,12 +12,14 @@ public readonly struct Property
     public readonly bool IsOverride;
     public readonly bool IsVirtual;
     public readonly bool HasSetter;
+    public readonly string? Expression;
     
     public readonly Accessibility Accessibility;
 
     public Property(
         string name, 
-        string type,
+        string type, 
+        string? expression = null, 
         bool hasSetter = false, 
         bool isOverride = false, 
         bool isVirtual = false, 
@@ -26,6 +28,7 @@ public readonly struct Property
     {
         Name = name;
         Type = type;
+        Expression = expression;
         HasSetter = hasSetter;
         IsOverride = isOverride;
         IsVirtual = isVirtual;
@@ -50,13 +53,21 @@ public readonly struct Property
         sb.Append(" ")
             .Append(Type)
             .Append(" ")
-            .Append(Name)
-            .Append(" { get; ");
+            .Append(Name);
 
-        if (HasSetter)
-            sb.Append("set; ");
+        if (Expression is null)
+        {
+            sb.Append(" { get; ");
 
-        sb.Append("}");
+            if (HasSetter)
+                sb.Append("set; ");
+
+            sb.Append("}");
+        }
+        else
+        {
+            sb.Append($" => ").Append(Expression).Append(';');
+        }
 
         return sb.ToString();
     }
