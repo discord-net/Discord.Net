@@ -10,7 +10,7 @@ namespace Discord;
 ]
 public partial interface IInteractionMessageActor :
     IActor<ulong, IMessage>,
-    IApplicationRelationship,
+    IApplicationActor.CanonicalRelationship,
     ITokenPathProvider
 {
 

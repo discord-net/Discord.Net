@@ -6,8 +6,8 @@ namespace Discord;
 [Deletable(nameof(Routes.RemoveThreadMember))]
 public partial interface IThreadMemberActor :
     IActor<ulong, IThreadMember>,
-    IThreadRelationship,
-    IUserRelationship
+    IThreadChannelActor.CanonicalRelationship,
+    IUserActor.Relationship
 {
     [LinkExtension]
     protected interface WithCurrentMemberExtension

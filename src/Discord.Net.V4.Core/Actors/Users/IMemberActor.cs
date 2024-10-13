@@ -12,8 +12,7 @@ namespace Discord;
 ]
 public partial interface IMemberActor :
     IUserActor,
-    IGuildRelationship,
-    IUserRelationship,
+    IGuildActor.CanonicalRelationship,
     IActor<ulong, IMember>
 {
     IVoiceStateActor VoiceState { get; }

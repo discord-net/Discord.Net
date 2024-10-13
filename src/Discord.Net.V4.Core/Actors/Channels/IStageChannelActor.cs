@@ -2,6 +2,7 @@ using Discord.Models;
 using Discord.Models.Json;
 using Discord.Rest;
 using System.Diagnostics.CodeAnalysis;
+using Discord;
 
 namespace Discord;
 
@@ -15,12 +16,13 @@ namespace Discord;
     SuppressMessage("ReSharper", "PossibleInterfaceMemberAmbiguity")
 ]
 public partial interface IStageChannelActor :
-    IVoiceChannelActor,
-    IIntegrationChannelTrait.WithChannelFollower,
-    IStageInstanceRelationship,
     IActor<ulong, IStageChannel>,
-    IEntityProvider<IStageInstance, IStageInstanceModel>
+    IEntityProvider<IStageInstance, IStageInstanceModel>,
+    IVoiceChannelActor,
+    IIntegrationChannelTrait.WithChannelFollower
 {
+    IStageInstanceActor Instance { get; }
+    
     async Task<IStageInstance> CreateStageInstanceAsync(
         string topic,
         StagePrivacyLevel? privacyLevel = null,

@@ -4,7 +4,7 @@ namespace Discord;
 
 public partial interface IApplicationRoleConnectionMetadataActor :
     IActor<string, IApplicationRoleConnectionMetadata>,
-    IApplicationRelationship
+    IApplicationActor.CanonicalRelationship
 {
     [BackLink<IApplicationActor>]
     private static async Task<IReadOnlyCollection<IApplicationRoleConnectionMetadata>> UpdateAsync(

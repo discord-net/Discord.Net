@@ -20,7 +20,7 @@ public class BackLinkNode(LinkTarget target) :
     public bool IsClass => !IsCore && IsTemplate;
 
     public bool HasImplementation { get; private set; }
-    public bool RedefinesSource { get; private set; }
+    //public bool RedefinesSource { get; private set; }
 
     public string ImplementationClassName
         => $"__{Target.Assembly}{
@@ -64,17 +64,15 @@ public class BackLinkNode(LinkTarget target) :
         Properties.Clear();
 
         HasImplementation = Target.Assembly is not LinkActorTargets.AssemblyTarget.Core;
-        RedefinesSource = HasImplementation || GetEntityAssignableAncestors(context).Length > 0;
+        //RedefinesSource = HasImplementation || GetEntityAssignableAncestors(context).Length > 0;
 
-        foreach (var relative in ContainingNodes.Select(x => x.Children.OfType<BackLinkNode>().FirstOrDefault()))
-        {
-            if (relative is null || relative == this) continue;
-
-            logger.Log($"{FormatTypePath()} BackLink += {relative.FormatTypePath()}");
-
-            InheritedBackLinks.Add(relative);
-            RedefinesSource |= relative.RedefinesSource;
-        }
+        // foreach (var relative in ContainingNodes.Select(x => x.Children.OfType<BackLinkNode>().FirstOrDefault()))
+        // {
+        //     if (relative is null || relative == this) continue;
+        //     
+        //     InheritedBackLinks.Add(relative);
+        //     RedefinesSource |= relative.RedefinesSource;
+        // }
 
         //ConstructorMembers.AddRange(RequiredMembers);
         Properties.Add(new("Source", "TSource"));
@@ -145,8 +143,6 @@ public class BackLinkNode(LinkTarget target) :
         NodeContext context,
         Logger logger)
     {
-        var ancestors = GetEntityAssignableAncestors(context);
-
         if (!IsCore)
         {
             bases.AddRange([
@@ -155,86 +151,80 @@ public class BackLinkNode(LinkTarget target) :
             ]);
         }
 
-        if (RedefinesSource)
+        if (!IsTemplate)
         {
-            members.UnionWith([
-                "new TSource Source { get; }",
-                $"TSource {FormattedCoreBackLinkType}.Source => Source;"
-            ]);
-
-            if (!IsCore)
-                members.Add($"TSource {FormattedBackLinkType}.Source => Source;");
+            foreach (var baseNode in ExplicitlyImplements)
+            {
+                if(baseNode is BackLinkNode {IsTemplate: true}) continue;
+                
+                bases.Add(baseNode.FormatAsTypePath());
+            }
         }
 
-        if (ancestors.Length > 0)
+        // if (RedefinesSource)
+        // {
+        //     members.UnionWith([
+        //         "new TSource Source { get; }",
+        //         $"TSource {FormattedCoreBackLinkType}.Source => Source;"
+        //     ]);
+        //
+        //     if (!IsCore)
+        //         members.Add($"TSource {FormattedBackLinkType}.Source => Source;");
+        // }
+
+        foreach (var ancestor in GetEntityAssignableAncestors(context))
         {
-            foreach (var ancestor in ancestors)
-            {
-                if (GetNodeWithEquivalentPathing(ancestor) is not BackLinkNode ancestorBackLink) continue;
-
-                var ancestorPath = ancestorBackLink.FormatTypePath();
-
-                bases.Add($"{ancestorPath}.BackLink<TSource>");
-
-                var overrideType = ancestorBackLink.RedefinesSource
-                    ? $"{ancestorPath}.BackLink<TSource>"
-                    : ancestor.FormattedBackLinkType;
-
-                members.Add($"TSource {overrideType}.Source => Source;");
-            }
+            if (GetNodeWithEquivalentPathing(ancestor) is not BackLinkNode ancestorBackLink) continue;
+            
+            bases.Add(ancestorBackLink.FormatAsTypePath());
+        
+            // var overrideType = ancestorBackLink.RedefinesSource
+            //     ? $"{ancestorPath}.BackLink<TSource>"
+            //     : ancestor.FormattedBackLinkType;
+        
+            //members.Add($"TSource {overrideType}.Source => Source;");
         }
 
         switch (Parent)
         {
             case LinkHierarchyNode hierarchy:
                 members.UnionWith(hierarchy
-                    .CartesianLinkTypeNodes
-                    .OfType<LinkHierarchyNode>()
-                    .Prepend(hierarchy)
-                    .SelectMany(IEnumerable<string> (node) => node
-                        .HierarchyNodes
-                        .SelectMany(IEnumerable<string> (x) =>
+                    .HierarchyNodes
+                    .SelectMany(IEnumerable<string> (x) =>
+                    {
+                        var type = hierarchy.IsTemplate
+                            ? x.FormattedBackLinkType
+                            : $"{x.Target.Actor}{hierarchy.FormatRelativeTypePath()}.BackLink<TSource>";
+
+                        var name = LinksV4.GetFriendlyName(x.Target.Actor);
+
+                        var overrideType = hierarchy.IsTemplate
+                            ? x.FormattedLink
+                            : $"{x.Target.Actor}{hierarchy.FormatRelativeTypePath()}";
+
+                        var results = new List<string>();
+
+                        results.Add($"new {type} {name} {{ get;}}");
+                        results.Add($"{overrideType} {hierarchy.FormatAsTypePath()}.{name} => {name};");
+
+                        if (!IsCore)
                         {
-                            var type = node.IsTemplate
-                                ? x.FormattedBackLinkType
-                                : $"{x.Target.Actor}{node.FormatRelativeTypePath()}.BackLink<TSource>";
+                            var coreType = hierarchy.IsTemplate
+                                ? x.FormattedCoreLink
+                                : $"{x.Target.GetCoreActor()}{hierarchy.FormatRelativeTypePath()}";
 
-                            var name = LinksV4.GetFriendlyName(x.Target.Actor);
+                            var coreOverrideType = hierarchy.IsTemplate
+                                ? x.FormattedCoreBackLinkType
+                                : $"{x.Target.GetCoreActor()}{hierarchy.FormatRelativeTypePath()}.BackLink<TSource>";
 
-                            var overrideType = node.IsTemplate
-                                ? x.FormattedLink
-                                : $"{x.Target.Actor}{node.FormatRelativeTypePath()}";
+                            results.AddRange([
+                                $"{coreOverrideType} {Target.GetCoreActor()}{hierarchy.FormatRelativeTypePath()}.Hierarchy.BackLink<TSource>.{name} => {name};",
+                                $"{coreType} {Target.GetCoreActor()}{hierarchy.FormatRelativeTypePath()}.Hierarchy.{name} => {name};"
+                            ]);
+                        }
 
-                            var results = new List<string>();
-
-                            if (node == hierarchy)
-                                results.Add($"new {type} {name} {{ get;}}");
-                            else
-                                results.Add(
-                                    $"{type} {node.FormatAsTypePath()}.BackLink<TSource>.{name} => {name};"
-                                );
-
-                            results.Add($"{overrideType} {node.FormatAsTypePath()}.{name} => {name};");
-
-                            if (!IsCore)
-                            {
-                                var coreType = node.IsTemplate
-                                    ? x.FormattedCoreLink
-                                    : $"{x.Target.GetCoreActor()}{node.FormatRelativeTypePath()}";
-
-                                var coreOverrideType = node.IsTemplate
-                                    ? x.FormattedCoreBackLinkType
-                                    : $"{x.Target.GetCoreActor()}{node.FormatRelativeTypePath()}.BackLink<TSource>";
-
-                                results.AddRange([
-                                    $"{coreOverrideType} {Target.GetCoreActor()}{node.FormatRelativeTypePath()}.Hierarchy.BackLink<TSource>.{name} => {name};",
-                                    $"{coreType} {Target.GetCoreActor()}{node.FormatRelativeTypePath()}.Hierarchy.{name} => {name};"
-                                ]);
-                            }
-
-                            return results;
-                        })
-                    )
+                        return results;
+                    })
                 );
 
                 break;
@@ -268,7 +258,7 @@ public class BackLinkNode(LinkTarget target) :
                                 ]);
                             }
 
-                            if (extension.CartesianExtensionProperties.TryGetValue(x.Name, out var cartesian))
+                            if (extension.InheritedPropertyDefinitions.TryGetValue(x.Name, out var cartesian))
                             {
                                 result.AddRange(cartesian
                                     .Where(x => x.IsDefinedOnPath)
@@ -300,15 +290,6 @@ public class BackLinkNode(LinkTarget target) :
                         })
                 );
                 break;
-        }
-
-        foreach (var inheritedBackLink in InheritedBackLinks)
-        {
-            bases.Add($"{inheritedBackLink.FormatTypePath()}.BackLink<TSource>");
-
-            if (!inheritedBackLink.RedefinesSource) continue;
-
-            members.Add($"TSource {inheritedBackLink.FormatTypePath()}.BackLink<TSource>.Source => Source;");
         }
     }
 
@@ -401,7 +382,7 @@ public class BackLinkNode(LinkTarget target) :
         {
             FormatAsTypePath()
         };
-        
+
         if (Parent is ITypeImplementerNode {WillGenerateImplementation: true} implementer)
         {
             Parent.GetPathGenerics(out var parentGenerics, out _);
@@ -426,7 +407,7 @@ public class BackLinkNode(LinkTarget target) :
 
         members.Add(
             $$"""
-              internal static {{FormatAsTypePath()}} Create({{(
+              internal static new {{FormatAsTypePath()}} Create({{(
                   ctorParams.Count > 0
                       ? $"{Environment.NewLine}{string.Join(
                           $",{Environment.NewLine}",
@@ -545,8 +526,6 @@ public class BackLinkNode(LinkTarget target) :
              {base.ToString()}
              Is Template?: {IsTemplate}
              Has Implementation?: {HasImplementation}
-             Redefines Source?: {RedefinesSource}
-             Inherited BackLinks: {InheritedBackLinks.Count}
              """;
 
 //        {(

@@ -46,268 +46,275 @@ public sealed partial class RestGuildActor :
     ) : base(client, guild)
     {
         Identity = guild | this;
-
-        Sounds = new(
-            client,
-            RestActorProvider.GetOrCreate(client, Discord.Template.Of<GuildSoundboardSoundIdentity>(), Identity),
-            IGuildSoundboardSound.FetchManyRoute(this)
-                .AsRequiredProvider()
-                .ToEntityEnumerableProvider(
-                    Discord.Template.Of<GuildSoundboardSoundIdentity>(),
-                    RestActorProvider.GetOrCreate(client, Discord.Template.Of<GuildSoundboardSoundIdentity>(), Identity)
-                )
-        );
-
-        Templates = new(
+        
+        Emotes = RestGuildEmoteActor.Enumerable.Indexable.BackLink<RestGuildActor>.Create(
             this,
+            RestGuildEmoteActor.DefaultEnumerableProvider,
             client,
-            RestActorProvider.GetOrCreate(client, Discord.Template.Of<GuildTemplateFromGuildIdentity>(), Identity),
-            IGuildTemplate.FetchManyRoute(this)
-                .AsRequiredProvider()
-                .ToEntityEnumerableProvider(
-                    Discord.Template.Of<GuildTemplateIdentity>(),
-                    RestActorProvider.GetOrCreate(client, Discord.Template.Of<GuildTemplateFromGuildIdentity>(),
-                        Identity)
-                )
+            RestActorProvider.GetOrCreate(client, Discord.Template.Of<GuildEmoteIdentity>(), Identity)
         );
 
-        Channels = new(
-            this,
-            client,
-            RestActorProvider.GetOrCreate(client, Discord.Template.Of<GuildChannelIdentity>(), Identity),
-            IGuildChannel.FetchManyRoute(this)
-                .AsRequiredProvider()
-                .ToEntityEnumerableProvider(
-                    Discord.Template.Of<GuildChannelIdentity>(),
-                    RestActorProvider.GetOrCreate(client, Discord.Template.Of<GuildChannelIdentity>(), Identity)
-                ),
-            new(
-                this,
-                client,
-                RestActorProvider.GetOrCreate(client, Discord.Template.Of<CategoryChannelIdentity>(), Identity),
-                IGuildChannel.FetchManyRoute(this)
-                    .AsRequiredProvider()
-                    .Map(v => v.OfType<IGuildCategoryChannelModel>())
-                    .ToEntityEnumerableProvider(
-                        Discord.Template.Of<CategoryChannelIdentity>(),
-                        RestActorProvider.GetOrCreate(client, Discord.Template.Of<CategoryChannelIdentity>(), Identity)
-                    )
-            ),
-            new(
-                this,
-                client,
-                RestActorProvider.GetOrCreate(client, Discord.Template.Of<ForumChannelIdentity>(), Identity),
-                IGuildChannel.FetchManyRoute(this)
-                    .AsRequiredProvider()
-                    .Map(v => v.OfType<IGuildForumChannelModel>())
-                    .ToEntityEnumerableProvider(
-                        Discord.Template.Of<ForumChannelIdentity>(),
-                        RestActorProvider.GetOrCreate(client, Discord.Template.Of<ForumChannelIdentity>(), Identity)
-                    )
-            ),
-            new(
-                this,
-                client,
-                RestActorProvider.GetOrCreate(client, Discord.Template.Of<MediaChannelIdentity>(), Identity),
-                IGuildChannel.FetchManyRoute(this)
-                    .AsRequiredProvider()
-                    .Map(v => v.OfType<IGuildMediaChannelModel>())
-                    .ToEntityEnumerableProvider(
-                        Discord.Template.Of<MediaChannelIdentity>(),
-                        RestActorProvider.GetOrCreate(client, Discord.Template.Of<MediaChannelIdentity>(), Identity)
-                    )
-            ),
-            new(
-                this,
-                client,
-                RestActorProvider.GetOrCreate(client, Discord.Template.Of<NewsChannelIdentity>(), Identity),
-                IGuildChannel.FetchManyRoute(this)
-                    .AsRequiredProvider()
-                    .Map(v => v.OfType<IGuildNewsChannelModel>())
-                    .ToEntityEnumerableProvider(
-                        Discord.Template.Of<NewsChannelIdentity>(),
-                        RestActorProvider.GetOrCreate(client, Discord.Template.Of<NewsChannelIdentity>(), Identity)
-                    )
-            ),
-            new(
-                this,
-                client,
-                RestActorProvider.GetOrCreate(client, Discord.Template.Of<StageChannelIdentity>(), Identity),
-                IGuildChannel.FetchManyRoute(this)
-                    .AsRequiredProvider()
-                    .Map(v => v.OfType<IGuildStageChannelModel>())
-                    .ToEntityEnumerableProvider(
-                        Discord.Template.Of<StageChannelIdentity>(),
-                        RestActorProvider.GetOrCreate(client, Discord.Template.Of<StageChannelIdentity>(), Identity)
-                    )
-            ),
-            new(
-                this,
-                client,
-                RestActorProvider.GetOrCreate(client, Discord.Template.Of<TextChannelIdentity>(), Identity),
-                IGuildChannel.FetchManyRoute(this)
-                    .AsRequiredProvider()
-                    .Map(v => v.OfType<IGuildTextChannelModel>())
-                    .ToEntityEnumerableProvider(
-                        Discord.Template.Of<TextChannelIdentity>(),
-                        RestActorProvider.GetOrCreate(client, Discord.Template.Of<TextChannelIdentity>(), Identity)
-                    )
-            ),
-            new(
-                this,
-                client,
-                RestActorProvider.GetOrCreate(client, Discord.Template.Of<ThreadableChannelIdentity>(), Identity),
-                IGuildChannel.FetchManyRoute(this)
-                    .AsRequiredProvider()
-                    .Map(v => v.OfType<IThreadableChannelModel>())
-                    .ToEntityEnumerableProvider(
-                        Discord.Template.Of<ThreadableChannelIdentity>(),
-                        RestActorProvider.GetOrCreate(client, Discord.Template.Of<ThreadableChannelIdentity>(),
-                            Identity)
-                    )
-            ),
-            new(
-                this,
-                client,
-                RestActorProvider.GetOrCreate(client, Discord.Template.Of<VoiceChannelIdentity>(), Identity),
-                IGuildChannel.FetchManyRoute(this)
-                    .AsRequiredProvider()
-                    .Map(v => v.OfType<IGuildVoiceChannelModel>())
-                    .ToEntityEnumerableProvider(
-                        Discord.Template.Of<VoiceChannelIdentity>(),
-                        RestActorProvider.GetOrCreate(client, Discord.Template.Of<VoiceChannelIdentity>(), Identity)
-                    )
-            )
-        );
-
-        Threads = new(
-            this,
-            client,
-            RestActorProvider.GetOrCreate(client, Discord.Template.Of<GuildThreadIdentity>(), Identity),
-            new(
-                client,
-                RestActorProvider.GetOrCreate(client, Discord.Template.Of<GuildThreadIdentity>(), Identity),
-                Routes.ListActiveGuildThreads(Id)
-                    .AsRequiredProvider()
-                    .ToEntityEnumerableProvider(result =>
-                    {
-                        foreach (var member in result.Members)
-                        {
-                            if (!member.ThreadId.IsSpecified) continue;
-                            Threads![member.ThreadId.Value].Members.Current.AddModelSource(member);
-                        }
-
-                        return result.Threads.Select(model => Threads![model.Id].CreateEntity(model));
-                    })
-            )
-        );
-
-        Integrations = new(
-            this,
-            client,
-            RestActorProvider.GetOrCreate(client, Discord.Template.Of<IntegrationIdentity>(), Identity),
-            IIntegration.FetchManyRoute(this)
-                .AsRequiredProvider()
-                .ToEntityEnumerableProvider(
-                    Discord.Template.Of<IntegrationIdentity>(),
-                    RestActorProvider.GetOrCreate(client, Discord.Template.Of<IntegrationIdentity>(), Identity)
-                )
-        );
-
-        Bans = new(
-            this,
-            client,
-            RestActorProvider.GetOrCreate(client, Discord.Template.Of<BanIdentity>(), Identity),
-            new RestPagingProvider<IBanModel, PageGuildBansParams, RestBan>(
-                client,
-                (model, _) => Bans![model.Id].CreateEntity(model),
-                this
-            )
-        );
-
-        Members = new(
-            this,
-            client,
-            RestActorProvider.GetOrCreate(client, Discord.Template.Of<MemberIdentity>(), Identity),
-            new RestPagingProvider<IMemberModel, PageGuildMembersParams, RestMember>(
-                client,
-                (model, _) => Members![model.Id].CreateEntity(model),
-                this
-            ),
-            new(client, Identity, CurrentMemberIdentity.Of(client.Users.Current.Id))
-        );
-
-        Emotes = new(
-            this,
-            client,
-            RestActorProvider.GetOrCreate(client, Discord.Template.Of<GuildEmoteIdentity>(), Identity),
-            IGuildEmote.FetchManyRoute(this)
-                .AsRequiredProvider()
-                .ToEntityEnumerableProvider(
-                    Discord.Template.Of<GuildEmoteIdentity>(),
-                    RestActorProvider.GetOrCreate(client, Discord.Template.Of<GuildEmoteIdentity>(), Identity)
-                )
-        );
-
-        Roles = new(
-            this,
-            client,
-            RestActorProvider.GetOrCreate(client, Discord.Template.Of<RoleIdentity>(), Identity),
-            IRole.FetchManyRoute(this)
-                .AsRequiredProvider()
-                .ToEntityEnumerableProvider(
-                    Discord.Template.Of<RoleIdentity>(),
-                    RestActorProvider.GetOrCreate(client, Discord.Template.Of<RoleIdentity>(), Identity)
-                )
-        );
-
-        Stickers = new(
-            this,
-            client,
-            RestActorProvider.GetOrCreate(client, Discord.Template.Of<GuildStickerIdentity>(), Identity),
-            IGuildSticker.FetchManyRoute(this)
-                .AsRequiredProvider()
-                .ToEntityEnumerableProvider(
-                    Discord.Template.Of<GuildStickerIdentity>(),
-                    RestActorProvider.GetOrCreate(client, Discord.Template.Of<GuildStickerIdentity>(), Identity)
-                )
-        );
-
-        ScheduledEvents = new(
-            this,
-            client,
-            RestActorProvider.GetOrCreate(client, Discord.Template.Of<GuildScheduledEventIdentity>(), Identity),
-            IGuildScheduledEvent.FetchManyRoute(this)
-                .AsRequiredProvider()
-                .ToEntityEnumerableProvider(
-                    Discord.Template.Of<GuildScheduledEventIdentity>(),
-                    RestActorProvider.GetOrCreate(client, Discord.Template.Of<GuildScheduledEventIdentity>(), Identity)
-                )
-        );
-
-        Invites = new(
-            this,
-            client,
-            RestActorProvider.GetOrCreate(client, Discord.Template.Of<GuildInviteIdentity>(), Identity),
-            IGuildInvite.FetchManyRoute(this)
-                .AsRequiredProvider()
-                .ToEntityEnumerableProvider(
-                    Discord.Template.Of<GuildInviteIdentity>(),
-                    RestActorProvider.GetOrCreate(client, Discord.Template.Of<GuildInviteIdentity>(), Identity)
-                )
-        );
-
-        Webhooks = new(
-            this,
-            client,
-            RestActorProvider.GetOrCreate(client, Discord.Template.Of<WebhookIdentity>()),
-            IWebhook.GetGuildWebhooksRoute(this)
-                .AsRequiredProvider()
-                .ToEntityEnumerableProvider(
-                    Discord.Template.Of<WebhookIdentity>(),
-                    RestActorProvider.GetOrCreate(client, Discord.Template.Of<WebhookIdentity>())
-                )
-        );
+        // Sounds = new(
+        //     client,
+        //     RestActorProvider.GetOrCreate(client, Discord.Template.Of<GuildSoundboardSoundIdentity>(), Identity),
+        //     IGuildSoundboardSound.FetchManyRoute(this)
+        //         .AsRequiredProvider()
+        //         .ToEntityEnumerableProvider(
+        //             Discord.Template.Of<GuildSoundboardSoundIdentity>(),
+        //             RestActorProvider.GetOrCreate(client, Discord.Template.Of<GuildSoundboardSoundIdentity>(), Identity)
+        //         )
+        // );
+        //
+        // Templates = new(
+        //     this,
+        //     client,
+        //     RestActorProvider.GetOrCreate(client, Discord.Template.Of<GuildTemplateFromGuildIdentity>(), Identity),
+        //     IGuildTemplate.FetchManyRoute(this)
+        //         .AsRequiredProvider()
+        //         .ToEntityEnumerableProvider(
+        //             Discord.Template.Of<GuildTemplateIdentity>(),
+        //             RestActorProvider.GetOrCreate(client, Discord.Template.Of<GuildTemplateFromGuildIdentity>(),
+        //                 Identity)
+        //         )
+        // );
+        //
+        // Channels = new(
+        //     this,
+        //     client,
+        //     RestActorProvider.GetOrCreate(client, Discord.Template.Of<GuildChannelIdentity>(), Identity),
+        //     IGuildChannel.FetchManyRoute(this)
+        //         .AsRequiredProvider()
+        //         .ToEntityEnumerableProvider(
+        //             Discord.Template.Of<GuildChannelIdentity>(),
+        //             RestActorProvider.GetOrCreate(client, Discord.Template.Of<GuildChannelIdentity>(), Identity)
+        //         ),
+        //     new(
+        //         this,
+        //         client,
+        //         RestActorProvider.GetOrCreate(client, Discord.Template.Of<CategoryChannelIdentity>(), Identity),
+        //         IGuildChannel.FetchManyRoute(this)
+        //             .AsRequiredProvider()
+        //             .Map(v => v.OfType<IGuildCategoryChannelModel>())
+        //             .ToEntityEnumerableProvider(
+        //                 Discord.Template.Of<CategoryChannelIdentity>(),
+        //                 RestActorProvider.GetOrCreate(client, Discord.Template.Of<CategoryChannelIdentity>(), Identity)
+        //             )
+        //     ),
+        //     new(
+        //         this,
+        //         client,
+        //         RestActorProvider.GetOrCreate(client, Discord.Template.Of<ForumChannelIdentity>(), Identity),
+        //         IGuildChannel.FetchManyRoute(this)
+        //             .AsRequiredProvider()
+        //             .Map(v => v.OfType<IGuildForumChannelModel>())
+        //             .ToEntityEnumerableProvider(
+        //                 Discord.Template.Of<ForumChannelIdentity>(),
+        //                 RestActorProvider.GetOrCreate(client, Discord.Template.Of<ForumChannelIdentity>(), Identity)
+        //             )
+        //     ),
+        //     new(
+        //         this,
+        //         client,
+        //         RestActorProvider.GetOrCreate(client, Discord.Template.Of<MediaChannelIdentity>(), Identity),
+        //         IGuildChannel.FetchManyRoute(this)
+        //             .AsRequiredProvider()
+        //             .Map(v => v.OfType<IGuildMediaChannelModel>())
+        //             .ToEntityEnumerableProvider(
+        //                 Discord.Template.Of<MediaChannelIdentity>(),
+        //                 RestActorProvider.GetOrCreate(client, Discord.Template.Of<MediaChannelIdentity>(), Identity)
+        //             )
+        //     ),
+        //     new(
+        //         this,
+        //         client,
+        //         RestActorProvider.GetOrCreate(client, Discord.Template.Of<NewsChannelIdentity>(), Identity),
+        //         IGuildChannel.FetchManyRoute(this)
+        //             .AsRequiredProvider()
+        //             .Map(v => v.OfType<IGuildNewsChannelModel>())
+        //             .ToEntityEnumerableProvider(
+        //                 Discord.Template.Of<NewsChannelIdentity>(),
+        //                 RestActorProvider.GetOrCreate(client, Discord.Template.Of<NewsChannelIdentity>(), Identity)
+        //             )
+        //     ),
+        //     new(
+        //         this,
+        //         client,
+        //         RestActorProvider.GetOrCreate(client, Discord.Template.Of<StageChannelIdentity>(), Identity),
+        //         IGuildChannel.FetchManyRoute(this)
+        //             .AsRequiredProvider()
+        //             .Map(v => v.OfType<IGuildStageChannelModel>())
+        //             .ToEntityEnumerableProvider(
+        //                 Discord.Template.Of<StageChannelIdentity>(),
+        //                 RestActorProvider.GetOrCreate(client, Discord.Template.Of<StageChannelIdentity>(), Identity)
+        //             )
+        //     ),
+        //     new(
+        //         this,
+        //         client,
+        //         RestActorProvider.GetOrCreate(client, Discord.Template.Of<TextChannelIdentity>(), Identity),
+        //         IGuildChannel.FetchManyRoute(this)
+        //             .AsRequiredProvider()
+        //             .Map(v => v.OfType<IGuildTextChannelModel>())
+        //             .ToEntityEnumerableProvider(
+        //                 Discord.Template.Of<TextChannelIdentity>(),
+        //                 RestActorProvider.GetOrCreate(client, Discord.Template.Of<TextChannelIdentity>(), Identity)
+        //             )
+        //     ),
+        //     new(
+        //         this,
+        //         client,
+        //         RestActorProvider.GetOrCreate(client, Discord.Template.Of<ThreadableChannelIdentity>(), Identity),
+        //         IGuildChannel.FetchManyRoute(this)
+        //             .AsRequiredProvider()
+        //             .Map(v => v.OfType<IThreadableChannelModel>())
+        //             .ToEntityEnumerableProvider(
+        //                 Discord.Template.Of<ThreadableChannelIdentity>(),
+        //                 RestActorProvider.GetOrCreate(client, Discord.Template.Of<ThreadableChannelIdentity>(),
+        //                     Identity)
+        //             )
+        //     ),
+        //     new(
+        //         this,
+        //         client,
+        //         RestActorProvider.GetOrCreate(client, Discord.Template.Of<VoiceChannelIdentity>(), Identity),
+        //         IGuildChannel.FetchManyRoute(this)
+        //             .AsRequiredProvider()
+        //             .Map(v => v.OfType<IGuildVoiceChannelModel>())
+        //             .ToEntityEnumerableProvider(
+        //                 Discord.Template.Of<VoiceChannelIdentity>(),
+        //                 RestActorProvider.GetOrCreate(client, Discord.Template.Of<VoiceChannelIdentity>(), Identity)
+        //             )
+        //     )
+        // );
+        //
+        // Threads = new(
+        //     this,
+        //     client,
+        //     RestActorProvider.GetOrCreate(client, Discord.Template.Of<GuildThreadIdentity>(), Identity),
+        //     new(
+        //         client,
+        //         RestActorProvider.GetOrCreate(client, Discord.Template.Of<GuildThreadIdentity>(), Identity),
+        //         Routes.ListActiveGuildThreads(Id)
+        //             .AsRequiredProvider()
+        //             .ToEntityEnumerableProvider(result =>
+        //             {
+        //                 foreach (var member in result.Members)
+        //                 {
+        //                     if (!member.ThreadId.IsSpecified) continue;
+        //                     Threads![member.ThreadId.Value].Members.Current.AddModelSource(member);
+        //                 }
+        //
+        //                 return result.Threads.Select(model => Threads![model.Id].CreateEntity(model));
+        //             })
+        //     )
+        // );
+        //
+        // Integrations = new(
+        //     this,
+        //     client,
+        //     RestActorProvider.GetOrCreate(client, Discord.Template.Of<IntegrationIdentity>(), Identity),
+        //     IIntegration.FetchManyRoute(this)
+        //         .AsRequiredProvider()
+        //         .ToEntityEnumerableProvider(
+        //             Discord.Template.Of<IntegrationIdentity>(),
+        //             RestActorProvider.GetOrCreate(client, Discord.Template.Of<IntegrationIdentity>(), Identity)
+        //         )
+        // );
+        //
+        // Bans = new(
+        //     this,
+        //     client,
+        //     RestActorProvider.GetOrCreate(client, Discord.Template.Of<BanIdentity>(), Identity),
+        //     new RestPagingProvider<IBanModel, PageGuildBansParams, RestBan>(
+        //         client,
+        //         (model, _) => Bans![model.Id].CreateEntity(model),
+        //         this
+        //     )
+        // );
+        //
+        // Members = new(
+        //     this,
+        //     client,
+        //     RestActorProvider.GetOrCreate(client, Discord.Template.Of<MemberIdentity>(), Identity),
+        //     new RestPagingProvider<IMemberModel, PageGuildMembersParams, RestMember>(
+        //         client,
+        //         (model, _) => Members![model.Id].CreateEntity(model),
+        //         this
+        //     ),
+        //     new(client, Identity, CurrentMemberIdentity.Of(client.Users.Current.Id))
+        // );
+        //
+        // Emotes = new(
+        //     this,
+        //     client,
+        //     RestActorProvider.GetOrCreate(client, Discord.Template.Of<GuildEmoteIdentity>(), Identity),
+        //     IGuildEmote.FetchManyRoute(this)
+        //         .AsRequiredProvider()
+        //         .ToEntityEnumerableProvider(
+        //             Discord.Template.Of<GuildEmoteIdentity>(),
+        //             RestActorProvider.GetOrCreate(client, Discord.Template.Of<GuildEmoteIdentity>(), Identity)
+        //         )
+        // );
+        //
+        // Roles = new(
+        //     this,
+        //     client,
+        //     RestActorProvider.GetOrCreate(client, Discord.Template.Of<RoleIdentity>(), Identity),
+        //     IRole.FetchManyRoute(this)
+        //         .AsRequiredProvider()
+        //         .ToEntityEnumerableProvider(
+        //             Discord.Template.Of<RoleIdentity>(),
+        //             RestActorProvider.GetOrCreate(client, Discord.Template.Of<RoleIdentity>(), Identity)
+        //         )
+        // );
+        //
+        // Stickers = new(
+        //     this,
+        //     client,
+        //     RestActorProvider.GetOrCreate(client, Discord.Template.Of<GuildStickerIdentity>(), Identity),
+        //     IGuildSticker.FetchManyRoute(this)
+        //         .AsRequiredProvider()
+        //         .ToEntityEnumerableProvider(
+        //             Discord.Template.Of<GuildStickerIdentity>(),
+        //             RestActorProvider.GetOrCreate(client, Discord.Template.Of<GuildStickerIdentity>(), Identity)
+        //         )
+        // );
+        //
+        // ScheduledEvents = new(
+        //     this,
+        //     client,
+        //     RestActorProvider.GetOrCreate(client, Discord.Template.Of<GuildScheduledEventIdentity>(), Identity),
+        //     IGuildScheduledEvent.FetchManyRoute(this)
+        //         .AsRequiredProvider()
+        //         .ToEntityEnumerableProvider(
+        //             Discord.Template.Of<GuildScheduledEventIdentity>(),
+        //             RestActorProvider.GetOrCreate(client, Discord.Template.Of<GuildScheduledEventIdentity>(), Identity)
+        //         )
+        // );
+        //
+        // Invites = new(
+        //     this,
+        //     client,
+        //     RestActorProvider.GetOrCreate(client, Discord.Template.Of<GuildInviteIdentity>(), Identity),
+        //     IGuildInvite.FetchManyRoute(this)
+        //         .AsRequiredProvider()
+        //         .ToEntityEnumerableProvider(
+        //             Discord.Template.Of<GuildInviteIdentity>(),
+        //             RestActorProvider.GetOrCreate(client, Discord.Template.Of<GuildInviteIdentity>(), Identity)
+        //         )
+        // );
+        //
+        // Webhooks = new(
+        //     this,
+        //     client,
+        //     RestActorProvider.GetOrCreate(client, Discord.Template.Of<WebhookIdentity>()),
+        //     IWebhook.GetGuildWebhooksRoute(this)
+        //         .AsRequiredProvider()
+        //         .ToEntityEnumerableProvider(
+        //             Discord.Template.Of<WebhookIdentity>(),
+        //             RestActorProvider.GetOrCreate(client, Discord.Template.Of<WebhookIdentity>())
+        //         )
+        // );
     }
 
     [SourceOfTruth]

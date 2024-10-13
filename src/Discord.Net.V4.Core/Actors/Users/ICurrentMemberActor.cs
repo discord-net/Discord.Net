@@ -8,11 +8,9 @@ namespace Discord;
 [SuppressMessage("ReSharper", "PossibleInterfaceMemberAmbiguity")]
 public partial interface ICurrentMemberActor :
     IMemberActor,
+    ICurrentUserActor,
     IActor<ulong, ICurrentMember>
 {
-    [SourceOfTruth]
-    new ICurrentUserActor User { get; }
-
     [SourceOfTruth]
     new ICurrentUserVoiceStateActor VoiceState { get; }
 }

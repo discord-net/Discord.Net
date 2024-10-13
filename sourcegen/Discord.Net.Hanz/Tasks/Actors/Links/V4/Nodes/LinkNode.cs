@@ -70,6 +70,9 @@ public abstract class LinkNode : IEquatable<LinkNode>
     public string FormattedCoreEntityProvider
         => $"Discord.IEntityProvider<{Target.GetCoreEntity()}, {Target.Model}>";
 
+    public HashSet<LinkNode> SemanticCompisition { get; } = [];
+    public HashSet<LinkNode> ImplicitSemanticCompisition { get; } = [];
+
     public IEnumerable<IEnumerable<LinkTypeNode>> ParentLinkTypesProduct
         => GetProduct(Parents.OfType<LinkTypeNode>());
 
@@ -114,6 +117,264 @@ public abstract class LinkNode : IEquatable<LinkNode>
                 })
                 .OfType<LinkNode>();
         }
+    }
+
+    protected IEnumerable<LinkNode> GetSemanticTypeNodeRelatives(Logger logger, bool excludeSelf = true)
+        => GetSemanticTypeNodeCompisition(logger, excludeSelf)
+            .Where(x => x.SemanticEquals(this) && (!excludeSelf || x != this))
+            .OfType<LinkModifierNode>();
+
+    protected HashSet<LinkNode> GetSemanticTypeNodeCompisition(
+        Logger logger,
+        bool excludeSelf = true,
+        bool excludeParentCompisition = true)
+    {
+        if (RootActorNode is null) return [];
+
+        // rules:
+        // - Link Nodes are order-aware based on the schematic:
+        //   - {A, B, C} ✅
+        //   - {C, B, A} ❌
+        //   - {A, B}    ✅
+        //   - {B, C}    ✅
+        //   - {A, C} is dependant on if A has a child of C.
+        // - Hierarchy nodes never contain descendant nodes of other hierarchy nodes, they can contain other modifier
+        //   nodes.
+        // - Link Extensions can contain other extensions, extension A in B ensures that theres a variant of B in A
+        //   on the closest non-extension parent. Generally, {{a,b} : a∈A ∧ b∈B} holds here.
+        //   - {A, B} ✅
+        //   - {B, A} ✅
+        //   - {B}    ✅
+        // - BackLinks are terminal, and don't have children.
+        // - Actor nodes are terminal, and don't have parents.
+
+        var product = new List<(Type SetType, List<List<LinkNode>> Nodes)>();
+
+        var searchType = GetSearchType(this);
+        var searchSet = new List<LinkNode>() {this};
+
+        Type GetSearchType(LinkNode node)
+        {
+            if (node is LinkTypeNode)
+                return typeof(LinkTypeNode);
+
+            return node.GetType();
+        }
+        
+        void CalculateSearchProduct()
+        {
+            searchSet.Reverse();
+
+            product.Add(
+                (
+                    searchType,
+                    searchSet.Last() switch
+                    {
+                        LinkTypeNode or LinkExtensionNode => GetProduct(searchSet)
+                            .Select(x => x.ToList())
+                            .ToList(),
+                        _ => [searchSet.ToList()]
+                    }
+                )
+            );
+        }
+
+        foreach (var parent in Parents.Where(x => x is ITypeProducerNode))
+        {
+            if (parent is ActorNode or BackLinkNode) continue;
+
+            var parentType = GetSearchType(parent);
+            
+            if (searchType != parentType)
+            {
+                CalculateSearchProduct();
+                searchType = parentType;
+                searchSet.Clear();
+            }
+
+            searchSet.Add(parent);
+        }
+
+        if (searchSet.Count > 0)
+            CalculateSearchProduct();
+
+        logger.Log($"Products with semantics: {product.Count}");
+
+        product.Reverse();
+
+        foreach (var entry in product)
+        {
+            logger.Log($" - {entry.SetType}: {entry.Nodes.Count}");
+
+            var pads = new List<int>();
+
+            var formatted = entry.Nodes
+                .Select(x => x
+                    .Select((x, i) =>
+                    {
+                        var line = $"{x.GetType().Name}: {((ITypeProducerNode) x).GetTypeName()}";
+
+                        if (pads.Count <= i)
+                            pads.Insert(i, line.Length);
+                        else if (pads[i] < line.Length)
+                            pads[i] = line.Length;
+
+                        return line;
+                    })
+                    .ToArray()
+                ).ToArray();
+
+            var maxElements = formatted.Select(x => x.Length).Max();
+            
+            foreach (var set in formatted)
+            {
+                logger.Log(
+                    $" - {{ {string
+                        .Join(
+                            " | ",
+                            set.Select((x, i) => x
+                                .PadRight(
+                                    pads[i] + pads.Take(i - 1).Sum()
+                                )
+                            )
+                        )
+                        .PadRight(pads.Sum() + 3 * (maxElements - set.Length))
+                    } }}"
+                );
+            }
+
+            // foreach (var nodes in entry.Nodes)
+            // {
+            //     logger.Log(
+            //         $"    - {{ {string.Join(" | ", nodes.Select(x => $"{x.GetType().Name}: {((ITypeProducerNode) x).GetTypeName()}"))} }}");
+            // }
+        }
+
+        var result = new HashSet<LinkNode>();
+
+        var bounds = (1 << product.Count) - 1;
+        var boundsDigitSize = Convert.ToString(bounds, 2).Length;
+
+        for (var sample = 1; sample <= bounds; sample++)
+        {
+            var sampleName = Convert.ToString(sample, 2).PadLeft(boundsDigitSize, '0');
+            var searchNodes = new HashSet<LinkNode>() {RootActorNode};
+
+            for (var index = 0; index != product.Count; index++)
+            {
+                if (searchNodes.Count == 0) break;
+
+                var identity = (1 << index);
+                var identityName = Convert.ToString(identity, 2).PadLeft(boundsDigitSize, '0');
+
+                if ((identity & sample) == 0)
+                {
+                    logger.Log($"Sample {sampleName} ({sample}/{bounds}): {identityName} -> skipped");
+                    continue;
+                }
+
+                var nodes = product[index].Nodes;
+
+                var bag = new ConcurrentBag<LinkNode>();
+
+                var sampleLocal = sample;
+                
+                Parallel.ForEach(searchNodes, searchNode =>
+                {
+                    for (var setIndex = 0; setIndex < nodes.Count; setIndex++)
+                    {
+                        var setSearchNode = searchNode;
+                        var set = nodes[setIndex];
+
+                        for (var i = 0; i < set.Count; i++)
+                        {
+                            var node = set[i];
+                            if (node == RootActorNode) break;
+
+                            if (setSearchNode?.Children.FirstOrDefault(x => x.SemanticEquals(node)) is not { } next)
+                            {
+                                logger.Log(
+                                    $"Sample {sampleName} ({sampleLocal}/{bounds}): {identityName} -> set " +
+                                    $"{setIndex + 1}/{nodes.Count} terminates at element {i}"
+                                );
+                                break;
+                            }
+
+                            setSearchNode = next;
+
+                            if (i == set.Count - 1)
+                            {
+                                // if (result.Contains(next) || searchNodes.Contains(next))
+                                // {
+                                //     logger.Log(
+                                //         $"Sample {sampleName} ({sample}/{bounds}): {identityName} -> set " +
+                                //         $"{setIndex + 1}/{nodes.Count} completes but it was already found."
+                                //     );
+                                //     break;
+                                // }
+
+                                if (
+                                    excludeParentCompisition &&
+                                    (Parent?.SemanticCompisition.Contains(setSearchNode) ?? false))
+                                {
+                                    logger.Log(
+                                        $"Sample {sampleName} ({sampleLocal}/{bounds}): {identityName} -> set " +
+                                        $"{setIndex + 1}/{nodes.Count} completes but is excluded as its contained in the parent."
+                                    );
+                                    break;
+                                }
+
+                                if (excludeSelf && setSearchNode == this)
+                                {
+                                    logger.Log(
+                                        $"Sample {sampleName} ({sampleLocal}/{bounds}): {identityName} -> set " +
+                                        $"{setIndex + 1}/{nodes.Count} completes but is excluded as its the current node."
+                                    );
+                                    break;
+                                }
+
+                                bag.Add(setSearchNode);
+                                logger.Log(
+                                    $"Sample {sampleName} ({sampleLocal}/{bounds}): {identityName} -> set " +
+                                    $"{setIndex + 1}/{nodes.Count} completes"
+                                );
+                            }
+                        }
+                    }
+                });
+
+                if (bag.Count == 0)
+                {
+                    logger.Log($"Sample {sampleName} ({sample}/{bounds}): ending at {index + 1}/{product.Count}");
+                    searchNodes.Clear();
+                    break;
+                }
+
+                logger.Log(
+                    $"Sample {sampleName} ({sample}/{bounds}): {identityName} -> {bag.Count} nodes from {searchNodes.Count}");
+
+                searchNodes.Clear();
+                searchNodes.UnionWith(bag);
+            }
+
+            logger.Log($"Sample: {sampleName} ({sample}/{bounds}): {searchNodes.Count} new nodes:");
+
+            foreach (var node in searchNodes)
+            {
+                logger.Log($" - {node.FormatAsTypePath()} ({node.GetType().Name})");
+            }
+
+            result.UnionWith(searchNodes);
+        }
+
+        logger.Log("Result:");
+
+        foreach (var node in result)
+        {
+            logger.Log($" - {node.FormatAsTypePath()} ({node.GetType().Name})");
+        }
+
+        return result;
     }
 
     public bool SemanticEquals(LinkNode node)
@@ -246,31 +507,40 @@ public abstract class LinkNode : IEquatable<LinkNode>
 
     public LinkNode? GetNodeWithEquivalentPathing(ActorNode target)
     {
-        LinkNode? node = target;
-        foreach (var parent in Parents.Prepend(this).Reverse())
-        {
-            if (parent is ActorNode) continue;
-
-            node = node.Children.FirstOrDefault(x =>
-                x.GetType() == parent.GetType()
-                &&
-                (
-                    x is not LinkTypeNode a ||
-                    parent is not LinkTypeNode b ||
-                    a.Entry.Symbol.Equals(b.Entry.Symbol, SymbolEqualityComparer.Default)
-                )
-                &&
-                (
-                    x is not ITypeProducerNode c ||
-                    parent is not ITypeProducerNode d ||
-                    c.GetTypeName().Equals(d.GetTypeName())
-                )
+        return Parents
+            .Prepend(this)
+            .Reverse()
+            .Skip(1)
+            .Aggregate(
+                (LinkNode?) target,
+                (node, part) => node?.Children.FirstOrDefault(x => x.SemanticEquals(part))
             );
 
-            if (node is null) return null;
-        }
-
-        return node;
+        // LinkNode? node = target;
+        // foreach (var parent in Parents.Prepend(this).Reverse())
+        // {
+        //     if (parent is ActorNode) continue;
+        //
+        //     node = node.Children.FirstOrDefault(x =>
+        //         x.GetType() == parent.GetType()
+        //         &&
+        //         (
+        //             x is not LinkTypeNode a ||
+        //             parent is not LinkTypeNode b ||
+        //             a.Entry.Symbol.Equals(b.Entry.Symbol, SymbolEqualityComparer.Default)
+        //         )
+        //         &&
+        //         (
+        //             x is not ITypeProducerNode c ||
+        //             parent is not ITypeProducerNode d ||
+        //             c.GetTypeName().Equals(d.GetTypeName())
+        //         )
+        //     );
+        //
+        //     if (node is null) return null;
+        // }
+        //
+        // return node;
     }
 
     public bool HasTypePath(LinkNode node)
@@ -330,7 +600,15 @@ public abstract class LinkNode : IEquatable<LinkNode>
         Children = [];
     }
 
-    private protected abstract void Visit(NodeContext context, Logger logger);
+    private protected virtual void Visit(NodeContext context, Logger logger)
+    {
+        ImplicitSemanticCompisition.Clear();
+        ImplicitSemanticCompisition.UnionWith(GetSemanticTypeNodeCompisition(logger, excludeParentCompisition: false));
+
+        SemanticCompisition.UnionWith(ImplicitSemanticCompisition);
+        if (Parent is not null)
+            SemanticCompisition.ExceptWith(Parent.ImplicitSemanticCompisition);
+    }
 
     public abstract string Build(NodeContext context, Logger logger);
 
@@ -354,9 +632,10 @@ public abstract class LinkNode : IEquatable<LinkNode>
 
     public virtual bool Equals(LinkNode other)
     {
-        return Target.Equals(other.Target)
-               && (Parent is null ? other.Parent is null : other.Parent is not null && Parent.Equals(other.Parent))
-               && Children.SequenceEqual(other.Children);
+        return ReferenceEquals(this, other);
+        // return Target.Equals(other.Target)
+        //        && (Parent is null ? other.Parent is null : (other.Parent is not null && Parent.Equals(other.Parent)))
+        //        && Children.SequenceEqual(other.Children);
     }
 
     public ActorNode[] GetAncestors(NodeContext context)

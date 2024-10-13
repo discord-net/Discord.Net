@@ -10,7 +10,7 @@ namespace Discord;
 ]
 public partial interface IWebhookMessageActor :
     IMessageActor,
-    IWebhookRelationship,
+    IWebhookActor.CanonicalRelationship,
     IActor<ulong, IWebhookMessage>,
     ITokenPathProvider
 {

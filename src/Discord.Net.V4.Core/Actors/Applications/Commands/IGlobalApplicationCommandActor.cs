@@ -10,7 +10,4 @@ namespace Discord;
 ]
 public partial interface IGlobalApplicationCommandActor :
     IApplicationCommandActor,
-    IActor<ulong, IGlobalApplicationCommand>
-{
-    
-}
+    IActor<ulong, IGlobalApplicationCommand>;

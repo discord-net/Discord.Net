@@ -2,7 +2,7 @@ namespace Discord;
 
 public partial interface IGuildApplicationActor :
     IApplicationActor,
-    IGuildRelationship
+    IGuildActor.CanonicalRelationship
 {
     IGuildApplicationCommandActor.Enumerable.Indexable Commands { get; }
 }

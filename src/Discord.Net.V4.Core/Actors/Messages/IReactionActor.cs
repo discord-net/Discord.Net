@@ -6,8 +6,7 @@ namespace Discord;
 [Deletable(nameof(Routes.DeleteAllReactionsForEmoji))]
 public partial interface IReactionActor :
     IActor<DiscordEmojiId, IReaction>,
-    IChannelRelationship<IMessageChannelTrait, IMessageChannel>,
-    IMessageRelationship,
+    IMessageActor.CanonicalRelationship,
     IEntityProvider<IReaction, IReactionModel>
 {
     IUserActor.Paged<PageUserReactionsParams>.Indexable.WithCurrent.BackLink<IReactionActor> Users { get; }

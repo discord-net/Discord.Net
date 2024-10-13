@@ -12,9 +12,7 @@ namespace Discord;
 [SuppressMessage("ReSharper", "PossibleInterfaceMemberAmbiguity")]
 public partial interface ICurrentUserActor :
     IUserActor,
-    IActor<ulong, ICurrentUser>,
-    IEntityProvider<IPartialGuild, IPartialGuildModel>,
-    IEntityProvider<IMember, IMemberModel, ulong>
+    IActor<ulong, ICurrentUser>
 {
     // TODO:
     // - https://discord.com/developers/docs/resources/user#get-current-user-application-role-connection

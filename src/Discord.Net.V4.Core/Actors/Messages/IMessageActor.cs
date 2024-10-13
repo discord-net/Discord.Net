@@ -14,7 +14,7 @@ namespace Discord;
     Modifiable<ModifyMessageProperties>(nameof(Routes.ModifyMessage))
 ]
 public partial interface IMessageActor :
-    IChannelRelationship<IMessageChannelTrait, IMessageChannel>,
+    IMessageChannelTrait.CanonicalRelationship,
     IActor<ulong, IMessage>
 {
     IPollActor Poll { get; }

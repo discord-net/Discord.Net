@@ -30,13 +30,13 @@ public class LinkExtensionNode :
         public bool IsValid { get; private set; }
         public string Type { get; private set; } = string.Empty;
 
-        public bool IsDefinedOnPath => IsValid && (Node.IsTemplate || !IsBackLinkMirror && IsLinkMirror);
+        public bool IsDefinedOnPath => IsValid && (Node.IsAbsoluteTemplate || !IsBackLinkMirror && IsLinkMirror);
 
         public ExtensionProperty GetClosestDefinedVariant()
         {
             if (
                 IsDefinedOnPath ||
-                !Node.CartesianExtensionProperties.TryGetValue(Name, out var cartesian)
+                !Node.InheritedPropertyDefinitions.TryGetValue(Name, out var cartesian)
             ) return this;
 
             return cartesian.FirstOrDefault(x => x.IsDefinedOnPath) ?? this;
@@ -92,7 +92,7 @@ public class LinkExtensionNode :
             {
                 return Node.IsTemplate
                     ? (useCoreTypes ? PropertyTarget!.FormattedCoreLink : PropertyTarget!.FormattedLink)
-                    : $"{actorType}{Node.FormatRelativeTypePath()}";
+                    : $"{actorType}{Node.FormatRelativeTypePath(x => x is LinkTypeNode or BackLinkNode)}";
             }
 
             return Symbol.Type.ToDisplayString();
@@ -114,7 +114,8 @@ public class LinkExtensionNode :
 
     public INamedTypeSymbol ExtensionSymbol { get; }
 
-    public bool IsTemplate => Parent is ActorNode;
+    public bool IsTemplate => Parents.All(x => x is ActorNode or LinkExtensionNode);
+    public bool IsAbsoluteTemplate => Parent is ActorNode;
 
     public bool WillGenerateImplementation => !IsCore;
 
@@ -139,8 +140,9 @@ public class LinkExtensionNode :
     public List<Property> Properties { get; } = [];
 
     public List<ExtensionProperty> ExtensionProperties { get; } = [];
+    public HashSet<LinkExtensionNode> ExtendedExtensions { get; } = [];
 
-    public Dictionary<string, ExtensionProperty[]> CartesianExtensionProperties { get; private set; } = [];
+    public Dictionary<string, ExtensionProperty[]> InheritedPropertyDefinitions { get; private set; } = [];
 
     public LinkExtensionNode(
         LinkTarget target,
@@ -155,93 +157,15 @@ public class LinkExtensionNode :
     {
         base.Visit(context, logger);
 
+        ExtendedExtensions.Clear();
         ExtensionProperties.Clear();
 
         foreach (var propertySymbol in ExtensionSymbol.GetMembers().OfType<IPropertySymbol>())
         {
-            LinkExtensionNode? overloadedBase = null;
+            var property = GetProperty(propertySymbol, context, logger);
 
-            if (propertySymbol.ExplicitInterfaceImplementations.Length > 0)
-            {
-                var overloadedProp = propertySymbol.ExplicitInterfaceImplementations[0];
-
-                var baseExtension =
-                    propertySymbol.ContainingType.ContainingType is not null &&
-                    context.Graph.Nodes.TryGetValue(propertySymbol.ContainingType.ContainingType, out var node)
-                        ? node
-                        : null;
-
-                overloadedBase = baseExtension?.Children.OfType<LinkExtensionNode>().FirstOrDefault(
-                    x => x.ExtensionSymbol.Equals(
-                        overloadedProp.ContainingType,
-                        SymbolEqualityComparer.Default
-                    )
-                );
-
-                logger.Log(
-                    $" - Overload search: {overloadedProp.ContainingType} in {overloadedProp.ContainingType.ContainingType}");
-            }
-
-            var attribute = propertySymbol.GetAttributes()
-                .FirstOrDefault(x => x.AttributeClass?.Name == "LinkMirrorAttribute");
-
-            var propertyTarget =
-                propertySymbol.Type is INamedTypeSymbol named
-                    ? IsCore
-                        ? context.Graph.Nodes.TryGetValue(named, out var targetNode)
-                            ? targetNode
-                            : null
-                        : context.Graph.Nodes.FirstOrDefault(x => x
-                            .Value
-                            .Target
-                            .GetCoreActor()
-                            .Equals(named, SymbolEqualityComparer.Default)
-                        ).Value
-                    : null;
-
-            if (
-                propertySymbol.Type.TypeKind is TypeKind.Unknown &&
-                propertyTarget is null)
-            {
-                var propTypeStr = propertySymbol.Type.ToDisplayString();
-                var prefix = Target.Assembly.ToString();
-
-                var actorPart = propTypeStr
-                    .Split(['.'], StringSplitOptions.RemoveEmptyEntries)
-                    .FirstOrDefault(x => x.StartsWith(prefix) && (x.EndsWith("Actor") || x.EndsWith("Trait")));
-
-                if (actorPart is not null)
-                {
-                    var actorSymbol = context.Graph.Compilation
-                        .GetTypeByMetadataName(
-                            $"Discord{(prefix is not "Core" ? $".{prefix}" : string.Empty)}.{actorPart}"
-                        );
-
-                    if (actorSymbol is not null && context.Graph.Nodes.TryGetValue(actorSymbol, out targetNode))
-                        propertyTarget = targetNode;
-                }
-
-                if (
-                    propTypeStr.StartsWith("Indexable") ||
-                    propTypeStr.StartsWith("Enumerable") ||
-                    propTypeStr.StartsWith("Defined") ||
-                    propTypeStr.StartsWith("Paged<")
-                )
-                {
-                    propertyTarget = Parents.OfType<ActorNode>().First();
-                }
-            }
-
-            ExtensionProperties.Add(new ExtensionProperty(
-                this,
-                propertySymbol,
-                attribute is not null,
-                attribute?.NamedArguments
-                    .FirstOrDefault(x => x.Key == "OnlyBackLinks")
-                    .Value.Value as bool? == true,
-                propertyTarget,
-                overloadedBase
-            ));
+            if (property is not null)
+                ExtensionProperties.Add(property);
         }
 
         ExtensionProperties.ForEach(x => x.Visit(this, logger));
@@ -272,11 +196,197 @@ public class LinkExtensionNode :
             Parents.OfType<ITypeImplementerNode>().FirstOrDefault(x => x.WillGenerateImplementation)?.Constructor
         );
 
-        CartesianExtensionProperties = CartesianLinkTypeNodes.OfType<LinkExtensionNode>()
+        InheritedPropertyDefinitions = ExplicitlyImplements
+            .OfType<LinkExtensionNode>()
             .SelectMany(x => x.ExtensionProperties)
-            .Where(x => x.IsDefinedOnPath)
             .GroupBy(x => x.Name)
             .ToDictionary(x => x.Key, x => x.ToArray());
+    }
+
+    private ExtensionProperty? GetProperty(IPropertySymbol symbol, NodeContext context, Logger logger)
+    {
+        LinkExtensionNode? overloadedBase = null;
+
+        if (symbol.ExplicitInterfaceImplementations.Length > 0)
+        {
+            var overloadedProp = symbol.ExplicitInterfaceImplementations[0];
+            var overloadExtensionSymbol = overloadedProp.ContainingType;
+            var overloadActor = overloadedProp.ContainingType.ContainingType;
+
+            var baseExtension =
+                overloadActor is not null &&
+                context.Graph.Nodes.TryGetValue(overloadActor, out var node)
+                    ? node
+                    : null;
+
+            if (baseExtension is null)
+            {
+                logger.Warn(
+                    $"{FormatAsTypePath()}: Failed to find overload extension for '{overloadedProp}' ({overloadActor})");
+                return null;
+            }
+
+            var baseExtensionNode = Parents.Reverse().Skip(1)
+                .Aggregate(
+                    (LinkNode?) baseExtension,
+                    (node, part) => node?.Children.FirstOrDefault(x => x.SemanticEquals(part))
+                );
+
+            if (baseExtensionNode is null)
+            {
+                logger.Warn(
+                    $"{FormatAsTypePath()}: Failed to find overload extension node for '{overloadedProp}' ({overloadActor})");
+                return null;
+            }
+
+            if (
+                baseExtensionNode
+                    .Children
+                    .OfType<LinkExtensionNode>()
+                    .FirstOrDefault(x => x
+                        .ExtensionSymbol
+                        .ToDisplayString()
+                        .Equals(overloadExtensionSymbol.ToDisplayString())
+                    )
+                is not { } ext
+            )
+            {
+                logger.Warn(
+                    $"{FormatAsTypePath()}: Failed to find child overload extension '{overloadExtensionSymbol}' node for '{overloadedProp}' ({overloadActor}) ({baseExtensionNode.GetType()} {baseExtensionNode.FormatAsTypePath()})"
+                );
+
+                foreach (var child in baseExtensionNode.Children)
+                {
+                    logger.Log($" - {child.GetType()}: {child.FormatAsTypePath()}");
+                }
+                return null;
+            }
+
+            overloadedBase = ext;
+            ExtendedExtensions.Add(overloadedBase);
+            // overloadedBase = baseExtension?.Children.OfType<LinkExtensionNode>().FirstOrDefault(
+            //     x => x.ExtensionSymbol.Equals(
+            //         overloadedProp.ContainingType,
+            //         SymbolEqualityComparer.Default
+            //     )
+            // );
+            //
+            // logger.Log(
+            //     $" - Overload search: {overloadedProp.ContainingType} in {overloadedProp.ContainingType.ContainingType}: {overloadedBase}"
+            // );
+            //
+            // if (overloadedBase is not null)
+            //     
+        }
+
+        var attribute = symbol.GetAttributes()
+            .FirstOrDefault(x => x.AttributeClass?.Name == "LinkMirrorAttribute");
+
+        var propertyTarget =
+            symbol.Type is INamedTypeSymbol named
+                ? IsCore
+                    ? context.Graph.Nodes.TryGetValue(named, out var targetNode)
+                        ? targetNode
+                        : null
+                    : context.Graph.Nodes.FirstOrDefault(x => x
+                        .Value
+                        .Target
+                        .GetCoreActor()
+                        .Equals(named, SymbolEqualityComparer.Default)
+                    ).Value
+                : null;
+
+        if (
+            symbol.Type.TypeKind is TypeKind.Unknown &&
+            propertyTarget is null)
+        {
+            var propTypeStr = symbol.Type.ToDisplayString();
+            var prefix = Target.Assembly.ToString();
+
+            var actorPart = propTypeStr
+                .Split(['.'], StringSplitOptions.RemoveEmptyEntries)
+                .FirstOrDefault(x => x.StartsWith(prefix) && (x.EndsWith("Actor") || x.EndsWith("Trait")));
+
+            if (actorPart is not null)
+            {
+                var actorSymbol = context.Graph.Compilation
+                    .GetTypeByMetadataName(
+                        $"Discord{(prefix is not "Core" ? $".{prefix}" : string.Empty)}.{actorPart}"
+                    );
+
+                if (actorSymbol is not null && context.Graph.Nodes.TryGetValue(actorSymbol, out targetNode))
+                    propertyTarget = targetNode;
+            }
+
+            if (
+                propTypeStr.StartsWith("Indexable") ||
+                propTypeStr.StartsWith("Enumerable") ||
+                propTypeStr.StartsWith("Defined") ||
+                propTypeStr.StartsWith("Paged<")
+            )
+            {
+                propertyTarget = Parents.OfType<ActorNode>().First();
+            }
+        }
+
+        return new ExtensionProperty(
+            this,
+            symbol,
+            attribute is not null,
+            attribute?.NamedArguments
+                .FirstOrDefault(x => x.Key == "OnlyBackLinks")
+                .Value.Value as bool? == true,
+            propertyTarget,
+            overloadedBase
+        );
+    }
+
+    private List<string> BuildProperty(ExtensionProperty property)
+    {
+        var results = new List<string>();
+
+        if (property.IsOverload)
+        {
+            results.Add(
+                $"{property.Type} {property.OverloadedBase!.FormatAsTypePath()}{FormatRelativeTypePath()}.{property.Symbol.ExplicitInterfaceImplementations[0].Name} => {property.Name};");
+            return results;
+        }
+
+        ExtensionProperty[]? existingMembers = null;
+
+        var isNew = !IsCore || InheritedPropertyDefinitions.TryGetValue(property.Name, out existingMembers);
+
+        results.Add($"{(isNew ? "new " : string.Empty)}{property.Type} {property.Name} {{ get; }}");
+
+        var corePath = $"{Target.GetCoreActor()}{FormatRelativeTypePath()}.{GetTypeName()}";
+
+        if (!IsCore)
+        {
+            results.Add(
+                $"{property.GetPropertyType(useCoreTypes: true)} {corePath}.{property.Name} => {property.Name};"
+            );
+        }
+
+        if (existingMembers?.Length > 0)
+        {
+            results.AddRange(
+                existingMembers.SelectMany(x =>
+                {
+                    var result = new List<string>()
+                    {
+                        $"{x.Type} {x.Node.FormatAsTypePath()}.{x.Name} => {x.Name};"
+                    };
+
+                    if (!IsCore)
+                        result.Add(
+                            $"{x.GetPropertyType(useCoreTypes: true)} {corePath}.{x.Name} => {x.Name}");
+
+                    return result;
+                })
+            );
+        }
+
+        return results;
     }
 
     public override string Build(NodeContext context, Logger logger)
@@ -287,47 +397,7 @@ public class LinkExtensionNode :
         members.AddRange(
             ExtensionProperties
                 .Where(x => x.IsDefinedOnPath)
-                .SelectMany(x =>
-                {
-                    ExtensionProperty[]? existingMembers = null;
-
-                    var isNew = !IsCore || CartesianExtensionProperties.TryGetValue(x.Name, out existingMembers);
-
-                    var results = new List<string>()
-                    {
-                        $"{(isNew ? "new " : string.Empty)}{x.Type} {x.Name} {{ get; }}"
-                    };
-
-                    var corePath = $"{Target.GetCoreActor()}{FormatRelativeTypePath()}.{GetTypeName()}";
-
-                    if (!IsCore)
-                    {
-                        results.Add(
-                            $"{x.GetPropertyType(useCoreTypes: true)} {corePath}.{x.Name} => {x.Name};"
-                        );
-                    }
-
-                    if (existingMembers?.Length > 0)
-                    {
-                        results.AddRange(
-                            existingMembers.SelectMany(x =>
-                            {
-                                var result = new List<string>()
-                                {
-                                    $"{x.Type} {x.Node.FormatAsTypePath()}.{x.Name} => {x.Name};"
-                                };
-
-                                if (!IsCore)
-                                    result.Add(
-                                        $"{x.GetPropertyType(useCoreTypes: true)} {corePath}.{x.Name} => {x.Name}");
-
-                                return result;
-                            })
-                        );
-                    }
-
-                    return results;
-                })
+                .SelectMany(BuildProperty)
         );
 
         if (!IsCore)
@@ -335,23 +405,22 @@ public class LinkExtensionNode :
             bases.Add($"{Target.GetCoreActor()}{FormatRelativeTypePath()}.{GetTypeName()}");
         }
 
-        if (!IsTemplate)
+        foreach (var relative in ExplicitlyImplements)
         {
-            bases.AddRange([
-                FormatTypePath(),
-            ]);
+            logger.Log($"{FormatAsTypePath()} : {relative.FormatAsTypePath()}");
+            bases.Add($"{relative.FormatAsTypePath()}");
 
-            logger.Log($"{FormatAsTypePath()}: {CartesianLinkTypeNodes.Count} cartesian products");
-
-            foreach (var relative in CartesianLinkTypeNodes.OfType<LinkExtensionNode>())
+            if (!IsCore)
             {
-                bases.Add($"{relative.FormatAsTypePath()}");
-
-                var coreOverrideTarget = $"{Target.GetCoreActor()}{relative.FormatRelativeTypePath()}.{GetTypeName()}";
-
-                if (!IsCore)
-                    bases.Add(coreOverrideTarget);
+                var coreOverrideTarget =
+                    $"{Target.GetCoreActor()}{relative.FormatRelativeTypePath()}.{GetTypeName()}";
+                bases.Add(coreOverrideTarget);
             }
+        }
+
+        foreach (var extendedExtension in ExtendedExtensions)
+        {
+            bases.Add($"{extendedExtension.FormatAsTypePath()}");
         }
 
         // TODO: base exts
@@ -437,7 +506,7 @@ public class LinkExtensionNode :
 
         members.Add(
             $$"""
-              internal static {{FormatAsTypePath()}} Create({{(
+              internal static new {{FormatAsTypePath()}} Create({{(
                   ctorParams.Count > 0
                       ? $"{Environment.NewLine}{string.Join(
                           $",{Environment.NewLine}",

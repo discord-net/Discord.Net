@@ -8,9 +8,7 @@ namespace Discord;
 ]
 public partial interface IGuildApplicationCommandPermissionsActor :
     IActor<ulong, IGuildApplicationCommandPermissionses>,
-    IGuildRelationship,
-    IApplicationRelationship,
-    IGuildApplicationCommandRelationship
+    IGuildApplicationCommandActor.CanonicalRelationship
 {
     
 }

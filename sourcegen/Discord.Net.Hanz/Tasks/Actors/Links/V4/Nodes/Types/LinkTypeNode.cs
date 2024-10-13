@@ -141,7 +141,7 @@ public abstract class LinkTypeNode :
 
         members.Add(
             $$"""
-              internal static {{FormatAsTypePath()}} Create(
+              internal static new {{FormatAsTypePath()}} Create(
                   {{(
                       constructorParamters.Count > 0
                           ? string.Join(
@@ -216,6 +216,8 @@ public abstract class LinkTypeNode :
                 RootActorNode?.Constructor
             );
         }
+        
+        base.Visit(context, logger);
     }
 
     public override string Build(NodeContext context, Logger logger)
@@ -223,65 +225,65 @@ public abstract class LinkTypeNode :
         var bases = new HashSet<string>();
         var members = new List<string>();
 
-        var path = FormatRelativeTypePath(x => x is LinkTypeNode);
         var ancestors = GetEntityAssignableAncestors(context);
 
-        foreach (var parentLinks in LinkTypesProduct)
-        {
-            bases.Add($"{Target.Actor}.{string.Join(".", parentLinks.Select(x => x.GetTypeName()))}");
-            logger.Log($"{path}.{GetTypeName()}: {string.Join(".", parentLinks.Select(x => x.GetTypeName()))}");
-        }
+        // foreach (var parentLinks in LinkTypesProduct)
+        // {
+        //     bases.Add($"{Target.Actor}.{string.Join(".", parentLinks.Select(x => x.GetTypeName()))}");
+        //     logger.Log($"{path}.{GetTypeName()}: {string.Join(".", parentLinks.Select(x => x.GetTypeName()))}");
+        // }
 
-        if (Parent is LinkTypeNode)
+        switch (Parent)
         {
-            bases.Add($"{Target.Actor}.{GetTypeName()}");
+            case ActorNode:
+                bases.Add($"{Target.Actor}.Link");
+                bases.Add($"{FormattedLinkType}{FormatRelativeTypePath()}.{GetTypeName()}");
+                break;
+            default:
+                bases.UnionWith(SemanticCompisition.OfType<LinkTypeNode>().Select(x => x.FormatAsTypePath()));
+                break;
         }
 
         AddMembers(members, context, logger);
-
-        if (IsCore)
+        
+        foreach (var parentlinkType in Parents.OfType<LinkTypeNode>())
         {
-            bases.Add($"{FormattedLinkType}{path}.{GetTypeName()}");
+            parentlinkType.AddMembers(members, context, logger);
         }
-        else
+        
+        if (!IsCore)
         {
             if (ImplementationLinkType is null) return string.Empty;
 
             bases.UnionWith([
-                $"{Target.GetCoreActor()}{path}.{GetTypeName()}",
-                $"{FormattedLinkType}{path}.{GetTypeName()}",
+                $"{Target.GetCoreActor()}{FormatRelativeTypePath()}.{GetTypeName()}",
                 $"{ImplementationLinkType}"
             ]);
 
             CreateImplementationForNode(members, bases, context, logger);
-
-            foreach (var parentlinkType in Parents.OfType<LinkTypeNode>())
-            {
-                parentlinkType.AddMembers(members, context, logger);
-            }
         }
 
         if (ancestors.Length > 0)
         {
             // redefine get actor
-            members.AddRange([
-                $"new {Target.Actor} GetActor({Target.Id} id);",
-                $"{Target.Actor} Discord.IActorProvider<{Target.Actor}, {Target.Id}>.GetActor({Target.Id} id) => GetActor(id);"
-            ]);
+            // members.AddRange([
+            //     $"new {Target.Actor} GetActor({Target.Id} id);",
+            //     $"{Target.Actor} Discord.IActorProvider<{Target.Actor}, {Target.Id}>.GetActor({Target.Id} id) => GetActor(id);"
+            // ]);
 
             foreach (var ancestor in ancestors)
             {
-                var ancestorBase = $"{ancestor.Target.Actor}{path}.{GetTypeName()}";
+                var ancestorBase = $"{ancestor.Target.Actor}{FormatRelativeTypePath()}.{GetTypeName()}";
 
                 bases.Add(ancestorBase);
 
-                var overrideType = ancestor.GetEntityAssignableAncestors(context).Length > 0
-                    ? ancestorBase
-                    : $"Discord.IActorProvider<{ancestor.Target.Actor}, {ancestor.Target.Id}>";
-
-                members.AddRange([
-                    $"{ancestor.Target.Actor} {overrideType}.GetActor({ancestor.Target.Id} id) => GetActor(id);"
-                ]);
+                // var overrideType = ancestor.GetEntityAssignableAncestors(context).Length > 0
+                //     ? ancestorBase
+                //     : $"Discord.IActorProvider<{ancestor.Target.Actor}, {ancestor.Target.Id}>";
+                //
+                // members.AddRange([
+                //     $"{ancestor.Target.Actor} {overrideType}.GetActor({ancestor.Target.Id} id) => GetActor(id);"
+                // ]);
             }
         }
 

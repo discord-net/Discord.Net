@@ -2,10 +2,12 @@ namespace Discord;
 
 public partial interface IGuildThreadMemberActor :
     IThreadMemberActor,
-    IMemberRelationship,
-    IGuildRelationship
+    IGuildThreadChannelActor.CanonicalRelationship,
+    IMemberActor.Relationship
+    // IMemberRelationship,
+    // IGuildRelationship
 {
-    [SourceOfTruth] new IGuildThreadChannelActor Thread { get; }
+    //[SourceOfTruth] new IGuildThreadChannelActor Thread { get; }
 
     [LinkExtension]
     protected new interface WithCurrentMemberExtension : IThreadMemberActor.WithCurrentMemberExtension

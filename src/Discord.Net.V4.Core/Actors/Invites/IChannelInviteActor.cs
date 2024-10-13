@@ -4,6 +4,6 @@ namespace Discord;
 
 public interface IChannelInviteActor :
     IInviteActor,
-    IChannelRelationship,
+    IChannelActor.CanonicalRelationship,
     IEntityProvider<IChannelInvite, IInviteModel>,
     IActor<string, IChannelInvite>;

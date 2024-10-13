@@ -6,7 +6,7 @@ namespace Discord;
 public partial interface IGuildChannelInviteActor :
     IGuildInviteActor,
     IChannelInviteActor,
-    IChannelRelationship<IGuildChannelActor, IGuildChannel>,
+    IGuildChannelActor.CanonicalRelationship,
     IActor<string, IGuildChannelInvite>
 {
     [SourceOfTruth]

@@ -4,8 +4,7 @@ namespace Discord;
 
 public partial interface IPollActor :
     IActor<ulong, IPoll>,
-    IMessageRelationship,
-    IChannelRelationship<IMessageChannelTrait, IMessageChannel>
+    IMessageActor.CanonicalRelationship
 {
     IPollAnswerActor.Indexable Answers { get; }
     

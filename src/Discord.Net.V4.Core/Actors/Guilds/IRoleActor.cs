@@ -9,7 +9,7 @@ namespace Discord;
 [Creatable<CreateRoleProperties>(nameof(Routes.CreateGuildRole))]
 [Modifiable<ModifyRoleProperties>(nameof(Routes.ModifyGuildRole))]
 public partial interface IRoleActor :
-    IGuildRelationship,
+    IGuildActor.CanonicalRelationship,
     IActor<ulong, IRole>
 {
     [BackLink<IMemberActor>]

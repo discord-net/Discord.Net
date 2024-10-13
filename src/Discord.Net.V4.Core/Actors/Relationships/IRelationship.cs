@@ -10,9 +10,3 @@ public interface IRelationship<out TActor, out TId, out TEntity> :
 
     TId IRelation<TId, TEntity> .RelationshipId => RelationshipActor.Id;
 }
-
-public interface IRelation<out TId, out TEntity>
-    where TId : IEquatable<TId>
-{
-    internal TId RelationshipId { get; }
-}

@@ -27,6 +27,14 @@ public class ActorNode :
 
     public ActorNode? BaseActorNode { get; private set; }
 
+    public bool RedefinesRootInterfaceMembers { get; private set; }
+
+    public string RelationshipName { get; private set; }
+
+    public Dictionary<string, List<ActorNode>> AdditionalCanonicalRelationships { get; } = [];
+
+    public bool CanonicalRelationshipIsRedefined { get; private set; }
+
     public ActorNode(LinkTarget target, LinkSchematics.Schematic schematic) : base(target)
     {
         Schematic = schematic;
@@ -43,63 +51,122 @@ public class ActorNode :
                 AddChild(node);
             }
         }
-    }
 
+        RelationshipName =
+            Target.Actor.GetAttributes()
+                .FirstOrDefault(x => x.AttributeClass?.Name == "RelationshipNameAttribute")
+                ?.ConstructorArguments[0].Value as string
+            ?? LinksV4.GetFriendlyName(Target.Actor);
+    }
 
     private protected override void Visit(NodeContext context, Logger logger)
     {
-        if (IsCore) return;
-
-        Properties.Clear();
-
-        if (context.TryGetBaseTarget(Target, out var baseActorNode))
-            BaseActorNode = baseActorNode;
-
-        var isOverride = BaseActorNode is not null;
-        var isVirtual = context.TryGetChildTarget(Target, out _);
-
-        Properties.Add(
-            new Property(
-                "Client",
-                $"Discord{Target.Assembly}Client",
-                accessibility: Accessibility.Public
-            )
-        );
-
-        Properties.Add(
-            new(
-                "ActorProvider",
-                FormattedActorProvider,
-                isOverride: isOverride,
-                isVirtual: isVirtual
-            )
-        );
-
-        if (!ModelHasId)
+        if (!IsCore)
         {
+            Properties.Clear();
+
+            if (context.TryGetBaseTarget(Target, out var baseActorNode))
+                BaseActorNode = baseActorNode;
+
+            var isOverride = BaseActorNode is not null;
+            var isVirtual = context.TryGetChildTarget(Target, out _);
+
+            Properties.Add(
+                new Property(
+                    "Client",
+                    $"Discord{Target.Assembly}Client",
+                    accessibility: Accessibility.Public
+                )
+            );
+
             Properties.Add(
                 new(
-                    "EntityProvider",
-                    FormattedEntityProvider,
+                    "ActorProvider",
+                    FormattedActorProvider,
                     isOverride: isOverride,
                     isVirtual: isVirtual
                 )
             );
+
+            if (!ModelHasId)
+            {
+                Properties.Add(
+                    new(
+                        "EntityProvider",
+                        FormattedEntityProvider,
+                        isOverride: isOverride,
+                        isVirtual: isVirtual
+                    )
+                );
+            }
+
+            Constructor = new(
+                ImplementationClassName,
+                Properties
+                    .Select(x =>
+                        new ConstructorParamter(
+                            ToParameterName(x.Name),
+                            x.Type,
+                            null,
+                            x
+                        )
+                    )
+                    .ToList()
+            );
         }
 
-        Constructor = new(
-            ImplementationClassName,
-            Properties
-                .Select(x =>
-                    new ConstructorParamter(
-                        ToParameterName(x.Name),
-                        x.Type,
-                        null,
-                        x
+        RedefinesRootInterfaceMembers = !IsCore || GetEntityAssignableAncestors(context).Length > 0;
+
+        AdditionalCanonicalRelationships.Clear();
+        GetAdditionalRelationshipTypes(Target.Actor, AdditionalCanonicalRelationships, context);
+
+        CanonicalRelationshipIsRedefined =
+            AdditionalCanonicalRelationships.ContainsKey(RelationshipName) ||
+            GetEntityAssignableAncestors(context).Any(x => x.RelationshipName == RelationshipName);
+        
+        logger.Log($"{AdditionalCanonicalRelationships.Count} additional canonical relationships:");
+
+        foreach (var entry in AdditionalCanonicalRelationships)
+        {
+            logger.Log($" - {entry.Key}: {entry.Value.Count}:");
+
+            foreach (var item in entry.Value)
+            {
+                logger.Log($"    - {item.Target.Actor}");
+            }
+        }
+        
+        base.Visit(context, logger);
+    }
+
+    private void GetAdditionalRelationshipTypes(
+        INamedTypeSymbol symbol,
+        Dictionary<string, List<ActorNode>> types,
+        NodeContext context)
+    {
+        foreach (var iface in symbol.Interfaces.Where(x => x.ToString().EndsWith("CanonicalRelationship")))
+        {
+            var node = context.Graph.Nodes.FirstOrDefault(x =>
+                x.Key.ToDisplayString()
+                    .Equals(iface.ToDisplayString().Replace(".CanonicalRelationship", string.Empty))
+            );
+
+            if (node.Value is null) continue;
+
+            if (types.TryGetValue(node.Value.RelationshipName, out var nodes))
+            {
+                if (
+                    nodes.All(x =>
+                        !x.Target.Actor.Equals(node.Value.Target.Actor, SymbolEqualityComparer.Default)
                     )
-                )
-                .ToList()
-        );
+                ) nodes.Add(node.Value);
+
+                continue;
+            }
+
+            types[node.Value.RelationshipName] = [node.Value];
+            GetAdditionalRelationshipTypes(node.Value.Target.Actor, types, context);
+        }
     }
 
     public override string Build(NodeContext context, Logger logger)
@@ -110,8 +177,9 @@ public class ActorNode :
 
         var members = new List<string>();
 
-        if (WillGenerateImplementation && CreateBaseLinkType(context) is { } baseLinkType)
-            members.Add(baseLinkType);
+        CreateBaseLinkType(members, context);
+        CreateActorProviderFactory(members, context);
+        CreateRelationshipsTypes(members, context);
 
         members.Add(BuildChildren(context, logger));
         members.AddRange(AdditionalTypes);
@@ -126,25 +194,185 @@ public class ActorNode :
               """;
     }
 
-    private string? CreateBaseLinkType(NodeContext context)
+    private void CreateRelationshipsTypes(List<string> members, NodeContext context)
     {
-        switch (Target.Assembly)
+        if (!IsCore) return;
+
+        var relationshipMembers = new List<string>()
         {
-            case LinkActorTargets.AssemblyTarget.Rest:
-                return CreateRestBaseLinkType(context);
-                break;
+            $"{Target.Actor} Discord.IRelationship<{Target.Actor}, {Target.Id}, {Target.Entity}>.RelationshipActor => {RelationshipName};"
+        };
+
+        var relationshipMemberIsNew = false;
+
+        var canonicalRelationshipMembers = new List<string>();
+
+        var relationshipBases = new List<string>()
+        {
+            $"Discord.IRelationship<{Target.Actor}, {Target.Id}, {Target.Entity}>"
+        };
+        var canonicalRelationshipBases = new List<string>()
+        {
+            $"Relationship",
+            $"Discord.ICanonicalRelationship<{Target.Actor}, {Target.Id}, {Target.Entity}>"
+        };
+
+        var ancestors = GetAncestors(context);
+
+        foreach (var ancestor in ancestors)
+        {
+            relationshipBases.Add($"{ancestor.Target.Actor}.Relationship");
+            canonicalRelationshipBases.Add($"{ancestor.Target.Actor}.CanonicalRelationship");
+
+            relationshipMembers.Add(
+                $"{ancestor.Target.Actor} {ancestor.Target.Actor}.Relationship.{ancestor.RelationshipName} => {RelationshipName};"
+            );
+            
+            // canonicalRelationshipMembers.Add(
+            //     $"{ancestor.Target.Actor} {ancestor.Target.Actor}.CanonicalRelationship.{ancestor.RelationshipName} => {RelationshipName};"
+            // );
         }
 
-        return null;
+        if (CanonicalRelationshipIsRedefined)
+        {
+            canonicalRelationshipMembers.AddRange([
+                $"internal{(relationshipMemberIsNew ? " new" : string.Empty)} {Target.Actor} {RelationshipName} {{ get; }}",
+                $"{Target.Actor} {Target.Actor}.Relationship.{RelationshipName} => {RelationshipName};"
+            ]);
+        }
+
+        foreach (var relationship in AdditionalCanonicalRelationships)
+        foreach (var node in relationship.Value)
+        {
+            canonicalRelationshipBases.Add($"{node.Target.Actor}.CanonicalRelationship");
+
+            if (CanonicalRelationshipIsRedefined)
+            {
+                canonicalRelationshipMembers.Add(
+                    $"{node.Target.Actor} {node.Target.Actor}.{(node.CanonicalRelationshipIsRedefined ? "Canonical" : string.Empty)}Relationship.{relationship.Key} => {RelationshipName}.{relationship.Key};");
+            }
+        }
+
+        relationshipMembers.Add(
+            $"internal{(relationshipMemberIsNew ? " new" : string.Empty)} {Target.Actor} {RelationshipName} {{ get; }}"
+        );
+
+        members.AddRange([
+            $$"""
+              public interface Relationship : 
+                  {{string.Join($",{Environment.NewLine}", relationshipBases).WithNewlinePadding(4)}}
+              {
+                  {{string.Join(Environment.NewLine, relationshipMembers).WithNewlinePadding(4)}}
+              }
+              """,
+            $$"""
+              public interface CanonicalRelationship : 
+                  {{string.Join($",{Environment.NewLine}", canonicalRelationshipBases).WithNewlinePadding(4)}}
+              {
+                  {{string.Join(Environment.NewLine, canonicalRelationshipMembers.Distinct()).WithNewlinePadding(4)}}
+              }
+              """
+        ]);
     }
 
-    private string CreateRestBaseLinkType(NodeContext context)
+    private void CreateActorProviderFactory(List<string> members, NodeContext context)
+    {
+        if (IsCore) return;
+    }
+
+    private void CreateBaseLinkType(List<string> members, NodeContext context)
+    {
+        CreateBaseLinkInterface(members, context);
+
+        if (WillGenerateImplementation)
+        {
+            switch (Target.Assembly)
+            {
+                case LinkActorTargets.AssemblyTarget.Rest:
+                    CreateRestBaseLinkClass(members, context);
+                    break;
+            }
+        }
+    }
+
+    private void CreateBaseLinkInterface(List<string> members, NodeContext context)
     {
         var bases = new List<string>()
         {
-            FormattedLink,
-            FormattedCoreLink,
-            FormattedRestLinkType
+            FormattedLink
+        };
+
+        if (!IsCore)
+            bases.Add(FormattedCoreLink);
+
+        switch (Target.Assembly)
+        {
+            case LinkActorTargets.AssemblyTarget.Rest:
+                bases.Add(FormattedRestLinkType);
+                break;
+        }
+
+        var linkMembers = new List<string>();
+
+        if (!IsCore)
+        {
+            bases.Add($"{Target.GetCoreActor()}.Link");
+        }
+
+        var ancestors = GetEntityAssignableAncestors(context);
+
+        if (RedefinesRootInterfaceMembers || ancestors.Length > 0)
+        {
+            linkMembers.AddRange([
+                $"new {Target.Actor} GetActor({Target.Id} id);",
+                $"new {Target.Entity} CreateEntity({Target.Model} model);",
+                $"{Target.Actor} {FormattedActorProvider}.GetActor({Target.Id} id) => GetActor(id);",
+                $"{Target.Entity} {FormattedEntityProvider}.CreateEntity({Target.Model} model) => CreateEntity(model);",
+            ]);
+
+            if (!IsCore)
+                linkMembers.AddRange([
+                    $"{Target.GetCoreActor()} {FormattedCoreActorProvider}.GetActor({Target.Id} id) => GetActor(id);",
+                    $"{Target.GetCoreEntity()} {FormattedCoreEntityProvider}.CreateEntity({Target.Model} model) => CreateEntity(model);",
+                ]);
+        }
+
+        foreach (var ancestor in ancestors)
+        {
+            bases.Add($"{ancestor.Target.Actor}.Link");
+
+            var ancestorActorProviderTarget = ancestor.RedefinesRootInterfaceMembers
+                ? $"{ancestor.Target.Actor}.Link"
+                : ancestor.FormattedActorProvider;
+
+            var ancestorEntityProviderTarget = ancestor.RedefinesRootInterfaceMembers
+                ? $"{ancestor.Target.Actor}.Link"
+                : ancestor.FormattedEntityProvider;
+
+            linkMembers.AddRange([
+                $"{ancestor.Target.Actor} {ancestorActorProviderTarget}.GetActor({Target.Id} id) => GetActor(id);",
+                $"{ancestor.Target.Entity} {ancestorEntityProviderTarget}.CreateEntity({ancestor.Target.Model} model) => CreateEntity(model);",
+            ]);
+        }
+
+        members.Add(
+            $$"""
+              public interface Link :
+                  {{string.Join($",{Environment.NewLine}", bases).WithNewlinePadding(4)}}
+              {
+                  {{string.Join(Environment.NewLine, linkMembers.Distinct()).WithNewlinePadding(4)}}
+              }  
+              """
+        );
+    }
+
+    private void CreateRestBaseLinkClass(List<string> members, NodeContext context)
+    {
+        var linkInterface = $"{Target.Actor}.Link";
+
+        var bases = new List<string>()
+        {
+            linkInterface
         };
 
         var hasBase = context.TryGetBaseTarget(Target, out var baseActorNode);
@@ -155,41 +383,40 @@ public class ActorNode :
 
         var modifier = hasBase ? "override" : "virtual";
 
-        var members = new List<string>();
+        var classMembers = new List<string>();
 
-        members.AddRange(Properties.Select(x => x.Format()));
+        classMembers.AddRange(Properties.Select(x => x.Format()));
 
-        members.AddRange([
+        classMembers.AddRange([
             $"internal {modifier} {Target.Actor} GetActor({Target.Id} id) => ActorProvider.GetActor(id);",
-            $"{Target.Actor} {FormattedActorProvider}.GetActor({Target.Id} id) => GetActor(id);",
-            $"{Target.GetCoreActor()} {FormattedCoreActorProvider}.GetActor({Target.Id} id) => GetActor(id);",
+            $"{Target.Actor} {(RedefinesRootInterfaceMembers ? linkInterface : FormattedActorProvider)}.GetActor({Target.Id} id) => GetActor(id);"
         ]);
 
         var entityFactoryImpl = ModelHasId
             ? "GetActor(model.Id).CreateEntity(model);"
             : "EntityProvider.CreateEntity(model);";
 
-        members.AddRange([
+        classMembers.AddRange([
             $"internal {modifier} {Target.Entity} CreateEntity({Target.Model} model) => {entityFactoryImpl}",
-            $"{Target.Entity} {FormattedEntityProvider}.CreateEntity({Target.Model} model) => CreateEntity(model);",
-            $"{Target.GetCoreEntity()} {FormattedCoreEntityProvider}.CreateEntity({Target.Model} model) => CreateEntity(model);",
+            $"{Target.Entity} {(RedefinesRootInterfaceMembers ? linkInterface : FormattedEntityProvider)}.CreateEntity({Target.Model} model) => CreateEntity(model);"
         ]);
-        
-        members.AddRange([
+
+        classMembers.AddRange([
             $"{FormattedActorProvider} {FormattedRestLinkType}.Provider => ActorProvider;"
         ]);
 
         if (Constructor is not null)
-            members.Add(Constructor.Format());
+            classMembers.Add(Constructor.Format());
 
-        return
+        members.Add(
             $$"""
               private protected abstract class {{ImplementationClassName}} :
                   {{string.Join($",{Environment.NewLine}", bases).WithNewlinePadding(4)}}
               {
-                  {{string.Join(Environment.NewLine, members).WithNewlinePadding(4)}}
+                  {{string.Join(Environment.NewLine, classMembers).WithNewlinePadding(4)}}
               }
-              """;
+              """
+        );
     }
 
     private string CreateView()
@@ -199,7 +426,15 @@ public class ActorNode :
             .AppendLine($"// - Model: {Target.Model}")
             .AppendLine($"// - Entity: {Target.Entity}")
             .AppendLine($"// - Id: {Target.Id}")
-            .AppendLine($"// Nodes: ");
+            .AppendLine($"// Interfaces: ");
+
+        foreach (var iface in Target.Actor.Interfaces)
+        {
+            sb.AppendLine($"//  - {iface}");
+        }
+
+
+        sb.AppendLine($"// Nodes: ");
 
         FormatNode(this, 0);
 

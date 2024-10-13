@@ -26,11 +26,7 @@ namespace Discord.Rest;
 
 public sealed partial class DiscordRestClient : IDiscordClient
 {
-    [SourceOfTruth]
-    public RestGuildActor
-        .Paged<RestPartialGuild, PageUserGuildsParams>
-        .Indexable
-        Guilds { get; }
+    [SourceOfTruth] public RestGuildActor.Paged<RestPartialGuild, PageUserGuildsParams>.Indexable Guilds { get; }
 
     [SourceOfTruth] public RestChannelActor.Indexable.Hierarchy Channels { get; }
 
@@ -75,28 +71,44 @@ public sealed partial class DiscordRestClient : IDiscordClient
         RateLimiter = new();
         Logger = logger;
 
-        Threads = new RestThreadChannelLink.Indexable(
+        // Guilds = RestGuildActor.Paged<RestPartialGuild, PageUserGuildsParams>.Indexable.Create(
+        //       
+        // );
+        Channels = RestChannelActor.Indexable.Hierarchy.Create(
+            RestDMChannelActor.Indexable.Create(
+                this,
+                RestActorProvider.GetOrCreate(this, Template.Of<DMChannelIdentity>())
+            ),
+            RestGroupChannelActor.Indexable.Create(
+                this,
+                RestActorProvider.GetOrCreate(this, Template.Of<GroupChannelIdentity>())
+            ),
             this,
-            new RestActorProvider<ulong, RestThreadChannelActor>(
-                (client, id) => new RestThreadChannelActor(client, ThreadIdentity.Of(id))
-            )
+            RestActorProvider.GetOrCreate(this, Template.Of<ChannelIdentity>())
         );
-        CurrentUser =
-            new RestCurrentUserActor(this, SelfUserIdentity.Of(TokenUtils.GetUserIdFromToken(config.Token.Value)));
-        Channels = new(this, id => new RestChannelActor(this, ChannelIdentity.Of(id)));
-        Users = new(this, id => new RestUserActor(this, UserIdentity.Of(id)));
-        Webhooks = new(this, id => new RestWebhookActor(this, WebhookIdentity.Of(id)));
-        CurrentUserThreadMemberIdentity = ThreadMemberIdentity.Of(CurrentUser.Id);
-        Guilds = RestActors.PagedGuilds(this);
-        StickerPacks = RestActors.Fetchable(
-            Template.T<RestStickerPackActor>(),
-            this,
-            RestStickerPackActor.Factory,
-            RestStickerPack.Construct,
-            IStickerPack.FetchManyRoute(IPathable.Empty)
-        );
-        Stickers = new(this, id => new RestStickerActor(this, StickerIdentity.Of(id)));
-        Invites = new(this, id => new RestInviteActor(this, InviteIdentity.Of(id)));
+
+        // Threads = new RestThreadChannelLink.Indexable(
+        //     this,
+        //     new RestActorProvider<ulong, RestThreadChannelActor>(
+        //         (client, id) => new RestThreadChannelActor(client, ThreadIdentity.Of(id))
+        //     )
+        // );
+        // CurrentUser =
+        //     new RestCurrentUserActor(this, SelfUserIdentity.Of(TokenUtils.GetUserIdFromToken(config.Token.Value)));
+        // Channels = new(this, id => new RestChannelActor(this, ChannelIdentity.Of(id)));
+        // Users = new(this, id => new RestUserActor(this, UserIdentity.Of(id)));
+        // Webhooks = new(this, id => new RestWebhookActor(this, WebhookIdentity.Of(id)));
+        // CurrentUserThreadMemberIdentity = ThreadMemberIdentity.Of(CurrentUser.Id);
+        // Guilds = RestActors.PagedGuilds(this);
+        // StickerPacks = RestActors.Fetchable(
+        //     Template.T<RestStickerPackActor>(),
+        //     this,
+        //     RestStickerPackActor.Factory,
+        //     RestStickerPack.Construct,
+        //     IStickerPack.FetchManyRoute(IPathable.Empty)
+        // );
+        // Stickers = new(this, id => new RestStickerActor(this, StickerIdentity.Of(id)));
+        // Invites = new(this, id => new RestInviteActor(this, InviteIdentity.Of(id)));
     }
 
     internal ApiModelProviderDelegate<TModel> GetApiProvider<TModel>(

@@ -8,7 +8,7 @@ public partial interface IGuildInviteActor :
     IInviteActor,
     IActor<string, IGuildInvite>,
     IEntityProvider<IGuildInvite, IInviteModel>,
-    IGuildRelationship
+    IGuildActor.CanonicalRelationship
 {
     [SourceOfTruth]
     internal new IGuildInvite CreateEntity(IInviteModel model);

@@ -18,7 +18,6 @@ public class LinksV4
     public static Logger Logger =>
         Hanz.DefaultLogger.GetSubLogger(nameof(LinksV4));
 
-
     public static void Register(IncrementalGeneratorInitializationContext context)
     {
         var schematics = context.SyntaxProvider
@@ -57,7 +56,9 @@ public class LinksV4
             schematics
                 .Combine(actors)
                 .Select(GetTarget!);
-
+                //.SelectMany((x, _) => x.Nodes.Select(y => (x, y)));
+                
+                
         context.RegisterSourceOutput(actors, GenerateAliases!);
         context.RegisterSourceOutput(provider, GenerateSource);
         context.RegisterSourceOutput(schematics, GenerateSchematics!);
@@ -68,10 +69,9 @@ public class LinksV4
         var logger = Logger.WithCompilationContext(graph.Compilation)
             .GetSubLogger("Build")
             .WithCleanLogFile();
-        
-        graph.Log(logger);
-        logger.Flush();
 
+        var start = DateTimeOffset.UtcNow;
+        
         foreach (var entry in graph.Nodes)
         {
             var entryLogger = logger.GetSubLogger(entry.Key.ToFullMetadataName()).WithCleanLogFile();
@@ -108,42 +108,17 @@ public class LinksV4
             catch (Exception x)
             {
                 entryLogger.Log($"Failed to generate: {x}");
+                logger.Log($"Failed to generate: {x}");
             }
             
             entryLogger.Flush();
         }
+
+        var dt = DateTimeOffset.UtcNow - start;
+        
+        logger.Log($"Build complete in {dt.TotalMilliseconds}ms");
         
         logger.Flush();
-
-//         foreach (var entry in graph.Nodes)
-//         {
-//             var logger = Logger.WithCompilationContext(graph.Compilation)
-//                 .GetSubLogger("Generation")
-//                 .GetSubLogger(entry.Key.ToFullMetadataName())
-//                 .WithCleanLogFile();
-//
-//             try
-//             {
-//                 context.AddSource(
-//                     $"LinksV4/{entry.Key.ToFullMetadataName()}",
-//                     $$"""
-//                       using Discord;
-//
-//                       namespace {{entry.Key.ContainingNamespace}};
-//
-//                       {{entry.Value.Build(graph.Context, logger)}}
-//                       """
-//                 );
-//             }
-//             catch (Exception x)
-//             {
-//                 logger.Log($"Error: {x}");
-//             }
-//             finally
-//             {
-//                 logger.Flush();
-//             }
-//         }
     }
 
     private static LinkGraph GetTarget(
@@ -254,11 +229,11 @@ public class LinksV4
         }
     }
 
-    public static string GetFriendlyName(ITypeSymbol symbol)
+    public static string GetFriendlyName(ITypeSymbol symbol, bool forceInterfaceRules = false)
     {
         var name = symbol.Name;
 
-        if (symbol.TypeKind is TypeKind.Interface)
+        if (forceInterfaceRules || symbol.TypeKind is TypeKind.Interface)
             name = symbol.Name.Remove(0, 1);
 
         return name

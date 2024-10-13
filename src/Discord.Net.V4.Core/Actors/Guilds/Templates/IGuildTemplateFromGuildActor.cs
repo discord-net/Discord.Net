@@ -8,7 +8,7 @@ namespace Discord;
 ]
 public partial interface IGuildTemplateFromGuildActor :
     IGuildTemplateActor,
-    IGuildRelationship
+    IGuildActor.CanonicalRelationship
 {
     Task SyncAsync(
         RequestOptions? options = null,

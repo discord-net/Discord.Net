@@ -13,4 +13,4 @@ namespace Discord;
 ]
 public partial interface IApplicationEmoteActor :
     IActor<ulong, IApplicationEmote>,
-    IApplicationRelationship;
+    IApplicationActor.CanonicalRelationship;

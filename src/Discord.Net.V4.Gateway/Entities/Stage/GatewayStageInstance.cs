@@ -1,7 +1,7 @@
 using Discord.Gateway;
 using Discord.Gateway.State;
 using Discord.Models;
-using Discord.Stage;
+using Discord;
 using static Discord.Template;
 
 namespace Discord.Gateway;

@@ -23,11 +23,12 @@ namespace Discord;
         nameof(IMediaChannelActor),
         MethodName = "CreateAsync"
     ),
+    RelationshipName("Thread"),
     SuppressMessage("ReSharper", "PossibleInterfaceMemberAmbiguity")
 ]
 public partial interface IGuildThreadChannelActor :
     IThreadChannelActor,
-    IGuildRelationship
+    IGuildActor.CanonicalRelationship
 {
     //[SourceOfTruth]
     new IGuildThreadMemberActor.Enumerable.Indexable.WithCurrentMember.WithPagedVariant.BackLink<IGuildThreadChannelActor> Members { get; }

@@ -14,7 +14,7 @@ namespace Discord;
     Modifiable<ModifyGuildScheduledEventProperties>(nameof(Routes.ModifyGuildScheduledEvent))
 ]
 public partial interface IGuildScheduledEventActor :
-    IGuildRelationship,
+    IGuildActor.CanonicalRelationship,
     IActor<ulong, IGuildScheduledEvent>
 {
     IGuildScheduledEventUserActor.Paged<PageGuildScheduledEventUsersParams> RSVPs { get; }

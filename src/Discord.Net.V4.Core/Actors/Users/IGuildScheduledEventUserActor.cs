@@ -3,9 +3,6 @@ using Discord.Models;
 namespace Discord;
 
 public partial interface IGuildScheduledEventUserActor :
-    IUserRelationship,
-    IMemberRelationship,
-    IGuildScheduledEventRelationship,
-    IGuildRelationship,
-    IEntityProvider<IGuildScheduledEventUser, IGuildScheduledEventUserModel>,
+    IGuildScheduledEventActor.CanonicalRelationship,
+    IMemberActor.Relationship,
     IActor<ulong, IGuildScheduledEventUser>;

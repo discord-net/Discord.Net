@@ -14,7 +14,7 @@ public class PagedNode(LinkTarget target, LinkSchematics.Entry entry) : LinkType
             : Target.Entity;
 
     public string PagingProviderType
-        => $"Discord.IPagedLinkProvider<{PagedEntityType}, TParams>";
+        => $"Func<{Target.Actor}.{GetTypeName()}, TParams?, RequestOptions?, IAsyncPaged<{PagedEntityType}>>";// $"Discord.IPagedLinkProvider<{PagedEntityType}, TParams>";
 
     private protected override void Visit(NodeContext context, Logger logger)
     {
@@ -23,8 +23,14 @@ public class PagedNode(LinkTarget target, LinkSchematics.Entry entry) : LinkType
         Properties.Clear();
         Properties.Add(new("PagingProvider", PagingProviderType));
         
-
         base.Visit(context, logger);
+    }
+
+    public override string Build(NodeContext context, Logger logger)
+    {
+        AddDefaultProvider();
+        
+        return base.Build(context, logger);
     }
 
     protected override void AddMembers(List<string> members, NodeContext context, Logger logger)
@@ -73,15 +79,11 @@ public class PagedNode(LinkTarget target, LinkSchematics.Entry entry) : LinkType
             : ImplementationChild is not null
                 ? "virtual "
                 : string.Empty;
-
-        var overrideType = RedefinesLinkMembers
-            ? FormatAsTypePath()
-            : $"{FormattedCoreLinkType}.{GetTypeName()}";
-
+        
         members.Add(
             $"""
              public {memberModifier}IAsyncPaged<{PagedEntityType}> PagedAsync(TParams? args = default, RequestOptions? options = null)
-                 => PagingProvider.PagedAsync(args, options);
+                 => PagingProvider(this, args, options);
              """
         );
 
@@ -97,7 +99,7 @@ public class PagedNode(LinkTarget target, LinkSchematics.Entry entry) : LinkType
         else
         {
             var corePagedEntityType = PagesEntity ? Target.GetCoreEntity() : PagedEntityType;
-            
+
             members.AddRange([
                 $"""
                  IAsyncPaged<{PagedEntityType}> {FormattedLinkType}.{GetTypeName()}.PagedAsync(TParams? args, RequestOptions? options)
@@ -109,5 +111,45 @@ public class PagedNode(LinkTarget target, LinkSchematics.Entry entry) : LinkType
                  """
             ]);
         }
+    }
+
+    private void AddDefaultProvider()
+    {
+        if (Parent is not ActorNode || RootActorNode is null || IsCore || !PagesEntity) return;
+
+        if (
+            Target.GetCoreEntity()
+                .Interfaces
+                .FirstOrDefault(x =>
+                    x.Name is "IPagedFetchableOfMany"
+                ) is not { } fetchable
+        ) return;
+
+        if (fetchable.TypeArguments[1] is not INamedTypeSymbol routeModel)
+            return;
+
+        if (
+            !routeModel.Equals(Target.Model, SymbolEqualityComparer.Default) &&
+            !Hierarchy.Implements(Target.Model, routeModel)
+        ) return;
+        
+        RootActorNode.AdditionalTypes.Add(
+            $$"""
+            internal static IAsyncPaged<{{Target.Entity}}> DefaultPagingProvider(
+                {{Target.Actor}}.Paged<{{fetchable.TypeArguments[2]}}> link,
+                {{fetchable.TypeArguments[2]}}? args,
+                RequestOptions? options
+            )    
+            {
+                return new RestPager<{{Target.Entity}}, IEnumerable<{{Target.Model}}>, {{fetchable.TypeArguments[2]}}>(
+                    link.Client,
+                    models => models.Select(link.CreateEntity),
+                    args,
+                    link,
+                    options
+                );
+            }
+            """
+        );
     }
 }

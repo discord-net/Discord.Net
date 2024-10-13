@@ -5,6 +5,5 @@ namespace Discord;
 [Loadable(nameof(Routes.GetUserVoiceState))]
 [Modifiable<ModifyUserVoiceStateProperties>(nameof(Routes.ModifyUserVoiceState))]
 public partial interface IVoiceStateActor :
-    IGuildRelationship,
-    IMemberRelationship,
+    IMemberActor.CanonicalRelationship,
     IActor<ulong, IVoiceState>;

@@ -1,7 +1,7 @@
 using Discord.Models;
 using Discord.Rest;
 using Discord.Rest.Extensions;
-using Discord.Stage;
+using Discord;
 
 namespace Discord.Rest;
 

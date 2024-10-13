@@ -11,4 +11,4 @@ namespace Discord;
 public partial interface IGuildSoundboardSoundActor :
     ISoundboardSoundActor,
     IActor<ulong, IGuildSoundboardSound>,
-    IGuildRelationship;
+    IGuildActor.CanonicalRelationship;

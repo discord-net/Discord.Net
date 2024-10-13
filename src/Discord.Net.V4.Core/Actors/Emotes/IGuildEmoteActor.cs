@@ -11,4 +11,4 @@ namespace Discord;
 ]
 public partial interface IGuildEmoteActor :
     IActor<ulong, IGuildEmote>,
-    IGuildRelationship;
+    IGuildActor.CanonicalRelationship;

@@ -5,6 +5,6 @@ namespace Discord;
 
 [Deletable(nameof(Routes.DeleteGuildIntegration))]
 public partial interface IIntegrationActor :
-    IGuildRelationship,
+    IGuildActor.CanonicalRelationship,
     IEntityProvider<IIntegration, IIntegrationModel>,
     IActor<ulong, IIntegration>;

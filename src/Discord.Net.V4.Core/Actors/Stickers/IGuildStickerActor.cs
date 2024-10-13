@@ -14,6 +14,6 @@ namespace Discord;
     SuppressMessage("ReSharper", "PossibleInterfaceMemberAmbiguity")
 ]
 public partial interface IGuildStickerActor :
-    IGuildRelationship,
+    IGuildActor.CanonicalRelationship,
     IStickerActor,
     IActor<ulong, IGuildSticker>;

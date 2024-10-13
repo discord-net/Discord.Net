@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using Discord.Net.Hanz.Tasks.Actors.Links.V4.Nodes;
 using Discord.Net.Hanz.Tasks.Actors.V3;
 using Discord.Net.Hanz.Utils;
@@ -45,11 +46,30 @@ public sealed class LinkGraph : IEquatable<LinkGraph>
 
     public void Visit(Logger logger)
     {
-        foreach (var node in Nodes.Values)
+        foreach (var node in Hierarchy.OrderByHierarchy(Nodes.Values.ToImmutableArray()!, x => x.Target.Actor, out _, out _))
         {
             var nodeLogger = logger.GetSubLogger(node.Target.Actor.ToFullMetadataName()).WithCleanLogFile();
-            node.VisitTree(Context, nodeLogger);
-            nodeLogger.Flush();
+            
+            try
+            {
+                var start = DateTimeOffset.UtcNow;
+                
+                node.VisitTree(Context, nodeLogger);
+
+                var dt = DateTimeOffset.UtcNow - start;
+                logger.Log($"{node.Target.Actor}: visited in {dt.TotalMilliseconds}ms ");
+            }
+            catch (Exception x)
+            {
+                nodeLogger.Log(LogLevel.Error, $"Failed visiting node: {x}");
+                logger.Log(LogLevel.Error, $"Failed visiting node: {x}");
+                throw;
+            }
+            finally
+            {
+                nodeLogger.Flush();
+                logger.Flush();
+            }
         }
     }
 

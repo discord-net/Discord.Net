@@ -8,6 +8,7 @@ namespace Discord;
 [
     Loadable(nameof(Routes.GetChannel), typeof(ThreadChannelBase)),
     Modifiable<ModifyThreadChannelProperties>(nameof(Routes.ModifyChannel)),
+    RelationshipName("Thread"),
     SuppressMessage("ReSharper", "PossibleInterfaceMemberAmbiguity")
 ]
 public partial interface IThreadChannelActor :

@@ -4,7 +4,4 @@ namespace Discord;
 
 public partial interface IApplicationCommandActor :
     IActor<ulong, IApplicationCommand>,
-    IApplicationRelationship
-{
-    
-}
+    IApplicationActor.CanonicalRelationship;

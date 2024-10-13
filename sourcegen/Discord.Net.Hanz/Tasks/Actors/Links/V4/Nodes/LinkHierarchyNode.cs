@@ -21,10 +21,10 @@ public class LinkHierarchyNode :
 
     public List<ActorNode> HierarchyNodes { get; } = [];
     public HierarchyProperties HierarchyProperties { get; } = [];
-
     public Constructor? Constructor { get; private set; }
-
     public List<Property> Properties { get; } = [];
+
+    //public HashSet<LinkHierarchyNode> ExplicitlyImplements { get; } = [];
 
     public string ImplementationClassName
         => $"__{Target.Assembly}Hierarchy{
@@ -52,10 +52,12 @@ public class LinkHierarchyNode :
     {
         _attribute = attribute;
         AddChild(new BackLinkNode(target));
+        LinkExtensionNode.AddTo(Target, this);
     }
 
     private protected override void Visit(NodeContext context, Logger logger)
     {
+        ExplicitlyImplements.Clear();
         HierarchyNodes.Clear();
         HierarchyProperties.Clear();
         Properties.Clear();
@@ -125,8 +127,16 @@ public class LinkHierarchyNode :
                 (Parent as ITypeImplementerNode)?.Constructor
             );
         }
-        
+
         base.Visit(context, logger);
+
+        // ExplicitlyImplements.UnionWith(
+        //     SemanticCompisition.OfType<LinkHierarchyNode>()
+        // );
+        //
+        // ExplicitlyImplements.ExceptWith(
+        //     SemanticCompisition.OfType<LinkHierarchyNode>().SelectMany(x => x.ExplicitlyImplements)
+        // );
     }
 
     public override string Build(NodeContext context, Logger logger)
@@ -135,64 +145,68 @@ public class LinkHierarchyNode :
 
         var bases = new List<string>();
 
-        if (!IsTemplate)
-            bases.AddRange([
-                FormatTypePath(),
-                //$"{Target.Actor}.Hierarchy"
-            ]);
+        // if (!IsTemplate)
+        //     bases.AddRange([
+        //         FormatTypePath(),
+        //         //$"{Target.Actor}.Hierarchy"
+        //     ]);
 
         var members = new List<string>(
             HierarchyNodes.Select(FormatHierarchyNodeAsProperty)
         );
 
-        foreach (var relative in CartesianLinkTypeNodes.OfType<LinkHierarchyNode>())
+        if (!IsTemplate)
         {
-            bases.Add($"{relative.FormatAsTypePath()}");
-
-            var coreOverrideTarget = $"{Target.GetCoreActor()}{relative.FormatRelativeTypePath()}.Hierarchy";
-
-            if (!IsCore)
-                bases.Add(coreOverrideTarget);
-
-            foreach (var hierarchyNode in HierarchyNodes)
+            foreach (var baseNode in ExplicitlyImplements)
             {
-                var type = relative.IsTemplate
-                    ? hierarchyNode.FormattedLink
-                    : $"{hierarchyNode.Target.Actor}{relative.FormatRelativeTypePath()}";
-
-                var name = LinksV4.GetFriendlyName(hierarchyNode.Target.Actor);
-
-                members.Add($"{type} {relative.FormatAsTypePath()}.{name} => {name};");
-
+                bases.Add($"{baseNode.FormatAsTypePath()}");
+            
+                if(baseNode is not LinkHierarchyNode relative)
+                    continue;
+            
                 if (!IsCore)
-                {
-                    var coreType = relative.IsTemplate
-                        ? hierarchyNode.FormattedCoreLink
-                        : $"{hierarchyNode.Target.GetCoreActor()}{relative.FormatRelativeTypePath()}";
+                    bases.Add($"{Target.GetCoreActor()}{baseNode.FormatRelativeTypePath()}.Hierarchy");
 
-                    members.Add($"{coreType} {coreOverrideTarget}.{name} => {name};");
+                foreach (var node in relative.HierarchyNodes)
+                {
+                    var name = LinksV4.GetFriendlyName(node.Target.Actor);
+                    var type = relative.IsTemplate
+                        ? node.FormattedLink
+                        : $"{node.Target.Actor}{relative.FormatRelativeTypePath()}";
+
+                    members.Add($"{type} {relative.FormatAsTypePath()}.{name} => {name};");
+
+                    if (!IsCore)
+                    {
+                        var coreType = relative.IsTemplate
+                            ? node.FormattedCoreLink
+                            : $"{node.Target.GetCoreActor()}{relative.FormatRelativeTypePath()}.Hierarchy";
+
+                        members.Add(
+                            $"{coreType} {relative.Target.GetCoreActor()}{relative.FormatRelativeTypePath()}.Hierarchy.{name} => {name};");
+                    }
                 }
             }
         }
-
+        
         if (!IsCore)
         {
-            bases.Add($"{Target.GetCoreActor()}{FormatRelativeTypePath()}.Hierarchy");
-
-            members.AddRange(
-                HierarchyNodes.Select(x =>
-                {
-                    var type = IsTemplate
-                        ? x.FormattedCoreLink
-                        : $"{x.Target.GetCoreActor()}{FormatRelativeTypePath()}";
-
-                    var overrideTarget = $"{Target.GetCoreActor()}{FormatRelativeTypePath()}.Hierarchy";
-
-                    var name = LinksV4.GetFriendlyName(x.Target.Actor);
-
-                    return $"{type} {overrideTarget}.{name} => {name};";
-                })
-            );
+            // bases.Add($"{Target.GetCoreActor()}{FormatRelativeTypePath()}.Hierarchy");
+            //
+            // members.AddRange(
+            //     HierarchyNodes.Select(x =>
+            //     {
+            //         var type = IsTemplate
+            //             ? x.FormattedCoreLink
+            //             : $"{x.Target.GetCoreActor()}{FormatRelativeTypePath()}";
+            //
+            //         var overrideTarget = $"{Target.GetCoreActor()}{FormatRelativeTypePath()}.Hierarchy";
+            //
+            //         var name = LinksV4.GetFriendlyName(x.Target.Actor);
+            //
+            //         return $"{type} {overrideTarget}.{name} => {name};";
+            //     })
+            // );
 
             CreateImplementation(members, bases);
         }
@@ -288,12 +302,12 @@ public class LinkHierarchyNode :
               }
               """
         );
-        
+
         var ctorParams = Constructor?.GetActualParameters() ?? [];
 
         members.Add(
             $$"""
-              internal static {{FormatAsTypePath()}} Create({{(
+              internal static new {{FormatAsTypePath()}} Create({{(
                   ctorParams.Count > 0
                       ? $"{Environment.NewLine}{string.Join(
                           $",{Environment.NewLine}",

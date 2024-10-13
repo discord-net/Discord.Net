@@ -5,8 +5,7 @@ namespace Discord;
 [Creatable<CreateWebhookProperties>(nameof(Routes.CreateChannelWebhook))]
 public partial interface IGuildChannelWebhookActor :
     IWebhookActor,
-    IGuildRelationship,
-    IChannelRelationship<IIntegrationChannelTrait, IIntegrationChannel>
+    IIntegrationChannelTrait.CanonicalRelationship
 {
     [LinkExtension]
     private interface WithIncomingExtension
