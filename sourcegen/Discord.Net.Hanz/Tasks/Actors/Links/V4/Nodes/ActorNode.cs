@@ -123,7 +123,7 @@ public class ActorNode :
         CanonicalRelationshipIsRedefined =
             AdditionalCanonicalRelationships.ContainsKey(RelationshipName) ||
             GetEntityAssignableAncestors(context).Any(x => x.RelationshipName == RelationshipName);
-        
+
         logger.Log($"{AdditionalCanonicalRelationships.Count} additional canonical relationships:");
 
         foreach (var entry in AdditionalCanonicalRelationships)
@@ -135,7 +135,7 @@ public class ActorNode :
                 logger.Log($"    - {item.Target.Actor}");
             }
         }
-        
+
         base.Visit(context, logger);
     }
 
@@ -227,7 +227,7 @@ public class ActorNode :
             relationshipMembers.Add(
                 $"{ancestor.Target.Actor} {ancestor.Target.Actor}.Relationship.{ancestor.RelationshipName} => {RelationshipName};"
             );
-            
+
             // canonicalRelationshipMembers.Add(
             //     $"{ancestor.Target.Actor} {ancestor.Target.Actor}.CanonicalRelationship.{ancestor.RelationshipName} => {RelationshipName};"
             // );
@@ -305,18 +305,28 @@ public class ActorNode :
         if (!IsCore)
             bases.Add(FormattedCoreLink);
 
+        var linkMembers = new List<string>();
+
         switch (Target.Assembly)
         {
             case LinkActorTargets.AssemblyTarget.Rest:
                 bases.Add(FormattedRestLinkType);
+                bases.Add($"{Target.GetCoreActor()}.Link");
+                linkMembers.AddRange([
+                    $"internal new {Target.Actor} GetActor({Target.Id} id) => Provider.GetActor(id);",
+                    $"internal new {Target.Entity} CreateEntity({Target.Model} model);",
+                ]);
                 break;
-        }
+            case LinkActorTargets.AssemblyTarget.Core:
+                if (RedefinesRootInterfaceMembers)
+                {
+                    linkMembers.AddRange([
+                        $"internal new {Target.Actor} GetActor({Target.Id} id);",
+                        $"internal new {Target.Entity} CreateEntity({Target.Model} model);",
+                    ]);
+                }
 
-        var linkMembers = new List<string>();
-
-        if (!IsCore)
-        {
-            bases.Add($"{Target.GetCoreActor()}.Link");
+                break;
         }
 
         var ancestors = GetEntityAssignableAncestors(context);
@@ -324,8 +334,6 @@ public class ActorNode :
         if (RedefinesRootInterfaceMembers || ancestors.Length > 0)
         {
             linkMembers.AddRange([
-                $"new {Target.Actor} GetActor({Target.Id} id);",
-                $"new {Target.Entity} CreateEntity({Target.Model} model);",
                 $"{Target.Actor} {FormattedActorProvider}.GetActor({Target.Id} id) => GetActor(id);",
                 $"{Target.Entity} {FormattedEntityProvider}.CreateEntity({Target.Model} model) => CreateEntity(model);",
             ]);

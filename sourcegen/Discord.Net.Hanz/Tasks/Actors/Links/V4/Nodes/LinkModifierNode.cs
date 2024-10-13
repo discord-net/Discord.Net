@@ -24,11 +24,11 @@ public abstract class LinkModifierNode(LinkTarget target) : LinkNode(target)
         base.Visit(context, logger);
         
         ExplicitlyImplements.UnionWith(
-            SemanticCompisition
+            SemanticComposition
         );
 
         ExplicitlyImplements.ExceptWith(
-            SemanticCompisition.OfType<LinkModifierNode>().SelectMany(x => x.ExplicitlyImplements)
+            SemanticComposition.OfType<LinkModifierNode>().SelectMany(x => x.ExplicitlyImplements)
         );
     }
 

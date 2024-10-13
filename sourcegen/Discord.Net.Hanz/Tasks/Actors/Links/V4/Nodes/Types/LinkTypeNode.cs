@@ -240,7 +240,7 @@ public abstract class LinkTypeNode :
                 bases.Add($"{FormattedLinkType}{FormatRelativeTypePath()}.{GetTypeName()}");
                 break;
             default:
-                bases.UnionWith(SemanticCompisition.OfType<LinkTypeNode>().Select(x => x.FormatAsTypePath()));
+                bases.UnionWith(SemanticComposition.OfType<LinkTypeNode>().Select(x => x.FormatAsTypePath()));
                 break;
         }
 

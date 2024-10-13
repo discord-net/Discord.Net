@@ -442,46 +442,32 @@ public class BackLinkNode(LinkTarget target) :
         NodeContext context,
         Logger logger)
     {
-        var coreBackLinkTemplate = Target.GetCoreActor()
-            .GetTypeMembers()
-            .FirstOrDefault(x => x.Name == "BackLink");
-
-        if (coreBackLinkTemplate is null)
-        {
-            logger.Warn("Could not find core BackLink template");
-            return;
-        }
-
         // create the root back link type
         bases.AddRange([
             FormattedBackLinkType,
-            $"{Target.GetCoreActor()}.BackLink<TSource>"
+            $"{Target.GetCoreActor()}.BackLink<TSource>",
+            $"{Target.Actor}.Link"
         ]);
 
         // only need to define once, since we'll
         members.UnionWith([
             "internal TSource Source { get; }",
-            $"TSource {FormattedBackLinkType}.Source => Source;"
+            $"TSource {FormattedBackLinkSourceContainer}.Source => Source;"
         ]);
-
-        var overrideType = coreBackLinkTemplate
-            .GetMembers()
-            .OfType<IPropertySymbol>()
-            .Any(x =>
-                x.Name == "Source" &&
-                x.ExplicitInterfaceImplementations.Length == 0
-            )
-            ? $"{Target.GetCoreActor()}.BackLink<TSource>"
-            : FormattedCoreBackLinkType;
-
-        members.Add($"TSource {overrideType}.Source => Source;");
 
         BuildConstructorsFromTargetActor(members);
 
         members.UnionWith([
-            $"{Target.Actor} {FormattedActorProvider}.GetActor({Target.Id} id) => this;",
-            $"{Target.GetCoreActor()} {FormattedCoreActorProvider}.GetActor({Target.Id} id) => this;",
+            $"{Target.Actor} {Target.Actor}.Link.GetActor({Target.Id} id) => this;",
+            $"{Target.Entity} {Target.Actor}.Link.CreateEntity({Target.Model} model) => CreateEntity(model);",
         ]);
+
+        switch (Target.Assembly)
+        {
+            case LinkActorTargets.AssemblyTarget.Rest:
+                members.Add($"{Target.Actor} {FormattedRestLinkType}.Provider => this;");
+                break;
+        }
     }
 
     private void BuildConstructorsFromTargetActor(HashSet<string> members, string? typeName = null)
