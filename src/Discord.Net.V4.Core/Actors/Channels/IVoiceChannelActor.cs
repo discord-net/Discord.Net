@@ -20,5 +20,4 @@ public partial interface IVoiceChannelActor :
     IMessageChannelTrait,
     IInvitableTrait<IGuildChannelInviteActor, IGuildChannelInvite>,
     IIntegrationChannelTrait.WithIncoming,
-    IGuildChannelActor,
     IActor<ulong, IVoiceChannel>;

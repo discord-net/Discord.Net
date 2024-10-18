@@ -12,9 +12,9 @@ public partial interface IChannelFollowerWebhookActor :
     IGuildChannelWebhookActor,
     IActor<ulong, IChannelFollowerWebhook>
 {
-    [BackLink<INewsChannelActor>]
+    [BackLink<IAnnouncementChannelActor>]
     private static async Task<FollowedChannel> FollowAsync(
-        INewsChannelActor newsChannelActor,
+        IAnnouncementChannelActor newsChannelActor,
         EntityOrId<ulong, IChannelActor> channel,
         RequestOptions? options = null,
         CancellationToken token = default)

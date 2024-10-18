@@ -68,8 +68,11 @@ public partial class RestChannel :
             ),
             IGuildChannelModel guildChannelModel => RestGuildChannel.Construct(
                 client,
-                // TODO: client.Guilds[guildChannelBase.GuildId].Channels[model.Id] leads to bad cast later on
-                actor as RestGuildChannelActor ?? client.Guilds[guildChannelModel.GuildId].Channels[model.Id], 
+                actor as RestGuildChannelActor ?? client
+                    .Guilds[guildChannelModel.GuildId]
+                    .Channels
+                    .OfType((ChannelType)model.Type)
+                    [model.Id], 
                 model
             ),
             _ => new RestChannel(client, model, actor)

@@ -96,6 +96,20 @@ public sealed class GenericTraits : ISyntaxGenerationCombineTask<GenericTraits.G
             .Any(x => x.AttributeClass?.ToDisplayString() == "Discord.TraitAttribute");
     }
 
+    private static bool IsOverrideTrait(INamedTypeSymbol trait)
+    {
+        var attributeProp = trait
+            .GetAttributes()
+            .FirstOrDefault(x => x.AttributeClass?.ToDisplayString() == "Discord.TraitAttribute")
+            ?.NamedArguments
+            .FirstOrDefault(x => x.Key == "Overrides")
+            .Value;
+
+        if (attributeProp?.Value is null) return false;
+        
+        return (bool)attributeProp.Value.Value!;
+    }
+
     private static bool IsActor(ITypeSymbol symbol)
         => symbol.ToDisplayString().StartsWith("Discord.IActor");
 
@@ -109,6 +123,144 @@ public sealed class GenericTraits : ISyntaxGenerationCombineTask<GenericTraits.G
         var generationTargets = targets
             .OfType<GenerationTarget>()
             .ToArray();
+
+        foreach (var target in generationTargets)
+        {
+            var targetLogger = logger.WithSemanticContext(target.Model);
+
+            var overridableTraits = target
+                .Traits
+                .Where(x => target.Symbol.Interfaces.Contains(x))
+                .Where(IsOverrideTrait)
+                .SelectMany(IEnumerable<INamedTypeSymbol> (x) => 
+                    [x, ..x.AllInterfaces.Where(IsOverrideTrait)]
+                )
+                .ToArray();
+
+            if(overridableTraits.Length == 0) continue;
+            
+            targetLogger.Log($"{target.Symbol}: {overridableTraits.Length} overridable traits");
+            
+            var overrides = new List<string>();
+
+            foreach (var trait in overridableTraits)
+            {
+                var traitOverrides = new List<string>();
+                var overloadedMembers = new HashSet<ISymbol>(SymbolEqualityComparer.Default);
+                var overloadedBaseTraits = new HashSet<INamedTypeSymbol>(SymbolEqualityComparer.Default);
+                
+                targetLogger.Log($" - processing {trait}...");
+                
+                foreach (var baseTarget in generationTargets.Where(x => Hierarchy.Implements(target.Symbol, x.Symbol)))
+                {
+                    var traitComparer = trait.IsGenericType
+                        ? trait.ConstructUnboundGenericType()
+                        : trait;
+
+                    foreach (var overrideTarget in baseTarget.Traits.Where(x =>
+                                 (x.IsGenericType ? x.ConstructUnboundGenericType() : x).Equals(traitComparer,
+                                     SymbolEqualityComparer.Default)))
+                    {
+                        if(!overloadedBaseTraits.Add(overrideTarget))
+                            continue;
+
+                        targetLogger.Log($"    - {overrideTarget} is base");
+                        
+                        foreach (var member in trait.GetMembers())
+                        {
+                            if (!member.IsVirtual && !member.IsAbstract)
+                            {
+                                targetLogger.Log($" - Skipping {member}: not implementable");
+                                continue;
+                            }
+
+                            var overrideMember = overrideTarget.GetMembers().FirstOrDefault(x => x.Name == member.Name);
+                           
+                            targetLogger.Log($" - {member} -> {overrideMember}");
+
+                            if (overrideMember is null )
+                            {
+                                targetLogger.Log($" - Skipping {member}: not overridable");
+                                continue;
+                            }
+
+                            switch (overrideMember)
+                            {
+                                case IPropertySymbol property:
+                                    traitOverrides.Add(
+                                        $"{property.Type} {property.ContainingType}.{property.Name} => {property.Name};"
+                                    );
+                                    overloadedMembers.Add(member);
+                                    break;
+                                case IMethodSymbol method when method.MethodKind is MethodKind.Ordinary:
+                                    var args = method.Parameters
+                                        .ToDictionary(x => x.Name, x => x.Type);
+                                    traitOverrides.Add(
+                                        $"{method.ReturnType} {method.ContainingType}.{method.Name}({
+                                            string.Join(", ", args.Select(x => $"{x.Value} {x.Key}"))
+                                        }) => {method.Name}({string.Join(", ", args.Keys)});"
+                                    );
+                                    overloadedMembers.Add(member);
+                                    break;
+                            }
+                        }
+                    }
+                }
+
+                if (traitOverrides.Count == 0)
+                {
+                    targetLogger.Log($" - {trait}: no overloads");
+                    continue;
+                }
+                
+                overrides.AddRange(traitOverrides);
+
+                foreach (var member in overloadedMembers)
+                {
+                    switch (member)
+                    {
+                        case IPropertySymbol property:
+                            overrides.AddRange([
+                                $"new {property.Type} {property.Name} {{ get; }}",
+                                $"{property.Type} {property.ContainingType}.{property.Name} => {property.Name};"
+                            ]);
+                            break;
+                        case IMethodSymbol method:
+                            var args = method.Parameters
+                                .ToDictionary(x => x.Name, x => x.Type);
+                            overrides.AddRange([
+                                $"new {method.ReturnType} {method.Name}({
+                                    string.Join(", ", args.Select(x => $"{x.Value} {x.Key}"))
+                                });",
+                                $"{method.ReturnType} {method.ContainingType}.{method.Name}({
+                                    string.Join(", ", args.Select(x => $"{x.Value} {x.Key}"))
+                                }) => {method.Name}({string.Join(", ", args.Keys)});"
+                            ]);
+                            break;
+                    }
+                }
+            }
+
+            if (overrides.Count == 0) continue;
+            
+            context.AddSource(
+                $"TraitOverrides/{target.Symbol.ToFullMetadataName()}",
+                $$"""
+                {{target.Syntax.GetFormattedUsingDirectives()}}
+                
+                namespace {{target.Symbol.ContainingNamespace}};
+                
+                public partial {{target.Symbol.TypeKind.ToString().ToLower()}} {{target.Symbol.Name}}{{(
+                    target.Symbol.TypeParameters.Length > 0
+                        ? $"<{string.Join(", ", target.Symbol.TypeParameters)}>"
+                        : string.Empty
+                )}}
+                {
+                    {{string.Join(Environment.NewLine, overrides).WithNewlinePadding(4)}}
+                }
+                """
+            );
+        }
 
         var grouping = targets
             .OfType<GenerationTarget>()
@@ -153,6 +305,8 @@ public sealed class GenericTraits : ISyntaxGenerationCombineTask<GenericTraits.G
             )
             .Where(x => x.Implementers.Length > 0 && x.CommonInterfaces.Length > 0)
             .ToArray();
+
+        var generatedTraits = new HashSet<string>();
 
         foreach
         (
@@ -251,6 +405,12 @@ public sealed class GenericTraits : ISyntaxGenerationCombineTask<GenericTraits.G
                           """
                     )!.AddModifiers(extraModifiers)
                 );
+
+            if (!generatedTraits.Add(trait.Key.ToFullMetadataName()))
+            {
+                logger.Warn($"Failed to generate {trait.Key}, already added to sources");
+                continue;
+            }
 
             context.AddSource(
                 $"GeneratedTraits/{trait.Key.ToFullMetadataName()}",

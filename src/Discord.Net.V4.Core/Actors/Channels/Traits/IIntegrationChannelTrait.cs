@@ -10,17 +10,20 @@ public partial interface IIntegrationChannelTrait :
 {
     [return: TypeHeuristic(nameof(Webhooks))]
     IGuildChannelWebhookActor Webhook(ulong id) => Webhooks[id];
+
     IGuildChannelWebhookActor.Enumerable.Indexable Webhooks { get; }
 
     [SourceOfTruth]
     internal new IIntegrationChannel CreateEntity(IGuildChannelModel model);
     
-    
-    [TraitComponent, TraitLinkExtends(nameof(Webhooks), typeof(IGuildChannelWebhookActor.WithIncoming))]
+    [
+        TraitComponent,
+        TraitLinkExtends(nameof(Webhooks), typeof(IGuildChannelWebhookActor.WithIncoming))
+    ]
     private interface WithIncomingComponent : IIntegrationChannelTrait;
 
     [
-        TraitComponent(Parent = typeof(WithIncomingComponent)), 
+        TraitComponent(Parent = typeof(WithIncomingComponent)),
         TraitLinkExtends(nameof(Webhooks), typeof(IGuildChannelWebhookActor.WithChannelFollower))
     ]
     private interface WithChannelFollowerComponent : IIntegrationChannelTrait;

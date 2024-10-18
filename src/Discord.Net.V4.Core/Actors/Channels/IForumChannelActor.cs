@@ -12,11 +12,10 @@ namespace Discord;
         nameof(Routes.CreateGuildChannel),
         nameof(IGuildActor),
         RouteGenerics = [typeof(GuildForumChannel)]
-    ), 
-    BackLink(nameof(Threads)),
+    ),
     SuppressMessage("ReSharper", "PossibleInterfaceMemberAmbiguity")
 ]
 public partial interface IForumChannelActor :
-    IThreadableChannelActor,
+    IThreadableChannelTrait<IThreadChannelActor.Indexable.WithArchived.BackLink<IForumChannelActor>>,
     IIntegrationChannelTrait.WithIncoming,
     IActor<ulong, IForumChannel>;

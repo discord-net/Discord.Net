@@ -8,7 +8,7 @@ public abstract class RestTrait<TId, TEntity, TModel>(
 ) :
     IRestTrait<TId, TEntity, TModel>
     where TId : IEquatable<TId>
-    where TEntity : RestEntity<TId>, IEntity<TId, TModel>
+    where TEntity : IRestEntity<TId>, IEntity<TId, TModel>
     where TModel : IEntityModel<TId>
 {
     public IDiscordClient Client { get; } = client;
@@ -19,10 +19,10 @@ public abstract class RestTrait<TId, TEntity, TModel>(
 public interface IRestTrait<out TId, out TEntity, in TModel> :
     IRestTrait<TId, TEntity>
     where TId : IEquatable<TId>
-    where TEntity : RestEntity<TId>, IEntity<TId, TModel>
+    where TEntity : IRestEntity<TId>, IEntity<TId, TModel>
     where TModel : IEntityModel<TId>;
 
 public interface IRestTrait<out TId, out TEntity> :
     IActorTrait<TId, TEntity>
     where TId : IEquatable<TId>
-    where TEntity : RestEntity<TId>;
+    where TEntity : IRestEntity<TId>;

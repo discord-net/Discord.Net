@@ -12,7 +12,7 @@ public partial interface IChannelFollowerWebhook :
     IGuildActor? SourceGuild { get; }
     string? SourceGuildName { get; }
     string? SourceGuildIcon { get; }
-    INewsChannelActor? SourceChannel { get; }
+    IAnnouncementChannelActor? SourceChannel { get; }
     string? SourceChannelName { get; }
 
     [SourceOfTruth]

@@ -51,7 +51,6 @@ public sealed partial class RestGuildEmote :
 
     [ProxyInterface(
         typeof(IGuildEmoteActor),
-        typeof(IGuildRelationship),
         typeof(IEntityProvider<IGuildEmote, ICustomEmoteModel>)
     )]
     internal RestGuildEmoteActor Actor { get; }

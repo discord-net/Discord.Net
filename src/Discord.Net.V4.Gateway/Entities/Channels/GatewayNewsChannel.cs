@@ -7,7 +7,7 @@ namespace Discord.Gateway;
 [ExtendInterfaceDefaults]
 public sealed partial class GatewayNewsChannelActor :
     GatewayTextChannelActor,
-    INewsChannelActor,
+    IAnnouncementChannelActor,
     IGatewayCachedActor<ulong, GatewayNewsChannel, NewsChannelIdentity, IGuildNewsChannelModel>
 {
     [SourceOfTruth] internal override NewsChannelIdentity Identity { get; }
@@ -31,7 +31,7 @@ public sealed partial class GatewayNewsChannelActor :
 [ExtendInterfaceDefaults]
 public sealed partial class GatewayNewsChannel :
     GatewayTextChannel,
-    INewsChannel,
+    IAnnouncementChannel,
     ICacheableEntity<GatewayNewsChannel, ulong, IGuildNewsChannelModel>
 {
     [ProxyInterface] internal override GatewayNewsChannelActor Actor { get; }

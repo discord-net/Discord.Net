@@ -77,14 +77,14 @@ public sealed partial class DiscordRestClient : IDiscordClient
         Channels = RestChannelActor.Indexable.Hierarchy.Create(
             RestDMChannelActor.Indexable.Create(
                 this,
-                RestActorProvider.GetOrCreate(this, Template.Of<DMChannelIdentity>())
+                RestDMChannelActor.GetProvider(this)
             ),
             RestGroupChannelActor.Indexable.Create(
                 this,
-                RestActorProvider.GetOrCreate(this, Template.Of<GroupChannelIdentity>())
+                RestGroupChannelActor.GetProvider(this)
             ),
             this,
-            RestActorProvider.GetOrCreate(this, Template.Of<ChannelIdentity>())
+            RestChannelActor.GetProvider(this)
         );
 
         // Threads = new RestThreadChannelLink.Indexable(

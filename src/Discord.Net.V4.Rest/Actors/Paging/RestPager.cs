@@ -13,7 +13,7 @@ internal sealed class RestPager<TEntity, TModel, TParams>(
 ) :
     IAsyncPaged<TEntity>
     where TParams : class, IPagingParams<TParams, TModel>
-    where TModel : class, IModel
+    where TModel : class
     where TEntity : class, IEntity
 {
     private readonly IPathable _path = path ?? IPathable.Empty;

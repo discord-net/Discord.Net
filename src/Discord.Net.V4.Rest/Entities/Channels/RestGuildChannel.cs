@@ -26,7 +26,7 @@ public partial class RestGuildChannelActor :
     {
         Identity = channel | this;
 
-        Guild = guild.Actor ?? client.Guilds[guild.Id];
+        Guild = client.Guilds[guild];
     }
 
     [SourceOfTruth]

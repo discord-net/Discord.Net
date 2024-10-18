@@ -133,7 +133,7 @@ public static class ModifyTrait
 
         var modifiableGenerics = SyntaxFactory.SeparatedList([
             idType,
-            SyntaxFactory.IdentifierName(target.InterfaceSymbol.Name),
+            SyntaxFactory.ParseTypeName(target.InterfaceSymbol.ToDisplayString()),
             userPropertiesType,
             apiParamsType
         ]);

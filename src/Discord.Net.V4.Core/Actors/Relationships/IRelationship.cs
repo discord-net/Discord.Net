@@ -8,5 +8,5 @@ public interface IRelationship<out TActor, out TId, out TEntity> :
 {
     internal TActor RelationshipActor { get; }
 
-    TId IRelation<TId, TEntity> .RelationshipId => RelationshipActor.Id;
+    TId IRelation<TId, TEntity>.RelationshipId => RelationshipActor.Id;
 }

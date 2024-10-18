@@ -14,5 +14,5 @@ public static class Directives
         => GetUsingDirectivesSyntax(node).Select(x => x.ToString());
 
     public static IEnumerable<UsingDirectiveSyntax> GetUsingDirectivesSyntax(this SyntaxNode node)
-        => node.SyntaxTree.GetRoot().ChildNodes().OfType<UsingDirectiveSyntax>();
+        => node.SyntaxTree.GetRoot().ChildNodes().OfType<UsingDirectiveSyntax>().Where(x => x.GlobalKeyword == default);
 }

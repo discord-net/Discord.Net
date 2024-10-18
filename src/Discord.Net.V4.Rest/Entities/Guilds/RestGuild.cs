@@ -8,7 +8,7 @@ using MorseCode.ITask;
 namespace Discord.Rest;
 
 [ExtendInterfaceDefaults]
-public sealed partial class RestGuildActor :
+public partial class RestGuildActor :
     RestActor<RestGuildActor, ulong, RestGuild, IGuildModel>,
     IGuildActor
 {

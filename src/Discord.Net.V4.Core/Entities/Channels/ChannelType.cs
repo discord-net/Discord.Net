@@ -24,22 +24,22 @@ public enum ChannelType
     Category = 4,
 
     /// <summary> The channel is a news channel. </summary>
-    [TypeHeuristic<INewsChannel>]
+    [TypeHeuristic<IAnnouncementChannel>]
     News = 5,
 
     /// <summary> The channel is a store channel. </summary>
     Store = 6,
 
     /// <summary> The channel is a temporary thread channel under a news channel. </summary>
-    [TypeHeuristic<IThreadChannel>]
+    [TypeHeuristic<IAnnouncementThreadChannel>]
     NewsThread = 10,
 
     /// <summary> The channel is a temporary thread channel under a text channel.  </summary>
-    [TypeHeuristic<IThreadChannel>]
+    [TypeHeuristic<IPublicThreadChannel>]
     PublicThread = 11,
 
     /// <summary> The channel is a private temporary thread channel under a text channel.  </summary>
-    [TypeHeuristic<IThreadChannel>]
+    [TypeHeuristic<IPrivateThreadChannel>]
     PrivateThread = 12,
 
     /// <summary> The channel is a stage voice channel. </summary>

@@ -1,3 +1,4 @@
+using Discord.Net.Hanz.Tasks.Actors.Links.V4;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -18,6 +19,9 @@ public static class LinkSchematics
 
         public bool Equals(Schematic other)
             => Root.Equals(other.Root);
+
+        public override int GetHashCode()
+            => Root.GetHashCode();
     }
 
     public class Entry(
@@ -28,14 +32,18 @@ public static class LinkSchematics
     ) : IEquatable<Entry>
     {
         public override int GetHashCode()
-        {
-            unchecked
-            {
-                var hashCode = Children.Count.GetHashCode();
-                hashCode = (hashCode * 397) ^ Symbol.ToDisplayString().GetHashCode();
-                return hashCode;
-            }
-        }
+            => HashCode
+                .Of(Symbol.ToDisplayString())
+                .AndEach(Children);
+        
+        // {
+        //     unchecked
+        //     {
+        //         var hashCode = Children.Count.GetHashCode();
+        //         hashCode = (hashCode * 397) ^ Symbol.ToDisplayString().GetHashCode();
+        //         return hashCode;
+        //     }
+        // }
 
         public HashSet<Entry> Children { get; } = children;
 
@@ -65,7 +73,7 @@ public static class LinkSchematics
 
         if (context.SemanticModel.GetDeclaredSymbol(syntax) is not INamedTypeSymbol symbol) return null;
 
-        var logger = LinksV3.Logger
+        var logger = LinksV4.Logger
             .WithSemanticContext(context.SemanticModel)
             .GetSubLogger(nameof(LinkSchematics))
             .WithCleanLogFile();
@@ -93,7 +101,7 @@ public static class LinkSchematics
         if (LinkActorTargets.GetAssemblyTarget(compilation) is LinkActorTargets.AssemblyTarget.Core)
             return null;
 
-        var logger = LinksV3.Logger
+        var logger = LinksV4.Logger
             .WithCompilationContext(compilation)
             .GetSubLogger(nameof(LinkSchematics))
             .WithCleanLogFile();
@@ -129,7 +137,7 @@ public static class LinkSchematics
     {
         var lookup = new Dictionary<string, Entry>();
 
-        logger ??= LinksV3.Logger
+        logger ??= LinksV4.Logger
             .GetSubLogger(nameof(LinkSchematics))
             .WithCompilationContext(compilation)
             .WithCleanLogFile();

@@ -13,10 +13,9 @@ namespace Discord;
         nameof(IGuildActor),
         RouteGenerics = [typeof(GuildMediaChannel)]
     ),
-    BackLink(nameof(Threads)),
     SuppressMessage("ReSharper", "PossibleInterfaceMemberAmbiguity")
 ]
 public partial interface IMediaChannelActor :
-    IThreadableChannelActor,
+    IThreadableChannelTrait<IThreadChannelActor.Indexable.WithArchived.BackLink<IMediaChannelActor>>,
     IIntegrationChannelTrait.WithIncoming,
     IActor<ulong, IMediaChannel>;

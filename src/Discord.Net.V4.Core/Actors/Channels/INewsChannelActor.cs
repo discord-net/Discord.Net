@@ -14,9 +14,11 @@ namespace Discord;
     ),
     SuppressMessage("ReSharper", "PossibleInterfaceMemberAmbiguity")
 ]
-public partial interface INewsChannelActor :
-    ITextChannelActor,
-    IActor<ulong, INewsChannel>
+public partial interface IAnnouncementChannelActor :
+    IMessageChannelTrait,
+    IIntegrationChannelTrait.WithIncoming.WithChannelFollower,
+    IThreadableChannelTrait<IAnnouncementThreadChannelActor.Indexable.WithAnnouncementArchived.BackLink<IAnnouncementChannelActor>>,
+    IActor<ulong, IAnnouncementChannel>
 {
     async Task<FollowedChannel> FollowAnnouncementChannelAsync(EntityOrId<ulong, ITextChannel> channel,
         RequestOptions? options = null, CancellationToken token = default)

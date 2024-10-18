@@ -3,8 +3,6 @@ using Discord.Rest.Extensions;
 
 namespace Discord.Rest;
 
-//using MessageChannelTrait = RestMessageChannelTrait<RestVoiceChannelActor, VoiceChannelIdentity>;
-
 [ExtendInterfaceDefaults]
 public partial class RestVoiceChannelActor :
     RestGuildChannelActor,
@@ -24,7 +22,6 @@ public partial class RestVoiceChannelActor :
     ) : base(client, guild, channel)
     {
         Identity = channel | this;
-        
     }
 
     [SourceOfTruth]

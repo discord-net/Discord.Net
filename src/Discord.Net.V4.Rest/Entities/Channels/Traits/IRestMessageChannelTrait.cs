@@ -1,3 +1,6 @@
+global using MessageChannelIdentity =
+    Discord.IIdentifiable<ulong, Discord.IMessageChannel, Discord.Rest.IRestMessageChannelTrait,
+        Discord.Models.IChannelModel>;
 using Discord.Models;
 
 namespace Discord.Rest;
@@ -5,32 +8,16 @@ namespace Discord.Rest;
 [Containerized, Trait]
 public partial interface IRestMessageChannelTrait :
     IMessageChannelTrait,
-    IRestTraitProvider<RestChannelActor>
+    IRestTraitProvider<RestChannelActor>,
+    IRestTrait<ulong, IRestMessageChannel>
 {
     [SourceOfTruth]
     new RestMessageActor.Paged<PageChannelMessagesParams>.Indexable Messages
         => GetOrCreateTraitData(nameof(Messages), channel =>
-        {
-            var provider = RestActorProvider.GetOrCreate(
+            RestMessageActor.Paged<PageChannelMessagesParams>.Indexable.Create(
+                RestMessageActor.DefaultPagingProvider,
                 channel.Client,
-                Template.Of<MessageIdentity>(),
-                (MessageChannelIdentity) channel.Identity
-            );
-
-            return new RestMessageActor.Paged<PageChannelMessagesParams>.Indexable(
-                new(
-                    channel.Client,
-                    provider
-                ),
-                new(
-                    channel.Client,
-                    provider,
-                    new RestPagingProvider<IMessageModel, PageChannelMessagesParams, RestMessage>(
-                        channel.Client,
-                        (model, _) => Messages[model.Id].CreateEntity(model),
-                        this
-                    )
-                )
-            );
-        });
+                RestMessageActor.GetProvider(channel.Client, (MessageChannelIdentity) channel.Identity)
+            )
+        );
 }

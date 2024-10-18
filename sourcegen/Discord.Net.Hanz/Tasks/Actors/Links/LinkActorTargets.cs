@@ -28,7 +28,7 @@ public class LinkActorTargets
         AssemblyTarget assembly
     ) : IEquatable<GenerationTarget>
     {
-        public SemanticModel SemanticModel { get; } = semanticModel;
+        public SemanticModel SemanticModel { get; private set; } = semanticModel;
         public TypeDeclarationSyntax Syntax { get; } = syntax;
         public INamedTypeSymbol Entity { get; } = entity;
         public INamedTypeSymbol Actor { get; } = actor;
@@ -36,10 +36,41 @@ public class LinkActorTargets
         public ITypeSymbol Id { get; } = id;
         public AssemblyTarget Assembly { get; } = assembly;
 
-        public bool Equals(GenerationTarget other)
+        public GenerationTarget? Update(Compilation compilation)
         {
-            return Actor.GetAttributes().SequenceEqual(other.Actor.GetAttributes());
+            var tree = compilation.SyntaxTrees.FirstOrDefault(x => x.IsEquivalentTo(Syntax.SyntaxTree));
+
+            if (tree is null) return null;
+
+            var newNode = tree.GetRoot()
+                .DescendantNodes()
+                .OfType<TypeDeclarationSyntax>()
+                .FirstOrDefault(x => x.IsEquivalentTo(Syntax));
+
+            if (newNode is null) return null;
+            
+            return GetTargetForGeneration(
+                compilation.GetSemanticModel(tree),
+                newNode
+            );
         }
+
+        public bool Equals(GenerationTarget other)
+            => GetHashCode() == other.GetHashCode();
+
+        public override int GetHashCode()
+            => HashCode
+                .Of(Actor.ToDisplayString())
+                .And((int)Assembly)
+                .AndEach(Actor
+                    .GetAttributes()
+                    .Select(x => HashCode
+                        .Of(x.AttributeClass?.ToDisplayString())
+                        // .AndEach(x.ConstructorArguments)
+                        // .AndEach(x.NamedArguments.Select(x => x.Key))
+                        // .AndEach(x.NamedArguments.Select(x => x.Value))
+                    )
+                );
 
         public INamedTypeSymbol GetCoreActor()
         {
@@ -96,7 +127,7 @@ public class LinkActorTargets
 
         if (symbol.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax(token) is not TypeDeclarationSyntax syntax)
             return null;
-        
+
         var actorType = assembly switch
         {
             AssemblyTarget.Core => "IActor",
@@ -112,7 +143,7 @@ public class LinkActorTargets
         {
             return null;
         }
-        
+
         if (actorInterface is null)
             return null;
 
@@ -134,7 +165,7 @@ public class LinkActorTargets
         {
             compilation = compilation.AddSyntaxTrees(syntax.SyntaxTree);
         }
-        
+
         return new GenerationTarget(
             compilation.GetSemanticModel(syntax.SyntaxTree),
             syntax,
@@ -148,18 +179,23 @@ public class LinkActorTargets
 
     public static GenerationTarget? GetTargetForGeneration(
         GeneratorSyntaxContext context,
-        CancellationToken token = default)
+        CancellationToken token = default
+    ) => GetTargetForGeneration(context.SemanticModel, context.Node);
+
+    public static GenerationTarget? GetTargetForGeneration(
+        SemanticModel semantic,
+        SyntaxNode node)
     {
-        if (!AllowedAssemblies.Contains(context.SemanticModel.Compilation.Assembly.Name)) return null;
+        if (!AllowedAssemblies.Contains(semantic.Compilation.Assembly.Name)) return null;
 
-        var assembly = GetAssemblyTarget(context.SemanticModel.Compilation) ?? throw new NotSupportedException();
+        var assembly = GetAssemblyTarget(semantic.Compilation) ?? throw new NotSupportedException();
 
-        if (context.Node is not TypeDeclarationSyntax syntax)
+        if (node is not TypeDeclarationSyntax syntax)
             return null;
 
-        if (ModelExtensions.GetDeclaredSymbol(context.SemanticModel, syntax) is not INamedTypeSymbol symbol)
+        if (ModelExtensions.GetDeclaredSymbol(semantic, syntax) is not INamedTypeSymbol symbol)
             return null;
-
+        
         var actorType = assembly switch
         {
             AssemblyTarget.Core => "IActor",
@@ -193,8 +229,20 @@ public class LinkActorTargets
             return null;
         }
 
+        var parent = syntax.Parent;
+
+        while (parent is TypeDeclarationSyntax parentSyntax)
+        {
+            if (parentSyntax.Modifiers.IndexOf(SyntaxKind.PartialKeyword) == -1)
+            {
+                return null;
+            }
+
+            parent = parentSyntax.Parent;
+        }
+
         return new GenerationTarget(
-            context.SemanticModel,
+            semantic,
             syntax,
             entity,
             symbol,

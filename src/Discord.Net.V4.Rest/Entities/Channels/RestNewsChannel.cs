@@ -7,7 +7,7 @@ namespace Discord.Rest;
 [ExtendInterfaceDefaults]
 public partial class RestNewsChannelActor :
     RestTextChannelActor,
-    INewsChannelActor,
+    IAnnouncementChannelActor,
     IRestActor<RestNewsChannelActor, ulong, RestNewsChannel, IGuildNewsChannelModel>
 {
     [SourceOfTruth] internal override NewsChannelIdentity Identity { get; }
@@ -30,14 +30,14 @@ public partial class RestNewsChannelActor :
 
 public partial class RestNewsChannel :
     RestTextChannel,
-    INewsChannel,
+    IAnnouncementChannel,
     IRestConstructable<RestNewsChannel, RestNewsChannelActor, IGuildNewsChannelModel>
 {
     internal override IGuildNewsChannelModel Model => _model;
 
     [ProxyInterface(
-        typeof(INewsChannelActor),
-        typeof(IEntityProvider<INewsChannel, IGuildNewsChannelModel>)
+        typeof(IAnnouncementChannelActor),
+        typeof(IEntityProvider<IAnnouncementChannel, IGuildNewsChannelModel>)
     )]
     internal override RestNewsChannelActor Actor { get; }
 

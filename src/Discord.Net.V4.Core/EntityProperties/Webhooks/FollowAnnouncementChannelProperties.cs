@@ -5,8 +5,8 @@ namespace Discord;
 public sealed class BacklinkFollowAnnouncementChannelProperties : 
     IEntityProperties<FollowAnnouncementChannelParams>
 {
-    [IdHeuristic<INewsChannel>]
-    public required EntityOrId<ulong, INewsChannelActor> AnnouncementChannel { get; set; }
+    [IdHeuristic<IAnnouncementChannel>]
+    public required EntityOrId<ulong, IAnnouncementChannelActor> AnnouncementChannel { get; set; }
 
     internal ulong TargetChannelId { get; }
     

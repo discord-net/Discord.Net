@@ -7,7 +7,7 @@ namespace Discord;
 public partial interface IThreadableChannel :
     ISnowflakeEntity<IThreadableChannelModel>,
     INestedChannel,
-    IThreadableChannelActor
+    IThreadableChannelTrait<IThreadChannelActor.Indexable.BackLink<IThreadableChannel>>
 {
     [SourceOfTruth]
     new IThreadableChannelModel GetModel();

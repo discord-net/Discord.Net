@@ -138,6 +138,8 @@ public class SourceOfTruth : ISyntaxGenerationCombineTask<SourceOfTruth.Generati
             ||
             sourceType.Name.EndsWith("Link")
             ||
+            sourceType.Name.EndsWith("Identity")
+            ||
             sourceType.Name is "Indexable" or "Enumerable" or "Defined" or "Paged"
             ||
             parts.Any(x => x is "Indexable" or "Enumerable" or "Defined" or "Paged");
@@ -204,9 +206,9 @@ public class SourceOfTruth : ISyntaxGenerationCombineTask<SourceOfTruth.Generati
 
             foreach (var iface in interfaces)
             {
-                var targetMembers = sourceOfTruthName == "this" 
-                ? iface.GetMembers().Where(x => x is IPropertySymbol { IsIndexer: true}).ToImmutableArray()
-                : iface.GetMembers(sourceOfTruthName);
+                var targetMembers = sourceOfTruthName == "this"
+                    ? iface.GetMembers().Where(x => x is IPropertySymbol {IsIndexer: true}).ToImmutableArray()
+                    : iface.GetMembers(sourceOfTruthName);
 
                 if (targetMembers.Length > 0)
                 {
@@ -274,9 +276,7 @@ public class SourceOfTruth : ISyntaxGenerationCombineTask<SourceOfTruth.Generati
                 if (!toGenerate.TryGetValue(fullTypeName, out var targetTypeDeclaration))
                     targetTypeDeclaration = new GenerationResult(
                         target.Semantic.GetDeclaredSymbol(target.TypeDeclarationSyntax)!.ContainingNamespace.ToString(),
-                        string.Join("\n",
-                            target.TypeDeclarationSyntax.SyntaxTree.GetRoot().ChildNodes()
-                                .OfType<UsingDirectiveSyntax>()),
+                        target.TypeDeclarationSyntax.GetFormattedUsingDirectives(),
                         SyntaxFactory.TypeDeclaration(
                             target.TypeDeclarationSyntax.Kind(),
                             [],

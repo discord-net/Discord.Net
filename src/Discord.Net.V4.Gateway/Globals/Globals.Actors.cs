@@ -213,7 +213,7 @@ global using GatewayNewsChannels = Discord.Gateway.GatewayEnumerableIndexableLin
     ulong,
     Discord.Gateway.GatewayNewsChannel,
     Discord.Rest.RestNewsChannel,
-    Discord.INewsChannel,
+    Discord.IAnnouncementChannel,
     Discord.Models.IGuildNewsChannelModel,
     System.Collections.Generic.IEnumerable<Discord.Models.IGuildChannelModel>
 >;

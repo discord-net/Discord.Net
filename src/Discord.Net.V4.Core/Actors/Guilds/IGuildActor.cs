@@ -11,8 +11,8 @@ namespace Discord;
 public partial interface IGuildActor :
     IActor<ulong, IGuild>,
     IHasThreadsTrait<
-        IGuildThreadChannelActor, 
-        IGuildThreadChannelActor.Indexable.WithActive.BackLink<IGuildActor>>,
+        IThreadChannelActor, 
+        IThreadChannelActor.Indexable.WithActive.BackLink<IGuildActor>>,
     IInvitableTrait<IGuildInviteActor, IGuildInvite>
 {
     [return: TypeHeuristic(nameof(Sounds))]

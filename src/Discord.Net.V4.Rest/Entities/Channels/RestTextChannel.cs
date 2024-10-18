@@ -6,11 +6,12 @@ namespace Discord.Rest;
 
 [ExtendInterfaceDefaults]
 public partial class RestTextChannelActor :
-    RestThreadableChannelActor,
+    RestGuildChannelActor,
     ITextChannelActor,
     IRestActor<RestTextChannelActor, ulong, RestTextChannel, IGuildTextChannelModel>,
     IRestMessageChannelTrait,
-    IRestIntegrationChannelTrait.WithIncoming.WithChannelFollower
+    IRestIntegrationChannelTrait.WithIncoming.WithChannelFollower,
+    IRestThreadableChannelTrait<RestThreadChannelActor.Indexable.WithArchived.BackLink<RestTextChannelActor>>
 {
     [SourceOfTruth] internal override TextChannelIdentity Identity { get; }
 
@@ -31,7 +32,7 @@ public partial class RestTextChannelActor :
 }
 
 public partial class RestTextChannel :
-    RestThreadableChannel,
+    RestGuildChannel,
     ITextChannel,
     IRestConstructable<RestTextChannel, RestTextChannelActor, IGuildTextChannelModel>
 {

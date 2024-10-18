@@ -1,6 +1,6 @@
 namespace Discord.Rest;
 
-public abstract partial class RestGuildChannelWebhookActor :
+public partial class RestGuildChannelWebhookActor :
     RestWebhookActor,
     IGuildChannelWebhookActor
 {

@@ -163,7 +163,7 @@ public static partial class Routes
 
     public static IApiInOutRoute<FollowAnnouncementChannelParams, Models.Json.FollowedChannel>
         FollowAnnouncementChannel(
-            [IdHeuristic<INewsChannel>] ulong channelId, FollowAnnouncementChannelParams body
+            [IdHeuristic<IAnnouncementChannel>] ulong channelId, FollowAnnouncementChannelParams body
         )
         => new ApiInOutRoute<FollowAnnouncementChannelParams, Models.Json.FollowedChannel>(
             nameof(FollowAnnouncementChannel),
