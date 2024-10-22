@@ -12,6 +12,10 @@ namespace Discord.Rest
     public class RestChannel : RestEntity<ulong>, IChannel, IUpdateable
     {
         #region RestChannel
+
+        /// <inheritdoc />
+        public ChannelType ChannelType { get; internal set; }
+
         /// <inheritdoc />
         public virtual DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
 
@@ -68,7 +72,11 @@ namespace Discord.Rest
                 _ => throw new InvalidOperationException($"Unexpected channel type: {model.Type}"),
             };
         }
-        internal virtual void Update(Model model) { }
+
+        internal virtual void Update(Model model)
+        {
+            ChannelType = model.Type;
+        }
 
         /// <inheritdoc />
         public virtual Task UpdateAsync(RequestOptions options = null) => Task.Delay(0);

@@ -63,6 +63,7 @@ namespace Discord.WebSocket
         }
         internal override void Update(ClientState state, Model model)
         {
+            base.Update(state, model);
             if (model.Name.IsSpecified)
                 Name = model.Name.Value;
             if (model.Icon.IsSpecified)

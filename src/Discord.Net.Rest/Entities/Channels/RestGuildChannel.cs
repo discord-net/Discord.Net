@@ -53,6 +53,7 @@ namespace Discord.Rest
         }
         internal override void Update(Model model)
         {
+            base.Update(model);
             Name = model.Name.Value;
 
             if (model.Position.IsSpecified)

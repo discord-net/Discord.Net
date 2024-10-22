@@ -8,6 +8,7 @@ namespace Discord
 {
     internal sealed class MockedGroupChannel : IGroupChannel
     {
+        public ChannelType ChannelType => ChannelType.Group;
         public IReadOnlyCollection<IUser> Recipients => throw new NotImplementedException();
 
         public string Name => throw new NotImplementedException();

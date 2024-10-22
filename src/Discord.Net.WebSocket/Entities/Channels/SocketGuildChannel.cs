@@ -70,6 +70,7 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         internal override void Update(ClientState state, Model model)
         {
+            base.Update(state, model);
             Name = model.Name.Value;
             Position = model.Position.GetValueOrDefault(0);
 
