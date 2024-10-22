@@ -53,7 +53,7 @@ public sealed class Hanz : IIncrementalGenerator
 
             var logger = _perfLogger.WithCleanLogFile();
 
-            foreach (var entry in _perfTable)
+            foreach (var entry in _perfTable.OrderByDescending(x => x.Value))
             {
                 logger.Log($"{entry.Key}: {entry.Value:c}");
             }
@@ -200,6 +200,8 @@ public sealed class Hanz : IIncrementalGenerator
 
             SetupLogger(context, options);
 
+            GenerationTask.Initialize(context);
+            
             var generationTasks = typeof(Hanz).Assembly.GetTypes()
                 .Where(x => x
                     .GetInterfaces()

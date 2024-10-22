@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Discord.Net.Hanz.Tasks.Actors.V3;
 
-public class LinkActorTargets
+public class LinkActorTargets : GenerationTask
 {
     public enum AssemblyTarget
     {
@@ -95,6 +95,18 @@ public class LinkActorTargets
                     x.Type.AllInterfaces.Any(y => y is {Name: "IEntity"})
                 ).Type;
         }
+    }
+
+    public IncrementalValuesProvider<GenerationTarget> Actors { get; }
+    
+    public LinkActorTargets(Context context, Logger logger) : base(context, logger)
+    {
+        Actors = context.GeneratorContext.SyntaxProvider
+            .CreateSyntaxProvider(
+                IsValid,
+                GetTargetForGeneration
+            )
+            .WhereNonNull();
     }
 
     public static bool IsValid(SyntaxNode node, CancellationToken token = default)

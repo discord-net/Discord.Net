@@ -13,8 +13,10 @@ using LinkTarget = LinkActorTargets.GenerationTarget;
 using Schematic = LinkSchematics.Schematic;
 using LinkType = LinkSchematics.Entry;
 
-public class LinksV4
+public class LinksV4 : GenerationTask
 {
+    
+
     public static Logger Logger =>
         Hanz.DefaultLogger.GetSubLogger(nameof(LinksV4));
 
@@ -69,6 +71,13 @@ public class LinksV4
         context.RegisterSourceOutput(schematics, GenerateSchematics!);
     }
 
+    public LinksV4(Context context, Logger logger) : base(context, logger)
+    {
+        var schematics = context.GetTask<LinkSchematics>();
+        
+        context.GeneratorContext.SyntaxProvider.CreateSyntaxProvider().Select()
+    }
+    
     private static void GenerateIdentities(MixinSourceProductionContext context, ImmutableArray<LinkTarget> actors)
     {
         var identities = actors
@@ -184,6 +193,7 @@ public class LinksV4
         SourceProductionContext context,
         Schematic schematic)
     {
+        TypeRef
         if (schematic.Compilation.Assembly.Name is not "Discord.Net.V4.Core") return;
 
         context.AddSource(

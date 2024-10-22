@@ -446,29 +446,9 @@ public abstract class LinkNode : IEquatable<LinkNode>
             // Add the nodes we found for the sample into the final result set.
             result.UnionWith(searchNodes);
             continue;
-
-            void LogSampleResult()
-            {
-                logger.Log($"Sample: {sampleName} ({sample}/{bounds}): {searchNodes.Count} new nodes:");
-
-                foreach (var node in searchNodes)
-                {
-                    logger.Log($" - {node.FormatAsTypePath()} ({node.GetType().Name})");
-                }
-            }
         }
 
         return result;
-
-        void LogResults()
-        {
-            logger.Log("Result:");
-
-            foreach (var node in result)
-            {
-                logger.Log($" - {node.FormatAsTypePath()} ({node.GetType().Name})");
-            }
-        }
 
         void LogProduct()
         {

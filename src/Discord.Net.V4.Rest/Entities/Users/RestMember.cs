@@ -37,14 +37,16 @@ public partial class RestMemberActor :
             member
         );
 
-        Roles = new(this, client, Guild.Roles);
+        Roles = RestRoleActor.Indexable.BackLink<RestMemberActor>.Create(
+            this,
+            client,
+            Guild.Roles
+        );
     }
 
     [SourceOfTruth]
     internal virtual RestMember CreateEntity(IMemberModel model)
         => RestMember.Construct(Client, this, model);
-
-    IUserActor IUserRelationship.User => this;
 }
 
 [ExtendInterfaceDefaults]
@@ -84,11 +86,11 @@ public partial class RestMember :
         Actor = actor;
         Model = model;
 
-        Roles = new(
+        Roles = RestRoleActor.Defined.Indexable.BackLink<RestMember>.Create(
             this,
+            model.RoleIds.ToList().AsReadOnly(),
             client,
-            actor.Roles,
-            model.RoleIds
+            actor.Roles
         );
     }
 

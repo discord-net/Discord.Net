@@ -51,8 +51,8 @@ public readonly struct HashCode : IEquatable<HashCode>
     /// <typeparam name="T">The type of the items.</typeparam>
     /// <param name="items">The collection.</param>
     /// <returns>The new hash code.</returns>
-    public static HashCode OfEach<T>(IEnumerable<T>? items) =>
-        items == null ? new HashCode(0) : new HashCode(GetHashCode(items, 0));
+    public static HashCode OfEach<T>(IEnumerable<T>? items, Func<T, int>? hashcodeFunc = null) =>
+        items == null ? new HashCode(0) : new HashCode(GetHashCode(items, hashcodeFunc ?? GetHashCode, 0));
 
     /// <summary>
     /// Adds the hash code of the specified item.
@@ -69,14 +69,14 @@ public readonly struct HashCode : IEquatable<HashCode>
     /// <typeparam name="T">The type of the items.</typeparam>
     /// <param name="items">The collection.</param>
     /// <returns>The new hash code.</returns>
-    public HashCode AndEach<T>(IEnumerable<T>? items)
+    public HashCode AndEach<T>(IEnumerable<T>? items, Func<T, int>? hashcodeFunc = null)
     {
         if (items == null)
         {
             return new HashCode(_value);
         }
 
-        return new HashCode(GetHashCode(items, _value));
+        return new HashCode(GetHashCode(items, hashcodeFunc ?? GetHashCode, _value));
     }
 
     /// <inheritdoc />
@@ -106,18 +106,18 @@ public readonly struct HashCode : IEquatable<HashCode>
 
     private static int GetHashCode<T>(T item) => item?.GetHashCode() ?? 0;
 
-    private static int GetHashCode<T>(IEnumerable<T> items, int startHashCode)
+    private static int GetHashCode<T>(IEnumerable<T> items, Func<T, int> hashcodeFunc, int startHashCode)
     {
         var temp = startHashCode;
 
         using var enumerator = items.GetEnumerator();
         if (enumerator.MoveNext())
         {
-            temp = CombineHashCodes(temp, GetHashCode(enumerator.Current));
+            temp = CombineHashCodes(temp, hashcodeFunc(enumerator.Current));
 
             while (enumerator.MoveNext())
             {
-                temp = CombineHashCodes(temp, GetHashCode(enumerator.Current));
+                temp = CombineHashCodes(temp, hashcodeFunc(enumerator.Current));
             }
         }
         else
@@ -127,4 +127,7 @@ public readonly struct HashCode : IEquatable<HashCode>
 
         return temp;
     }
+
+    private static int GetHashCode<T>(IEnumerable<T> items, int startHashCode)
+        => GetHashCode(items, GetHashCode, startHashCode);
 }

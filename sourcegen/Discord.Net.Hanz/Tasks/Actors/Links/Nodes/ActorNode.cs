@@ -499,6 +499,14 @@ public class ActorNode :
                     $"internal new {Target.Actor} GetActor({Target.Id} id) => Provider.GetActor(id);",
                     $"internal new {Target.Entity} CreateEntity({Target.Model} model);",
                 ]);
+
+                if (Ancestors.Count > 0)
+                {
+                    linkMembers.AddRange([
+                        $"internal new {FormattedActorProvider} Provider {{ get; }}",
+                        $"{FormattedActorProvider} {FormattedRestLinkType}.Provider => Provider;"
+                    ]);
+                }
                 break;
             case LinkActorTargets.AssemblyTarget.Core:
                 if (RedefinesRootInterfaceMembers)
@@ -542,6 +550,15 @@ public class ActorNode :
                 $"{ancestor.Target.Actor} {ancestorActorProviderTarget}.GetActor({Target.Id} id) => GetActor(id);",
                 $"{ancestor.Target.Entity} {ancestorEntityProviderTarget}.CreateEntity({ancestor.Target.Model} model) => CreateEntity(model);",
             ]);
+            
+            switch (Target.Assembly)
+            {
+                case LinkActorTargets.AssemblyTarget.Rest:
+                    linkMembers.Add(
+                        $"{ancestor.FormattedActorProvider} {(ancestor.Ancestors.Count > 0 ? $"{ancestor.Target.Actor}.Link" : ancestor.FormattedRestLinkType)}.Provider => Provider;"    
+                    );
+                    break;
+            }
         }
 
         members.Add(

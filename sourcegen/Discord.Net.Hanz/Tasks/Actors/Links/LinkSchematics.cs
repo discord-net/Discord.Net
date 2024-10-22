@@ -1,20 +1,22 @@
+using System.Collections.Immutable;
+using System.Reflection;
 using Discord.Net.Hanz.Tasks.Actors.Links.V4;
+using Discord.Net.Hanz.Utils.Bakery;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Discord.Net.Hanz.Tasks.Actors.V3;
 
-public static class LinkSchematics
+public class LinkSchematics : GenerationTask
 {
     public class Schematic : IEquatable<Schematic>
     {
         public Entry Root { get; }
-        public Compilation Compilation { get; }
+        //public Compilation Compilation { get; }
 
-        public Schematic(Entry root, Compilation compilation)
+        public Schematic(Entry root)
         {
             Root = root;
-            Compilation = compilation;
         }
 
         public bool Equals(Schematic other)
@@ -25,17 +27,15 @@ public static class LinkSchematics
     }
 
     public class Entry(
-        INamedTypeSymbol symbol,
-        TypeDeclarationSyntax syntax,
-        HashSet<Entry> children,
-        AttributeData attribute
+        TypeRef type,
+        HashSet<Entry> children
     ) : IEquatable<Entry>
     {
         public override int GetHashCode()
             => HashCode
-                .Of(Symbol.ToDisplayString())
+                .Of(Type)
                 .AndEach(Children);
-        
+
         // {
         //     unchecked
         //     {
@@ -47,22 +47,48 @@ public static class LinkSchematics
 
         public HashSet<Entry> Children { get; } = children;
 
-        public INamedTypeSymbol Symbol { get; } = symbol;
-        public TypeDeclarationSyntax Syntax { get; } = syntax;
-        public AttributeData Attribute { get; } = attribute;
+        public TypeRef Type { get; } = type;
+        //public TypeDeclarationSyntax Syntax { get; } = syntax;
+        //public AttributeData Attribute { get; } = attribute;
 
         public bool Equals(Entry other)
         {
             return
                 Children.SetEquals(other.Children)
                 &&
-                Symbol.ToDisplayString().Equals(other.Symbol.ToDisplayString())
-                &&
-                Attribute.ToString().Equals(other.Attribute.ToString())
-                &&
-                Symbol.MemberNames.SequenceEqual(other.Symbol.MemberNames);
+                Type.Equals(other.Type);
         }
     }
+
+    public IncrementalValuesProvider<Schematic> SourceSchematics { get; }
+    public IncrementalValueProvider<Schematic?> NonCoreSchematics { get; }
+    public IncrementalValuesProvider<Schematic> Schematics { get; }
+
+    public LinkSchematics(Context context, Logger logger) : base(context, logger)
+    {
+        SourceSchematics = context.GeneratorContext.SyntaxProvider
+            .CreateSyntaxProvider(
+                IsPotentialSchematic,
+                MapSchematic
+            )
+            .Where(x => x is not null)!;
+
+        NonCoreSchematics = context.GeneratorContext
+            .CompilationProvider
+            .Select(MapNonCoreSchematic);
+
+        Schematics = SourceSchematics
+            .Collect()
+            .Combine(NonCoreSchematics)
+            .SelectMany(IEnumerable<Schematic> (x, _) =>
+                x.Left.Length > 0
+                    ? x.Left
+                    : x.Right is not null
+                        ? new[] {x.Right}.ToImmutableArray()
+                        : ImmutableArray<Schematic>.Empty
+            );
+    }
+
 
     public static bool IsPotentialSchematic(SyntaxNode node, CancellationToken token)
         => node is TypeDeclarationSyntax {AttributeLists.Count: > 0} && node.Parent is not TypeDeclarationSyntax;
@@ -88,7 +114,7 @@ public static class LinkSchematics
 
             if (root is null) return null;
 
-            return new Schematic(root, context.SemanticModel.Compilation);
+            return new Schematic(root);
         }
         finally
         {
@@ -128,7 +154,7 @@ public static class LinkSchematics
             logger.Flush();
         }
     }
-    
+
     public static Schematic? MapSchematic(
         INamedTypeSymbol symbol,
         Compilation compilation,
@@ -148,7 +174,7 @@ public static class LinkSchematics
 
             if (root is null) return null;
 
-            return new Schematic(root, compilation);
+            return new Schematic(root);
         }
         finally
         {
@@ -206,10 +232,7 @@ public static class LinkSchematics
             }
         }
 
-        if (symbol.DeclaringSyntaxReferences.First().GetSyntax(token) is not TypeDeclarationSyntax syntax)
-            return null;
-
-        return new(symbol, syntax, childrenEntries, attribute);
+        return new(new(symbol), childrenEntries);
     }
 
     private static bool IsLinkSchematicAttribute(AttributeData attribute)

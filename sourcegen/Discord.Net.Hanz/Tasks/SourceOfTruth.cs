@@ -49,14 +49,7 @@ public class SourceOfTruth : ISyntaxGenerationCombineTask<SourceOfTruth.Generati
         }
 
         public override int GetHashCode()
-        {
-            unchecked
-            {
-                var hashcode = TypeDeclarationSyntax.GetHashCode();
-                hashcode = (hashcode * 397) ^ (MemberDeclarationSyntax?.GetHashCode() ?? 0);
-                return (hashcode * 397) ^ SymbolEqualityComparer.Default.GetHashCode(TypeSymbol);
-            }
-        }
+            => HashCode.Of(TypeSymbol).And(MemberDeclarationSyntax.ToString());
 
         public static bool operator ==(GenerationTarget? left, GenerationTarget? right) => Equals(left, right);
 
