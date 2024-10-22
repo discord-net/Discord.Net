@@ -97,9 +97,16 @@ public sealed class Logger : ILogger, IEquatable<Logger>
 
         lock (_syncRoot)
         {
-            if (clearLogs) _logs.Clear();
-            if (File.Exists(_logFilePath))
-                File.Delete(_logFilePath);
+            try
+            {
+                if (clearLogs) _logs.Clear();
+                if (File.Exists(_logFilePath))
+                    File.Delete(_logFilePath);
+            }
+            catch
+            {
+                // ignored
+            }
         }
     }
 

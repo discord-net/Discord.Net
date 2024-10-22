@@ -10,8 +10,11 @@ public abstract class Node
 
     private readonly IncrementalValuesProvider<LinksV5.NodeContext> _context;
 
-    protected Node(IncrementalValuesProvider<LinksV5.NodeContext> context)
+    protected Logger Logger { get; }
+
+    protected Node(IncrementalValuesProvider<LinksV5.NodeContext> context, Logger logger)
     {
+        Logger = logger;
         _context = context;
     }
 
@@ -39,16 +42,34 @@ public abstract class Node
         return provider;
     }
 
-    public static TNode GetInstance<TNode>(IncrementalValuesProvider<LinksV5.NodeContext> context)
+    public static IncrementalValuesProvider<StatefulGeneration<ActorNode.IntrospectedBuildState>> Create(
+        IncrementalValuesProvider<LinksV5.NodeContext> context
+    ) => GetInstance<ActorNode>(context).TypeProvider;
+
+    private static TNode GetInstance<TNode>(IncrementalValuesProvider<LinksV5.NodeContext> context)
         where TNode : Node
         => (TNode) GetInstance(typeof(TNode), context);
 
-    public static Node GetInstance(Type type, IncrementalValuesProvider<LinksV5.NodeContext> context)
+    private static Node GetInstance(Type type, IncrementalValuesProvider<LinksV5.NodeContext> context)
     {
         if (!_nodes.TryGetValue(type, out var node))
-            _nodes[type] = node = (Node) Activator.CreateInstance(type, context);
+            _nodes[type] = node = (Node) Activator.CreateInstance(type, context, Logger.CreateForTask(type.Name));
 
         return node;
+    }
+    
+    public static string GetFriendlyName(TypeRef type, bool forceInterfaceRules = false)
+    {
+        var name = type.Name;
+
+        if (forceInterfaceRules || type.TypeKind is TypeKind.Interface)
+            name = type.Name.Remove(0, 1);
+
+        return name
+            .Replace("Trait", string.Empty)
+            .Replace("Actor", string.Empty)
+            .Replace("Gateway", string.Empty)
+            .Replace("Rest", string.Empty);
     }
 }
 

@@ -1,52 +1,74 @@
+using System.Diagnostics;
 using System.Reflection;
+using Discord.Net.Hanz.Tasks.Actors.Links.V5;
+using Discord.Net.Hanz.Tasks.Actors.V3;
 using Microsoft.CodeAnalysis;
 
 namespace Discord.Net.Hanz;
 
 public abstract class GenerationTask
 {
+    private static readonly Dictionary<
+        Type,
+        Func<IncrementalGeneratorInitializationContext, Logger, GenerationTask>
+    > _generators = new()
+    {
+        {typeof(LinksV5), (ctx, logger) => new LinksV5(ctx, logger)},
+        {typeof(LinkActorTargets), (ctx, logger) => new LinkActorTargets(ctx, logger)},
+        {typeof(LinkSchematics), (ctx, logger) => new LinkSchematics(ctx, logger)},
+    };
+
     private static readonly Dictionary<Type, GenerationTask> _tasks = [];
 
     private static readonly Logger _logger = Logger.CreateForTask("GenerationTaskBuilder").WithCleanLogFile();
-    
-    public GenerationTask(Context context, Logger logger)
+
+    public GenerationTask(IncrementalGeneratorInitializationContext context, Logger logger)
     {
     }
 
     public static void Initialize(IncrementalGeneratorInitializationContext context)
     {
+        _tasks.Clear();
         _logger.Clean();
-        
-        var queue = new Queue<Type>(
-            typeof(GenerationTask).Assembly.GetTypes()
-                .Where(x => !x.IsAbstract && typeof(GenerationTask).IsAssignableFrom(x))
-        );
 
-        var taskContext = new Context(context);
-
-        _logger.Log($"{queue.Count} tasks to initialize...");
-        
-        while (queue.Count > 0)
+        try
         {
-            var type = queue.Dequeue();
-            
-            _logger.Log($"Initializing {type}...");
-
-            if (_tasks.ContainsKey(type)) continue;
-
-            var taskLogger = Logger.CreateForTask(type.Name).WithCleanLogFile();
-            
-            _tasks[type] = (GenerationTask) Activator.CreateInstance(
-                type, taskContext, taskLogger
+            var queue = new Queue<Type>(
+                typeof(GenerationTask).Assembly.GetTypes()
+                    .Where(x => !x.IsAbstract && typeof(GenerationTask).IsAssignableFrom(x))
             );
-            
-            taskLogger.Flush();
+
+            _logger.Log($"{queue.Count} tasks to initialize...");
+
+            while (queue.Count > 0)
+            {
+                var type = queue.Dequeue();
+
+                _logger.Log($"Initializing {type}...");
+
+                if (_tasks.ContainsKey(type) || !_generators.ContainsKey(type)) continue;
+
+                var taskLogger = Logger.CreateForTask(type.Name).WithCleanLogFile();
+
+                _tasks[type] = _generators[type](context, taskLogger);
+
+                taskLogger.Flush();
+            }
         }
-        
-        _logger.Flush();
+        catch (Exception x)
+        {
+            _logger.Log($"Failed: {x}");
+        }
+        finally
+        {
+            _logger.Flush();
+        }
     }
 
-    private static T GetOrCreate<T>(Context context) where T : GenerationTask
+    public T GetTask<T>(IncrementalGeneratorInitializationContext context) where T : GenerationTask
+        => GetOrCreate<T>(context);
+
+    private static T GetOrCreate<T>(IncrementalGeneratorInitializationContext context) where T : GenerationTask
     {
         if (_tasks.TryGetValue(typeof(T), out var rawTask))
         {
@@ -56,23 +78,13 @@ public abstract class GenerationTask
             return task;
         }
 
-        var logger = Hanz.DefaultLogger.GetSubLogger(typeof(T).Name);
-
-        var instance = (T) Activator.CreateInstance(typeof(T), context, logger);
+        var logger = Logger.CreateForTask(typeof(T).Name).WithCleanLogFile();
+        
+        var instance = (T) _generators[typeof(T)](context, logger);
         _tasks[typeof(T)] = instance;
+        
+        logger.Flush();
+        
         return instance;
-    }
-
-    public readonly struct Context
-    {
-        public readonly IncrementalGeneratorInitializationContext GeneratorContext;
-
-        public Context(IncrementalGeneratorInitializationContext context)
-        {
-            GeneratorContext = context;
-        }
-
-        public T GetTask<T>() where T : GenerationTask
-            => GetOrCreate<T>(this);
     }
 }

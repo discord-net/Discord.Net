@@ -21,6 +21,14 @@ public readonly record struct ActorInfo(
 {
     public bool IsCore => Assembly is LinkActorTargets.AssemblyTarget.Core;
 
+    public string FormattedRelation
+        => $"Discord.IRelation<{Id}, {Entity}>";
+    
+    public string FormattedRelationship
+        => $"Discord.IRelationship<{Actor}, {Id}, {Entity}>";
+    public string FormattedCanonicalRelationship
+        => $"Discord.ICanonicalRelationship<{Actor}, {Id}, {Entity}>";
+    
     public string FormattedIdentifiable
         => $"Discord.IIdentifiable<{Id}, {Entity}, {Actor}, {Model}>";
 

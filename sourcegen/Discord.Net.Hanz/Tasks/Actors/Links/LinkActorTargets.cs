@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -36,24 +37,24 @@ public class LinkActorTargets : GenerationTask
         public ITypeSymbol Id { get; } = id;
         public AssemblyTarget Assembly { get; } = assembly;
 
-        public GenerationTarget? Update(Compilation compilation)
-        {
-            var tree = compilation.SyntaxTrees.FirstOrDefault(x => x.IsEquivalentTo(Syntax.SyntaxTree));
-
-            if (tree is null) return null;
-
-            var newNode = tree.GetRoot()
-                .DescendantNodes()
-                .OfType<TypeDeclarationSyntax>()
-                .FirstOrDefault(x => x.IsEquivalentTo(Syntax));
-
-            if (newNode is null) return null;
-            
-            return GetTargetForGeneration(
-                compilation.GetSemanticModel(tree),
-                newNode
-            );
-        }
+        // public GenerationTarget? Update(Compilation compilation)
+        // {
+        //     var tree = compilation.SyntaxTrees.FirstOrDefault(x => x.IsEquivalentTo(Syntax.SyntaxTree));
+        //
+        //     if (tree is null) return null;
+        //
+        //     var newNode = tree.GetRoot()
+        //         .DescendantNodes()
+        //         .OfType<TypeDeclarationSyntax>()
+        //         .FirstOrDefault(x => x.IsEquivalentTo(Syntax));
+        //
+        //     if (newNode is null) return null;
+        //     
+        //     return GetTargetForGeneration(
+        //         compilation.GetSemanticModel(tree),
+        //         newNode
+        //     );
+        // }
 
         public bool Equals(GenerationTarget other)
             => GetHashCode() == other.GetHashCode();
@@ -98,10 +99,14 @@ public class LinkActorTargets : GenerationTask
     }
 
     public IncrementalValuesProvider<GenerationTarget> Actors { get; }
+
+    private readonly Logger _logger;
     
-    public LinkActorTargets(Context context, Logger logger) : base(context, logger)
+    public LinkActorTargets(IncrementalGeneratorInitializationContext context, Logger logger) : base(context, logger)
     {
-        Actors = context.GeneratorContext.SyntaxProvider
+        _logger = logger;
+        
+        Actors = context.SyntaxProvider
             .CreateSyntaxProvider(
                 IsValid,
                 GetTargetForGeneration
@@ -109,7 +114,7 @@ public class LinkActorTargets : GenerationTask
             .WhereNonNull();
     }
 
-    public static bool IsValid(SyntaxNode node, CancellationToken token = default)
+    public bool IsValid(SyntaxNode node, CancellationToken token = default)
     {
         return node is TypeDeclarationSyntax;
     }
@@ -189,12 +194,12 @@ public class LinkActorTargets : GenerationTask
         );
     }
 
-    public static GenerationTarget? GetTargetForGeneration(
+    public GenerationTarget? GetTargetForGeneration(
         GeneratorSyntaxContext context,
         CancellationToken token = default
     ) => GetTargetForGeneration(context.SemanticModel, context.Node);
 
-    public static GenerationTarget? GetTargetForGeneration(
+    public GenerationTarget? GetTargetForGeneration(
         SemanticModel semantic,
         SyntaxNode node)
     {

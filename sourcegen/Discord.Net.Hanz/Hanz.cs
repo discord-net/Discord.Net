@@ -4,8 +4,10 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 using System.Collections.Concurrent;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Reflection;
 using Discord.Net.Hanz.Tasks.Actors.Links.V4;
+using Discord.Net.Hanz.Tasks.Actors.Links.V5;
 using Discord.Net.Hanz.Tasks.Actors.V3;
 
 namespace Discord.Net.Hanz;
@@ -192,6 +194,7 @@ public sealed class Hanz : IIncrementalGenerator
 
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
+        
         try
         {
             RootLogger.DeleteLogFile();
@@ -201,6 +204,7 @@ public sealed class Hanz : IIncrementalGenerator
             SetupLogger(context, options);
 
             GenerationTask.Initialize(context);
+            //new LinksV5(context, RootLogger);
             
             var generationTasks = typeof(Hanz).Assembly.GetTypes()
                 .Where(x => x
@@ -258,7 +262,7 @@ public sealed class Hanz : IIncrementalGenerator
             );
             
             //LinksV3.Register(context);
-            LinksV4.Register(context);
+            //LinksV4.Register(context);
 
             RootLogger.Flush();
         }

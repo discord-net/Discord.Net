@@ -26,6 +26,19 @@ public sealed class ImmutableEquatableArray<T> :
         );
     }
 
+    public ImmutableEquatableArray<T> AddRange(IEnumerable<T> values)
+    {
+        if (Count == 0)
+            return new ImmutableEquatableArray<T>(values);
+
+        return new ImmutableEquatableArray<T>(
+            [.._values, ..values]
+        );
+    }
+
+    public ImmutableEquatableArray<T> AddRange(params T[] values)
+        => AddRange((IEnumerable<T>) values);
+
     public bool Equals(ImmutableEquatableArray<T>? other)
         => other != null && ((ReadOnlySpan<T>) _values).SequenceEqual(other._values);
 

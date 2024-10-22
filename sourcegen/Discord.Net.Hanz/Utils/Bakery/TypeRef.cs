@@ -17,8 +17,10 @@ public sealed class TypeRef(ITypeSymbol type) : IEquatable<TypeRef>
     );
     
     public string Name { get; } = type.Name;
+    public string Namespace { get; } = type.ContainingNamespace.ToString();
 
     public string DisplayString { get; } = type.ToDisplayString();
+    public string MetadataName { get; } = type.ToFullMetadataName();
     
     public string FullyQualifiedName { get; } = type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
     public Accessibility Accessibility { get; } = type.DeclaredAccessibility;
@@ -28,6 +30,8 @@ public sealed class TypeRef(ITypeSymbol type) : IEquatable<TypeRef>
     public SpecialType SpecialType { get; } = type.OriginalDefinition.SpecialType;
 
     public bool CanBeNull => !IsValueType || SpecialType is SpecialType.System_Nullable_T;
+
+    public override string ToString() => FullyQualifiedName;
 
     public bool Equals(TypeRef? other) => other != null && FullyQualifiedName == other.FullyQualifiedName;
     public override bool Equals(object? obj) => Equals(obj as TypeRef);

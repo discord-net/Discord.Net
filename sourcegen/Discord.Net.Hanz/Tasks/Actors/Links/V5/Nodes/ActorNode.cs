@@ -9,7 +9,8 @@ public class ActorNode : Node
 {
     public readonly record struct State(
         string? UserSpecifiedRelationshipName,
-        ActorInfo ActorInfo
+        ActorInfo ActorInfo,
+        ImmutableEquatableArray<string> InheritedCanonicalRelationships
     ) : IHasActorInfo
     {
         public static State Create(LinksV5.NodeContext context, CancellationToken token)
@@ -19,7 +20,13 @@ public class ActorNode : Node
                     .GetAttributes()
                     .FirstOrDefault(x => x.AttributeClass?.Name == "RelationshipNameAttribute")
                     ?.ConstructorArguments[0].Value as string,
-                ActorInfo: ActorInfo.Create(context)
+                ActorInfo: ActorInfo.Create(context),
+                InheritedCanonicalRelationships: new(
+                    context.Target.GetCoreActor()
+                        .Interfaces
+                        .Where(x => x.ToString().EndsWith("CanonicalRelationship"))
+                        .Select(x => x.Name.Replace(".CanonicalRelationship", string.Empty))
+                )
             );
         }
     }
@@ -30,42 +37,131 @@ public class ActorNode : Node
     ) : IHasActorInfo
     {
         public ActorInfo ActorInfo => State.ActorInfo;
+
+        public bool RedefinesRootInterfaceMemebrs =>
+            !State.ActorInfo.IsCore || AncestralInfo.EntityAssignableAncestors.Count > 0;
     }
-    
+
+    public readonly record struct IntrospectedBuildState(
+        BuildState BuildState,
+        ImmutableEquatableArray<IntrospectedBuildState> Ancestors,
+        ImmutableEquatableArray<IntrospectedBuildState> EntityAssignableAncestors
+    ) : IHasActorInfo
+    {
+        public ActorInfo ActorInfo => BuildState.ActorInfo;
+
+        public bool RedefinesRootInterfaceMemebrs =>
+            !BuildState.ActorInfo.IsCore || EntityAssignableAncestors.Count > 0;
+
+        public bool CanonicalRelationshipIsRedefined
+        {
+            get
+            {
+                var ours = RelationshipName;
+                return Ancestors.Any(x => x.RelationshipName == ours);
+            }
+        }
+
+        public string RelationshipName =>
+            BuildState.State.UserSpecifiedRelationshipName
+            ??
+            Ancestors
+                .Select(x => x.BuildState.State.UserSpecifiedRelationshipName)
+                .FirstOrDefault(x => x is not null)
+            ??
+            GetFriendlyName(BuildState.ActorInfo.Actor);
+    }
+
     public readonly record struct ActorAncestralInfo(
         string Actor,
         ImmutableEquatableArray<string> EntityAssignableAncestors,
         ImmutableEquatableArray<string> Ancestors
     );
 
-    public IncrementalValuesProvider<State> StateProvider { get; }
-    public IncrementalValuesProvider<StatefulGeneration<BuildState>> TypeProvider { get; }
-
+    public IncrementalValuesProvider<StatefulGeneration<IntrospectedBuildState>> TypeProvider { get; }
 
     public ActorNode(
-        IncrementalValuesProvider<LinksV5.NodeContext> context
-    ) : base(context)
+        IncrementalValuesProvider<LinksV5.NodeContext> context,
+        Logger logger
+    ) : base(context, logger)
     {
-        StateProvider = context.Select(State.Create);
-
-        TypeProvider = StateProvider
-            .Combine(context
-                .Collect()
-                .Select(MapAncestralInfo)
-            )
-            .Select((x, _) =>
-                new BuildState(
-                    x.Left,
-                    x.Right.FirstOrDefault(y => y.Actor == x.Left.ActorInfo.Actor.DisplayString)
-                )
-            )
-            .Select(Build);
+        logger.Log("Initialized");
 
         TypeProvider = AddChildren(
-            TypeProvider,
+            context
+                .Select(State.Create)
+                .Combine(context
+                    .Collect()
+                    .Select(MapAncestralInfo)
+                )
+                .Select((x, _) =>
+                    new BuildState(
+                        x.Left,
+                        x.Right.FirstOrDefault(y => y.Actor == x.Left.ActorInfo.Actor.DisplayString)
+                    )
+                )
+                .Select(CreatePartialContainer)
+                .Collect()
+                .SelectMany(Introspect)
+                .Select(CreateLinkInterface)
+                .Select(CreateRelationshipsTypes),
             typeof(BackLinkNode),
             typeof(ExtensionNode)
         );
+
+        logger.Flush();
+    }
+
+    private static IEnumerable<StatefulGeneration<IntrospectedBuildState>> Introspect(
+        ImmutableArray<StatefulGeneration<BuildState>> states,
+        CancellationToken token
+    )
+    {
+        var table = new Dictionary<string, IntrospectedBuildState>();
+
+        foreach (var build in states)
+        {
+            yield return new StatefulGeneration<IntrospectedBuildState>(
+                CreateIntrospected(build.State),
+                build.Spec
+            );
+
+            token.ThrowIfCancellationRequested();
+        }
+
+        yield break;
+
+        IntrospectedBuildState Find(string name)
+        {
+            if (table.TryGetValue(name, out var state))
+                return state;
+
+            return table[name] = CreateIntrospected(
+                states
+                    .First(x => x.State.ActorInfo.Actor.DisplayString == name)
+                    .State
+            );
+        }
+
+        IntrospectedBuildState CreateIntrospected(
+            BuildState context)
+        {
+            var ancestors = context.AncestralInfo.Ancestors.Select(Find).ToArray();
+
+            return new IntrospectedBuildState(
+                BuildState: context,
+                Ancestors: new ImmutableEquatableArray<IntrospectedBuildState>(
+                    ancestors
+                ),
+                EntityAssignableAncestors: new ImmutableEquatableArray<IntrospectedBuildState>(
+                    ancestors.Where(x => context
+                        .AncestralInfo
+                        .EntityAssignableAncestors
+                        .Contains(x.ActorInfo.Actor.DisplayString)
+                    )
+                )
+            );
+        }
     }
 
     private static ImmutableEquatableArray<ActorAncestralInfo> MapAncestralInfo(
@@ -91,16 +187,245 @@ public class ActorNode : Node
         );
     }
 
-    public StatefulGeneration<BuildState> Build(BuildState state, CancellationToken token)
+    public StatefulGeneration<BuildState> CreatePartialContainer(BuildState state, CancellationToken token)
     {
-        var type = TypeSpec.From(state.ActorInfo.Actor) with
-        {
-            Modifiers = new(["partial"]),
-        };
+        var logger = Logger
+            .GetSubLogger(state.ActorInfo.Assembly.ToString())
+            .GetSubLogger(state.ActorInfo.Actor.MetadataName)
+            .GetSubLogger(nameof(CreatePartialContainer))
+            .WithCleanLogFile();
 
-        return new StatefulGeneration<BuildState>(
-            state,
-            type
+        logger.Log($"Generating: {state}");
+
+        try
+        {
+            var type = TypeSpec.From(state.ActorInfo.Actor) with
+            {
+                Modifiers = new(["partial"]),
+            };
+
+            return new StatefulGeneration<BuildState>(
+                state,
+                type
+            );
+        }
+        finally
+        {
+            logger.Flush();
+        }
+    }
+
+    public StatefulGeneration<IntrospectedBuildState> CreateRelationshipsTypes(
+        StatefulGeneration<IntrospectedBuildState> context,
+        CancellationToken token)
+    {
+        if (!context.State.ActorInfo.IsCore) return context;
+
+        return context with
+        {
+            Spec = context.Spec
+                .AddNestedType(CreateRelationshipType(context.State))
+                .AddNestedType(CreateCanonicalRelationshipType(context.State))
+        };
+    }
+
+    private TypeSpec CreateCanonicalRelationshipType(IntrospectedBuildState state)
+    {
+        var type =
+            new TypeSpec(
+                    "CanonicalRelationship",
+                    TypeKind.Interface,
+                    Bases: new([
+                        "Relationship",
+                        state.ActorInfo.FormattedCanonicalRelationship
+                    ])
+                )
+                .AddBases(state.Ancestors.Select(x => $"{x.ActorInfo.Actor}.CanonicalRelationship"));
+
+        foreach (var ancestor in state.Ancestors)
+        {
+            type = type
+                .AddInterfacePropertyOverload(
+                    ancestor.ActorInfo.Actor.FullyQualifiedName,
+                    $"{ancestor.ActorInfo.Actor}.Relationship",
+                    ancestor.RelationshipName,
+                    state.RelationshipName
+                );
+        }
+
+        // conflicts
+        foreach
+        (
+            var group
+            in state.Ancestors
+                .Prepend(state)
+                .GroupBy(
+                    x => x.ActorInfo.Entity,
+                    (key, x) => (Entity: key, Nodes: x.ToArray())
+                )
+                .Where(x => x.Nodes.Length > 1)
+        )
+        {
+            var node = group.Nodes[0];
+            type = type
+                .AddInterfacePropertyOverload(
+                    node.ActorInfo.Id.FullyQualifiedName,
+                    node.ActorInfo.FormattedRelation,
+                    "RelationshipId",
+                    $"{node.RelationshipName}.Id"
+                );
+        }
+
+        if (state.CanonicalRelationshipIsRedefined)
+        {
+            type = type
+                .AddProperty(
+                    new PropertySpec(
+                        state.ActorInfo.Actor.FullyQualifiedName,
+                        state.RelationshipName,
+                        Accessibility.Internal,
+                        new(["new"])
+                    )
+                )
+                .AddInterfacePropertyOverload(
+                    state.ActorInfo.Actor.FullyQualifiedName,
+                    $"{state.ActorInfo.Actor}.Relationship",
+                    state.RelationshipName,
+                    state.RelationshipName
+                );
+        }
+
+        return type
+            .AddBases(state
+                .Ancestors
+                .Select(x => $"{x.ActorInfo.Actor}.CanonicalRelationship")
+            );
+    }
+
+    private TypeSpec CreateRelationshipType(IntrospectedBuildState state)
+    {
+        return
+            new TypeSpec(
+                    "Relationship",
+                    TypeKind.Interface,
+                    Bases: new([state.ActorInfo.FormattedRelationship])
+                )
+                .AddInterfacePropertyOverload(
+                    state.ActorInfo.Actor.FullyQualifiedName,
+                    state.ActorInfo.FormattedRelationship,
+                    "RelationshipActor",
+                    state.RelationshipName
+                )
+                .AddProperty(new PropertySpec(
+                    state.ActorInfo.Actor.FullyQualifiedName,
+                    state.RelationshipName,
+                    Accessibility.Internal
+                ));
+    }
+
+    public StatefulGeneration<IntrospectedBuildState> CreateLinkInterface(
+        StatefulGeneration<IntrospectedBuildState> context,
+        CancellationToken token)
+    {
+        var linkType = new TypeSpec(
+            "Link",
+            TypeKind.Interface,
+            Bases: new([
+                context.State.ActorInfo.FormattedLink
+            ])
         );
+
+        if (!context.State.ActorInfo.IsCore)
+            linkType = linkType.AddBases(context.State.ActorInfo.FormattedCoreLink);
+
+        if (context.State.RedefinesRootInterfaceMemebrs)
+        {
+            linkType = linkType
+                .AddInterfaceOverloadMethod(
+                    context.State.ActorInfo.Actor.FullyQualifiedName,
+                    context.State.ActorInfo.FormattedActorProvider,
+                    "GetActor",
+                    [
+                        new ParameterSpec(
+                            context.State.ActorInfo.Id.FullyQualifiedName,
+                            "id"
+                        )
+                    ],
+                    expression: "GetActor(id)"
+                )
+                .AddInterfaceOverloadMethod(
+                    context.State.ActorInfo.Entity.FullyQualifiedName,
+                    context.State.ActorInfo.FormattedEntityProvider,
+                    "CreateEntity",
+                    [
+                        new ParameterSpec(
+                            context.State.ActorInfo.Model.FullyQualifiedName,
+                            "model"
+                        )
+                    ],
+                    expression: "CreateEntity(model)"
+                );
+
+            if (!context.State.ActorInfo.IsCore)
+            {
+                linkType = linkType
+                    .AddInterfaceOverloadMethod(
+                        context.State.ActorInfo.CoreActor.FullyQualifiedName,
+                        context.State.ActorInfo.FormattedCoreActorProvider,
+                        "GetActor",
+                        [
+                            new ParameterSpec(
+                                context.State.ActorInfo.Id.FullyQualifiedName,
+                                "id"
+                            )
+                        ],
+                        expression: "GetActor(id)"
+                    )
+                    .AddInterfaceOverloadMethod(
+                        context.State.ActorInfo.CoreEntity.FullyQualifiedName,
+                        context.State.ActorInfo.FormattedCoreEntityProvider,
+                        "CreateEntity",
+                        [
+                            new ParameterSpec(
+                                context.State.ActorInfo.Model.FullyQualifiedName,
+                                "model"
+                            )
+                        ],
+                        expression: "CreateEntity(model)"
+                    );
+            }
+        }
+
+        foreach (var ancestor in context.State.Ancestors)
+        {
+            var ancestorActorProviderTarget = ancestor.RedefinesRootInterfaceMemebrs
+                ? $"{ancestor.ActorInfo.Actor}.Link"
+                : ancestor.ActorInfo.FormattedActorProvider;
+
+            var ancestorEntityProviderTarget = ancestor.RedefinesRootInterfaceMemebrs
+                ? $"{ancestor.ActorInfo.Actor}.Link"
+                : ancestor.ActorInfo.FormattedEntityProvider;
+
+            linkType = linkType
+                .AddInterfaceOverloadMethod(
+                    ancestor.ActorInfo.Actor.FullyQualifiedName,
+                    ancestorActorProviderTarget,
+                    "GetActor",
+                    [(ancestor.ActorInfo.Id.FullyQualifiedName, "id")],
+                    expression: "GetActor(id)"
+                )
+                .AddInterfaceOverloadMethod(
+                    ancestor.ActorInfo.Entity.FullyQualifiedName,
+                    ancestorEntityProviderTarget,
+                    "CreateEntity",
+                    [(ancestor.ActorInfo.Model.FullyQualifiedName, "model")],
+                    expression: "CreateEntity(model)"
+                );
+        }
+
+        return context with
+        {
+            Spec = context.Spec.AddNestedType(linkType)
+        };
     }
 }

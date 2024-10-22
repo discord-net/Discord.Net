@@ -14,7 +14,7 @@ public class BackLinkNode : Node, INestedNode
         public bool IsRoot => Parent is ActorNode.State;
     }
 
-    public BackLinkNode(IncrementalValuesProvider<LinksV5.NodeContext> context) : base(context)
+    public BackLinkNode(IncrementalValuesProvider<LinksV5.NodeContext> context, Logger logger) : base(context, logger)
     {
     }
 

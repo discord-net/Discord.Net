@@ -9,71 +9,49 @@ namespace Discord.Net.Hanz.Tasks.Actors.V3;
 
 public class LinkSchematics : GenerationTask
 {
-    public class Schematic : IEquatable<Schematic>
+    public record Schematic
     {
         public Entry Root { get; }
-        //public Compilation Compilation { get; }
 
         public Schematic(Entry root)
         {
             Root = root;
         }
-
-        public bool Equals(Schematic other)
-            => Root.Equals(other.Root);
-
-        public override int GetHashCode()
-            => Root.GetHashCode();
     }
 
-    public class Entry(
+    public record Entry(
         TypeRef type,
         HashSet<Entry> children
-    ) : IEquatable<Entry>
+    )
     {
         public override int GetHashCode()
             => HashCode
                 .Of(Type)
                 .AndEach(Children);
 
-        // {
-        //     unchecked
-        //     {
-        //         var hashCode = Children.Count.GetHashCode();
-        //         hashCode = (hashCode * 397) ^ Symbol.ToDisplayString().GetHashCode();
-        //         return hashCode;
-        //     }
-        // }
-
         public HashSet<Entry> Children { get; } = children;
 
         public TypeRef Type { get; } = type;
-        //public TypeDeclarationSyntax Syntax { get; } = syntax;
-        //public AttributeData Attribute { get; } = attribute;
-
-        public bool Equals(Entry other)
-        {
-            return
-                Children.SetEquals(other.Children)
-                &&
-                Type.Equals(other.Type);
-        }
     }
 
     public IncrementalValuesProvider<Schematic> SourceSchematics { get; }
     public IncrementalValueProvider<Schematic?> NonCoreSchematics { get; }
     public IncrementalValuesProvider<Schematic> Schematics { get; }
 
-    public LinkSchematics(Context context, Logger logger) : base(context, logger)
+    private readonly Logger _logger;
+    
+    public LinkSchematics(IncrementalGeneratorInitializationContext context, Logger logger) : base(context, logger)
     {
-        SourceSchematics = context.GeneratorContext.SyntaxProvider
+        _logger = logger;
+        
+        SourceSchematics = context.SyntaxProvider
             .CreateSyntaxProvider(
                 IsPotentialSchematic,
                 MapSchematic
             )
             .Where(x => x is not null)!;
 
-        NonCoreSchematics = context.GeneratorContext
+        NonCoreSchematics = context
             .CompilationProvider
             .Select(MapNonCoreSchematic);
 
@@ -81,27 +59,31 @@ public class LinkSchematics : GenerationTask
             .Collect()
             .Combine(NonCoreSchematics)
             .SelectMany(IEnumerable<Schematic> (x, _) =>
-                x.Left.Length > 0
+            {
+                logger.Log($"Schematic: {string.Join(" | ", x.Left)} <> {x.Right}");
+                
+                logger.Flush();
+                
+                return x.Left.Length > 0
                     ? x.Left
                     : x.Right is not null
                         ? new[] {x.Right}.ToImmutableArray()
-                        : ImmutableArray<Schematic>.Empty
-            );
+                        : ImmutableArray<Schematic>.Empty;
+            });
     }
 
 
     public static bool IsPotentialSchematic(SyntaxNode node, CancellationToken token)
         => node is TypeDeclarationSyntax {AttributeLists.Count: > 0} && node.Parent is not TypeDeclarationSyntax;
 
-    public static Schematic? MapSchematic(GeneratorSyntaxContext context, CancellationToken token)
+    public Schematic? MapSchematic(GeneratorSyntaxContext context, CancellationToken token)
     {
         if (context.Node is not TypeDeclarationSyntax syntax) return null;
 
         if (context.SemanticModel.GetDeclaredSymbol(syntax) is not INamedTypeSymbol symbol) return null;
 
-        var logger = LinksV4.Logger
+        var logger = _logger
             .WithSemanticContext(context.SemanticModel)
-            .GetSubLogger(nameof(LinkSchematics))
             .WithCleanLogFile();
 
         logger.Log($"Processing {symbol}...");
@@ -122,14 +104,13 @@ public class LinkSchematics : GenerationTask
         }
     }
 
-    public static Schematic? MapNonCoreSchematic(Compilation compilation, CancellationToken token)
+    public Schematic? MapNonCoreSchematic(Compilation compilation, CancellationToken token)
     {
         if (LinkActorTargets.GetAssemblyTarget(compilation) is LinkActorTargets.AssemblyTarget.Core)
             return null;
 
-        var logger = LinksV4.Logger
+        var logger = _logger
             .WithCompilationContext(compilation)
-            .GetSubLogger(nameof(LinkSchematics))
             .WithCleanLogFile();
 
         try
@@ -155,7 +136,7 @@ public class LinkSchematics : GenerationTask
         }
     }
 
-    public static Schematic? MapSchematic(
+    public Schematic? MapSchematic(
         INamedTypeSymbol symbol,
         Compilation compilation,
         CancellationToken token,
@@ -163,8 +144,7 @@ public class LinkSchematics : GenerationTask
     {
         var lookup = new Dictionary<string, Entry>();
 
-        logger ??= LinksV4.Logger
-            .GetSubLogger(nameof(LinkSchematics))
+        logger ??= _logger
             .WithCompilationContext(compilation)
             .WithCleanLogFile();
 
