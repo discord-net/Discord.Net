@@ -379,7 +379,7 @@ namespace Discord.Interactions.Builders
         /// <returns>
         ///     The builder instance.
         /// </returns>
-        public ModuleBuilder AddSlashCommand(string name, ExecuteCallback callback, Action<AutocompleteCommandBuilder> configure)
+        public ModuleBuilder AddAutocompleteCommand(string name, ExecuteCallback callback, Action<AutocompleteCommandBuilder> configure)
         {
             var command = new AutocompleteCommandBuilder(this, name, callback);
             configure(command);
