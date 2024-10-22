@@ -8,6 +8,7 @@ namespace Discord
 {
     internal sealed class MockedDMChannel : IDMChannel
     {
+        public ChannelType ChannelType => ChannelType.DM;
         public IUser Recipient => throw new NotImplementedException();
 
         public IReadOnlyCollection<IUser> Recipients => throw new NotImplementedException();

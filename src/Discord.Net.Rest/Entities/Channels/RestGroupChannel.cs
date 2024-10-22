@@ -41,6 +41,7 @@ namespace Discord.Rest
         }
         internal override void Update(Model model)
         {
+            base.Update(model);
             if (model.Name.IsSpecified)
                 Name = model.Name.Value;
             if (model.Icon.IsSpecified)

@@ -9,6 +9,8 @@ namespace Discord
 {
     internal sealed class MockedVoiceChannel : IVoiceChannel
     {
+        public ChannelType ChannelType => ChannelType.Voice;
+
         public int DefaultSlowModeInterval => throw new NotImplementedException();
 
         public int Bitrate => throw new NotImplementedException();

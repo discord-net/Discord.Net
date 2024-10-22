@@ -8,6 +8,7 @@ namespace Discord
 {
     internal sealed class MockedTextChannel : ITextChannel
     {
+        public ChannelType ChannelType => ChannelType.Text;
         public bool IsNsfw => throw new NotImplementedException();
 
         public int DefaultSlowModeInterval => throw new NotImplementedException();

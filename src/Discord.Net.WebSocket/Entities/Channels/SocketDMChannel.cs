@@ -44,6 +44,7 @@ namespace Discord.WebSocket
         internal override void Update(ClientState state, Model model)
         {
             Recipient.Update(state, model.Recipients.Value[0]);
+            base.Update(state, model);
         }
         internal static SocketDMChannel Create(DiscordSocketClient discord, ClientState state, ulong channelId, API.User recipient)
         {
