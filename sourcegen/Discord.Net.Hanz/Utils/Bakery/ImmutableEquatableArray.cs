@@ -13,6 +13,11 @@ public sealed class ImmutableEquatableArray<T> :
     public T this[int index] => _values[index];
     public int Count => _values.Length;
 
+    public ImmutableEquatableArray()
+    {
+        _values = [];
+    }
+    
     public ImmutableEquatableArray(IEnumerable<T> values)
         => _values = values.ToArray();
 
@@ -46,15 +51,7 @@ public sealed class ImmutableEquatableArray<T> :
         => obj is ImmutableEquatableArray<T> other && Equals(other);
 
     public override int GetHashCode()
-    {
-        int hash = 0;
-        foreach (T value in _values)
-        {
-            hash = System.HashCode.Combine(hash, value is null ? 0 : value.GetHashCode());
-        }
-
-        return hash;
-    }
+        => HashCode.OfEach(_values);
 
     public Enumerator GetEnumerator() => new Enumerator(_values);
     IEnumerator<T> IEnumerable<T>.GetEnumerator() => ((IEnumerable<T>) _values).GetEnumerator();
@@ -86,6 +83,9 @@ public sealed class ImmutableEquatableArray<T> :
 
         public readonly T Current => _values[_index];
     }
+
+    public override string ToString()
+        => $"{typeof(T).Name}[{_values.Length}]";
 }
 
 internal static class ImmutableEquatableArray

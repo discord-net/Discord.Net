@@ -13,10 +13,13 @@ public static class SyntaxUtils
     public const string SingleFormatString = "G9";
 
     public static string FormatLiteral(object? value, TypeRef type)
+        => FormatLiteral(value, type.FullyQualifiedName);
+    
+    public static string FormatLiteral(object? value, string fullyQualifiedTypeName)
     {
         if (value == null)
         {
-            return $"default({type.FullyQualifiedName})";
+            return $"default({fullyQualifiedTypeName})";
         }
 
         switch (value)
@@ -51,7 +54,7 @@ public static class SyntaxUtils
                 return FormatNumber();
         }
         
-        string FormatNumber() => $"({type.FullyQualifiedName})({Convert.ToString(value, CultureInfo.InvariantCulture)})";
+        string FormatNumber() => $"({fullyQualifiedTypeName})({Convert.ToString(value, CultureInfo.InvariantCulture)})";
     }
 
     public static TypeDeclarationSyntax? CombineMembers(IEnumerable<TypeDeclarationSyntax> nodes)

@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -12,6 +13,7 @@ public readonly record struct TypeSpec(
     ImmutableEquatableArray<string>? Modifiers = null,
     ImmutableEquatableArray<TypeSpec>? Children = null,
     ImmutableEquatableArray<PropertySpec>? Properties = null,
+    ImmutableEquatableArray<IndexerSpec>? Indexers = null,
     ImmutableEquatableArray<FieldSpec>? Fields = null,
     ImmutableEquatableArray<ConstructorSpec>? Constructors = null,
     ImmutableEquatableArray<MethodSpec>? Methods = null,
@@ -31,6 +33,9 @@ public readonly record struct TypeSpec(
     public ImmutableEquatableArray<PropertySpec> Properties { get; init; }
         = Properties ?? ImmutableEquatableArray<PropertySpec>.Empty;
 
+    public ImmutableEquatableArray<IndexerSpec> Indexers { get; init; }
+        = Indexers ?? ImmutableEquatableArray<IndexerSpec>.Empty;
+
     public ImmutableEquatableArray<FieldSpec> Fields { get; init; }
         = Fields ?? ImmutableEquatableArray<FieldSpec>.Empty;
 
@@ -48,8 +53,31 @@ public readonly record struct TypeSpec(
 
     public TypeSpec AddBases(params string[] bases)
         => this with {Bases = Bases.AddRange(bases)};
+
     public TypeSpec AddBases(IEnumerable<string> bases)
         => this with {Bases = Bases.AddRange(bases)};
+
+    public TypeSpec AddModifiers(IEnumerable<string> modifiers)
+        => this with {Modifiers = Modifiers.AddRange(modifiers)};
+
+    public TypeSpec AddModifiers(params string[] modifiers)
+        => this with {Modifiers = Modifiers.AddRange(modifiers)};
+
+    public TypeSpec AddIndexers(
+        params IndexerSpec[] indexer
+    ) => this with {Indexers = Indexers.AddRange(indexer)};
+
+    public TypeSpec AddIndexers(
+        IEnumerable<IndexerSpec> indexers
+    ) => this with {Indexers = Indexers.AddRange(indexers)};
+
+    public TypeSpec AddMethods(
+        params MethodSpec[] methods
+    ) => this with {Methods = Methods.AddRange(methods)};
+    
+    public TypeSpec AddMethods(
+        IEnumerable<MethodSpec> methods
+    ) => this with {Methods = Methods.AddRange(methods)};
 
     public TypeSpec AddProperty(
         PropertySpec property
@@ -63,6 +91,13 @@ public readonly record struct TypeSpec(
     ) => this with
     {
         Children = Children.Add(type)
+    };
+
+    public TypeSpec AddNestedTypes(
+        IEnumerable<TypeSpec> types
+    ) => this with
+    {
+        Children = Children.AddRange(types)
     };
 
     public TypeSpec AddInterfacePropertyOverload(
@@ -82,7 +117,7 @@ public readonly record struct TypeSpec(
         )
     };
 
-    public TypeSpec AddInterfaceOverloadMethod(
+    public TypeSpec AddInterfaceMethodOverload(
         string returnType,
         string interfaceName,
         string methodName,
@@ -164,54 +199,57 @@ public readonly record struct TypeSpec(
                 .AppendLine()
                 .AppendLine("{");
 
-            foreach
-            (
-                var property
-                in Properties
+            var any = false;
+
+            AddMembers(
+                builder,
+                Properties
                     .Where(x => x.ExplicitInterfaceImplementation is null)
-                    .OrderByDescending(x => x.Accessibility)
-            )
-            {
-                builder.AppendLine(property.ToString().PrefixSpaces(4).WithNewlinePadding(4)).AppendLine();
-            }
-
-            foreach (var field in Fields)
-            {
-                builder.AppendLine(field.ToString().PrefixSpaces(4).WithNewlinePadding(4));
-            }
-
-            foreach (var constructor in Constructors)
-            {
-                builder.AppendLine(constructor.ToString().PrefixSpaces(4).WithNewlinePadding(4));
-            }
-
-            builder.AppendLine(string
-                .Join(
-                    $"{Environment.NewLine}{Environment.NewLine}",
-                    Methods
-                )
-                .PrefixSpaces(4)
-                .WithNewlinePadding(4)
+                    .OrderByDescending(x => x.Accessibility),
+                ref any,
+                seperation: 2
             );
 
-            foreach
-            (
-                var property
-                in Properties
-                    .Where(x => x.ExplicitInterfaceImplementation is not null)
-                    .OrderByDescending(x => x.Accessibility)
-            )
-            {
-                builder.AppendLine(property.ToString().PrefixSpaces(4).WithNewlinePadding(4));
-            }
+            AddMembers(
+                builder,
+                Indexers,
+                ref any,
+                seperation: 2
+            );
 
-            builder.AppendLine(string
-                .Join(
-                    $"{Environment.NewLine}{Environment.NewLine}",
-                    Children
-                )
-                .PrefixSpaces(4)
-                .WithNewlinePadding(4)
+            AddMembers(
+                builder,
+                Fields,
+                ref any
+            );
+
+            AddMembers(
+                builder,
+                Constructors,
+                ref any,
+                seperation: 2
+            );
+
+            AddMembers(
+                builder,
+                Methods,
+                ref any,
+                seperation: 2
+            );
+
+            AddMembers(
+                builder,
+                Properties
+                    .Where(x => x.ExplicitInterfaceImplementation is not null)
+                    .OrderByDescending(x => x.Accessibility),
+                ref any
+            );
+
+            AddMembers(
+                builder,
+                Children,
+                ref any,
+                seperation: 2
             );
 
             builder.Append('}');
@@ -220,359 +258,35 @@ public readonly record struct TypeSpec(
 
         return builder.ToString();
     }
-}
 
-public readonly record struct ConstructorSpec(
-    string Name,
-    Accessibility Accessibility
-)
-{
-    public ImmutableEquatableArray<ParameterSpec> Parameters { get; init; } =
-        ImmutableEquatableArray<ParameterSpec>.Empty;
-
-    public string? BaseInvocation { get; init; }
-    public string? Body { get; init; }
-
-    public override string ToString()
+    private static void AddMembers<T>(
+        StringBuilder builder,
+        IEnumerable<T> members,
+        ref bool any,
+        int seperation = 1,
+        int padding = 4
+    ) where T : IEquatable<T>
     {
-        var builder = new StringBuilder();
+        var arr = members.ToArray();
+        
+        if (arr.Length == 0) return;
 
-        builder
-            .Append(SyntaxFacts.GetText(Accessibility))
-            .Append(' ')
-            .Append(Name)
-            .Append('(');
+        var formatted = string
+            .Join(
+                string.Join(string.Empty, Enumerable.Range(0, seperation).Select(_ => Environment.NewLine)),
+                arr.Select(x => x?.ToString().PrefixSpaces(padding).WithNewlinePadding(padding))
+            );
 
-        if (Parameters.Count > 0)
+        if (formatted == string.Empty) return;
+
+        if (any)
         {
-            builder.AppendLine()
-                .AppendLine(string
-                    .Join(
-                        $",{Environment.NewLine}",
-                        Parameters
-                    )
-                    .PrefixSpaces(4)
-                    .WithNewlinePadding(4)
-                );
+            for(var i = 0; i != seperation; i++)
+                builder.AppendLine();
         }
 
-        builder
-            .Append(')');
+        any = true;
 
-        if (BaseInvocation is not null)
-            builder.Append(" : ").AppendLine(BaseInvocation);
-
-        builder.AppendLine("{");
-
-        if (Body is not null)
-            builder.AppendLine(Body.WithNewlinePadding(4));
-
-        return builder.Append("}").ToString();
-    }
-}
-
-public readonly record struct ParameterSpec(
-    string Type,
-    string Name,
-    string? Default = null
-)
-{
-    public override string ToString()
-        => $"{Type} {Name}{(Default is not null ? $" = {Default}" : string.Empty)}";
-
-    public static implicit operator ParameterSpec((string, string) tuple) => new(tuple.Item1, tuple.Item2);
-
-    public static implicit operator ParameterSpec((string, string, string) tuple) =>
-        new(tuple.Item1, tuple.Item2, tuple.Item3);
-}
-
-public readonly record struct GenericSpec(
-    string Name
-)
-{
-    public VarianceKind Variance { get; init; } = VarianceKind.None;
-
-    public override string ToString()
-        => $"{(Variance is not VarianceKind.None ? $"{Variance.ToString().ToLower()} " : string.Empty)}{Name}";
-
-    public static implicit operator GenericSpec(string str) => new(str);
-}
-
-public readonly record struct GenericConstraintSpec(
-    string Name
-)
-{
-    public ImmutableEquatableArray<string> Constraints { get; init; } = ImmutableEquatableArray<string>.Empty;
-
-    public override string ToString()
-    {
-        if (Constraints.Count == 0)
-            return string.Empty;
-
-        return $"where {Name} : {string.Join(", ", Constraints)}";
-    }
-
-    public static implicit operator GenericConstraintSpec((string, string[]) tuple) => new(tuple.Item1)
-    {
-        Constraints = new(tuple.Item2)
-    };
-}
-
-public readonly record struct FieldSpec(
-    string Name,
-    string Type,
-    Accessibility Accessibility
-)
-{
-    public ImmutableEquatableArray<string> Modifiers { get; init; } = ImmutableEquatableArray<string>.Empty;
-
-    public override string ToString()
-    {
-        var builder = new StringBuilder();
-
-        builder
-            .Append(SyntaxFacts.GetText(Accessibility))
-            .Append(' ');
-
-        if (Modifiers.Count > 0)
-            builder
-                .Append(string.Join(" ", Modifiers))
-                .Append(' ');
-
-        builder.Append(Name).Append(';');
-
-        return builder.ToString();
-    }
-}
-
-public readonly record struct MethodSpec(
-    string Name,
-    string ReturnType,
-    Accessibility Accessibility = Accessibility.NotApplicable,
-    ImmutableEquatableArray<string>? Modifiers = null,
-    ImmutableEquatableArray<ParameterSpec>? Parameters = null,
-    ImmutableEquatableArray<GenericSpec>? Generics = null,
-    ImmutableEquatableArray<GenericConstraintSpec>? GenericConstraints = null,
-    string? ExplicitInterfaceImplementation = null,
-    string? Expression = null,
-    string? Body = null
-)
-{
-    public ImmutableEquatableArray<string> Modifiers { get; init; }
-        = Modifiers ?? ImmutableEquatableArray<string>.Empty;
-
-    public ImmutableEquatableArray<ParameterSpec> Parameters { get; init; }
-        = Parameters ?? ImmutableEquatableArray<ParameterSpec>.Empty;
-
-    public ImmutableEquatableArray<GenericSpec> Generics { get; init; }
-        = Generics ?? ImmutableEquatableArray<GenericSpec>.Empty;
-
-    public ImmutableEquatableArray<GenericConstraintSpec> GenericConstraints { get; init; }
-        = GenericConstraints ?? ImmutableEquatableArray<GenericConstraintSpec>.Empty;
-
-    public override string ToString()
-    {
-        var builder = new StringBuilder();
-
-        builder
-            .Append(SyntaxFacts.GetText(Accessibility))
-            .Append(' ');
-
-        if (Modifiers.Count > 0)
-        {
-            builder.Append(string.Join(" ", Modifiers)).Append(' ');
-        }
-
-        if (ExplicitInterfaceImplementation is not null)
-            builder.Append(ExplicitInterfaceImplementation).Append('.');
-
-        builder.Append(Name);
-
-        if (Generics.Count > 0)
-        {
-            builder
-                .Append('<')
-                .Append(string.Join(", ", Generics))
-                .Append('>');
-        }
-
-        builder.Append('(');
-
-        if (Parameters.Count > 0)
-        {
-            builder.AppendLine()
-                .AppendLine(string
-                    .Join(
-                        $",{Environment.NewLine}",
-                        Parameters
-                    )
-                    .PrefixSpaces(4)
-                    .WithNewlinePadding(4)
-                );
-        }
-
-        builder
-            .Append(')');
-
-        if (GenericConstraints.Count > 0)
-        {
-            builder
-                .AppendLine()
-                .Append(string.Join(Environment.NewLine, GenericConstraints).PrefixSpaces(4));
-        }
-
-        if (Expression is not null)
-        {
-            builder.Append($" => {Expression};");
-        }
-        else if (Body is not null)
-        {
-            builder.AppendLine()
-                .AppendLine("{")
-                .AppendLine()
-                .AppendLine(Body)
-                .AppendLine("}");
-        }
-        else
-        {
-            builder.Append(";");
-        }
-
-        return builder.ToString();
-    }
-}
-
-public readonly record struct PropertySpec(
-    string Type,
-    string Name,
-    Accessibility Accessibility = Accessibility.NotApplicable,
-    ImmutableEquatableArray<string>? Modifiers = null,
-    string? ExplicitInterfaceImplementation = null,
-    Accessibility AutoGet = Accessibility.Public,
-    Accessibility AutoSet = Accessibility.NotApplicable,
-    string? Getter = null,
-    string? Setter = null,
-    string? Expression = null
-)
-{
-    public ImmutableEquatableArray<string> Modifiers { get; init; }
-        = Modifiers ?? ImmutableEquatableArray<string>.Empty;
-
-    public bool HasAutoGetter => AutoGet is not Accessibility.NotApplicable;
-    public bool HasAutoSetter => AutoSet is not Accessibility.NotApplicable;
-
-    public bool HasGetter
-        => Getter is not null || HasAutoGetter;
-
-    public bool HasSetter
-        => Setter is not null || HasAutoSetter;
-
-    public override string ToString()
-    {
-        var builder = new StringBuilder();
-
-        if (Accessibility is not Accessibility.NotApplicable)
-            builder.Append(SyntaxFacts.GetText(Accessibility)).Append(' ');
-
-        if (Modifiers.Count > 0)
-        {
-            builder
-                .Append(string.Join(" ", Modifiers))
-                .Append(' ');
-        }
-
-        builder.Append(Type).Append(' ');
-
-        if (ExplicitInterfaceImplementation is not null)
-            builder
-                .Append(ExplicitInterfaceImplementation)
-                .Append('.');
-
-        builder.Append(Name);
-
-        if (Expression is not null)
-        {
-            builder
-                .Append(" => ")
-                .Append(Expression)
-                .Append(';');
-        }
-        else if (HasGetter || HasSetter)
-        {
-            if (Getter is null && Setter is null)
-            {
-                builder.Append(" { ");
-
-                if (AutoGet is not Accessibility.Public)
-                    builder
-                        .Append(SyntaxFacts.GetText(AutoGet))
-                        .Append(' ');
-
-                builder.Append("get; ");
-
-                if (HasAutoSetter)
-                {
-                    if (AutoSet is not Accessibility.Public)
-                        builder
-                            .Append(SyntaxFacts.GetText(AutoSet))
-                            .Append(' ');
-
-                    builder.Append("set; ");
-                }
-
-                builder.Append('}');
-            }
-            else
-            {
-                builder.AppendLine()
-                    .AppendLine("{")
-                    .Append(string.Empty.PrefixSpaces(4));
-
-                if (HasAutoGetter && AutoGet is not Accessibility.Public)
-                    builder
-                        .Append(SyntaxFacts.GetText(AutoGet))
-                        .Append(' ');
-
-                builder.Append("get");
-
-                if (Getter is not null)
-                {
-                    builder.Append(Getter.WithNewlinePadding(4));
-                }
-                else
-                {
-                    builder.Append(';');
-                }
-
-                if (HasSetter)
-                {
-                    builder
-                        .AppendLine()
-                        .Append(string.Empty.PrefixSpaces(4));
-
-                    if (HasAutoSetter && AutoSet is not Accessibility.Public)
-                        builder
-                            .Append(SyntaxFacts.GetText(AutoSet))
-                            .Append(' ');
-
-                    builder.Append("set");
-
-                    if (Setter is not null)
-                    {
-                        builder.Append(Setter.WithNewlinePadding(4));
-                    }
-                    else
-                    {
-                        builder.Append(';');
-                    }
-                }
-
-                builder
-                    .AppendLine()
-                    .Append('}');
-            }
-        }
-
-        return builder.ToString();
+        builder.AppendLine(formatted);
     }
 }

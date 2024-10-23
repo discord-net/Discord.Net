@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using Discord.Net.Hanz.Tasks.Actors.Links.V5.Nodes.Common;
+using Discord.Net.Hanz.Tasks.Actors.Links.V5.Nodes.Types;
 using Discord.Net.Hanz.Utils.Bakery;
 using Microsoft.CodeAnalysis;
 
@@ -81,32 +82,37 @@ public class ActorNode : Node
     public IncrementalValuesProvider<StatefulGeneration<IntrospectedBuildState>> TypeProvider { get; }
 
     public ActorNode(
-        IncrementalValuesProvider<LinksV5.NodeContext> context,
+        NodeProviders providers,
         Logger logger
-    ) : base(context, logger)
+    ) : base(providers, logger)
     {
         logger.Log("Initialized");
 
-        TypeProvider = AddChildren(
-            context
-                .Select(State.Create)
-                .Combine(context
-                    .Collect()
-                    .Select(MapAncestralInfo)
-                )
-                .Select((x, _) =>
-                    new BuildState(
-                        x.Left,
-                        x.Right.FirstOrDefault(y => y.Actor == x.Left.ActorInfo.Actor.DisplayString)
-                    )
-                )
-                .Select(CreatePartialContainer)
+        var buildProvider = providers
+            .Context
+            .Select(State.Create)
+            .Combine(providers
+                .Context 
                 .Collect()
-                .SelectMany(Introspect)
-                .Select(CreateLinkInterface)
-                .Select(CreateRelationshipsTypes),
+                .Select(MapAncestralInfo)
+            )
+            .Select((x, _) =>
+                new BuildState(
+                    x.Left,
+                    x.Right.FirstOrDefault(y => y.Actor == x.Left.ActorInfo.Actor.DisplayString)
+                )
+            )
+            .Select(CreatePartialContainer)
+            .Collect()
+            .SelectMany(Introspect)
+            .Select(CreateLinkInterface)
+            .Select(CreateRelationshipsTypes);
+        
+        TypeProvider = AddChildren(
+            buildProvider,
             typeof(BackLinkNode),
-            typeof(ExtensionNode)
+            typeof(ExtensionNode),
+            typeof(LinkNode)
         );
 
         logger.Flush();
@@ -341,7 +347,7 @@ public class ActorNode : Node
         if (context.State.RedefinesRootInterfaceMemebrs)
         {
             linkType = linkType
-                .AddInterfaceOverloadMethod(
+                .AddInterfaceMethodOverload(
                     context.State.ActorInfo.Actor.FullyQualifiedName,
                     context.State.ActorInfo.FormattedActorProvider,
                     "GetActor",
@@ -353,7 +359,7 @@ public class ActorNode : Node
                     ],
                     expression: "GetActor(id)"
                 )
-                .AddInterfaceOverloadMethod(
+                .AddInterfaceMethodOverload(
                     context.State.ActorInfo.Entity.FullyQualifiedName,
                     context.State.ActorInfo.FormattedEntityProvider,
                     "CreateEntity",
@@ -369,7 +375,7 @@ public class ActorNode : Node
             if (!context.State.ActorInfo.IsCore)
             {
                 linkType = linkType
-                    .AddInterfaceOverloadMethod(
+                    .AddInterfaceMethodOverload(
                         context.State.ActorInfo.CoreActor.FullyQualifiedName,
                         context.State.ActorInfo.FormattedCoreActorProvider,
                         "GetActor",
@@ -381,7 +387,7 @@ public class ActorNode : Node
                         ],
                         expression: "GetActor(id)"
                     )
-                    .AddInterfaceOverloadMethod(
+                    .AddInterfaceMethodOverload(
                         context.State.ActorInfo.CoreEntity.FullyQualifiedName,
                         context.State.ActorInfo.FormattedCoreEntityProvider,
                         "CreateEntity",
@@ -407,14 +413,14 @@ public class ActorNode : Node
                 : ancestor.ActorInfo.FormattedEntityProvider;
 
             linkType = linkType
-                .AddInterfaceOverloadMethod(
+                .AddInterfaceMethodOverload(
                     ancestor.ActorInfo.Actor.FullyQualifiedName,
                     ancestorActorProviderTarget,
                     "GetActor",
                     [(ancestor.ActorInfo.Id.FullyQualifiedName, "id")],
                     expression: "GetActor(id)"
                 )
-                .AddInterfaceOverloadMethod(
+                .AddInterfaceMethodOverload(
                     ancestor.ActorInfo.Entity.FullyQualifiedName,
                     ancestorEntityProviderTarget,
                     "CreateEntity",

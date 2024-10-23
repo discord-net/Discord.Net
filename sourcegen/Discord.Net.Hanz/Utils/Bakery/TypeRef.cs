@@ -7,10 +7,8 @@ public sealed class TypeRef(ITypeSymbol type) : IEquatable<TypeRef>
 {
     public static readonly SymbolDisplayFormat DeclarationFormat = new SymbolDisplayFormat(
         typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameOnly,
-        kindOptions: SymbolDisplayKindOptions.IncludeTypeKeyword,
-        genericsOptions: SymbolDisplayGenericsOptions.IncludeVariance | 
-                         SymbolDisplayGenericsOptions.IncludeTypeConstraints | 
-                         SymbolDisplayGenericsOptions.IncludeTypeParameters,
+        kindOptions: SymbolDisplayKindOptions.None,
+        genericsOptions: SymbolDisplayGenericsOptions.IncludeTypeParameters,
         miscellaneousOptions:
         SymbolDisplayMiscellaneousOptions.EscapeKeywordIdentifiers |
         SymbolDisplayMiscellaneousOptions.UseSpecialTypes
@@ -21,6 +19,7 @@ public sealed class TypeRef(ITypeSymbol type) : IEquatable<TypeRef>
 
     public string DisplayString { get; } = type.ToDisplayString();
     public string MetadataName { get; } = type.ToFullMetadataName();
+    public string ReferenceName { get; } = type.ToDisplayString(DeclarationFormat);
     
     public string FullyQualifiedName { get; } = type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
     public Accessibility Accessibility { get; } = type.DeclaredAccessibility;

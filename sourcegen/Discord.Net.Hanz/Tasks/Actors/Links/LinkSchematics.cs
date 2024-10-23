@@ -9,47 +9,31 @@ namespace Discord.Net.Hanz.Tasks.Actors.V3;
 
 public class LinkSchematics : GenerationTask
 {
-    public record Schematic
-    {
-        public Entry Root { get; }
+    public readonly record struct Schematic(
+        Entry Root
+    );
 
-        public Schematic(Entry root)
-        {
-            Root = root;
-        }
-    }
-
-    public record Entry(
-        TypeRef type,
-        HashSet<Entry> children
-    )
-    {
-        public override int GetHashCode()
-            => HashCode
-                .Of(Type)
-                .AndEach(Children);
-
-        public HashSet<Entry> Children { get; } = children;
-
-        public TypeRef Type { get; } = type;
-    }
+    public readonly record struct Entry(
+        TypeRef Type,
+        ImmutableEquatableArray<Entry> Children
+    );
 
     public IncrementalValuesProvider<Schematic> SourceSchematics { get; }
     public IncrementalValueProvider<Schematic?> NonCoreSchematics { get; }
     public IncrementalValuesProvider<Schematic> Schematics { get; }
 
     private readonly Logger _logger;
-    
+
     public LinkSchematics(IncrementalGeneratorInitializationContext context, Logger logger) : base(context, logger)
     {
         _logger = logger;
-        
+
         SourceSchematics = context.SyntaxProvider
             .CreateSyntaxProvider(
                 IsPotentialSchematic,
                 MapSchematic
             )
-            .Where(x => x is not null)!;
+            .WhereNonNull();
 
         NonCoreSchematics = context
             .CompilationProvider
@@ -61,13 +45,13 @@ public class LinkSchematics : GenerationTask
             .SelectMany(IEnumerable<Schematic> (x, _) =>
             {
                 logger.Log($"Schematic: {string.Join(" | ", x.Left)} <> {x.Right}");
-                
+
                 logger.Flush();
-                
+
                 return x.Left.Length > 0
                     ? x.Left
                     : x.Right is not null
-                        ? new[] {x.Right}.ToImmutableArray()
+                        ? new[] {x.Right.Value}.ToImmutableArray()
                         : ImmutableArray<Schematic>.Empty;
             });
     }
@@ -96,7 +80,7 @@ public class LinkSchematics : GenerationTask
 
             if (root is null) return null;
 
-            return new Schematic(root);
+            return new Schematic(root.Value);
         }
         finally
         {
@@ -154,7 +138,7 @@ public class LinkSchematics : GenerationTask
 
             if (root is null) return null;
 
-            return new Schematic(root);
+            return new Schematic(root.Value);
         }
         finally
         {
@@ -180,7 +164,7 @@ public class LinkSchematics : GenerationTask
 
         logger?.Log($"{symbol}: Children?: {children.Kind}");
 
-        HashSet<Entry> childrenEntries = new();
+        ImmutableEquatableArray<Entry> childrenEntries = new();
 
         if (children.Kind is TypedConstantKind.Array)
         {
@@ -194,12 +178,13 @@ public class LinkSchematics : GenerationTask
 
                     if (childNode is null) continue;
 
-                    entry = GetEntry(root, childNode, lookup, token, logger);
+                    if(GetEntry(root, childNode, lookup, token, logger) is not {} next)
+                        continue;
 
-                    if (entry is null) continue;
+                    entry = next;
                 }
 
-                childrenEntries.Add(entry);
+                childrenEntries = childrenEntries.Add(entry);
             }
         }
         else if (root.Equals(symbol, SymbolEqualityComparer.Default))
@@ -208,7 +193,7 @@ public class LinkSchematics : GenerationTask
             {
                 if (child is null) continue;
 
-                childrenEntries.Add(child);
+                childrenEntries = childrenEntries.Add(child.Value);
             }
         }
 

@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 
 namespace Discord.Net.Hanz;
 
-public sealed class Logger : ILogger, IEquatable<Logger>
+public sealed class Logger : ILogger, IEquatable<Logger>, IDisposable
 {
     public const int MAX_UNFLUSHED_LOGS = 2500;
 
@@ -207,6 +207,11 @@ public sealed class Logger : ILogger, IEquatable<Logger>
         {
             return ((int) _logLevel * 397) ^ _logFilePath.GetHashCode();
         }
+    }
+
+    void IDisposable.Dispose()
+    {
+        Flush();
     }
 
     public static bool operator ==(Logger? left, Logger? right) => Equals(left, right);
