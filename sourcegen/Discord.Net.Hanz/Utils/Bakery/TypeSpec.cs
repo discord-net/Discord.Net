@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Diagnostics;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -21,6 +22,8 @@ public readonly record struct TypeSpec(
     ImmutableEquatableArray<GenericConstraintSpec>? GenericConstraints = null
 )
 {
+    public bool IsDefault => this == default;
+
     public ImmutableEquatableArray<string> Bases { get; init; }
         = Bases ?? ImmutableEquatableArray<string>.Empty;
 
@@ -52,16 +55,16 @@ public readonly record struct TypeSpec(
         = GenericConstraints ?? ImmutableEquatableArray<GenericConstraintSpec>.Empty;
 
     public TypeSpec AddBases(params string[] bases)
-        => this with {Bases = Bases.AddRange(bases)};
+        => this with {Bases = Bases.AddRange(bases.Where(x => !string.IsNullOrWhiteSpace(x)))};
 
     public TypeSpec AddBases(IEnumerable<string> bases)
-        => this with {Bases = Bases.AddRange(bases)};
+        => this with {Bases = Bases.AddRange(bases.Where(x => !string.IsNullOrWhiteSpace(x)))};
 
     public TypeSpec AddModifiers(IEnumerable<string> modifiers)
-        => this with {Modifiers = Modifiers.AddRange(modifiers)};
+        => this with {Modifiers = Modifiers.AddRange(modifiers.Where(x => !string.IsNullOrWhiteSpace(x)))};
 
     public TypeSpec AddModifiers(params string[] modifiers)
-        => this with {Modifiers = Modifiers.AddRange(modifiers)};
+        => this with {Modifiers = Modifiers.AddRange(modifiers.Where(x => !string.IsNullOrWhiteSpace(x)))};
 
     public TypeSpec AddIndexers(
         params IndexerSpec[] indexer
@@ -74,16 +77,23 @@ public readonly record struct TypeSpec(
     public TypeSpec AddMethods(
         params MethodSpec[] methods
     ) => this with {Methods = Methods.AddRange(methods)};
-    
+
     public TypeSpec AddMethods(
         IEnumerable<MethodSpec> methods
     ) => this with {Methods = Methods.AddRange(methods)};
 
-    public TypeSpec AddProperty(
-        PropertySpec property
+    public TypeSpec AddProperties(
+        params PropertySpec[] properties
     ) => this with
     {
-        Properties = Properties.Add(property)
+        Properties = Properties.AddRange(properties)
+    };
+
+    public TypeSpec AddProperties(
+        IEnumerable<PropertySpec> properties
+    ) => this with
+    {
+        Properties = Properties.AddRange(properties)
     };
 
     public TypeSpec AddNestedType(
@@ -144,11 +154,11 @@ public readonly record struct TypeSpec(
     {
         return new TypeSpec(
             Name: typeref.Name,
-            Kind: typeref.TypeKind
-        )
-        {
-            Accessibility = typeref.Accessibility
-        };
+            Kind: typeref.TypeKind,
+            Generics: new(typeref.Generics.Select(x => new GenericSpec(x))),
+            GenericConstraints: new(typeref.GenericConstraints),
+            Accessibility: typeref.Accessibility
+        );
     }
 
     public override string ToString()
@@ -206,6 +216,7 @@ public readonly record struct TypeSpec(
                 Properties
                     .Where(x => x.ExplicitInterfaceImplementation is null)
                     .OrderByDescending(x => x.Accessibility),
+                nameof(Properties),
                 ref any,
                 seperation: 2
             );
@@ -213,6 +224,7 @@ public readonly record struct TypeSpec(
             AddMembers(
                 builder,
                 Indexers,
+                nameof(Indexers),
                 ref any,
                 seperation: 2
             );
@@ -220,12 +232,14 @@ public readonly record struct TypeSpec(
             AddMembers(
                 builder,
                 Fields,
+                nameof(Fields),
                 ref any
             );
 
             AddMembers(
                 builder,
                 Constructors,
+                nameof(Constructors),
                 ref any,
                 seperation: 2
             );
@@ -233,6 +247,7 @@ public readonly record struct TypeSpec(
             AddMembers(
                 builder,
                 Methods,
+                nameof(Methods),
                 ref any,
                 seperation: 2
             );
@@ -242,12 +257,14 @@ public readonly record struct TypeSpec(
                 Properties
                     .Where(x => x.ExplicitInterfaceImplementation is not null)
                     .OrderByDescending(x => x.Accessibility),
+                nameof(Properties),
                 ref any
             );
 
             AddMembers(
                 builder,
                 Children,
+                nameof(Children),
                 ref any,
                 seperation: 2
             );
@@ -259,34 +276,45 @@ public readonly record struct TypeSpec(
         return builder.ToString();
     }
 
-    private static void AddMembers<T>(
+    private void AddMembers<T>(
         StringBuilder builder,
         IEnumerable<T> members,
+        string name,
         ref bool any,
         int seperation = 1,
         int padding = 4
-    ) where T : IEquatable<T>
+    ) where T : struct, IEquatable<T>
     {
-        var arr = members.ToArray();
-        
-        if (arr.Length == 0) return;
+        var arr = members.Where(x => !x.Equals(default)).ToArray();
 
-        var formatted = string
-            .Join(
-                string.Join(string.Empty, Enumerable.Range(0, seperation).Select(_ => Environment.NewLine)),
-                arr.Select(x => x?.ToString().PrefixSpaces(padding).WithNewlinePadding(padding))
-            );
-
-        if (formatted == string.Empty) return;
-
-        if (any)
+        try
         {
-            for(var i = 0; i != seperation; i++)
-                builder.AppendLine();
+            if (arr.Length == 0) return;
+
+            var formatted = string
+                .Join(
+                    string.Join(string.Empty, Enumerable.Range(0, seperation).Select(_ => Environment.NewLine)),
+                    arr.Select(x => x.ToString().PrefixSpaces(padding).WithNewlinePadding(padding))
+                );
+
+            if (formatted == string.Empty) return;
+
+            if (any)
+            {
+                for (var i = 0; i != seperation; i++)
+                    builder.AppendLine();
+            }
+
+            any = true;
+
+            builder.AppendLine(formatted);
         }
+        catch (Exception ex)
+        {
+            var printed = new StringBuilder();
+            PrintMembers(printed);
 
-        any = true;
-
-        builder.AppendLine(formatted);
+            throw new Exception($"Failed to add {name} members ({typeof(T)})\n{printed}", ex);
+        }
     }
 }

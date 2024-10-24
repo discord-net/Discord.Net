@@ -73,11 +73,14 @@ public readonly record struct ActorInfo(
         => $"Discord.IEntityProvider<{CoreEntity}, {Model}>";
 
     public static ActorInfo Create(LinksV5.NodeContext context)
+        => Create(context.Target);
+    
+    public static ActorInfo Create(LinkActorTargets.GenerationTarget target)
     {
-        var coreActor = context.Target.Assembly is LinkActorTargets.AssemblyTarget.Core
-            ? new TypeRef(context.Target.Actor)
+        var coreActor = target.Assembly is LinkActorTargets.AssemblyTarget.Core
+            ? new TypeRef(target.Actor)
             : new TypeRef(
-                Hierarchy.GetHierarchy(context.Target.Actor, false)
+                Hierarchy.GetHierarchy(target.Actor, false)
                     .First(x =>
                         x.Type.ContainingAssembly.Name == "Discord.Net.V4.Core"
                         &&
@@ -85,10 +88,10 @@ public readonly record struct ActorInfo(
                     ).Type
             );
 
-        var coreEntity = context.Target.Assembly is LinkActorTargets.AssemblyTarget.Core
-            ? new TypeRef(context.Target.Actor)
+        var coreEntity = target.Assembly is LinkActorTargets.AssemblyTarget.Core
+            ? new TypeRef(target.Actor)
             : new TypeRef(
-                Hierarchy.GetHierarchy(context.Target.Entity, false)
+                Hierarchy.GetHierarchy(target.Entity, false)
                     .First(x =>
                         x.Type.ContainingAssembly.Name == "Discord.Net.V4.Core"
                         &&
@@ -97,11 +100,11 @@ public readonly record struct ActorInfo(
             );
 
         return new ActorInfo(
-            Assembly: context.Target.Assembly,
-            Actor: new(context.Target.Actor),
-            Entity: new(context.Target.Entity),
-            Id: new(context.Target.Id),
-            Model: new(context.Target.Model),
+            Assembly: target.Assembly,
+            Actor: new(target.Actor),
+            Entity: new(target.Entity),
+            Id: new(target.Id),
+            Model: new(target.Model),
             CoreEntity: coreEntity,
             CoreActor: coreActor
         );

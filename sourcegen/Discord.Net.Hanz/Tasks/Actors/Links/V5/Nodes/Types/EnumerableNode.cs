@@ -8,12 +8,12 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Discord.Net.Hanz.Tasks.Actors.Links.V5.Nodes.Types;
 
-public class EnumerableLink :
+public class EnumerableNode :
     Node,
     ILinkImplmenter
 {
     public readonly record struct StateWithParameterInfo(
-        Branch<State, LinkNode.State> State,
+        Branch<State> State,
         ExtraParameters? ExtraParameters,
         ImmutableEquatableArray<ExtraParameters> AncestorExtraParameters
     )
@@ -24,7 +24,7 @@ public class EnumerableLink :
                    State.Value.AncestorOverrides.Count > 0
                    ||
                    !State.Value.ActorInfo.IsCore
-                   || 
+                   ||
                    ExtraParameters is {Parameters.Count: > 0}
                );
     }
@@ -34,7 +34,32 @@ public class EnumerableLink :
         ImmutableEquatableArray<(string Actor, string Entity, string OverrideTarget)> AncestorOverrides,
         bool RedefinesLinkMembers,
         bool IsTemplate
-    );
+    )
+    {
+        public static State Create(
+            LinkNode.State link,
+            Grouping<string, ActorInfo> ancestorGrouping)
+        {
+            var ancestors = ancestorGrouping.GetGroupOrEmpty(link.ActorInfo.Actor.DisplayString);
+
+            return new State(
+                link.ActorInfo,
+                new(
+                    ancestors.Select(x =>
+                        (
+                            x.Actor.DisplayString,
+                            x.Entity.FullyQualifiedName,
+                            ancestorGrouping.GetGroupOrEmpty(x.Actor.DisplayString).Count > 0
+                                ? $"{x.Actor}.{link.Path.FormatRelative()}"
+                                : $"{x.FormattedLinkType}.Enumerable"
+                        )
+                    )
+                ),
+                link.IsTemplate || ancestors.Count > 0,
+                link.IsTemplate
+            );
+        }
+    }
 
     public readonly record struct ExtraParameters(
         string Actor,
@@ -121,12 +146,15 @@ public class EnumerableLink :
 
 
     private readonly IncrementalValueProvider<Grouping<string, ExtraParameters>> _extraParametersProvider;
+    private readonly IncrementalValueProvider<Grouping<string, ActorInfo>> _ancestors;
 
-    public EnumerableLink(
+    public EnumerableNode(
         NodeProviders providers,
         Logger logger
     ) : base(providers, logger)
     {
+        _ancestors = providers.ActorAncestors;
+
         _extraParametersProvider = providers
             .Actors
             .Select(ExtraParameters.Create)
@@ -134,31 +162,14 @@ public class EnumerableLink :
             .GroupBy(x => x.Actor);
     }
 
-    public IncrementalValuesProvider<Branch<ILinkImplmenter.LinkImplementation, LinkNode.State>> Branch(
-        IncrementalValuesProvider<Branch<LinkNode.State, LinkNode.State>> provider)
+    public IncrementalValuesProvider<Branch<ILinkImplmenter.LinkImplementation>> Branch(
+        IncrementalValuesProvider<Branch<LinkNode.State>> provider)
     {
         return provider
             .Where(x => x.Value.Entry.Type.Name == "Enumerable")
-            .Select((branch, token) => branch
-                .Mutate(
-                    new State(
-                        branch.Value.ActorInfo,
-                        new(
-                            branch.Value.Actor.State.Ancestors
-                                .Select(x =>
-                                    (
-                                        x.ActorInfo.Actor.DisplayString,
-                                        x.ActorInfo.Entity.FullyQualifiedName,
-                                        x.Ancestors.Count > 0
-                                            ? $"{x.ActorInfo.Actor}.{string.Join(".", branch.Value.Parts)}"
-                                            : $"{x.ActorInfo.FormattedLinkType}.Enumerable"
-                                    )
-                                )
-                        ),
-                        branch.Value.IsTemplate || branch.Value.Actor.State.Ancestors.Count > 0,
-                        branch.Value.IsTemplate
-                    )
-                )
+            .Combine(_ancestors)
+            .Select((tuple, _) => tuple.Left
+                .Mutate(State.Create(tuple.Left.Value, tuple.Right))
             )
             .Combine(
                 _extraParametersProvider,

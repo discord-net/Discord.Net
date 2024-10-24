@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Immutable;
 
 namespace Discord.Net.Hanz.Utils.Bakery;
 
@@ -44,6 +45,22 @@ public sealed class ImmutableEquatableArray<T> :
     public ImmutableEquatableArray<T> AddRange(params T[] values)
         => AddRange((IEnumerable<T>) values);
 
+    public ImmutableEquatableArray<T> Remove(T value)
+    {
+        var idx = Array.IndexOf(_values, value);
+
+        if (idx < 0) return this;
+        
+        if(Count == 1) return Empty;
+
+        var tmp = new T[Count - 1];
+        
+        Array.Copy(_values, tmp, idx);
+        Array.Copy(_values, idx + 1, tmp, idx, _values.Length - idx - 1);
+
+        return new(tmp);
+    }
+
     public bool Equals(ImmutableEquatableArray<T>? other)
         => other != null && ((ReadOnlySpan<T>) _values).SequenceEqual(other._values);
 
@@ -53,7 +70,19 @@ public sealed class ImmutableEquatableArray<T> :
     public override int GetHashCode()
         => HashCode.OfEach(_values);
 
-    public Enumerator GetEnumerator() => new Enumerator(_values);
+    public T[] ToArray()
+    {
+        var arr = new T[Count];
+        
+        _values.CopyTo(arr, 0);
+
+        return arr;
+    }
+
+    public Enumerator GetEnumerator() => new(_values);
+    
+    public IEnumerator<T> GetUnderlyingEnumerator() => ((IEnumerable<T>) _values).GetEnumerator();
+    
     IEnumerator<T> IEnumerable<T>.GetEnumerator() => ((IEnumerable<T>) _values).GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => _values.GetEnumerator();
 

@@ -11,47 +11,151 @@ public readonly struct Grouping<TKey, TElement> :
 {
     private readonly Dictionary<TKey, ImmutableEquatableArray<TElement>> _groups;
 
-    private readonly ImmutableArray<TElement> _elements;
+    private readonly int _hashCode;
 
-    public Grouping(ImmutableArray<TElement> elements, Func<TElement, TKey> keySelector)
+    internal Grouping(Dictionary<TKey, ImmutableEquatableArray<TElement>> groups, int hash)
     {
-        _elements = elements;
+        _hashCode = hash;
+        _groups = groups;
+    }
 
-        _groups = elements
+    public static Grouping<TKey, TElement> Create<TIntermediate>(
+        ImmutableArray<TIntermediate> elements,
+        Func<TIntermediate, TKey> keySelector,
+        Func<TIntermediate, IEnumerable<TElement>> resultSelector
+    ) => new(
+        elements
             .GroupBy(keySelector)
             .ToDictionary(
                 x => x.Key,
-                x => new ImmutableEquatableArray<TElement>(x)
-            );
-    }
+                x => new ImmutableEquatableArray<TElement>(x.SelectMany(resultSelector))
+            ),
+        HashCode.OfEach(elements)
+    );
+
+    public static Grouping<TKey, TElement> Create(ImmutableArray<TElement> elements, Func<TElement, TKey> keySelector)
+        => new(
+            elements
+                .GroupBy(keySelector)
+                .ToDictionary(
+                    x => x.Key,
+                    x => new ImmutableEquatableArray<TElement>(x)
+                ),
+            HashCode.OfEach(elements)
+        );
+
+    public static Grouping<TKey, TElement> Create(ImmutableEquatableArray<TElement> elements,
+        Func<TElement, TKey> keySelector)
+        => new(
+            elements
+                .GroupBy(keySelector)
+                .ToDictionary(
+                    x => x.Key,
+                    x => new ImmutableEquatableArray<TElement>(x)
+                ),
+            HashCode.OfEach(elements)
+        );
 
     public bool TryGetGroup(TKey key, out ImmutableEquatableArray<TElement> elements)
         => _groups.TryGetValue(key, out elements);
 
     public ImmutableEquatableArray<TElement> GetGroupOrEmpty(TKey key)
-        => TryGetGroup(key, out var elements) 
-            ? elements 
+        => TryGetGroup(key, out var elements)
+            ? elements
             : ImmutableEquatableArray<TElement>.Empty;
 
+    public bool HasGroup(TKey key)
+        => _groups.ContainsKey(key);
+
     public bool Equals(Grouping<TKey, TElement> other)
-        => _elements.SequenceEqual(other._elements);
+        => _hashCode == other._hashCode;
 
     public override int GetHashCode()
-        => HashCode.OfEach(_elements);
+        => _hashCode;
 }
 
 public static partial class ProviderExtensions
 {
+    public static TElement? GetValueOrDefault<TKey, TElement>(
+        this Grouping<TKey, TElement> group,
+        TKey key,
+        TElement? defaultValue = default
+    )
+        where TElement : struct, IEquatable<TElement>
+        where TKey : IEquatable<TKey>
+        => group.TryGetGroup(key, out var elements) && elements.Count > 0
+            ? elements[0]
+            : defaultValue;
+
+    public static IncrementalValueProvider<Grouping<TKey, TElement>> GroupBy<TKey, TElement>(
+        this IncrementalValueProvider<ImmutableEquatableArray<TElement>> source,
+        Func<TElement, TKey> keySelector
+    )
+        where TElement : IEquatable<TElement>
+        where TKey : IEquatable<TKey>
+    {
+        return source.Select((items, _) =>
+            Grouping<TKey, TElement>.Create(items, keySelector)
+        );
+    }
+
+    public static IncrementalValueProvider<Grouping<TKey, TElement>> GroupBy<TKey, TElement>(
+        this IncrementalValueProvider<ImmutableArray<TElement>> source,
+        Func<TElement, TKey> keySelector
+    )
+        where TElement : IEquatable<TElement>
+        where TKey : IEquatable<TKey>
+    {
+        return source.Select((items, _) =>
+            Grouping<TKey, TElement>.Create(items, keySelector)
+        );
+    }
+
+    public static IncrementalValueProvider<Grouping<TKey, TResult>> GroupBy<TKey, TElement, TResult>(
+        this IncrementalValueProvider<ImmutableArray<TElement>> source,
+        Func<TElement, TKey> keySelector,
+        Func<TElement, IEnumerable<TResult>> valueSelector
+    )
+        where TElement : IEquatable<TElement>
+        where TResult : IEquatable<TResult>
+        where TKey : IEquatable<TKey>
+    {
+        return source.Select((items, _) =>
+            Grouping<TKey, TResult>.Create(items, keySelector, valueSelector)
+        );
+    }
+
     public static IncrementalValueProvider<Grouping<TKey, TElement>> GroupBy<TKey, TElement>(
         this IncrementalValuesProvider<TElement> source,
         Func<TElement, TKey> keySelector
     )
         where TElement : IEquatable<TElement>
         where TKey : IEquatable<TKey>
+        => GroupBy(source.Collect(), keySelector);
+
+    public static IncrementalValuesProvider<TResult> Pair<
+        TSource,
+        TKey,
+        TElement,
+        TResult
+    >(
+        this IncrementalValuesProvider<TSource> source,
+        IncrementalValueProvider<Grouping<TKey, TElement>> group,
+        Func<TSource, TKey> keySelector,
+        Func<TSource, TElement, TResult> selector
+    )
+        where TElement : IEquatable<TElement>
+        where TKey : IEquatable<TKey>
     {
-        return source.Collect().Select((items, _) =>
-            new Grouping<TKey, TElement>(items, keySelector)
-        );
+        return source
+            .Combine(group)
+            .SelectMany((pair, token) =>
+                pair.Right
+                    .GetGroupOrEmpty(keySelector(pair.Left))
+                    .Select(
+                        element => selector(pair.Left, element)
+                    )
+            );
     }
 
     public static IncrementalValuesProvider<(TSource Left, ImmutableEquatableArray<TElement> Right)> Combine<
@@ -81,7 +185,7 @@ public static partial class ProviderExtensions
         where TElement : IEquatable<TElement>
         where TKey : IEquatable<TKey>
         => Combine(source, group, keySelector, (source, elements, _) => resultSelector(source, elements));
-    
+
     public static IncrementalValuesProvider<TResult> Combine<
         TSource,
         TKey,

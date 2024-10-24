@@ -5,7 +5,7 @@ using Microsoft.CodeAnalysis;
 
 namespace Discord.Net.Hanz.Tasks.Actors.Links.V5.Nodes.Types;
 
-public class IndexableLink : 
+public class IndexableNode : 
     Node,
     ILinkImplmenter
 {
@@ -13,50 +13,47 @@ public class IndexableLink :
         ActorInfo ActorInfo,
         bool RedefinesLinkMembers,
         ImmutableEquatableArray<(string Actor, string OverrideTarget)> AncestorOverrides
-    );
-    
-    public IndexableLink(NodeProviders providers, Logger logger) : base(providers, logger)
+    )
     {
-    }
-    
-    public IncrementalValuesProvider<Branch<ILinkImplmenter.LinkImplementation, LinkNode.State>> Branch(
-        IncrementalValuesProvider<Branch<LinkNode.State, LinkNode.State>> provider)
-    {
-        return provider
-            .Where(x => x.Value is {IsTemplate: true, Entry.Type.Name: "Indexable"})
-            .Select(CreateState)
-            .Select((x, token) => x.Mutate(Build(x.Value, token)));
-    }
-
-    private Branch<State, LinkNode.State> CreateState(
-        Branch<LinkNode.State, LinkNode.State> link,
-        CancellationToken token)
-    {
-        using var logger = Logger
-            .GetSubLogger(link.Value.ActorInfo.Assembly.ToString())
-            .GetSubLogger(nameof(CreateState))
-            .GetSubLogger(link.Value.ActorInfo.Actor.MetadataName);
-        
-        logger.Log($"{link.Value.ActorInfo.Actor}");
-        logger.Log($" - {link.Value.Entry}");
-        
-        return link.Mutate(
-            new State(
-                link.Value.ActorInfo,
-                link.Value.Actor.State.EntityAssignableAncestors.Count > 0 || !link.Value.ActorInfo.IsCore,
+        public static State Create(LinkNode.State link, Grouping<string, ActorInfo> ancestorGrouping)
+        {
+            var ancestors = ancestorGrouping.GetGroupOrEmpty(link.ActorInfo.Actor.DisplayString);
+            
+            return new State(
+                link.ActorInfo,
+                ancestors.Count > 0 || !link.ActorInfo.IsCore,
                 new(
-                    link.Value.Actor.State.Ancestors
+                    ancestors
                         .Select(x =>
                             (
-                                x.ActorInfo.Actor.FullyQualifiedName,
-                                x.Ancestors.Count > 0
-                                    ? $"{x.ActorInfo.Actor}.{string.Join(".", link.Value.Parts)}"
-                                    : $"{x.ActorInfo.FormattedLinkType}.Indexable"
+                                x.Actor.FullyQualifiedName,
+                                ancestorGrouping.GetGroupOrEmpty(x.Actor.DisplayString).Count > 0
+                                    ? $"{x.Actor}.{link.Path.FormatRelative()}"
+                                    : $"{x.FormattedLinkType}.Indexable"
                             )
                         )
                 )
+            );
+        }
+    }
+    
+    private readonly IncrementalValueProvider<Grouping<string, ActorInfo>> _ancestors;
+    
+    public IndexableNode(NodeProviders providers, Logger logger) : base(providers, logger)
+    {
+        _ancestors = providers.ActorAncestors;
+    }
+    
+    public IncrementalValuesProvider<Branch<ILinkImplmenter.LinkImplementation>> Branch(
+        IncrementalValuesProvider<Branch<LinkNode.State>> provider)
+    {
+        return provider
+            .Where(x => x.Value is {IsTemplate: true, Entry.Type.Name: "Indexable"})
+            .Combine(_ancestors)
+            .Select((tuple, _) => tuple.Left
+                .Mutate(State.Create(tuple.Left.Value, tuple.Right))
             )
-        );
+            .Select((x, token) => x.Mutate(Build(x.Value, token)));
     }
 
     private ILinkImplmenter.LinkImplementation Build(State state, CancellationToken token)

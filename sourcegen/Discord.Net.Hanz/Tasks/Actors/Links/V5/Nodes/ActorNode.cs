@@ -39,6 +39,8 @@ public class ActorNode : Node
     {
         public ActorInfo ActorInfo => State.ActorInfo;
 
+        public TypePath Path { get; } = new(new([(typeof(ActorNode), State.ActorInfo.Actor.FullyQualifiedName)]));
+
         public bool RedefinesRootInterfaceMemebrs =>
             !State.ActorInfo.IsCore || AncestralInfo.EntityAssignableAncestors.Count > 0;
     }
@@ -81,6 +83,8 @@ public class ActorNode : Node
 
     public IncrementalValuesProvider<StatefulGeneration<IntrospectedBuildState>> TypeProvider { get; }
 
+    public IncrementalValueProvider<Grouping<string, ActorAncestralInfo>> AncestralProvider { get; }
+
     public ActorNode(
         NodeProviders providers,
         Logger logger
@@ -88,32 +92,39 @@ public class ActorNode : Node
     {
         logger.Log("Initialized");
 
+        AncestralProvider = providers
+            .Context
+            .Collect()
+            .Select(MapAncestralInfo)
+            .GroupBy(x => x.Actor);
+
         var buildProvider = providers
             .Context
             .Select(State.Create)
-            .Combine(providers
-                .Context 
-                .Collect()
-                .Select(MapAncestralInfo)
-            )
-            .Select((x, _) =>
-                new BuildState(
-                    x.Left,
-                    x.Right.FirstOrDefault(y => y.Actor == x.Left.ActorInfo.Actor.DisplayString)
+            .Combine(
+                AncestralProvider,
+                x => x.ActorInfo.Actor.DisplayString,
+                (state, ancestors, token) => new BuildState(
+                    state,
+                    ancestors[0]
                 )
             )
-            .Select(CreatePartialContainer)
+            .Select(CreatePartialContainer);
+
+        buildProvider = AddNestedTypes(
+            buildProvider,
+            (build, _) => new(build.State.ActorInfo, build.Path),
+            GetInstance<HierarchyNode>(),
+            GetInstance<BackLinkNode>(),
+            GetInstance<ExtensionNode>(),
+            GetInstance<LinkNode>()
+        );
+        
+        TypeProvider = buildProvider
             .Collect()
             .SelectMany(Introspect)
             .Select(CreateLinkInterface)
             .Select(CreateRelationshipsTypes);
-        
-        TypeProvider = AddChildren(
-            buildProvider,
-            typeof(BackLinkNode),
-            typeof(ExtensionNode),
-            typeof(LinkNode)
-        );
 
         logger.Flush();
     }
@@ -285,7 +296,7 @@ public class ActorNode : Node
         if (state.CanonicalRelationshipIsRedefined)
         {
             type = type
-                .AddProperty(
+                .AddProperties(
                     new PropertySpec(
                         state.ActorInfo.Actor.FullyQualifiedName,
                         state.RelationshipName,
@@ -322,7 +333,7 @@ public class ActorNode : Node
                     "RelationshipActor",
                     state.RelationshipName
                 )
-                .AddProperty(new PropertySpec(
+                .AddProperties(new PropertySpec(
                     state.ActorInfo.Actor.FullyQualifiedName,
                     state.RelationshipName,
                     Accessibility.Internal
