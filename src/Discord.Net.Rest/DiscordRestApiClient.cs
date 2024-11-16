@@ -1524,9 +1524,6 @@ namespace Discord.API
                 throw new ArgumentException("At least one of 'Content', 'Embeds', 'File' or 'Components' must be specified.", nameof(args));
             }
 
-            if (args.Content.IsSpecified && args.Content.Value is not null && args.Content.Value.Length > DiscordConfig.MaxMessageSize)
-                throw new ArgumentException(message: $"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", paramName: nameof(args.Content));
-
             if (args.Content.IsSpecified && args.Content.Value?.Length > DiscordConfig.MaxMessageSize)
                 throw new ArgumentException(message: $"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", paramName: nameof(args.Content));
 
