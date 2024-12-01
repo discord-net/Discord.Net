@@ -56,9 +56,7 @@ public class RestEntitlement : RestEntity<ulong>, IEntitlement
         ApplicationId = model.ApplicationId;
         Type = model.Type;
         IsConsumed = model.IsConsumed.GetValueOrDefault(false);
-        StartsAt = model.StartsAt.IsSpecified
-            ? model.StartsAt.Value
-            : null;
+        StartsAt = model.StartsAt;
         EndsAt = model.EndsAt.IsSpecified
             ? model.EndsAt.Value
             : null;
