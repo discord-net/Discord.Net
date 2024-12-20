@@ -59,6 +59,7 @@ jobs:
       with:
         private-key: ${{ secrets.DNET_BOT_PEM }}
         app-id: ${{ secrets.DNET_BOT_ID }}
+        owner: ${{ github.repository_owner }}
 
     - name: Push to the Docs Repo
       uses: cpina/github-action-push-to-another-repository@main
