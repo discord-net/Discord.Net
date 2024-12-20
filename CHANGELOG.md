@@ -1,5 +1,37 @@
 # Changelog
 
+## [3.17.0] - 2024-12-20
+
+### Added
+- #3025 Build with .NET 9 SDK (164a289)
+- #3032 Add `net8.0` and `net9.0` (d780d6c)
+- #3033 Add `net8.0` and `net9.0` to the metapackage (93229f6)
+
+- #3005 Add StickerId to REST and WebSocket Sticker audit log data classes (8a2ea4b)
+- #3023 Scheduled event recurrence rule (b7208d4)
+- #3024 Support sending voice messages (5904ecd)
+- #3036 Support for multiple subscription tiers (79fade6)
+- #3017 Add support for keyed services. (3017f6b)
+  
+### Fixed
+- #2974 rest client add webporxy config, keep the processing logic with WebSocketProvider (292f8c4)
+- #3008 fix webhook ctor (433bdc2)
+- #3015 Fixes incorrect cast of parameters in CommandBuilder (aaa8df9)
+- #3028 Create a new scope when building interaction service modules if `AutoServiceScopes = true` (a1e50c4)
+- #3035 NRE in message commands in user app contexts (c78296f)
+- #3034 Entitlements `starts_at` is nullable (d5879c8)
+- #3031 Interaction Service failing to create scopes with some DI providers (a884ad1)
+- #3030 NRE on thread member creation without a guild user in the payload (96a8327)
+
+### Misc
+- #3021 Expose channel type property on `IChannel` (8b92969)
+- #3006 Add missing permissions (6b92cc2)
+- #3007 Allow setting SuppressNotification in webhook client (682d87e)
+- #3027 Eliminate the waste of checking arguments under the same conditions. (f644e68)
+- #3037 add missing overwrite perms (d2d8d73)
+- #3038 Clamp cache size (438e31e)
+
+
 ## [3.16.0] - 2024-09-14
 
 ### Added
