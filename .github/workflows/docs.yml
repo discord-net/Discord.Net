@@ -55,15 +55,15 @@ jobs:
     
     - name: Auth DNet bot
       id: bot_auth
-      uses: machine-learning-apps/actions-app-token@master
+      uses: actions/create-github-app-token@v1
       with:
-        APP_PEM: ${{ secrets.DNET_BOT_PEM }}
-        APP_ID: ${{ secrets.DNET_BOT_ID }}
+        private-key: ${{ secrets.DNET_BOT_PEM }}
+        app-id: ${{ secrets.DNET_BOT_ID }}
 
     - name: Push to the Docs Repo
       uses: cpina/github-action-push-to-another-repository@main
       env:
-        API_TOKEN_GITHUB: ${{ steps.bot_auth.outputs.app_token }}
+        API_TOKEN_GITHUB: ${{ steps.bot_auth.outputs.token }}
       with:
         source-directory: 'output'
         destination-github-username: 'discord-net'
