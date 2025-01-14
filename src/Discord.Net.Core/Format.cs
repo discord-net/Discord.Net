@@ -1,3 +1,4 @@
+using System;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -24,11 +25,16 @@ namespace Discord
         public static string Url(string text, string url) => $"[{text}]({url})";
         /// <summary> Escapes a URL so that a preview is not generated. </summary>
         public static string EscapeUrl(string url) => $"<{url}>";
+        /// <summary> Returns a markdown-formatted string with header formatting. </summary>
+        public static string Header(string text, int level = 1)
+            => level < 1 || level > 3 ? text : $"{new string('#', level)} {text}";
+        /// <summary> Returns a markdown-formatted string with subtext formatting. </summary>
+        public static string Subtext(string text) => $"-# {text}";
 
         /// <summary> Returns a markdown-formatted string with codeblock formatting. </summary>
         public static string Code(string text, string language = null)
         {
-            if (language != null || text.Contains("\n"))
+            if (language is not null || text.Contains("\n"))
                 return $"```{language ?? ""}\n{text}\n```";
             else
                 return $"`{text}`";
