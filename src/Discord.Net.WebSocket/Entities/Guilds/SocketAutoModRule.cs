@@ -60,6 +60,9 @@ namespace Discord.WebSocket
         /// </summary>
         public IReadOnlyCollection<SocketGuildChannel> ExemptChannels { get; private set; }
 
+        /// <inheritdoc />
+        public bool? MentionRaidProtectionEnabled { get; private set; }
+
         /// <inheritdoc/>
         public DateTimeOffset CreatedAt
             => SnowflakeUtils.FromSnowflake(Id);
@@ -106,6 +109,7 @@ namespace Discord.WebSocket
             Enabled = model.Enabled;
             ExemptRoles = model.ExemptRoles.Select(x => Guild.GetRole(x)).ToImmutableArray();
             ExemptChannels = model.ExemptChannels.Select(x => Guild.GetChannel(x)).ToImmutableArray();
+            MentionRaidProtectionEnabled = model.TriggerMetadata.MentionRaidProtectionEnabled.ToNullable();
         }
 
         /// <inheritdoc/>

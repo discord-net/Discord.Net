@@ -55,6 +55,9 @@ public class RestAutoModRule : RestEntity<ulong>, IAutoModRule
     /// <inheritdoc />
     public IReadOnlyCollection<ulong> ExemptChannels { get; private set; }
 
+    /// <inheritdoc />
+    public bool? MentionRaidProtectionEnabled { get; private set; }
+
     internal RestAutoModRule(BaseDiscordClient discord, ulong id) : base(discord, id)
     {
 
@@ -95,6 +98,7 @@ public class RestAutoModRule : RestEntity<ulong>, IAutoModRule
         Enabled = model.Enabled;
         ExemptRoles = model.ExemptRoles.ToImmutableArray();
         ExemptChannels = model.ExemptChannels.ToImmutableArray();
+        MentionRaidProtectionEnabled = model.TriggerMetadata.MentionRaidProtectionEnabled.ToNullable();
     }
 
     /// <inheritdoc />
