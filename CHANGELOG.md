@@ -1,5 +1,14 @@
 # Changelog
 
+## [3.17.0] - 2025-01-19
+
+### Added
+- # #3056 Add IAutomodRule.MentionRaidProtectionEnabled (0e9caf3)
+
+### Fixed
+- # #3057 Use 8.0.x dependencies for net6 support (50aa278)
+
+
 ## [3.17.0] - 2024-12-20
 
 ### Added
