@@ -1,5 +1,4 @@
 using Discord.Rest;
-using NSubstitute;
 using System;
 using Xunit;
 
