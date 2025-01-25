@@ -49,6 +49,6 @@ public class DiscordRestApiClientTests : IClassFixture<RestGuildFixture>, IAsync
             await _apiClient.UploadFileAsync(_channel.Id, new UploadFileParams(new FileAttachment(stream, "filename")));
 
         var exception = await upload.ShouldThrowAsync<HttpException>();
-        Assert.Equal(exception.DiscordCode, DiscordErrorCode.RequestEntityTooLarge);
+        exception.DiscordCode.ShouldBe(DiscordErrorCode.RequestEntityTooLarge);
     }
 }
