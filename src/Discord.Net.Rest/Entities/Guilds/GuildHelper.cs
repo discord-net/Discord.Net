@@ -1538,6 +1538,7 @@ namespace Discord.Rest
                                       AllowList = args.AllowList.IsSpecified ? args.AllowList : rule.AllowList.ToArray(),
                                       MentionLimit = args.MentionLimit.IsSpecified ? args.MentionLimit : rule.MentionTotalLimit ?? Optional<int>.Unspecified,
                                       Presets = args.Presets.IsSpecified ? args.Presets : rule.Presets.ToArray(),
+                                      MentionRaidProtectionEnabled = args.MentionRaidProtectionEnabled.IsSpecified ? args.MentionRaidProtectionEnabled : rule.MentionRaidProtectionEnabled ?? Optional<bool>.Unspecified,
                                   } : Optional<API.TriggerMetadata>.Unspecified
             };
 

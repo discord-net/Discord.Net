@@ -440,7 +440,7 @@ namespace Discord.WebSocket
             => ApiClient.DeleteEntitlementAsync(entitlementId, options);
 
         /// <inheritdoc cref="IDiscordClient.GetEntitlementsAsync"/>
-        public IAsyncEnumerable<IReadOnlyCollection<IEntitlement>> GetEntitlementsAsync(BaseDiscordClient client, int? limit = 100,
+        public IAsyncEnumerable<IReadOnlyCollection<IEntitlement>> GetEntitlementsAsync(int? limit = 100,
             ulong? afterId = null, ulong? beforeId = null, bool excludeEnded = false, ulong? guildId = null, ulong? userId = null,
             ulong[] skuIds = null, RequestOptions options = null)
             => ClientHelper.ListEntitlementsAsync(this, limit, afterId, beforeId, excludeEnded, guildId, userId, skuIds, options);

@@ -2,11 +2,12 @@ using Discord.API;
 using Discord.API.Rest;
 using Discord.Net;
 using Discord.Rest;
-using FluentAssertions;
 using System;
 using System.IO;
 using System.Threading.Tasks;
 using Xunit;
+
+using Shouldly;
 
 namespace Discord;
 
@@ -47,7 +48,7 @@ public class DiscordRestApiClientTests : IClassFixture<RestGuildFixture>, IAsync
         Func<Task> upload = async () =>
             await _apiClient.UploadFileAsync(_channel.Id, new UploadFileParams(new FileAttachment(stream, "filename")));
 
-        await upload.Should().ThrowExactlyAsync<HttpException>()
-                 .Where(e => e.DiscordCode == DiscordErrorCode.RequestEntityTooLarge);
+        var exception = await upload.ShouldThrowAsync<HttpException>();
+        exception.DiscordCode.ShouldBe(DiscordErrorCode.RequestEntityTooLarge);
     }
 }

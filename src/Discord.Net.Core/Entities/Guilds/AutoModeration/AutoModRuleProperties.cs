@@ -131,6 +131,11 @@ namespace Discord
         ///     Gets or sets the exempt channels for the rule. Empty if the rule has no exempt channels.
         /// </summary>
         public Optional<ulong[]> ExemptChannels { get; set; }
+
+        /// <summary>
+        ///     Gets or sets whether to automatically detect mention raids.
+        /// </summary>
+        public Optional<bool> MentionRaidProtectionEnabled { get; set; }
     }
 
     /// <summary>

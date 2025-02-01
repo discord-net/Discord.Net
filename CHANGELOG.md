@@ -1,5 +1,21 @@
 # Changelog
 
+## [3.17.0] - 2025-01-19
+
+### Added
+- #3056 Add IAutomodRule.MentionRaidProtectionEnabled (0e9caf3)
+- #3052 Added Header and Subtext to the Format class (0174745)
+
+### Fixed
+- #3057 Use 8.0.x dependencies for net6 support (50aa278)
+- #3049 `Task.Delay(0)` => `Task.CompletedTask` (b5f5df0)
+- #3014 An AddSlashCommand overload should be AddAutocompleteCommand in ModuleBuilder (35e8122)
+- #3053 `DiscordSocketClient.GetEntitlementsAsync` requiring unused `BaseDiscordClient` parameter (d828cd8)
+
+### Misc 
+- #3046 Refactor & update member search v2 (36439b6)
+
+
 ## [3.17.0] - 2024-12-20
 
 ### Added

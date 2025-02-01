@@ -1,5 +1,3 @@
-using Discord;
-using System;
 using Xunit;
 
 namespace Discord;

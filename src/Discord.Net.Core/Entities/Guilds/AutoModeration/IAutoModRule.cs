@@ -43,7 +43,7 @@ namespace Discord
         ///     This collection will be empty if <see cref="TriggerType"/> is not
         ///     <see cref="AutoModTriggerType.Keyword"/>.
         /// </remarks>
-        public IReadOnlyCollection<string> KeywordFilter { get; }
+        IReadOnlyCollection<string> KeywordFilter { get; }
 
         /// <summary>
         ///     Gets regex patterns for this rule. Empty if the rule has no regexes.
@@ -52,7 +52,7 @@ namespace Discord
         ///     This collection will be empty if <see cref="TriggerType"/> is not
         ///     <see cref="AutoModTriggerType.Keyword"/>.
         /// </remarks>
-        public IReadOnlyCollection<string> RegexPatterns { get; }
+        IReadOnlyCollection<string> RegexPatterns { get; }
 
         /// <summary>
         ///     Gets the allow list patterns for this rule. Empty if the rule has no allowed terms.
@@ -61,7 +61,7 @@ namespace Discord
         ///     This collection will be empty if <see cref="TriggerType"/> is not
         ///     <see cref="AutoModTriggerType.Keyword"/>.
         /// </remarks>
-        public IReadOnlyCollection<string> AllowList { get; }
+        IReadOnlyCollection<string> AllowList { get; }
 
         /// <summary>
         ///     Gets the preset keyword types for this rule. Empty if the rule has no presets.
@@ -70,7 +70,7 @@ namespace Discord
         ///     This collection will be empty if <see cref="TriggerType"/> is not
         ///     <see cref="AutoModTriggerType.KeywordPreset"/>.
         /// </remarks>
-        public IReadOnlyCollection<KeywordPresetTypes> Presets { get; }
+        IReadOnlyCollection<KeywordPresetTypes> Presets { get; }
 
         /// <summary>
         ///     Gets the total mention limit for this rule.
@@ -79,7 +79,7 @@ namespace Discord
         ///     This property will be <see langword="null"/> if <see cref="TriggerType"/> is not
         ///     <see cref="AutoModTriggerType.MentionSpam"/>.
         /// </remarks>
-        public int? MentionTotalLimit { get; }
+        int? MentionTotalLimit { get; }
 
         /// <summary>
         ///     Gets a collection of actions that will be preformed if a user breaks this rule.
@@ -100,6 +100,15 @@ namespace Discord
         ///     Gets a collection of channel ids that are exempt from this rule. Empty if the rule has no exempt channels.
         /// </summary>
         IReadOnlyCollection<ulong> ExemptChannels { get; }
+
+        /// <summary>
+        ///     Gets or sets whether to automatically detect mention raids.
+        /// </summary>
+        /// <remarks>
+        ///     This property will be <see langword="null"/> if <see cref="TriggerType"/> is not
+        ///     <see cref="AutoModTriggerType.MentionSpam"/>.
+        /// </remarks>
+        bool? MentionRaidProtectionEnabled { get; }
 
         /// <summary>
         ///     Modifies this rule.
