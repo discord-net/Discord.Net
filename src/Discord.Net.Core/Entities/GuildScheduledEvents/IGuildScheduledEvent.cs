@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Discord
@@ -89,6 +87,11 @@ namespace Discord
         ///     Gets the user count of the event.
         /// </summary>
         int? UserCount { get; }
+
+        /// <summary>
+        ///     Gets the definition for how often this event should recur. <cref langword="null"/> if not set.
+        /// </summary>
+        GuildScheduledEventRecurrenceRule? RecurrenceRule { get; }
 
         /// <summary>
         ///     Gets this events banner image url.

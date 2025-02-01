@@ -200,7 +200,7 @@ namespace Discord.WebSocket
                 {
                     var _ = g.DownloadUsersAsync();
                 }
-                return Task.Delay(0);
+                return Task.CompletedTask;
             };
 
             _largeGuilds = new ConcurrentQueue<ulong>();

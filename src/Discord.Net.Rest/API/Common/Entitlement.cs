@@ -27,7 +27,7 @@ internal class Entitlement
     public Optional<bool> IsConsumed { get; set; }
 
     [JsonProperty("starts_at")]
-    public Optional<DateTimeOffset> StartsAt { get; set; }
+    public DateTimeOffset? StartsAt { get; set; }
 
     [JsonProperty("ends_at")]
     public Optional<DateTimeOffset?> EndsAt { get; set; }

@@ -19,8 +19,8 @@ namespace Discord.WebSocket
     {
         #region SocketMessage
         private long _timestampTicks;
-        private readonly List<SocketReaction> _reactions = new List<SocketReaction>();
-        private ImmutableArray<SocketUser> _userMentions = ImmutableArray.Create<SocketUser>();
+        private readonly List<SocketReaction> _reactions = [];
+        private ImmutableArray<SocketUser> _userMentions = [];
 
         /// <summary>
         ///     Gets the author of this message.
@@ -116,18 +116,26 @@ namespace Discord.WebSocket
         /// <returns>
         ///     Collection of WebSocket-based guild channels.
         /// </returns>
-        public virtual IReadOnlyCollection<SocketGuildChannel> MentionedChannels => ImmutableArray.Create<SocketGuildChannel>();
+        public virtual IReadOnlyCollection<SocketGuildChannel> MentionedChannels => [];
         /// <summary>
         ///     Returns the roles mentioned in this message.
         /// </summary>
+        /// <remarks>
+        ///     This collection may be missing values due to the guild being missing from cache (i.e. in user app interaction context).
+        ///     In that case you can use the <see cref="MentionedRoleIds"/> property.
+        /// </remarks>
         /// <returns>
         ///     Collection of WebSocket-based roles.
         /// </returns>
-        public virtual IReadOnlyCollection<SocketRole> MentionedRoles => ImmutableArray.Create<SocketRole>();
+        public virtual IReadOnlyCollection<SocketRole> MentionedRoles => [];
+
         /// <inheritdoc />
-        public virtual IReadOnlyCollection<ITag> Tags => ImmutableArray.Create<ITag>();
+        public virtual IReadOnlyCollection<ulong> MentionedRoleIds => [];
+
         /// <inheritdoc />
-        public virtual IReadOnlyCollection<SocketSticker> Stickers => ImmutableArray.Create<SocketSticker>();
+        public virtual IReadOnlyCollection<ITag> Tags => [];
+        /// <inheritdoc />
+        public virtual IReadOnlyCollection<SocketSticker> Stickers => [];
         /// <inheritdoc />
         public IReadOnlyDictionary<IEmote, ReactionMetadata> Reactions => _reactions.GroupBy(r => r.Emote).ToDictionary(x => x.Key, x => new ReactionMetadata { ReactionCount = x.Count(), IsMe = x.Any(y => y.UserId == Discord.CurrentUser.Id) });
         /// <summary>
@@ -221,7 +229,8 @@ namespace Discord.WebSocket
                         var val = value[i];
                         if (val != null)
                         {
-                            var user = Channel.GetUserAsync(val.Id, CacheMode.CacheOnly).GetAwaiter().GetResult() as SocketUser;
+                            // TODO: this is cursed af and should be yeeted
+                            var user = Channel?.GetUserAsync(val.Id, CacheMode.CacheOnly).GetAwaiter().GetResult() as SocketUser;
                             if (user != null)
                                 newMentions.Add(user);
                             else
@@ -295,8 +304,6 @@ namespace Discord.WebSocket
         IReadOnlyCollection<IEmbed> IMessage.Embeds => Embeds;
         /// <inheritdoc />
         IReadOnlyCollection<ulong> IMessage.MentionedChannelIds => MentionedChannels.Select(x => x.Id).ToImmutableArray();
-        /// <inheritdoc />
-        IReadOnlyCollection<ulong> IMessage.MentionedRoleIds => MentionedRoles.Select(x => x.Id).ToImmutableArray();
         /// <inheritdoc />
         IReadOnlyCollection<ulong> IMessage.MentionedUserIds => MentionedUsers.Select(x => x.Id).ToImmutableArray();
 

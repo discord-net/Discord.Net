@@ -8,7 +8,7 @@ internal class GuildMemberSearchResponse
     public ulong GuildId { get; set; }
 
     [JsonProperty("members")]
-    public GuildSearchMemberData[] Members { get; set; }
+    public SupplementalGuildUser[] Members { get; set; }
 
     [JsonProperty("page_result_count")]
     public int PageResultCount { get; set; }

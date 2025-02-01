@@ -85,7 +85,7 @@ namespace Discord.Rest
         internal override Task OnLogoutAsync()
         {
             _applicationInfo = null;
-            return Task.Delay(0);
+            return Task.CompletedTask;
         }
 
         #region Rest interactions

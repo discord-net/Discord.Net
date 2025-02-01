@@ -777,168 +777,11 @@ namespace Discord.Rest
             var apiArgs = new SearchGuildMembersParamsV2
             {
                 Limit = limit,
-                After = args is null
-                    ? null
-                    : new SearchParamsAfter 
-                    {
-                        UserId = args.After.UserId,
-                        GuildJoinedAt = args.After.GuildJoinedAt
-                    },
+                After = args?.After?.ToModel() ?? Optional<API.Rest.MemberSearchPaginationFilter>.Unspecified,
+                Before = args?.Before?.ToModel() ?? Optional<API.Rest.MemberSearchPaginationFilter>.Unspecified,
                 Sort = args?.Sort ?? Optional<MemberSearchV2SortType>.Unspecified,
-                OrQuery = args is null
-                    ? Optional<SearchQueryParams>.Unspecified
-                    : args.OrQuery is null
-                        ? Optional<SearchQueryParams>.Unspecified
-                        : new SearchQueryParams
-                        {
-                            GuildJoinedAt = args.OrQuery.Value.GuildJoinedAt is null
-                                ? Optional<SearchRangeProperties>.Unspecified
-                                : new SearchRangeProperties
-                                {
-                                    GreaterThanOrEqual = args.OrQuery.Value.GuildJoinedAt.Value.GreaterThanOrEqual is null
-                                        ? Optional<long>.Unspecified
-                                        : args.OrQuery.Value.GuildJoinedAt.Value.GreaterThanOrEqual.Value,
-                                    LessThanOrEqual = args.OrQuery.Value.GuildJoinedAt.Value.LessThanOrEqual is null
-                                        ? Optional<long>.Unspecified
-                                        : args.OrQuery.Value.GuildJoinedAt.Value.LessThanOrEqual.Value,
-                                },
-                            JoinSourceType = args.OrQuery.Value.JoinSourceType is null
-                                ? Optional<SearchQueryProperties>.Unspecified
-                                : new SearchQueryProperties
-                                {
-                                    AndQuery = args.OrQuery.Value.JoinSourceType.Value.AndQuery ?? Optional<Dictionary<int, object>>.Unspecified,
-                                    OrQuery = args.OrQuery.Value.JoinSourceType.Value.OrQuery ?? Optional<Dictionary<int, object>>.Unspecified
-                                },
-                            RoleIds = args.OrQuery.Value.RoleIds is null
-                                ? Optional<SearchQueryProperties>.Unspecified
-                                : new SearchQueryProperties
-                                {
-                                    AndQuery = args.OrQuery.Value.RoleIds.Value.AndQuery ?? Optional<Dictionary<int, object>>.Unspecified,
-                                    OrQuery = args.OrQuery.Value.RoleIds.Value.OrQuery ?? Optional<Dictionary<int, object>>.Unspecified
-                                },
-                            SourceInviteCode = args.OrQuery.Value.SourceInviteCode is null
-                                ? Optional<SearchQueryProperties>.Unspecified
-                                : new SearchQueryProperties
-                                {
-                                    AndQuery = args.OrQuery.Value.SourceInviteCode.Value.AndQuery ?? Optional<Dictionary<int, object>>.Unspecified,
-                                    OrQuery = args.OrQuery.Value.SourceInviteCode.Value.OrQuery ?? Optional<Dictionary<int, object>>.Unspecified
-                                },
-                            SafetySignals = args.OrQuery.Value.SafetySignals is null
-                                ? Optional<SafetySignalsProperties>.Unspecified
-                                : new SafetySignalsProperties
-                                {
-                                    AutomodQuarantinedUsername = args.OrQuery.Value.SafetySignals.Value.AutomodQuarantinedUsername is null
-                                        ? Optional<bool>.Unspecified
-                                        : args.OrQuery.Value.SafetySignals.Value.AutomodQuarantinedUsername.Value,
-                                    UnusualAccountActivity = args.OrQuery.Value.SafetySignals.Value.UnusualAccountActivity is null
-                                        ? Optional<bool>.Unspecified
-                                        : args.OrQuery.Value.SafetySignals.Value.UnusualAccountActivity.Value,
-                                    CommunicationDisabledUntil = args.OrQuery.Value.SafetySignals.Value.CommunicationDisabledUntil is null
-                                        ? Optional<SafetySignalProperties>.Unspecified
-                                        : new SafetySignalProperties
-                                        {
-                                            Until = new SearchRangeProperties
-                                            {
-                                                GreaterThanOrEqual = args.OrQuery.Value.SafetySignals.Value.CommunicationDisabledUntil.Value.Range.GreaterThanOrEqual ?? Optional<long>.Unspecified,
-                                                LessThanOrEqual = args.OrQuery.Value.SafetySignals.Value.CommunicationDisabledUntil.Value.Range.LessThanOrEqual ?? Optional<long>.Unspecified,
-                                            }
-                                        },
-                                    UnusualDMActivityUntil = args.OrQuery.Value.SafetySignals.Value.UnusualDmActivityUntil is null
-                                        ? Optional<SafetySignalProperties>.Unspecified
-                                        : new SafetySignalProperties
-                                        {
-                                            Until = new SearchRangeProperties
-                                            {
-                                                GreaterThanOrEqual = args.OrQuery.Value.SafetySignals.Value.UnusualDmActivityUntil.Value.Range.GreaterThanOrEqual ?? Optional<long>.Unspecified,
-                                                LessThanOrEqual = args.OrQuery.Value.SafetySignals.Value.UnusualDmActivityUntil.Value.Range.LessThanOrEqual ?? Optional<long>.Unspecified,
-                                            }
-                                        },
-                                },
-                            UserId = args.OrQuery.Value.UserId is null
-                                ? Optional<SearchRangeProperties>.Unspecified
-                                : new SearchRangeProperties
-                                {
-                                    LessThanOrEqual = args.OrQuery.Value.UserId.Value.LessThanOrEqual ?? Optional<long>.Unspecified,
-                                    GreaterThanOrEqual = args.OrQuery.Value.UserId.Value.GreaterThanOrEqual ?? Optional<long>.Unspecified,
-                                },
-                        },
-                AndQuery = args is null
-                    ? Optional<SearchQueryParams>.Unspecified
-                    : args.AndQuery is null
-                        ? Optional<SearchQueryParams>.Unspecified
-                        : new SearchQueryParams
-                        {
-                            GuildJoinedAt = args.AndQuery.Value.GuildJoinedAt is null
-                                ? Optional<SearchRangeProperties>.Unspecified
-                                : new SearchRangeProperties
-                                {
-                                    GreaterThanOrEqual = args.AndQuery.Value.GuildJoinedAt.Value.GreaterThanOrEqual is null
-                                        ? Optional<long>.Unspecified
-                                        : args.AndQuery.Value.GuildJoinedAt.Value.GreaterThanOrEqual.Value,
-                                    LessThanOrEqual = args.AndQuery.Value.GuildJoinedAt.Value.LessThanOrEqual is null
-                                        ? Optional<long>.Unspecified
-                                        : args.AndQuery.Value.GuildJoinedAt.Value.LessThanOrEqual.Value,
-                                },
-                            JoinSourceType = args.AndQuery.Value.JoinSourceType is null
-                                ? Optional<SearchQueryProperties>.Unspecified
-                                : new SearchQueryProperties
-                                {
-                                    AndQuery = args.AndQuery.Value.JoinSourceType.Value.AndQuery ?? Optional<Dictionary<int, object>>.Unspecified,
-                                    OrQuery = args.AndQuery.Value.JoinSourceType.Value.OrQuery ?? Optional<Dictionary<int, object>>.Unspecified
-                                },
-                            RoleIds = args.AndQuery.Value.RoleIds is null
-                                ? Optional<SearchQueryProperties>.Unspecified
-                                : new SearchQueryProperties
-                                {
-                                    AndQuery = args.AndQuery.Value.RoleIds.Value.AndQuery ?? Optional<Dictionary<int, object>>.Unspecified,
-                                    OrQuery = args.AndQuery.Value.RoleIds.Value.OrQuery ?? Optional<Dictionary<int, object>>.Unspecified
-                                },
-                            SourceInviteCode = args.AndQuery.Value.SourceInviteCode is null
-                                ? Optional<SearchQueryProperties>.Unspecified
-                                : new SearchQueryProperties
-                                {
-                                    AndQuery = args.AndQuery.Value.SourceInviteCode.Value.AndQuery ?? Optional<Dictionary<int, object>>.Unspecified,
-                                    OrQuery = args.AndQuery.Value.SourceInviteCode.Value.OrQuery ?? Optional<Dictionary<int, object>>.Unspecified
-                                },
-                            SafetySignals = args.AndQuery.Value.SafetySignals is null
-                                ? Optional<SafetySignalsProperties>.Unspecified
-                                : new SafetySignalsProperties
-                                {
-                                    AutomodQuarantinedUsername = args.AndQuery.Value.SafetySignals.Value.AutomodQuarantinedUsername is null
-                                        ? Optional<bool>.Unspecified
-                                        : args.AndQuery.Value.SafetySignals.Value.AutomodQuarantinedUsername.Value,
-                                    UnusualAccountActivity = args.AndQuery.Value.SafetySignals.Value.UnusualAccountActivity is null
-                                        ? Optional<bool>.Unspecified
-                                        : args.AndQuery.Value.SafetySignals.Value.UnusualAccountActivity.Value,
-                                    CommunicationDisabledUntil = args.AndQuery.Value.SafetySignals.Value.CommunicationDisabledUntil is null
-                                        ? Optional<SafetySignalProperties>.Unspecified
-                                        : new SafetySignalProperties
-                                        {
-                                            Until = new SearchRangeProperties
-                                            {
-                                                GreaterThanOrEqual = args.AndQuery.Value.SafetySignals.Value.CommunicationDisabledUntil.Value.Range.GreaterThanOrEqual ?? Optional<long>.Unspecified,
-                                                LessThanOrEqual = args.AndQuery.Value.SafetySignals.Value.CommunicationDisabledUntil.Value.Range.LessThanOrEqual ?? Optional<long>.Unspecified,
-                                            }
-                                        },
-                                    UnusualDMActivityUntil = args.AndQuery.Value.SafetySignals.Value.UnusualDmActivityUntil is null
-                                        ? Optional<SafetySignalProperties>.Unspecified
-                                        : new SafetySignalProperties
-                                        {
-                                            Until = new SearchRangeProperties
-                                            {
-                                                GreaterThanOrEqual = args.AndQuery.Value.SafetySignals.Value.UnusualDmActivityUntil.Value.Range.GreaterThanOrEqual ?? Optional<long>.Unspecified,
-                                                LessThanOrEqual = args.AndQuery.Value.SafetySignals.Value.UnusualDmActivityUntil.Value.Range.LessThanOrEqual ?? Optional<long>.Unspecified,
-                                            }
-                                        },
-                                },
-                            UserId = args.AndQuery.Value.UserId is null
-                                ? Optional<SearchRangeProperties>.Unspecified
-                                : new SearchRangeProperties
-                                {
-                                    LessThanOrEqual = args.AndQuery.Value.UserId.Value.LessThanOrEqual ?? Optional<long>.Unspecified,
-                                    GreaterThanOrEqual = args.AndQuery.Value.UserId.Value.GreaterThanOrEqual ?? Optional<long>.Unspecified,
-                                },
-                        },
+                OrQuery = args?.OrQuery?.ToModel() ?? Optional<API.Rest.MemberSearchFilter>.Unspecified,
+                AndQuery = args?.AndQuery?.ToModel() ?? Optional<API.Rest.MemberSearchFilter>.Unspecified
             };
             var model = await client.ApiClient.SearchGuildMembersAsyncV2(guild.Id, apiArgs, options);
 
@@ -1273,6 +1116,55 @@ namespace Discord.Rest
                 }
             }
 
+            if (args.RecurrenceRule is { IsSpecified: true, Value: not null })
+            {
+                var rule = args.RecurrenceRule.Value;
+
+                var hasByWeekDay = rule.ByWeekday?.Any() ?? false;
+                var hasByNWeekDay = rule.ByNWeekday?.Any() ?? false;
+                var hasByMonth = (rule.ByMonthDay?.Any() ?? false) || (rule.ByMonth?.Any() ?? false);
+
+                if (hasByWeekDay && hasByNWeekDay ||
+                    hasByWeekDay && hasByMonth ||
+                    hasByNWeekDay && hasByMonth)
+                {
+                    throw new ArgumentException($"A recurrence rule can have one of ('{nameof(rule.ByWeekday)}', '{nameof(rule.ByNWeekday)}', '{nameof(rule.ByMonth)}' + '{nameof(rule.ByMonthDay)}'), but not a combination of them.");
+                }
+
+                if (hasByWeekDay)
+                {
+                    if (rule.Frequency is not RecurrenceFrequency.Daily and not RecurrenceFrequency.Weekly)
+                        throw new ArgumentException($"A {nameof(rule.ByWeekday)} rule can only be used with {nameof(rule.Frequency)} of 'Daily' or 'Weekly'.");
+
+                    if (rule.Frequency is RecurrenceFrequency.Weekly)
+                    {
+                        if (rule.ByWeekday.Count != 1)
+                            throw new ArgumentException("A 'Weekly' recurrence rule must have a single weekday selected.");
+
+                        if (rule.Interval == 1)
+                            throw new ArgumentException($"{nameof(rule.Interval)} can only be set to a value other than '1' when {nameof(rule.Frequency)} is set to 'Weekly'");
+                    }
+                }
+
+                if (hasByNWeekDay)
+                {
+                    if (rule.Frequency is not RecurrenceFrequency.Monthly)
+                        throw new ArgumentException($"A {rule.ByNWeekday} rule must have {nameof(rule.Frequency)} set to 'Monthly'.");
+
+                    if (rule.ByNWeekday.Count != 1)
+                        throw new ArgumentException($"A {rule.ByNWeekday} must have exactly one day selected.");
+                }
+
+                if (hasByMonth)
+                {
+                    if (rule.Frequency is not RecurrenceFrequency.Yearly)
+                        throw new ArgumentException($"A {rule.ByMonth} rule must have {nameof(rule.Frequency)} set to 'Yearly'.");
+
+                    if (rule.ByMonth?.Count is not 1 || rule.ByMonthDay?.Count is not 1)
+                        throw new ArgumentException($"A {rule.ByMonth} rule must have exactly 1 day and 1 month selected.");
+                }
+            }
+
             var apiArgs = new ModifyGuildScheduledEventParams()
             {
                 ChannelId = args.ChannelId,
@@ -1284,10 +1176,11 @@ namespace Discord.Rest
                 Status = args.Status,
                 Type = args.Type,
                 Image = args.CoverImage.IsSpecified
-                    ? args.CoverImage.Value.HasValue
-                        ? args.CoverImage.Value.Value.ToModel()
-                        : null
-                    : Optional<ImageModel?>.Unspecified
+                    ? args.CoverImage.Value?.ToModel()
+                    : Optional<ImageModel?>.Unspecified,
+                RecurrenceRule = args.RecurrenceRule.IsSpecified
+                    ? args.RecurrenceRule.Value?.ToModel()
+                    : Optional<API.GuildScheduledEventRecurrenceRule>.Unspecified
             };
 
             if (args.Location.IsSpecified)
@@ -1328,7 +1221,8 @@ namespace Discord.Rest
             ulong? channelId = null,
             string location = null,
             Image? bannerImage = null,
-            RequestOptions options = null)
+            RequestOptions options = null,
+            GuildScheduledEventRecurrenceRuleProperties recurrenceRule = null)
         {
             if (location != null)
             {
@@ -1353,6 +1247,53 @@ namespace Discord.Rest
             if (endTime != null && endTime <= startTime)
                 throw new ArgumentOutOfRangeException(nameof(endTime), $"{nameof(endTime)} cannot be before the start time");
 
+            if (recurrenceRule is not null)
+            {
+                var hasByWeekDay = recurrenceRule.ByWeekday?.Any() ?? false;
+                var hasByNWeekDay = recurrenceRule.ByNWeekday?.Any() ?? false;
+                var hasByMonth = (recurrenceRule.ByMonthDay?.Any() ?? false) || (recurrenceRule.ByMonth?.Any() ?? false);
+
+                if (hasByWeekDay && hasByNWeekDay ||
+                    hasByWeekDay && hasByMonth ||
+                    hasByNWeekDay && hasByMonth)
+                {
+                    throw new ArgumentException($"A recurrence rule can have one of ('{nameof(recurrenceRule.ByWeekday)}', '{nameof(recurrenceRule.ByNWeekday)}', '{nameof(recurrenceRule.ByMonth)}' + '{nameof(recurrenceRule.ByMonthDay)}'), but not a combination of them.");
+                }
+
+                if (hasByWeekDay)
+                {
+                    if (recurrenceRule.Frequency is not RecurrenceFrequency.Daily and not RecurrenceFrequency.Weekly)
+                        throw new ArgumentException($"A {nameof(recurrenceRule.ByWeekday)} rule can only be used with {nameof(recurrenceRule.Frequency)} of 'Daily' or 'Weekly'.");
+
+                    if (recurrenceRule.Frequency is RecurrenceFrequency.Weekly)
+                    {
+                        if (recurrenceRule.ByWeekday.Count != 1)
+                            throw new ArgumentException("A 'Weekly' recurrence rule must have a single weekday selected.");
+
+                        if (recurrenceRule.Interval == 1)
+                            throw new ArgumentException($"{nameof(recurrenceRule.Interval)} can only be set to a value other than '1' when {nameof(recurrenceRule.Frequency)} is set to 'Weekly'");
+                    }
+                }
+
+                if (hasByNWeekDay)
+                {
+                    if (recurrenceRule.Frequency is not RecurrenceFrequency.Monthly)
+                        throw new ArgumentException($"A {recurrenceRule.ByNWeekday} rule must have {nameof(recurrenceRule.Frequency)} set to 'Monthly'.");
+
+                    if (recurrenceRule.ByNWeekday.Count != 1)
+                        throw new ArgumentException($"A {recurrenceRule.ByNWeekday} must have exactly one day selected.");
+                }
+
+                if (hasByMonth)
+                {
+                    if (recurrenceRule.Frequency is not RecurrenceFrequency.Yearly)
+                        throw new ArgumentException($"A {recurrenceRule.ByMonth} rule must have {nameof(recurrenceRule.Frequency)} set to 'Yearly'.");
+
+                    if (recurrenceRule.ByMonth?.Count is not 1 || recurrenceRule.ByMonthDay?.Count is not 1)
+                        throw new ArgumentException($"A {recurrenceRule.ByMonth} rule must have exactly 1 day and 1 month selected.");
+                }
+            }
+
 
             var apiArgs = new CreateGuildScheduledEventParams()
             {
@@ -1363,7 +1304,8 @@ namespace Discord.Rest
                 PrivacyLevel = privacyLevel,
                 StartTime = startTime,
                 Type = type,
-                Image = bannerImage.HasValue ? bannerImage.Value.ToModel() : Optional<ImageModel>.Unspecified
+                Image = bannerImage?.ToModel() ?? Optional<ImageModel>.Unspecified,
+                RecurrenceRule = recurrenceRule?.ToModel() ?? Optional<API.GuildScheduledEventRecurrenceRule>.Unspecified
             };
 
             if (location != null)

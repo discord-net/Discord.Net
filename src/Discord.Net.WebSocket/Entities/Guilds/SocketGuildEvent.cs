@@ -65,6 +65,9 @@ namespace Discord.WebSocket
         /// <inheritdoc/>
         public int? UserCount { get; private set; }
 
+        /// <inheritdoc/>
+        public GuildScheduledEventRecurrenceRule? RecurrenceRule { get; private set; }
+
         internal SocketGuildEvent(DiscordSocketClient client, SocketGuild guild, ulong id)
             : base(client, id)
         {
@@ -117,6 +120,8 @@ namespace Discord.WebSocket
             UserCount = model.UserCount.ToNullable();
             CoverImageId = model.Image;
             GuildId = model.GuildId;
+
+            RecurrenceRule = model.RecurrenceRule?.ToEntity();
         }
 
         /// <inheritdoc/>

@@ -1277,6 +1277,7 @@ namespace Discord.Rest
         /// <param name="location">The location of the event; links are supported</param>
         /// <param name="coverImage">The optional banner image for the event.</param>
         /// <param name="options">The options to be used when sending the request.</param>
+        /// <param name="recurrenceRule">The definition for how often this event should recur.</param>
         /// <returns>
         ///     A task that represents the asynchronous create operation.
         /// </returns>
@@ -1290,8 +1291,9 @@ namespace Discord.Rest
             ulong? channelId = null,
             string location = null,
             Image? coverImage = null,
-            RequestOptions options = null)
-            => GuildHelper.CreateGuildEventAsync(Discord, this, name, privacyLevel, startTime, type, description, endTime, channelId, location, coverImage, options);
+            RequestOptions options = null,
+            GuildScheduledEventRecurrenceRuleProperties recurrenceRule = null)
+            => GuildHelper.CreateGuildEventAsync(Discord, this, name, privacyLevel, startTime, type, description, endTime, channelId, location, coverImage, options, recurrenceRule);
 
         #endregion
 

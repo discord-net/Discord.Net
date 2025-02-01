@@ -9,19 +9,22 @@ internal class SearchGuildMembersParamsV2
     public Optional<int?> Limit { get; set; }
 
     [JsonProperty("and_query")]
-    public Optional<SearchQueryParams> AndQuery { get; set; }
+    public Optional<MemberSearchFilter> AndQuery { get; set; }
 
     [JsonProperty("or_query")]
-    public Optional<SearchQueryParams> OrQuery { get; set; }
+    public Optional<MemberSearchFilter> OrQuery { get; set; }
 
     [JsonProperty("after")]
-    public Optional<SearchParamsAfter> After { get; set; }
+    public Optional<MemberSearchPaginationFilter> After { get; set; }
+
+    [JsonProperty("before")]
+    public Optional<MemberSearchPaginationFilter> Before { get; set; }
 
     [JsonProperty("sort")]
     public Optional<MemberSearchV2SortType> Sort { get; set; }
 }
 
-internal class SearchParamsAfter
+internal class MemberSearchPaginationFilter
 {
     [JsonProperty("guild_joined_at")]
     public long GuildJoinedAt { get; set; }
@@ -30,7 +33,7 @@ internal class SearchParamsAfter
     public ulong UserId { get; set; }
 }
 
-internal class SearchQueryParams
+internal class MemberSearchFilter
 {
     [JsonProperty("safety_signals")]
     public Optional<SafetySignalsProperties> SafetySignals { get; set; }
@@ -39,46 +42,52 @@ internal class SearchQueryParams
     public Optional<SearchQueryProperties> RoleIds { get; set; }
 
     [JsonProperty("user_id")]
-    public Optional<SearchRangeProperties> UserId { get; set; }
+    public Optional<SearchQueryProperties> UserId { get; set; }
 
     [JsonProperty("guild_joined_at")]
-    public Optional<SearchRangeProperties> GuildJoinedAt { get; set; }
+    public Optional<SearchQueryProperties> GuildJoinedAt { get; set; }
 
     [JsonProperty("source_invite_code")]
     public Optional<SearchQueryProperties> SourceInviteCode { get; set; }
 
     [JsonProperty("join_source_type")]
     public Optional<SearchQueryProperties> JoinSourceType { get; set; }
+
+    [JsonProperty("did_rejoin")]
+    public Optional<bool> DidRejoin { get; set; }
+
+    [JsonProperty("is_pending")]
+    public Optional<bool> IsPending { get; set; }
+
+    [JsonProperty("usernames")]
+    public Optional<SearchQueryProperties> Usernames { get; set; }
 }
 
 internal class SearchQueryProperties
 {
     [JsonProperty("and_query")]
-    public Optional<Dictionary<int, object>> AndQuery { get; set; }
+    public Optional<IEnumerable<object>> AndQuery { get; set; }
 
     [JsonProperty("or_query")]
-    public Optional<Dictionary<int, object>> OrQuery { get; set; }
+    public Optional<IEnumerable<object>> OrQuery { get; set; }
+
+    [JsonProperty("range")]
+    public Optional<SearchRangeProperties> Range { get; set; }
 }
 
 internal class SafetySignalsProperties
 {
     [JsonProperty("unusual_dm_activity_until")]
-    public Optional<SafetySignalProperties> UnusualDMActivityUntil { get; set; }
+    public Optional<SearchQueryProperties> UnusualDMActivityUntil { get; set; }
 
     [JsonProperty("communication_disabled_until")]
-    public Optional<SafetySignalProperties> CommunicationDisabledUntil { get; set; }
+    public Optional<SearchQueryProperties> CommunicationDisabledUntil { get; set; }
 
     [JsonProperty("unusual_account_activity")]
     public Optional<bool> UnusualAccountActivity { get; set; }
 
     [JsonProperty("automod_quarantined_username")]
     public Optional<bool> AutomodQuarantinedUsername  { get; set; }
-}
-
-internal class SafetySignalProperties
-{
-    [JsonProperty("range")]
-    public SearchRangeProperties Until { get; set; }
 }
 
 internal class SearchRangeProperties

@@ -58,6 +58,9 @@ namespace Discord.Rest
         /// <inheritdoc/>
         public int? UserCount { get; private set; }
 
+        /// <inheritdoc/>
+        public GuildScheduledEventRecurrenceRule? RecurrenceRule { get; private set; }
+
         internal RestGuildEvent(BaseDiscordClient client, IGuild guild, ulong id)
             : base(client, id)
         {
@@ -106,6 +109,8 @@ namespace Discord.Rest
             UserCount = model.UserCount.ToNullable();
             CoverImageId = model.Image;
             GuildId = model.GuildId;
+
+            RecurrenceRule = model.RecurrenceRule?.ToEntity();
         }
 
         /// <inheritdoc/>

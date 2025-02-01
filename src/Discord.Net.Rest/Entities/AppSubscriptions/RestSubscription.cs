@@ -22,6 +22,9 @@ public class RestSubscription : RestEntity<ulong>, ISubscription
     public IReadOnlyCollection<ulong> EntitlementIds { get; private set; }
 
     /// <inheritdoc />
+    public IReadOnlyCollection<ulong> RenewalSKUIds { get; private set; }
+
+    /// <inheritdoc />
     public DateTimeOffset CurrentPeriodStart { get; private set; }
 
     /// <inheritdoc />
@@ -52,6 +55,7 @@ public class RestSubscription : RestEntity<ulong>, ISubscription
         UserId = model.UserId;
         SKUIds = model.SKUIds.ToImmutableArray();
         EntitlementIds = model.EntitlementIds.ToImmutableArray();
+        RenewalSKUIds = model.RenewalSKUIds?.ToImmutableArray() ?? [];
         CurrentPeriodStart = model.CurrentPeriodStart;
         CurrentPeriodEnd = model.CurrentPeriodEnd;
         Status = model.Status;

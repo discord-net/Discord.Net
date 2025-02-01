@@ -49,7 +49,7 @@ namespace Discord.Net.Examples.Core.Entities.Channels
             // Another dummy method
             Task LongRunningAsync()
             {
-                return Task.Delay(0);
+                return Task.CompletedTask;
             }
 
             #region GetMessagesAsync.FromLimit.Standard

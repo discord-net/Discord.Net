@@ -2,7 +2,7 @@ using Newtonsoft.Json;
 
 namespace Discord.API;
 
-internal class GuildSearchMemberData
+internal class SupplementalGuildUser
 {
     [JsonProperty("member")]
     public GuildMember Member { get; set; }

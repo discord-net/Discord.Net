@@ -124,7 +124,7 @@ namespace Discord.Rest
             await _loggedInEvent.InvokeAsync().ConfigureAwait(false);
         }
         internal virtual Task OnLoginAsync(TokenType tokenType, string token)
-            => Task.Delay(0);
+            => Task.CompletedTask;
 
         public async Task LogoutAsync()
         {
@@ -150,7 +150,7 @@ namespace Discord.Rest
             await _loggedOutEvent.InvokeAsync().ConfigureAwait(false);
         }
         internal virtual Task OnLogoutAsync()
-            => Task.Delay(0);
+            => Task.CompletedTask;
 
         internal virtual void Dispose(bool disposing)
         {
@@ -266,10 +266,10 @@ namespace Discord.Rest
 
         /// <inheritdoc />
         Task IDiscordClient.StartAsync()
-            => Task.Delay(0);
+            => Task.CompletedTask;
         /// <inheritdoc />
         Task IDiscordClient.StopAsync()
-            => Task.Delay(0);
+            => Task.CompletedTask;
 
         /// <summary>
         ///     Creates a test entitlement to a given SKU for a given guild or user.

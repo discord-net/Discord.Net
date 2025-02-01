@@ -79,7 +79,7 @@ namespace Discord.Rest
         }
 
         /// <inheritdoc />
-        public virtual Task UpdateAsync(RequestOptions options = null) => Task.Delay(0);
+        public virtual Task UpdateAsync(RequestOptions options = null) => Task.CompletedTask;
         #endregion
 
         #region IChannel

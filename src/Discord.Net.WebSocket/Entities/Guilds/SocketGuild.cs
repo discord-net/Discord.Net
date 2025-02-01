@@ -1417,6 +1417,7 @@ namespace Discord.WebSocket
         /// <param name="location">The location of the event; links are supported</param>
         /// <param name="coverImage">The optional banner image for the event.</param>
         /// <param name="options">The options to be used when sending the request.</param>
+        /// <param name="recurrenceRule">The definition for how often this event should recur.</param>
         /// <returns>
         ///     A task that represents the asynchronous create operation.
         /// </returns>
@@ -1430,7 +1431,8 @@ namespace Discord.WebSocket
             ulong? channelId = null,
             string location = null,
             Image? coverImage = null,
-            RequestOptions options = null)
+            RequestOptions options = null,
+            GuildScheduledEventRecurrenceRuleProperties recurrenceRule = null)
         {
             // requirements taken from https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-permissions-requirements
             switch (type)
@@ -1446,7 +1448,7 @@ namespace Discord.WebSocket
                     break;
             }
 
-            return GuildHelper.CreateGuildEventAsync(Discord, this, name, privacyLevel, startTime, type, description, endTime, channelId, location, coverImage, options);
+            return GuildHelper.CreateGuildEventAsync(Discord, this, name, privacyLevel, startTime, type, description, endTime, channelId, location, coverImage, options, recurrenceRule);
         }
 
 
@@ -1791,7 +1793,7 @@ namespace Discord.WebSocket
                     audioClient.Connected += () =>
                     {
                         _ = promise.TrySetResultAsync(_audioClient);
-                        return Task.Delay(0);
+                        return Task.CompletedTask;
                     };
 
                     _audioClient = audioClient;

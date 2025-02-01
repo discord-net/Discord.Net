@@ -185,7 +185,7 @@ namespace Discord.Interactions.Builders
 
         /// <inheritdoc/>
         ICommandBuilder ICommandBuilder.AddParameters(params IParameterBuilder[] parameters) =>
-            AddParameters(parameters as TParamBuilder);
+            AddParameters(parameters as TParamBuilder[]);
 
         /// <inheritdoc/>
         ICommandBuilder ICommandBuilder.WithPreconditions(params PreconditionAttribute[] preconditions) =>

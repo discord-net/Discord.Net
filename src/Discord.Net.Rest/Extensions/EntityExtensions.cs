@@ -231,5 +231,34 @@ namespace Discord.Rest
                 Id = interaction.Id,
             };
         }
+
+        public static GuildScheduledEventRecurrenceRule ToEntity(this API.GuildScheduledEventRecurrenceRule rule)
+            => new(
+                rule.StartAt,
+                rule.EndAt,
+                rule.Frequency,
+                rule.Interval,
+                rule.ByWeekday?.ToReadOnlyCollection() ?? ImmutableArray<RecurrenceRuleWeekday>.Empty,
+                rule.ByNWeekday?.Select(x => new RecurrenceRuleByNWeekday(x.WeekNumber, x.Day)).ToImmutableArray() ?? ImmutableArray<RecurrenceRuleByNWeekday>.Empty,
+                rule.ByMonth?.ToReadOnlyCollection() ?? ImmutableArray<RecurrenceRuleMonth>.Empty,
+                rule.ByMonthDay?.ToReadOnlyCollection() ?? ImmutableArray<int>.Empty,
+                rule.ByYearDay?.ToReadOnlyCollection() ?? ImmutableArray<int>.Empty,
+                rule.Count);
+
+        public static API.GuildScheduledEventRecurrenceRule ToModel(this GuildScheduledEventRecurrenceRuleProperties rule)
+            => new()
+            {
+                Frequency = rule.Frequency,
+                ByMonthDay = rule.ByMonthDay?.ToArray(),
+                ByNWeekday = rule.ByNWeekday?.Select(x => new API.GuildScheduledEventRecurrenceRuleByNWeekday
+                {
+                    Day = x.Day,
+                    WeekNumber = x.Week
+                }).ToArray(),
+                ByWeekday = rule.ByWeekday?.ToArray(),
+                ByMonth = rule.ByMonth?.ToArray(),
+                Interval = rule.Interval,
+                StartAt = rule.StartsAt
+            };
     }
 }

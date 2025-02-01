@@ -13,7 +13,12 @@ public class MemberSearchPropertiesV2
     /// <summary>
     ///     Gets or sets the after property for the search.
     /// </summary>
-    public MemberSearchPropertiesV2After After { get; set; }
+    public MemberSearchPaginationFilter? After { get; set; }
+
+    /// <summary>
+    ///     Gets or sets the before property for the search.
+    /// </summary>
+    public MemberSearchPaginationFilter? Before { get; set; }
 
     /// <summary>
     ///     Gets or sets the sort type for the search.
@@ -23,19 +28,19 @@ public class MemberSearchPropertiesV2
     /// <summary>
     ///     Gets or sets the and query for the search.
     /// </summary>
-    public MemberSearchV2QueryParams? AndQuery { get; set; }
+    public MemberSearchFilter? AndQuery { get; set; }
 
     /// <summary>
     ///     Gets or sets the or query for the search.
     /// </summary>
-    public MemberSearchV2QueryParams? OrQuery { get; set; }
+    public MemberSearchFilter? OrQuery { get; set; }
 }
 
 
 /// <summary>
 ///     Represents the after property for searching members in a guild.
 /// </summary>
-public struct MemberSearchPropertiesV2After
+public struct MemberSearchPaginationFilter
 {
     /// <summary>
     ///     Gets or sets the user ID to search after.
@@ -47,24 +52,26 @@ public struct MemberSearchPropertiesV2After
     /// </summary>
     public long GuildJoinedAt { get; set; }
 
-    public MemberSearchPropertiesV2After(ulong userId, long guildJoinedAt)
+    public MemberSearchPaginationFilter(ulong userId, long guildJoinedAt)
     {
         UserId = userId;
         GuildJoinedAt = guildJoinedAt;
     }
 
-    public MemberSearchPropertiesV2After(ulong userId, DateTimeOffset guildJoinedAt)
+    public MemberSearchPaginationFilter(ulong userId, DateTimeOffset guildJoinedAt)
     {
         UserId = userId;
         GuildJoinedAt = guildJoinedAt.ToUnixTimeMilliseconds();
     }
+
+    public MemberSearchPaginationFilter() { }
 }
 
 
 /// <summary>
 ///     Represents the query parameters for searching members in a guild.
 /// </summary>
-public struct MemberSearchV2QueryParams
+public struct MemberSearchFilter
 {
     /// <summary>
     ///     Gets or sets the safety signal search properties.
@@ -74,27 +81,60 @@ public struct MemberSearchV2QueryParams
     /// <summary>
     ///     Gets or sets the role IDs to search for.
     /// </summary>
-    public MemberSearchV2QueryProperties? RoleIds { get; set; }
+    /// <remarks>
+    ///     Only <see cref="IMemberSearchQuery.OrQuery"/> and <see cref="IMemberSearchQuery.AndQuery"/> are supported.
+    /// </remarks>
+    public MemberSearchSnowflakeQuery? RoleIds { get; set; }
 
     /// <summary>
     ///     Gets or sets the range to search for the user ID.
     /// </summary>
-    public MemberSearchV2RangeProperties? UserId { get; set; }
+    /// <remarks>
+    ///     Only <see cref="IMemberSearchQuery.OrQuery"/> and <see cref="IMemberSearchQuery.Range"/> are supported.
+    /// </remarks>
+    public MemberSearchSnowflakeQuery? UserId { get; set; }
 
     /// <summary>
     ///     Gets or sets the range to search for the user's guild joined at timestamp.
     /// </summary>
-    public MemberSearchV2RangeProperties? GuildJoinedAt { get; set; }
+    /// <remarks>
+    ///     Only <see cref="IMemberSearchQuery.Range"/> is supported.
+    /// </remarks>
+    public MemberSearchIntQuery? GuildJoinedAt { get; set; }
 
     /// <summary>
     ///     Gets or sets the source invite code to search for.
     /// </summary>
-    public MemberSearchV2QueryProperties? SourceInviteCode { get; set; }
+    /// <remarks>
+    ///     Only <see cref="IMemberSearchQuery.OrQuery"/> is supported.
+    /// </remarks>
+    public MemberSearchStringQuery? SourceInviteCode { get; set; }
 
     /// <summary>
     ///     Gets or sets the join source type to search for.
     /// </summary>
-    public MemberSearchV2QueryProperties? JoinSourceType { get; set; }
+    /// <remarks>
+    ///     Only <see cref="IMemberSearchQuery.OrQuery"/> is supported.
+    /// </remarks>
+    public MemberSearchIntQuery? JoinSourceType { get; set; }
+
+    /// <summary>
+    ///     Gets or sets whether the member left and rejoined the guild.
+    /// </summary>
+    public bool? DidRejoin { get; set; }
+
+    /// <summary>
+    ///     Gets or sets whether the member has not yet passed the guild's member verification requirements.
+    /// </summary>
+    public bool? IsPending { get; set; }
+
+    /// <summary>
+    ///     Gets or sets the usernames to match against.
+    /// </summary>
+    /// <remarks>
+    ///     Only <see cref="IMemberSearchQuery.OrQuery"/> is supported.
+    /// </remarks>
+    public MemberSearchStringQuery? Usernames { get; set; }
 }
 
 
@@ -106,12 +146,12 @@ public struct MemberSearchV2SafetySignalsProperties
     /// <summary>
     ///     Gets or sets the unusual DM activity until property for the search.
     /// </summary>
-    public MemberSearchV2SafetySignalProperties? UnusualDmActivityUntil { get; set; }
+    public MemberSearchIntQuery? UnusualDmActivityUntil { get; set; }
 
     /// <summary>
     ///     Gets or sets the communication disabled until property for the search.
     /// </summary>
-    public MemberSearchV2SafetySignalProperties? CommunicationDisabledUntil { get; set; }
+    public MemberSearchIntQuery? CommunicationDisabledUntil { get; set; }
 
     /// <summary>
     ///     Gets or sets the unusual account activity property for the search.
@@ -124,52 +164,10 @@ public struct MemberSearchV2SafetySignalsProperties
     public bool? AutomodQuarantinedUsername { get; set; }
 }
 
-
-/// <summary>
-///     Represents the query properties for searching members in a guild.
-/// </summary>
-public readonly struct MemberSearchV2QueryProperties
-{
-    /// <summary>
-    ///     Gets the and query for the search.
-    /// </summary>
-    public Dictionary<int, object> AndQuery { get; }
-
-    /// <summary>
-    ///     Gets the or query for the search.
-    /// </summary>
-    public Dictionary<int, object> OrQuery { get; }
-
-    public MemberSearchV2QueryProperties(Dictionary<int, string> andQuery, Dictionary<int, string> orQuery)
-    {
-        AndQuery = andQuery.Select(x => new KeyValuePair<int, object>(x.Key, x.Value)).ToDictionary(x => x.Key, y => y.Value);
-        OrQuery = orQuery.Select(x => new KeyValuePair<int, object>(x.Key, x.Value)).ToDictionary(x => x.Key, y => y.Value);
-    }
-
-    public MemberSearchV2QueryProperties(Dictionary<int, long> andQuery, Dictionary<int, long> orQuery)
-    {
-        AndQuery = andQuery.Select(x => new KeyValuePair<int, object>(x.Key, x.Value)).ToDictionary(x => x.Key, y => y.Value);
-        OrQuery = orQuery.Select(x => new KeyValuePair<int, object>(x.Key, x.Value)).ToDictionary(x => x.Key, y => y.Value);
-    }
-}
-
-
-/// <summary>
-///     Represents the safety signal properties for searching members in a guild.
-/// </summary>
-public struct MemberSearchV2SafetySignalProperties
-{
-    /// <summary>
-    ///     Gets or sets the range for the search.
-    /// </summary>
-    public MemberSearchV2RangeProperties Range { get; set; }
-}
-
-
 /// <summary>
 ///     Represents the range properties for searching members in a guild.
 /// </summary>
-public struct MemberSearchV2RangeProperties
+public struct MemberSearchV2Range
 {
     /// <summary>
     ///     Gets or sets the less than property for the search.
@@ -180,4 +178,79 @@ public struct MemberSearchV2RangeProperties
     ///     Gets or sets the greater than property for the search.
     /// </summary>
     public long? GreaterThanOrEqual { get; set; }
+}
+
+
+public interface IMemberSearchQuery
+{
+    /// <summary>
+    ///     Gets or sets the range for the search.
+    /// </summary>
+    MemberSearchV2Range? Range { get; }
+
+    /// <summary>
+    ///     Gets the AND query for the search.
+    /// </summary>
+    IEnumerable<object> AndQuery { get; }
+
+    /// <summary>
+    ///     Gets the OR query for the search.
+    /// </summary>
+    IEnumerable<object> OrQuery { get; }
+}
+
+public struct MemberSearchStringQuery : IMemberSearchQuery
+{
+    /// <inheritdoc />
+    public MemberSearchV2Range? Range { get; set; }
+
+    /// <inheritdoc cref="IMemberSearchQuery.AndQuery"/>
+    public IEnumerable<string> AndQuery { get; set; }
+
+    /// <inheritdoc cref="IMemberSearchQuery.OrQuery"/>
+    public IEnumerable<string> OrQuery { get; set; }
+
+    /// <inheritdoc />
+    IEnumerable<object> IMemberSearchQuery.AndQuery => AndQuery;
+
+    /// <inheritdoc />
+    IEnumerable<object> IMemberSearchQuery.OrQuery => OrQuery;
+}
+
+
+public struct MemberSearchIntQuery : IMemberSearchQuery
+{
+    /// <inheritdoc />
+    public MemberSearchV2Range? Range { get; set; }
+
+    /// <inheritdoc cref="IMemberSearchQuery.AndQuery"/>
+    public IEnumerable<int> AndQuery { get; set; }
+
+    /// <inheritdoc cref="IMemberSearchQuery.OrQuery"/>
+    public IEnumerable<int> OrQuery { get; set; }
+
+    /// <inheritdoc />
+    IEnumerable<object> IMemberSearchQuery.AndQuery => AndQuery?.Select(x => (object)x);
+
+    /// <inheritdoc />
+    IEnumerable<object> IMemberSearchQuery.OrQuery => OrQuery?.Select(x => (object)x);
+}
+
+
+public struct MemberSearchSnowflakeQuery : IMemberSearchQuery
+{
+    /// <inheritdoc />
+    public MemberSearchV2Range? Range { get; set; }
+
+    /// <inheritdoc cref="IMemberSearchQuery.AndQuery"/>
+    public IEnumerable<ulong> AndQuery { get; set; }
+
+    /// <inheritdoc cref="IMemberSearchQuery.OrQuery"/>
+    public IEnumerable<ulong> OrQuery { get; set; }
+
+    /// <inheritdoc />
+    IEnumerable<object> IMemberSearchQuery.AndQuery => AndQuery?.Select(x => (object)x);
+
+    /// <inheritdoc />
+    IEnumerable<object> IMemberSearchQuery.OrQuery => OrQuery?.Select(x => (object)x);
 }

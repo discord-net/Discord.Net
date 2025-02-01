@@ -17,6 +17,9 @@ internal class Subscription
     [JsonProperty("entitlement_ids")]
     public ulong[] EntitlementIds { get; set; }
 
+    [JsonProperty("renewal_sku_ids")]
+    public ulong[] RenewalSKUIds { get; set; }
+
     [JsonProperty("current_period_start")]
     public DateTimeOffset CurrentPeriodStart { get; set; }
 

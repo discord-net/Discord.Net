@@ -27,7 +27,7 @@ namespace Discord.Audio
             ClearAsync(CancellationToken.None).GetAwaiter().GetResult();
         }
 
-        public virtual Task ClearAsync(CancellationToken cancellationToken) { return Task.Delay(0); }
+        public virtual Task ClearAsync(CancellationToken cancellationToken) { return Task.CompletedTask; }
 
         /// <inheritdoc />
         /// <exception cref="NotSupportedException">Reading stream length is not supported.</exception>

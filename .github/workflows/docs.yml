@@ -24,10 +24,10 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 8.0.x
+        dotnet-version: 9.0.x
 
     - name: Setup DocFX
-      run: dotnet tool install -g docfx --version 2.77.0
+      run: dotnet tool install -g docfx --version 2.78.2
 
     - name: Build DNet docs
       run: docfx docs/docfx.json
@@ -55,15 +55,16 @@ jobs:
     
     - name: Auth DNet bot
       id: bot_auth
-      uses: machine-learning-apps/actions-app-token@master
+      uses: actions/create-github-app-token@v1
       with:
-        APP_PEM: ${{ secrets.DNET_BOT_PEM }}
-        APP_ID: ${{ secrets.DNET_BOT_ID }}
+        private-key: ${{ secrets.DNET_BOT_PEM }}
+        app-id: ${{ secrets.DNET_BOT_ID }}
+        owner: ${{ github.repository_owner }}
 
     - name: Push to the Docs Repo
       uses: cpina/github-action-push-to-another-repository@main
       env:
-        API_TOKEN_GITHUB: ${{ steps.bot_auth.outputs.app_token }}
+        API_TOKEN_GITHUB: ${{ steps.bot_auth.outputs.token }}
       with:
         source-directory: 'output'
         destination-github-username: 'discord-net'

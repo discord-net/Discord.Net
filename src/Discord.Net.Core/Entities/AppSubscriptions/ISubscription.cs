@@ -24,6 +24,11 @@ public interface ISubscription : ISnowflakeEntity
     IReadOnlyCollection<ulong> EntitlementIds { get; }
 
     /// <summary>
+    ///     Gets the SKUs that this user will be subscribed to at renewal.
+    /// </summary>
+    IReadOnlyCollection<ulong> RenewalSKUIds { get; }
+
+    /// <summary>
     ///     Gets the start of the current subscription period.
     /// </summary>
     DateTimeOffset CurrentPeriodStart { get; }

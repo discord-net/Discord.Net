@@ -1,8 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Discord
 {
@@ -59,5 +55,10 @@ namespace Discord
         ///     Gets or sets the banner image of the event.
         /// </summary>
         public Optional<Image?> CoverImage { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the definition for how often this event should recur.
+        /// </summary>
+        public Optional<GuildScheduledEventRecurrenceRuleProperties> RecurrenceRule { get; set; }
     }
 }

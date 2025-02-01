@@ -137,6 +137,6 @@ namespace Discord
     public sealed class TestModule : ModuleBase
     {
         [Command("test")]
-        public Task TestCommand(ArgumentType arg) => Task.Delay(0);
+        public Task TestCommand(ArgumentType arg) => Task.CompletedTask;
     }
 }

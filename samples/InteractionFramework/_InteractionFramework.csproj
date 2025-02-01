@@ -13,8 +13,8 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="9.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0" />
-    <PackageReference Include="Discord.Net.WebSocket" Version="3.16.0" />
-    <PackageReference Include="Discord.Net.Interactions" Version="3.16.0" />
+    <PackageReference Include="Discord.Net.WebSocket" Version="3.17.0" />
+    <PackageReference Include="Discord.Net.Interactions" Version="3.17.0" />
   </ItemGroup>
 
   <ItemGroup>

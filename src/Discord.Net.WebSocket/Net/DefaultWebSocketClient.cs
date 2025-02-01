@@ -140,7 +140,7 @@ namespace Discord.Net.WebSockets
 
             try
             {
-                await (_task ?? Task.Delay(0)).ConfigureAwait(false);
+                await (_task ?? Task.CompletedTask).ConfigureAwait(false);
                 _task = null;
             }
             finally { _isDisconnecting = false; }

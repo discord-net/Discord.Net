@@ -428,7 +428,7 @@ namespace Discord.WebSocket
                     //Should only happen if token is changed
                     var _ = LogoutAsync(); //Signal the logout, fire and forget
                 }
-                return Task.Delay(0);
+                return Task.CompletedTask;
             };
 
             client.SentRequest += (method, endpoint, millis) => _sentRequest.InvokeAsync(method, endpoint, millis);

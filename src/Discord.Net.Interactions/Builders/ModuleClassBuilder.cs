@@ -425,7 +425,7 @@ namespace Discord.Interactions.Builders
                 {
                     await instance.BeforeExecuteAsync(commandInfo).ConfigureAwait(false);
                     instance.BeforeExecute(commandInfo);
-                    var task = commandInvoker(instance, args) ?? Task.Delay(0);
+                    var task = commandInvoker(instance, args) ?? Task.CompletedTask;
 
                     if (task is Task<RuntimeResult> runtimeTask)
                     {

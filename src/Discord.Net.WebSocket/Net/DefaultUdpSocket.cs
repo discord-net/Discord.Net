@@ -92,7 +92,7 @@ namespace Discord.Net.Udp
             catch { }
 
             if (!isDisposing)
-                await (_task ?? Task.Delay(0)).ConfigureAwait(false);
+                await (_task ?? Task.CompletedTask).ConfigureAwait(false);
 
             if (_udp != null)
             {

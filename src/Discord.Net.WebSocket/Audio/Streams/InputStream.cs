@@ -76,7 +76,7 @@ namespace Discord.Audio.Streams
             if (_signal.CurrentCount >= MaxFrames) //1-2 seconds
             {
                 _hasHeader = false;
-                return Task.Delay(0); //Buffer overloaded
+                return Task.CompletedTask; //Buffer overloaded
             }
             if (!_hasHeader)
                 throw new InvalidOperationException("Received payload without an RTP header");
@@ -91,7 +91,7 @@ namespace Discord.Audio.Streams
                 payload: payload
             ));
             _signal.Release();
-            return Task.Delay(0);
+            return Task.CompletedTask;
         }
 
         protected override void Dispose(bool isDisposing)

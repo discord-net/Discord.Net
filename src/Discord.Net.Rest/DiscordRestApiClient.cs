@@ -195,8 +195,8 @@ namespace Discord.API
             LoginState = LoginState.LoggedOut;
         }
 
-        internal virtual Task ConnectInternalAsync() => Task.Delay(0);
-        internal virtual Task DisconnectInternalAsync(Exception ex = null) => Task.Delay(0);
+        internal virtual Task ConnectInternalAsync() => Task.CompletedTask;
+        internal virtual Task DisconnectInternalAsync(Exception ex = null) => Task.CompletedTask;
         #endregion
 
         #region Core
@@ -2047,13 +2047,15 @@ namespace Discord.API
             return SendAsync<IReadOnlyCollection<GuildMember>>("GET", endpoint, ids, options: options);
         }
 
-        public Task<GuildMemberSearchResponse> SearchGuildMembersAsyncV2(ulong guildId, SearchGuildMembersParamsV2 args, RequestOptions options = null)
+        public async Task<GuildMemberSearchResponse> SearchGuildMembersAsyncV2(ulong guildId, SearchGuildMembersParamsV2 args, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             options = RequestOptions.CreateOrClone(options);
             
             var ids = new BucketIds(guildId: guildId);
-            return SendJsonAsync<GuildMemberSearchResponse>("POST", () => $"guilds/{guildId}/members-search", args, ids, options: options);
+            var response = await SendJsonAsync<GuildMemberSearchResponse>("POST", () => $"guilds/{guildId}/members-search", args, ids, options: options);
+
+            return response;
         }
 
         #endregion
