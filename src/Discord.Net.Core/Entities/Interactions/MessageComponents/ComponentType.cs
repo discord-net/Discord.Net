@@ -45,12 +45,16 @@ namespace Discord
         /// </summary>
         ChannelSelect = 8,
 
+        Section = 9,
+
         TextDisplay = 10,
 
         MediaGallery = 12,
 
         File = 13,
 
-        Separator = 14
+        Separator = 14,
+
+        Container = 17,
     }
 }
