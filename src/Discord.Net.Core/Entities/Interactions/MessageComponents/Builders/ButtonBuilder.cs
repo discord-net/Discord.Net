@@ -7,8 +7,10 @@ namespace Discord;
 /// <summary>
 ///     Represents a class used to build <see cref="ButtonComponent"/>'s.
 /// </summary>
-public class ButtonBuilder
+public class ButtonBuilder : IInteractableComponentBuilder
 {
+    public ComponentType Type => ComponentType.Button;
+
     /// <summary>
     ///     The max length of a <see cref="ButtonComponent.Label"/>.
     /// </summary>
@@ -322,4 +324,6 @@ public class ButtonBuilder
 
         return new ButtonComponent(Style, Label, Emote, CustomId, Url, IsDisabled, SkuId, Id);
     }
+
+    IMessageComponent IMessageComponentBuilder.Build() => Build();
 }

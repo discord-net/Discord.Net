@@ -8,7 +8,7 @@ namespace Discord;
 /// <summary>
 ///     Represents a class used to build <see cref="SelectMenuComponent"/>'s.
 /// </summary>
-public class SelectMenuBuilder
+public class SelectMenuBuilder : IInteractableComponentBuilder
 {
     /// <summary>
     ///     The max length of a <see cref="SelectMenuComponent.Placeholder"/>.
@@ -407,4 +407,6 @@ public class SelectMenuBuilder
 
         return new SelectMenuComponent(CustomId, options, Placeholder, MinValues, MaxValues, IsDisabled, Type, Id, ChannelTypes, DefaultValues);
     }
+
+    IMessageComponent IMessageComponentBuilder.Build() => Build();
 }

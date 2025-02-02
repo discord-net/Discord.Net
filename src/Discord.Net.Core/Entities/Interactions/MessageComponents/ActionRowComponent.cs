@@ -20,7 +20,7 @@ public class ActionRowComponent : IMessageComponent
 
     internal ActionRowComponent() { }
 
-    internal ActionRowComponent(List<IMessageComponent> components)
+    internal ActionRowComponent(IReadOnlyCollection<IMessageComponent> components)
     {
         Components = components;
     }

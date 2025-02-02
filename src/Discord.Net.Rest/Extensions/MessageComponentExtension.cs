@@ -20,6 +20,24 @@ internal static class MessageComponentExtension
 
             case TextDisplayComponent textDisplay:
                 return new API.TextDisplayComponent(textDisplay);
+
+            case SectionComponent section:
+                return new API.SectionComponent(section);
+
+            case ThumbnailComponent thumbnail:
+                return new API.ThumbnailComponent(thumbnail);
+
+            case MediaGalleryComponent mediaGallery:
+                return new API.MediaGalleryComponent(mediaGallery);
+
+            case SeparatorComponent separator:
+                return new API.SeparatorComponent(separator);
+
+            case FileComponent file:
+                return new API.FileComponent(file);
+
+            case ContainerComponent container:
+                return new API.ContainerComponent(container);
         }
 
         return null;
@@ -85,14 +103,82 @@ internal static class MessageComponentExtension
                 );
             }
 
+            case ComponentType.TextInput:
+            {
+                var parsed = (API.TextInputComponent)component;
+                return new TextInputComponent(parsed.CustomId,
+                    parsed.Label,
+                    parsed.Placeholder.GetValueOrDefault(null),
+                    parsed.MinLength.ToNullable(),
+                    parsed.MaxLength.ToNullable(),
+                    parsed.Style,
+                    parsed.Required.ToNullable(),
+                    parsed.Value.GetValueOrDefault(null),
+                    parsed.Id.ToNullable());
+            }
+
             case ComponentType.TextDisplay:
             {
                 var parsed = (API.TextDisplayComponent)component;
-                return new TextDisplayComponent(parsed.Id.ToNullable(), parsed.Content);
+                return new TextDisplayComponent(parsed.Content, parsed.Id.ToNullable());
+            }
+
+            case ComponentType.Section:
+            {
+                var parsed = (API.SectionComponent)component;
+                return new SectionComponent(parsed.Id.ToNullable(), parsed.Components.Select(x => x.ToEntity()).ToImmutableArray(), parsed.Accessory.ToModel());
+            }
+
+            case ComponentType.Thumbnail:
+            {
+                var parsed = (API.ThumbnailComponent)component;
+                return new ThumbnailComponent(parsed.Id.ToNullable(), parsed.Media.ToEntity(), parsed.Description.GetValueOrDefault(null), parsed.IsSpoiler.ToNullable());
+            }
+
+            case ComponentType.MediaGallery:
+            {
+                var parsed = (API.MediaGalleryComponent)component;
+
+                return new MediaGalleryComponent(
+                    parsed.Items.Select(x => new MediaGalleryItem(x.Media.ToEntity(), x.Description.GetValueOrDefault(null), x.IsSpoiler.GetValueOrDefault(false))).ToList(),
+                    parsed.Id.ToNullable());
+            }
+
+            case ComponentType.Separator:
+            {
+                var parsed = (API.SeparatorComponent)component;
+                return new SeparatorComponent(parsed.IsDivider.ToNullable(), parsed.Spacing.ToNullable(), parsed.Id.ToNullable());
+            }
+
+            case ComponentType.File:
+            {
+                var parsed = (API.FileComponent)component;
+                return new FileComponent(parsed.File.ToEntity(), parsed.IsSpoiler.ToNullable(), parsed.Id.ToNullable());
+            }
+
+            case ComponentType.Container:
+            {
+                var parsed = (API.ContainerComponent)component;
+                return new ContainerComponent(parsed.Components.Select(x => x.ToEntity()).ToImmutableArray(),
+                    parsed.AccentColor.ToNullable(),
+                    parsed.IsSpoiler.ToNullable(),
+                    parsed.Id.ToNullable());
             }
 
             default:
                 return null;
         }
+    }
+
+    internal static UnfurledMediaItem ToEntity(this API.UnfurledMediaItem mediaItem)
+    {
+        return new UnfurledMediaItem(mediaItem.Url);
+    }
+    internal static API.UnfurledMediaItem ToModel(this UnfurledMediaItem mediaItem)
+    {
+        return new API.UnfurledMediaItem
+        {
+            Url = mediaItem.Url
+        };
     }
 }

@@ -6,8 +6,10 @@ namespace Discord;
 /// <summary>
 ///     Represents a builder for creating a <see cref="TextInputComponent"/>.
 /// </summary>
-public class TextInputBuilder
+public class TextInputBuilder : IInteractableComponentBuilder
 {
+    public ComponentType Type => ComponentType.TextInput;
+
     /// <summary>
     ///     The max length of a <see cref="TextInputComponent.Placeholder"/>.
     /// </summary>
@@ -262,4 +264,6 @@ public class TextInputBuilder
 
         return new TextInputComponent(CustomId, Label, Placeholder, MinLength, MaxLength, Style, Required, Value, Id);
     }
+
+    IMessageComponent IMessageComponentBuilder.Build() => Build();
 }

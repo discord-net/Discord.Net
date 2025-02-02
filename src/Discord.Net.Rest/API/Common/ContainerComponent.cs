@@ -1,4 +1,6 @@
+using Discord.Rest;
 using Newtonsoft.Json;
+using System.Linq;
 
 namespace Discord.API;
 
@@ -20,6 +22,15 @@ internal class ContainerComponent : IMessageComponent
     public IMessageComponent[] Components { get; set; }
 
     public ContainerComponent() { }
+
+    public ContainerComponent(Discord.ContainerComponent component)
+    {
+        Type = component.Type;
+        Id = component.Id ?? Optional<int>.Unspecified;
+        AccentColor = component.AccentColor ?? Optional<int>.Unspecified;
+        IsSpoiler = component.IsSpoiler ?? Optional<bool>.Unspecified;
+        Components = component.Components.Select(x => x.ToModel()).ToArray();
+    }
 
     int? IMessageComponent.Id => Id.ToNullable();
 }

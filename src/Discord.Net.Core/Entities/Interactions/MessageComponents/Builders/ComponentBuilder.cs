@@ -67,18 +67,13 @@ public class ComponentBuilder
     {
         switch (component)
         {
-            case TextDisplayComponent textDisplay:
-                break;
-
             case ButtonComponent button:
                 WithButton(button.Label, button.CustomId, button.Style, button.Emote, button.Url, button.IsDisabled, row);
                 break;
-
             case ActionRowComponent actionRow:
                 foreach (var cmp in actionRow.Components)
                     AddComponent(cmp, row);
                 break;
-
             case SelectMenuComponent menu:
                 WithSelectMenu(menu.CustomId, menu.Options?.Select(x => new SelectMenuOptionBuilder(x.Label, x.Value, x.Description, x.Emote, x.IsDefault)).ToList(), menu.Placeholder, menu.MinValues, menu.MaxValues, menu.IsDisabled, row);
                 break;
@@ -103,7 +98,7 @@ public class ComponentBuilder
     /// <returns>The current builder.</returns>
     public ComponentBuilder RemoveComponent(string customId)
     {
-        this.ActionRows.ForEach(ar => ar.Components.RemoveAll(c => c is IInteractableComponent ic && ic.CustomId == customId));
+        this.ActionRows.ForEach(ar => ar.Components.RemoveAll(c => c is IInteractableComponent i && i.CustomId == customId));
         return this;
     }
 
@@ -163,20 +158,15 @@ public class ComponentBuilder
         Preconditions.LessThan(row, MaxActionRowCount, nameof(row));
         if (menu.Options is not null && menu.Options.Distinct().Count() != menu.Options.Count)
             throw new InvalidOperationException("Please make sure that there is no duplicates values.");
-
-        var builtMenu = menu.Build();
-
+        
         if (_actionRows == null)
         {
-            _actionRows = new List<ActionRowBuilder>
-            {
-                new ActionRowBuilder().AddComponent(builtMenu)
-            };
+            _actionRows = [new ActionRowBuilder().AddComponent(menu)];
         }
         else
         {
             if (_actionRows.Count == row)
-                _actionRows.Add(new ActionRowBuilder().AddComponent(builtMenu));
+                _actionRows.Add(new ActionRowBuilder().AddComponent(menu));
             else
             {
                 ActionRowBuilder actionRow;
@@ -188,12 +178,12 @@ public class ComponentBuilder
                     _actionRows.Add(actionRow);
                 }
 
-                if (actionRow.CanTakeComponent(builtMenu))
-                    actionRow.AddComponent(builtMenu);
+                if (actionRow.CanTakeComponent(menu))
+                    actionRow.AddComponent(menu);
                 else if (row < MaxActionRowCount)
                     WithSelectMenu(menu, row + 1);
                 else
-                    throw new InvalidOperationException($"There is no more row to add a {nameof(builtMenu)}");
+                    throw new InvalidOperationException($"There is no more row to add a {nameof(menu)}");
             }
         }
 
@@ -248,16 +238,17 @@ public class ComponentBuilder
     {
         Preconditions.LessThan(row, MaxActionRowCount, nameof(row));
 
-        var builtButton = button.Build();
-
         if (_actionRows == null)
         {
-            _actionRows = [new ActionRowBuilder().AddComponent(builtButton)];
+            _actionRows = new List<ActionRowBuilder>
+            {
+                new ActionRowBuilder().AddComponent(button)
+            };
         }
         else
         {
             if (_actionRows.Count == row)
-                _actionRows.Add(new ActionRowBuilder().AddComponent(builtButton));
+                _actionRows.Add(new ActionRowBuilder().AddComponent(button));
             else
             {
                 ActionRowBuilder actionRow;
@@ -269,8 +260,8 @@ public class ComponentBuilder
                     _actionRows.Add(actionRow);
                 }
 
-                if (actionRow.CanTakeComponent(builtButton))
-                    actionRow.AddComponent(builtButton);
+                if (actionRow.CanTakeComponent(button))
+                    actionRow.AddComponent(button);
                 else if (row < MaxActionRowCount)
                     WithButton(button, row + 1);
                 else
@@ -328,7 +319,7 @@ public class ComponentBuilder
                     _actionRows.RemoveAt(i);
 
         return _actionRows != null
-            ? new MessageComponent(_actionRows.Select(x => x.Build()).ToList())
+            ? new MessageComponent(_actionRows.Select(x => x.Build()).OfType<IMessageComponent>().ToList())
             : MessageComponent.Empty;
     }
 }

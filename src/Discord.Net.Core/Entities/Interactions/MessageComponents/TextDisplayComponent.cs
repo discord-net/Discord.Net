@@ -8,7 +8,7 @@ public class TextDisplayComponent : IMessageComponent
 
     public string Content { get; }
 
-    internal TextDisplayComponent(int? id, string content)
+    internal TextDisplayComponent(string content, int? id = null)
     {
         Id = id;
         Content = content;

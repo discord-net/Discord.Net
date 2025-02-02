@@ -1,4 +1,6 @@
+using Discord.Rest;
 using Newtonsoft.Json;
+using System.Linq;
 
 namespace Discord.API;
 
@@ -17,6 +19,14 @@ internal class SectionComponent : IMessageComponent
     public IMessageComponent Accessory { get; set; }
 
     public SectionComponent() { }
+
+    public SectionComponent(Discord.SectionComponent component)
+    {
+        Type = component.Type;
+        Id = component.Id ?? Optional<int>.Unspecified;
+        Components = component.Components.Select(x => x.ToModel()).ToArray();
+        Accessory = component.Accessory.ToModel();
+    }
 
     int? IMessageComponent.Id => Id.ToNullable();
 }

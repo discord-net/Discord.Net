@@ -17,5 +17,14 @@ internal class SeparatorComponent : IMessageComponent
     public Optional<SeparatorSpacingSize> Spacing { get; set; }
 
     public SeparatorComponent() { }
+
+    public SeparatorComponent(Discord.SeparatorComponent component)
+    {
+        Type = component.Type;
+        Id = component.Id ?? Optional<int>.Unspecified;
+        IsDivider = component.IsDivider ?? Optional<bool>.Unspecified;
+        Spacing = component.Spacing ?? Optional<SeparatorSpacingSize>.Unspecified;
+    }
+
     int? IMessageComponent.Id => Id.ToNullable();
 }

@@ -10,6 +10,9 @@ internal class ThumbnailComponent : IMessageComponent
     [JsonProperty("id")]
     public Optional<int> Id { get; set; }
 
+    [JsonProperty("media")]
+    public UnfurledMediaItem Media { get; set; }
+
     [JsonProperty("description")]
     public Optional<string> Description { get; set; }
 
@@ -17,6 +20,15 @@ internal class ThumbnailComponent : IMessageComponent
     public Optional<bool> IsSpoiler { get; set; }
 
     public ThumbnailComponent() { }
+
+    public ThumbnailComponent(Discord.ThumbnailComponent component)
+    {
+        Type = component.Type;
+        Id = component.Id ?? Optional<int>.Unspecified;
+        Media = new UnfurledMediaItem { Url = component.Media.Url };
+        Description = component.Description;
+        IsSpoiler = component.IsSpoiler;
+    }
 
     int? IMessageComponent.Id => Id.ToNullable();
 }

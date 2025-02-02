@@ -49,6 +49,8 @@ namespace Discord
 
         TextDisplay = 10,
 
+        Thumbnail = 11,
+
         MediaGallery = 12,
 
         File = 13,
