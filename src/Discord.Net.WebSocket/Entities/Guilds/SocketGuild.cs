@@ -1048,7 +1048,7 @@ namespace Discord.WebSocket
         {
             var model = await InteractionHelper.CreateGuildCommandAsync(Discord, Id, properties, options);
 
-            var entity = Discord.State.GetOrAddCommand(model.Id, (id) => SocketApplicationCommand.Create(Discord, model));
+            var entity = Discord.State.GetOrAddCommand(model.Id, (id) => SocketApplicationCommand.Create(Discord, model, Id));
 
             entity.Update(model);
 
@@ -1068,7 +1068,7 @@ namespace Discord.WebSocket
         {
             var models = await InteractionHelper.BulkOverwriteGuildCommandsAsync(Discord, Id, properties, options);
 
-            var entities = models.Select(x => SocketApplicationCommand.Create(Discord, x));
+            var entities = models.Select(x => SocketApplicationCommand.Create(Discord, x, Id));
 
             Discord.State.PurgeCommands(x => !x.IsGlobalCommand && x.Guild.Id == Id);
 
