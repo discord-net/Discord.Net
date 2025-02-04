@@ -22,7 +22,7 @@ public class SeparatorBuilder : IMessageComponentBuilder
         return this;
     }
 
-    public SeparatorBuilder WithId(int id)
+    public SeparatorBuilder WithId(int? id)
     {
         Id = id;
         return this;

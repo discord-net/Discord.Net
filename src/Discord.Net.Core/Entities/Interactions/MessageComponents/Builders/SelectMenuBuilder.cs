@@ -397,6 +397,12 @@ public class SelectMenuBuilder : IInteractableComponentBuilder
         return this;
     }
 
+    public SelectMenuBuilder WithId(int? id)
+    {
+        Id = id;
+        return this;
+    }
+
     /// <summary>
     ///     Builds a <see cref="SelectMenuComponent"/>
     /// </summary>

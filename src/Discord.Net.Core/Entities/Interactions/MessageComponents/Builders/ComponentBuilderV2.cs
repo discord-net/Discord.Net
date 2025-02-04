@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Discord;
 
-public class ComponentBuilderV2
+public class ComponentBuilderV2 : IStaticComponentContainer
 {
     public ComponentBuilderV2() {}
 
@@ -25,72 +25,25 @@ public class ComponentBuilderV2
         return this;
     }
 
-    public ComponentBuilderV2 AddComponent(IMessageComponent component)
+    public ComponentBuilderV2 AddComponents(params IEnumerable<IMessageComponentBuilder> components)
     {
+        foreach (var component in components)
+            Components.Add(component);
         return this;
     }
 
-    public ComponentBuilderV2 WithComponents(List<IMessageComponentBuilder> components)
+    public ComponentBuilderV2 WithComponents(IEnumerable<IMessageComponentBuilder> components)
     {
-        Components = components;
+        Components = components.ToList();
         return this;
     }
 
-    public ComponentBuilderV2 WithActionRow(ActionRowBuilder actionRow)
-    {
-        Components.Add(actionRow);
-        return this;
-    }
-
-    public ComponentBuilderV2 WithTextDisplay(TextDisplayBuilder textDisplayComponent)
-    {
-        Components.Add(textDisplayComponent);
-        return this;
-    }
-
-    public ComponentBuilderV2 WithSection(SectionBuilder sectionComponent)
-    {
-        Components.Add(sectionComponent);
-        return this;
-    }
-
-    public ComponentBuilderV2 WithMediaGallery(MediaGalleryBuilder mediaGallery)
-    {
-        Components.Add(mediaGallery);
-        return this;
-    }
-
-    public ComponentBuilderV2 WithSeparator(SeparatorBuilder separator)
-    {
-        Components.Add(separator);
-        return this;
-    }
-
-    public ComponentBuilderV2 WithFile(FileComponentBuilder file)
-    {
-        Components.Add(file);
-        return this;
-    }
-
-    public ComponentBuilderV2 WithContainer(ContainerComponentBuilder container)
-    {
-        Components.Add(container);
-        return this;
-    }
-
-    public ComponentBuilderV2 WithButton(ButtonBuilder button)
-    {
-        Components.Add(button);
-        return this;
-    }
-
-    public ComponentBuilderV2 WithSelectMenu(SelectMenuBuilder selectMenu)
-    {
-        Components.Add(selectMenu);
-        return this;
-    }
     public MessageComponent Build()
     {
         return new MessageComponent(Components.Select(x => x.Build()).ToList());
     }
+
+    IComponentContainer IComponentContainer.AddComponent(IMessageComponentBuilder component) => AddComponent(component);
+    IComponentContainer IComponentContainer.AddComponents(params IEnumerable<IMessageComponentBuilder> components) => AddComponents(components);
+    IComponentContainer IComponentContainer.WithComponents(IEnumerable<IMessageComponentBuilder> components) => WithComponents(components);
 }

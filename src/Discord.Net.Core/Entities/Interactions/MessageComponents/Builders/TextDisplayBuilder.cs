@@ -18,7 +18,7 @@ public class TextDisplayBuilder : IMessageComponentBuilder
         return this;
     }
 
-    public TextDisplayBuilder WithId(int id)
+    public TextDisplayBuilder WithId(int? id)
     {
         Id = id;
         return this;

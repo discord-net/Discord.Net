@@ -13,7 +13,7 @@ internal class ContainerComponent : IMessageComponent
     public Optional<int> Id { get; set; }
 
     [JsonProperty("accent_color")]
-    public Optional<int> AccentColor { get; set; }
+    public Optional<uint> AccentColor { get; set; }
 
     [JsonProperty("spoiler")]
     public Optional<bool> IsSpoiler { get; set; }
@@ -27,7 +27,7 @@ internal class ContainerComponent : IMessageComponent
     {
         Type = component.Type;
         Id = component.Id ?? Optional<int>.Unspecified;
-        AccentColor = component.AccentColor ?? Optional<int>.Unspecified;
+        AccentColor = component.AccentColor ?? Optional<uint>.Unspecified;
         IsSpoiler = component.IsSpoiler ?? Optional<bool>.Unspecified;
         Components = component.Components.Select(x => x.ToModel()).ToArray();
     }

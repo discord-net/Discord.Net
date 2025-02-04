@@ -22,7 +22,7 @@ public class FileComponentBuilder : IMessageComponentBuilder
         return this;
     }
 
-    public FileComponentBuilder WithId(int id)
+    public FileComponentBuilder WithId(int? id)
     {
         Id = id;
         return this;

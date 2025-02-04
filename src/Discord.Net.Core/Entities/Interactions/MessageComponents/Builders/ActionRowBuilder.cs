@@ -8,7 +8,7 @@ namespace Discord;
 /// <summary>
 ///     Represents a class used to build Action rows.
 /// </summary>
-public class ActionRowBuilder : IMessageComponentBuilder
+public class ActionRowBuilder : IMessageComponentBuilder, IInteractableComponentContainer
 {
     public ComponentType Type => ComponentType.ActionRow;
 
@@ -39,6 +39,20 @@ public class ActionRowBuilder : IMessageComponentBuilder
                 _ => value
             };
         }
+    }
+
+
+    public ActionRowBuilder AddComponents(params IEnumerable<IMessageComponentBuilder> components)
+    {
+        foreach (var component in components)
+            AddComponent(component);
+        return this;
+    }
+
+    public ActionRowBuilder WithComponents(IEnumerable<IMessageComponentBuilder> components)
+    {
+        Components = components.ToList();
+        return this;
     }
 
     private List<IMessageComponentBuilder> _components = new ();
@@ -165,6 +179,12 @@ public class ActionRowBuilder : IMessageComponentBuilder
         return this;
     }
 
+    public ActionRowBuilder WithId(int? id)
+    {
+        Id = id;
+        return this;
+    }
+
     /// <summary>
     ///     Builds the current builder to a <see cref="ActionRowComponent"/> that can be used within a <see cref="ComponentBuilder"/>
     /// </summary>
@@ -196,4 +216,11 @@ public class ActionRowBuilder : IMessageComponentBuilder
                 return false;
         }
     }
+
+
+    IComponentContainer IComponentContainer.AddComponent(IMessageComponentBuilder component) => AddComponent(component);
+
+    IComponentContainer IComponentContainer.AddComponents(params IEnumerable<IMessageComponentBuilder> components) => AddComponents(components);
+
+    IComponentContainer IComponentContainer.WithComponents(IEnumerable<IMessageComponentBuilder> components) => WithComponents(components);
 }

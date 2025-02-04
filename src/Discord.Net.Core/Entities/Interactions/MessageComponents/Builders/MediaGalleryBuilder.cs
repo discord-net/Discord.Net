@@ -24,7 +24,26 @@ public class MediaGalleryBuilder : IMessageComponentBuilder
         return this;
     }
 
-    public MediaGalleryBuilder WithId(int id)
+    public MediaGalleryBuilder AddItem(string url, string description = null, bool isSpoiler = false)
+    {
+        _items.Add(new MediaGalleryItemProperties(new UnfurledMediaItemProperties(url), description, isSpoiler));
+        return this;
+    }
+
+    public MediaGalleryBuilder AddItems(params IEnumerable<MediaGalleryItemProperties> items)
+    {
+        foreach (var item in items)
+            _items.Add(item);
+        return this;
+    }
+
+    public MediaGalleryBuilder WithItems(IEnumerable<MediaGalleryItemProperties> items)
+    {
+        _items = items.ToList();
+        return this;
+    }
+
+    public MediaGalleryBuilder WithId(int? id)
     {
         Id = id;
         return this;

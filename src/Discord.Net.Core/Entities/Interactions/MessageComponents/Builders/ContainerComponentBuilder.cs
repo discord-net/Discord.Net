@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 
 namespace Discord;
 
-public class ContainerComponentBuilder : IMessageComponentBuilder
+public class ContainerComponentBuilder : IMessageComponentBuilder, IComponentContainer 
 {
     public ComponentType Type => ComponentType.Container;
 
@@ -18,19 +19,24 @@ public class ContainerComponentBuilder : IMessageComponentBuilder
         set => _components = value ?? throw new ArgumentNullException(nameof(value), $"{nameof(Components)} cannot be null.");
     }
 
-    public int? AccentColor { get; set; }
+    public uint? AccentColor { get; set; }
 
     public bool? IsSpoiler { get; set; }
 
-    public ContainerComponentBuilder WithId(int id)
+    public ContainerComponentBuilder WithId(int? id)
     {
         Id = id;
         return this;
     }
 
-    public ContainerComponentBuilder WithAccentColor(int accentColor)
+    public ContainerComponentBuilder WithAccentColor(uint? accentColor)
     {
         AccentColor = accentColor;
+        return this;
+    }
+    public ContainerComponentBuilder WithAccentColor(Color? color)
+    {
+        AccentColor = color?.RawValue;
         return this;
     }
 
@@ -46,6 +52,19 @@ public class ContainerComponentBuilder : IMessageComponentBuilder
         return this;
     }
 
+    public ContainerComponentBuilder AddComponents(params IEnumerable<IMessageComponentBuilder> components)
+    {
+        foreach (var component in components)
+            Components.Add(component);
+        return this;
+    }
+
+    public ContainerComponentBuilder WithComponents(IEnumerable<IMessageComponentBuilder> components)
+    {
+        Components = components.ToList();
+        return this;
+    }
+
     public ContainerComponentBuilder WithComponents(List<IMessageComponentBuilder> components)
     {
         Components = components;
@@ -58,4 +77,7 @@ public class ContainerComponentBuilder : IMessageComponentBuilder
     }
 
     IMessageComponent IMessageComponentBuilder.Build() => Build();
+    IComponentContainer IComponentContainer.AddComponent(IMessageComponentBuilder component) => AddComponent(component);
+    IComponentContainer IComponentContainer.AddComponents(params IEnumerable<IMessageComponentBuilder> components) => AddComponents(components);
+    IComponentContainer IComponentContainer.WithComponents(IEnumerable<IMessageComponentBuilder> components) => WithComponents(components);
 }

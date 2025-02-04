@@ -10,11 +10,11 @@ public class ContainerComponent : IMessageComponent
 
     public IReadOnlyCollection<IMessageComponent> Components { get; }
 
-    public int? AccentColor { get; }
+    public uint? AccentColor { get; }
 
     public bool? IsSpoiler { get; }
 
-    internal ContainerComponent(IReadOnlyCollection<IMessageComponent> components, int? accentColor, bool? isSpoiler, int? id = null)
+    internal ContainerComponent(IReadOnlyCollection<IMessageComponent> components, uint? accentColor, bool? isSpoiler, int? id = null)
     {
         Components = components;
         AccentColor = accentColor;
