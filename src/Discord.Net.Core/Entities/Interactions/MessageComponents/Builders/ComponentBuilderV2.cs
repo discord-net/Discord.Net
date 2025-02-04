@@ -78,6 +78,17 @@ public class ComponentBuilderV2
         return this;
     }
 
+    public ComponentBuilderV2 WithButton(ButtonBuilder button)
+    {
+        Components.Add(button);
+        return this;
+    }
+
+    public ComponentBuilderV2 WithSelectMenu(SelectMenuBuilder selectMenu)
+    {
+        Components.Add(selectMenu);
+        return this;
+    }
     public MessageComponent Build()
     {
         return new MessageComponent(Components.Select(x => x.Build()).ToList());
