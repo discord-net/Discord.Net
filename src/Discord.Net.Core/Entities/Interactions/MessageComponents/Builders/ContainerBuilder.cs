@@ -29,11 +29,6 @@ public class ContainerBuilder : IMessageComponentBuilder, IStaticComponentContai
         return this;
     }
 
-    public ContainerBuilder WithAccentColor(uint? accentColor)
-    {
-        AccentColor = accentColor;
-        return this;
-    }
     public ContainerBuilder WithAccentColor(Color? color)
     {
         AccentColor = color?.RawValue;

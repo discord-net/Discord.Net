@@ -1,6 +1,6 @@
 namespace Discord;
 
-public class ThumbnailComponentBuilder : IMessageComponentBuilder
+public class ThumbnailBuilder : IMessageComponentBuilder
 {
     public ComponentType Type => ComponentType.Thumbnail;
 
@@ -12,25 +12,31 @@ public class ThumbnailComponentBuilder : IMessageComponentBuilder
 
     public bool IsSpoiler { get; set; } = false;
 
-    public ThumbnailComponentBuilder WithMedia(UnfurledMediaItemProperties media)
+    public ThumbnailBuilder WithMedia(UnfurledMediaItemProperties media)
     {
         Media = media;
         return this;
     }
 
-    public ThumbnailComponentBuilder WithDescription(string description)
+    public ThumbnailBuilder WithMedia(string url)
+    {
+        Media = new UnfurledMediaItemProperties(url);
+        return this;
+    }
+
+    public ThumbnailBuilder WithDescription(string description)
     {
         Description = description;
         return this;
     }
 
-    public ThumbnailComponentBuilder WithId(int id)
+    public ThumbnailBuilder WithId(int id)
     {
         Id = id;
         return this;
     }
 
-    public ThumbnailComponentBuilder WithSpoiler(bool isSpoiler)
+    public ThumbnailBuilder WithSpoiler(bool isSpoiler)
     {
         IsSpoiler = isSpoiler;
         return this;
