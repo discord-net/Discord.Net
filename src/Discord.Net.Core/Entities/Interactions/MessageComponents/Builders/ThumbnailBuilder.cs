@@ -12,6 +12,15 @@ public class ThumbnailBuilder : IMessageComponentBuilder
 
     public bool IsSpoiler { get; set; } = false;
 
+    public ThumbnailBuilder() { }
+
+    public ThumbnailBuilder(UnfurledMediaItemProperties media, string description = null, bool isSpoiler = false)
+    {
+        Media = media;
+        Description = description;
+        IsSpoiler = isSpoiler;
+    }
+
     public ThumbnailBuilder WithMedia(UnfurledMediaItemProperties media)
     {
         Media = media;

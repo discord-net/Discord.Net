@@ -6,12 +6,16 @@ public class TextDisplayBuilder : IMessageComponentBuilder
 
     public int? Id { get; set; }
 
-    private string _content;
-    public string Content
+    public string Content { get; set; }
+
+    public TextDisplayBuilder() { }
+
+    public TextDisplayBuilder(string content, int? id = null)
     {
-        get => _content;
-        set => _content = value;
+        Content = content;
+        Id = id;
     }
+
     public TextDisplayBuilder WithContent(string content)
     {
         Content = content;
@@ -26,7 +30,7 @@ public class TextDisplayBuilder : IMessageComponentBuilder
 
     public TextDisplayComponent Build()
     {
-        return new(_content, Id);
+        return new(Content, Id);
     }
 
     IMessageComponent IMessageComponentBuilder.Build() => Build();

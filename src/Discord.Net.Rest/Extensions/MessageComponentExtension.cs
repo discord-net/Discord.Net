@@ -9,6 +9,9 @@ internal static class MessageComponentExtension
     {
         switch (component)
         {
+            case ActionRowComponent actionRow:
+                return new API.ActionRowComponent(actionRow);
+
             case ButtonComponent btn:
                 return new API.ButtonComponent(btn);
 
@@ -50,7 +53,7 @@ internal static class MessageComponentExtension
             case ComponentType.ActionRow:
             {
                 var parsed = (API.ActionRowComponent)component;
-                return new ActionRowComponent()
+                return new ActionRowComponent
                 {
                     Id = component.Id,
                     Components = parsed.Components.Select(x => x.ToEntity()).ToImmutableArray()

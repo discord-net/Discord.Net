@@ -9,4 +9,6 @@ public struct UnfurledMediaItemProperties
     {
         Url = url;
     }
+
+    public static implicit operator UnfurledMediaItemProperties(string url) => new(url);
 }
