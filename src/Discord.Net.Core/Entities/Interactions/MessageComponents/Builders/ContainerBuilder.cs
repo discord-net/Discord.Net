@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Discord;
 
-public class ContainerComponentBuilder : IMessageComponentBuilder, IComponentContainer 
+public class ContainerBuilder : IMessageComponentBuilder, IStaticComponentContainer 
 {
     public ComponentType Type => ComponentType.Container;
 
@@ -23,49 +23,49 @@ public class ContainerComponentBuilder : IMessageComponentBuilder, IComponentCon
 
     public bool? IsSpoiler { get; set; }
 
-    public ContainerComponentBuilder WithId(int? id)
+    public ContainerBuilder WithId(int? id)
     {
         Id = id;
         return this;
     }
 
-    public ContainerComponentBuilder WithAccentColor(uint? accentColor)
+    public ContainerBuilder WithAccentColor(uint? accentColor)
     {
         AccentColor = accentColor;
         return this;
     }
-    public ContainerComponentBuilder WithAccentColor(Color? color)
+    public ContainerBuilder WithAccentColor(Color? color)
     {
         AccentColor = color?.RawValue;
         return this;
     }
 
-    public ContainerComponentBuilder WithSpoiler(bool isSpoiler)
+    public ContainerBuilder WithSpoiler(bool isSpoiler)
     {
         IsSpoiler = isSpoiler;
         return this;
     }
 
-    public ContainerComponentBuilder AddComponent(IMessageComponentBuilder component)
+    public ContainerBuilder AddComponent(IMessageComponentBuilder component)
     {
         Components.Add(component);
         return this;
     }
 
-    public ContainerComponentBuilder AddComponents(params IEnumerable<IMessageComponentBuilder> components)
+    public ContainerBuilder AddComponents(params IEnumerable<IMessageComponentBuilder> components)
     {
         foreach (var component in components)
             Components.Add(component);
         return this;
     }
 
-    public ContainerComponentBuilder WithComponents(IEnumerable<IMessageComponentBuilder> components)
+    public ContainerBuilder WithComponents(IEnumerable<IMessageComponentBuilder> components)
     {
         Components = components.ToList();
         return this;
     }
 
-    public ContainerComponentBuilder WithComponents(List<IMessageComponentBuilder> components)
+    public ContainerBuilder WithComponents(List<IMessageComponentBuilder> components)
     {
         Components = components;
         return this;
