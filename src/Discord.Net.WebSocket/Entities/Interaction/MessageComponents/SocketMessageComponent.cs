@@ -116,6 +116,13 @@ namespace Discord.WebSocket
                 }
             }
 
+            if (components?.Components?.Any(x => x.Type != ComponentType.ActionRow) ?? false)
+                flags |= MessageFlags.ComponentsV2;
+            if (ephemeral)
+                flags |= MessageFlags.Ephemeral;
+
+            Preconditions.ValidateMessageFlags(flags);
+
             var response = new API.Rest.UploadInteractionFileParams(attachments?.ToArray())
             {
                 Type = InteractionResponseType.ChannelMessageWithSource,
@@ -124,11 +131,7 @@ namespace Discord.WebSocket
                 Embeds = embeds.Any() ? embeds.Select(x => x.ToModel()).ToArray() : Optional<API.Embed[]>.Unspecified,
                 IsTTS = isTTS,
                 MessageComponents = components?.Components.Select(x => x.ToModel()).ToArray() ?? Optional<IMessageComponent[]>.Unspecified,
-                Flags = ephemeral
-                    ? flags | MessageFlags.Ephemeral
-                    : flags == MessageFlags.None
-                        ? Optional<MessageFlags>.Unspecified
-                        : flags,
+                Flags = flags,
                 Poll = poll?.ToModel() ?? Optional<CreatePollParams>.Unspecified
             };
 
@@ -188,6 +191,13 @@ namespace Discord.WebSocket
                 }
             }
 
+            if (components?.Components?.Any(x => x.Type != ComponentType.ActionRow) ?? false)
+                flags |= MessageFlags.ComponentsV2;
+            if (ephemeral)
+                flags |= MessageFlags.Ephemeral;
+
+            Preconditions.ValidateMessageFlags(flags);
+
             var response = new API.InteractionResponse
             {
                 Type = InteractionResponseType.ChannelMessageWithSource,
@@ -197,11 +207,7 @@ namespace Discord.WebSocket
                     AllowedMentions = allowedMentions?.ToModel(),
                     Embeds = embeds.Select(x => x.ToModel()).ToArray(),
                     TTS = isTTS,
-                    Flags = ephemeral
-                        ? flags | MessageFlags.Ephemeral
-                        : flags == MessageFlags.None
-                            ? Optional<MessageFlags>.Unspecified
-                            : flags,
+                    Flags = flags,
                     Components = components?.Components.Select(x => x.ToModel()).ToArray() ?? Optional<IMessageComponent[]>.Unspecified,
                     Poll = poll?.ToModel() ?? Optional<CreatePollParams>.Unspecified
                 }
@@ -346,6 +352,14 @@ namespace Discord.WebSocket
             Preconditions.AtMost(embeds.Length, 10, nameof(embeds), "A max of 10 embeds are allowed.");
             Preconditions.ValidatePoll(poll);
 
+            if (components?.Components?.Any(x => x.Type != ComponentType.ActionRow) ?? false)
+                flags |= MessageFlags.ComponentsV2;
+            if (ephemeral)
+                flags |= MessageFlags.Ephemeral;
+
+            Preconditions.ValidateMessageFlags(flags);
+                
+
             var args = new API.Rest.CreateWebhookMessageParams
             {
                 Content = text,
@@ -354,11 +368,7 @@ namespace Discord.WebSocket
                 Embeds = embeds.Select(x => x.ToModel()).ToArray(),
                 Components = components?.Components.Select(x => x.ToModel()).ToArray() ?? Optional<IMessageComponent[]>.Unspecified,
                 Poll = poll?.ToModel() ?? Optional<CreatePollParams>.Unspecified,
-                Flags = ephemeral
-                    ? flags | MessageFlags.Ephemeral
-                    : flags == MessageFlags.None
-                        ? Optional<MessageFlags>.Unspecified
-                        : flags,
+                Flags = flags,
             };
 
             return InteractionHelper.SendFollowupAsync(Discord.Rest, args, Token, Channel, options);
@@ -410,14 +420,16 @@ namespace Discord.WebSocket
                     throw new ArgumentException("The Roles flag is mutually exclusive with the list of Role Ids.", nameof(allowedMentions));
                 }
             }
+            if (components?.Components?.Any(x => x.Type != ComponentType.ActionRow) ?? false)
+                flags |= MessageFlags.ComponentsV2;
+            if (ephemeral)
+                flags |= MessageFlags.Ephemeral;
+
+            Preconditions.ValidateMessageFlags(flags);
 
             var args = new API.Rest.UploadWebhookFileParams(attachments.ToArray())
             {
-                Flags = ephemeral
-                    ? flags | MessageFlags.Ephemeral
-                    : flags == MessageFlags.None
-                        ? Optional<MessageFlags>.Unspecified
-                        : flags,
+                Flags = flags,
                 Content = text,
                 IsTTS = isTTS,
                 Embeds = embeds.Any() ? embeds.Select(x => x.ToModel()).ToArray() : Optional<API.Embed[]>.Unspecified,

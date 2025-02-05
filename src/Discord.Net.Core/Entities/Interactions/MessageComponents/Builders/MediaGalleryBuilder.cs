@@ -12,6 +12,14 @@ public class MediaGalleryBuilder : IMessageComponentBuilder
 
     private List<MediaGalleryItemProperties> _items = new();
 
+    public MediaGalleryBuilder() { }
+
+    public MediaGalleryBuilder(IEnumerable<MediaGalleryItemProperties> items, int? id = null)
+    {
+        Items = items.ToList();
+        Id = id;
+    }
+
     public List<MediaGalleryItemProperties> Items
     {
         get => _items;

@@ -10,6 +10,15 @@ public class FileComponentBuilder : IMessageComponentBuilder
 
     public bool? IsSpoiler { get; set; }
 
+    public FileComponentBuilder() {}
+
+    public FileComponentBuilder(UnfurledMediaItemProperties media, bool isSpoiler = false, int? id = null)
+    {
+        File = media;
+        Id = id;
+        IsSpoiler = isSpoiler;
+    }
+
     public FileComponentBuilder WithFile(UnfurledMediaItemProperties file)
     {
         File = file;

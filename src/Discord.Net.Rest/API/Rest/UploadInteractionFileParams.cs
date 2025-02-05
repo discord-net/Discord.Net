@@ -44,8 +44,10 @@ namespace Discord.API.Rest
         {
             var d = new Dictionary<string, object>();
 
+            var extraFlags = MessageFlags.None;
+
             if (Files.Any(x => x.Waveform is not null && x.DurationSeconds is not null))
-                Flags = Flags.GetValueOrDefault(MessageFlags.None) | MessageFlags.VoiceMessage;
+                extraFlags |= MessageFlags.VoiceMessage;
 
             var payload = new Dictionary<string, object>();
             payload["type"] = Type;
@@ -55,14 +57,20 @@ namespace Discord.API.Rest
                 data["content"] = Content.Value;
             if (IsTTS.IsSpecified)
                 data["tts"] = IsTTS.Value;
-            if (MessageComponents.IsSpecified)
-                data["components"] = MessageComponents.Value;
             if (Embeds.IsSpecified)
                 data["embeds"] = Embeds.Value;
             if (AllowedMentions.IsSpecified)
                 data["allowed_mentions"] = AllowedMentions.Value;
-            if (Flags.IsSpecified)
-                data["flags"] = Flags.Value;
+
+            if (MessageComponents.IsSpecified)
+            {
+                data["components"] = MessageComponents.Value;
+                if (MessageComponents.Value.Any(x => x.Type is not ComponentType.ActionRow))
+                    extraFlags |= MessageFlags.ComponentsV2;
+            }
+
+            data["flags"] = Flags.GetValueOrDefault(MessageFlags.None) | extraFlags;
+
             if (Poll.IsSpecified)
                 data["poll"] = Poll.Value;
 

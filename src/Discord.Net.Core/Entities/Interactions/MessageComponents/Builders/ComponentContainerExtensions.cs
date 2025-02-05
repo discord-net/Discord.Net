@@ -85,12 +85,12 @@ public static class ComponentContainerExtensions
     }
 
     public static BuilderT WithFile<BuilderT>(this BuilderT container,
-        string url,
+        UnfurledMediaItemProperties file,
         bool isSpoiler = false,
         int? id = null)
         where BuilderT : class, IStaticComponentContainer
         => container.WithFile(new FileComponentBuilder()
-            .WithFile(new UnfurledMediaItemProperties(url))
+            .WithFile(file)
             .WithIsSpoiler(isSpoiler)
             .WithId(id));
 

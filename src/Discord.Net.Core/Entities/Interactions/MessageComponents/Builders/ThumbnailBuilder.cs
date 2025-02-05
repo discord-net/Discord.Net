@@ -10,7 +10,7 @@ public class ThumbnailBuilder : IMessageComponentBuilder
 
     public string Description { get; set; }
 
-    public bool IsSpoiler { get; set; } = false;
+    public bool IsSpoiler { get; set; }
 
     public ThumbnailBuilder() { }
 
