@@ -163,7 +163,7 @@ internal static class MessageComponentExtension
             {
                 var parsed = (API.ContainerComponent)component;
                 return new ContainerComponent(parsed.Components.Select(x => x.ToEntity()).ToImmutableArray(),
-                    parsed.AccentColor.ToNullable(),
+                    parsed.AccentColor.GetValueOrDefault(null),
                     parsed.IsSpoiler.ToNullable(),
                     parsed.Id.ToNullable());
             }
