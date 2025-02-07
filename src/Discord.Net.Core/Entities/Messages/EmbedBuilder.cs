@@ -545,7 +545,7 @@ namespace Discord
             {
                 var stringValue = value?.ToString();
                 if (string.IsNullOrWhiteSpace(stringValue))
-                    throw new ArgumentException(message: "Field value must not be null or empty.", paramName: nameof(Value));
+                    throw new ArgumentException(message: "Field value must not be null, empty or entirely whitespace.", paramName: nameof(Value));
                 if (stringValue.Length > MaxFieldValueLength)
                     throw new ArgumentException(message: $"Field value length must be less than or equal to {MaxFieldValueLength}.", paramName: nameof(Value));
                 _value = stringValue;
