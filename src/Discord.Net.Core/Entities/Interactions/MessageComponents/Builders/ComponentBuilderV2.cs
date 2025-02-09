@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Discord;
 
-public class ComponentBuilderV2 : IStaticComponentContainer
+public class ComponentBuilderV2 : IStaticComponentContainer, IInteractableComponentContainer
 {
     public ComponentBuilderV2() {}
 

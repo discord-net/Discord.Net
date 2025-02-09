@@ -4,9 +4,9 @@ public class FileComponent : IMessageComponent
 {
     public ComponentType Type => ComponentType.File;
 
-    public UnfurledMediaItem File { get; }
-
     public int? Id { get; }
+
+    public UnfurledMediaItem File { get; }
 
     public bool? IsSpoiler { get; }
 

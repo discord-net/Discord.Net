@@ -178,13 +178,13 @@ namespace Discord
         /// <summary>
         ///     Removes a component from this builder by the specified <paramref name="customId"/>.
         /// </summary>
-        /// <param name="customId">The <see cref="IMessageComponent.CustomId"/> of the component to remove.</param>
+        /// <param name="customId">The <see cref="IInteractableComponent.CustomId"/> of the component to remove.</param>
         /// <returns>The current builder.</returns>
         public ModalBuilder RemoveComponent(string customId)
         {
             Preconditions.NotNull(customId, nameof(customId));
 
-            Components.ActionRows?.ForEach(r => r.Components.RemoveAll(c => c is IInteractableComponent ic && ic.CustomId == customId));
+            Components.ActionRows?.ForEach(r => r.Components.RemoveAll(c => c is IInteractableComponentBuilder ic && ic.CustomId == customId));
             return this;
         }
 
@@ -225,7 +225,7 @@ namespace Discord
     public class ModalComponentBuilder
     {
         /// <summary>
-        ///     The max length of a <see cref="IMessageComponent.CustomId"/>.
+        ///     The max length of a <see cref="IInteractableComponent.CustomId"/>.
         /// </summary>
         public const int MaxCustomIdLength = 100;
 
