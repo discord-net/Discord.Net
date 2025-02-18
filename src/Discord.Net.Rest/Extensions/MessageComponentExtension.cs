@@ -129,13 +129,18 @@ internal static class MessageComponentExtension
             case ComponentType.Section:
             {
                 var parsed = (API.SectionComponent)component;
-                return new SectionComponent(parsed.Id.ToNullable(), parsed.Components.Select(x => x.ToEntity()).ToImmutableArray(), parsed.Accessory.ToModel());
+                return new SectionComponent(parsed.Id.ToNullable(),
+                    parsed.Components.Select(x => x.ToEntity()).ToImmutableArray(),
+                    parsed.Accessory.ToEntity());
             }
 
             case ComponentType.Thumbnail:
             {
                 var parsed = (API.ThumbnailComponent)component;
-                return new ThumbnailComponent(parsed.Id.ToNullable(), parsed.Media.ToEntity(), parsed.Description.GetValueOrDefault(null), parsed.IsSpoiler.ToNullable());
+                return new ThumbnailComponent(parsed.Id.ToNullable(),
+                    parsed.Media.ToEntity(),
+                    parsed.Description.GetValueOrDefault(null),
+                    parsed.IsSpoiler.ToNullable());
             }
 
             case ComponentType.MediaGallery:
@@ -175,8 +180,14 @@ internal static class MessageComponentExtension
 
     internal static UnfurledMediaItem ToEntity(this API.UnfurledMediaItem mediaItem)
     {
-        return new UnfurledMediaItem(mediaItem.Url);
+        return new ResolvedUnfurledMediaItem(mediaItem.Url,
+            mediaItem.ProxyUrl.Value,
+            mediaItem.Height.Value,
+            mediaItem.Width.Value,
+            mediaItem.ContentType.Value,
+            mediaItem.LoadingState.Value);
     }
+
     internal static API.UnfurledMediaItem ToModel(this UnfurledMediaItem mediaItem)
     {
         return new API.UnfurledMediaItem

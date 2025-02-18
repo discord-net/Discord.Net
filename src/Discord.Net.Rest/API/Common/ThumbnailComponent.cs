@@ -1,3 +1,4 @@
+using Discord.Rest;
 using Newtonsoft.Json;
 
 namespace Discord.API;
@@ -25,7 +26,7 @@ internal class ThumbnailComponent : IMessageComponent
     {
         Type = component.Type;
         Id = component.Id ?? Optional<int>.Unspecified;
-        Media = new UnfurledMediaItem { Url = component.Media.Url };
+        Media = component.Media.ToModel();
         Description = component.Description;
         IsSpoiler = component.IsSpoiler;
     }

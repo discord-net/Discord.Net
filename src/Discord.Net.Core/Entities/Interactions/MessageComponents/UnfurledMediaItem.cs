@@ -1,6 +1,6 @@
 namespace Discord;
 
-public readonly struct UnfurledMediaItem
+public class UnfurledMediaItem
 {
     public string Url { get; }
 
