@@ -262,12 +262,6 @@ public class ButtonBuilder : IInteractableComponentBuilder
         return this;
     }
 
-    public ButtonBuilder WithId(int? id)
-    {
-        Id = id;
-        return this;
-    }
-
     /// <summary>
     ///     Builds this builder into a <see cref="ButtonComponent"/> to be used in a <see cref="ComponentBuilder"/>.
     /// </summary>

@@ -29,6 +29,11 @@ namespace Discord.Webhook
             MessageFlags flags, ulong? threadId = null, string threadName = null, ulong[] appliedTags = null,
             PollProperties poll = null)
         {
+            if (components?.Components.Any(x => x.Type is not ComponentType.ActionRow) ?? false)
+                flags |= MessageFlags.ComponentsV2;
+
+            Preconditions.ValidateMessageFlags(flags);
+
             var args = new CreateWebhookMessageParams
             {
                 Content = text,
@@ -56,8 +61,6 @@ namespace Discord.Webhook
             if (poll != null)
                 args.Poll = poll.ToModel();
 
-            if (flags is not MessageFlags.None and not MessageFlags.SuppressEmbeds and not MessageFlags.SuppressNotification)
-                throw new ArgumentException("The only valid MessageFlags are SuppressEmbeds, SuppressNotification and none.", nameof(flags));
 
             var model = await client.ApiClient.CreateWebhookMessageAsync(client.Webhook.Id, args, options: options, threadId: threadId).ConfigureAwait(false);
             return model.Id;
@@ -193,8 +196,10 @@ namespace Discord.Webhook
                 }
             }
 
-            if (flags is not MessageFlags.None and not MessageFlags.SuppressEmbeds and not MessageFlags.SuppressNotification)
-                throw new ArgumentException("The only valid MessageFlags are SuppressEmbeds, SuppressNotification and none.", nameof(flags));
+            if (components?.Components.Any(x => x.Type is not ComponentType.ActionRow) ?? false)
+                flags |= MessageFlags.ComponentsV2;
+
+            Preconditions.ValidateMessageFlags(flags);
 
             var args = new UploadWebhookFileParams(attachments.ToArray())
             {

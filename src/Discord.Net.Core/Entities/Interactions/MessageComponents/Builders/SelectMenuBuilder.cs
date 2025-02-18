@@ -136,15 +136,16 @@ public class SelectMenuBuilder : IInteractableComponentBuilder
         }
     }
 
+    /// <inheritdoc/>
     public int? Id { get; set; }
 
-    private List<SelectMenuOptionBuilder> _options = new List<SelectMenuOptionBuilder>();
+    private List<SelectMenuOptionBuilder> _options = [];
     private int _minValues = 1;
     private int _maxValues = 1;
     private string _placeholder;
     private string _customId;
     private ComponentType _type = ComponentType.SelectMenu;
-    private List<SelectMenuDefaultValue> _defaultValues = new();
+    private List<SelectMenuDefaultValue> _defaultValues = [];
 
     /// <summary>
     ///     Creates a new instance of a <see cref="SelectMenuBuilder"/>.
@@ -397,12 +398,6 @@ public class SelectMenuBuilder : IInteractableComponentBuilder
         return this;
     }
 
-    public SelectMenuBuilder WithId(int? id)
-    {
-        Id = id;
-        return this;
-    }
-
     /// <summary>
     ///     Builds a <see cref="SelectMenuComponent"/>
     /// </summary>
@@ -414,5 +409,6 @@ public class SelectMenuBuilder : IInteractableComponentBuilder
         return new SelectMenuComponent(CustomId, options, Placeholder, MinValues, MaxValues, IsDisabled, Type, Id, ChannelTypes, DefaultValues);
     }
 
+    /// <inheritdoc/>
     IMessageComponent IMessageComponentBuilder.Build() => Build();
 }

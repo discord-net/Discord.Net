@@ -42,7 +42,7 @@ public class ActionRowBuilder : IMessageComponentBuilder, IInteractableComponent
     }
 
 
-    public ActionRowBuilder AddComponents(params IEnumerable<IMessageComponentBuilder> components)
+    public ActionRowBuilder AddComponents(params IMessageComponentBuilder[] components)
     {
         foreach (var component in components)
             AddComponent(component);
@@ -179,12 +179,6 @@ public class ActionRowBuilder : IMessageComponentBuilder, IInteractableComponent
         return this;
     }
 
-    public ActionRowBuilder WithId(int? id)
-    {
-        Id = id;
-        return this;
-    }
-
     /// <summary>
     ///     Builds the current builder to a <see cref="ActionRowComponent"/> that can be used within a <see cref="ComponentBuilder"/>
     /// </summary>
@@ -220,7 +214,7 @@ public class ActionRowBuilder : IMessageComponentBuilder, IInteractableComponent
 
     IComponentContainer IComponentContainer.AddComponent(IMessageComponentBuilder component) => AddComponent(component);
 
-    IComponentContainer IComponentContainer.AddComponents(params IEnumerable<IMessageComponentBuilder> components) => AddComponents(components);
+    IComponentContainer IComponentContainer.AddComponents(params IMessageComponentBuilder[] components) => AddComponents(components);
 
     IComponentContainer IComponentContainer.WithComponents(IEnumerable<IMessageComponentBuilder> components) => WithComponents(components);
 }

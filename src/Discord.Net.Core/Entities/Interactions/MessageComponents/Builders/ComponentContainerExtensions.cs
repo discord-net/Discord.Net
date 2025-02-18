@@ -5,6 +5,12 @@ namespace Discord;
 
 public static class ComponentContainerExtensions
 {
+    /// <summary>
+    ///     Adds a <see cref="TextDisplayBuilder"/> to the container.
+    /// </summary>
+    /// <returns>
+    ///     The current container.
+    /// </returns>
     public static BuilderT WithTextDisplay<BuilderT>(this BuilderT container, TextDisplayBuilder textDisplay)
         where BuilderT : class, IStaticComponentContainer
     {
@@ -12,6 +18,12 @@ public static class ComponentContainerExtensions
         return container;
     }
 
+    /// <summary>
+    ///     Adds a <see cref="TextDisplayBuilder"/> to the container.
+    /// </summary>
+    /// <returns>
+    ///     The current container.
+    /// </returns>
     public static BuilderT WithTextDisplay<BuilderT>(this BuilderT container,
         string content,
         int? id = null)
@@ -20,6 +32,12 @@ public static class ComponentContainerExtensions
             .WithContent(content)
             .WithId(id));
 
+    /// <summary>
+    ///     Adds a <see cref="SectionBuilder"/> to the container.
+    /// </summary>
+    /// <returns>
+    ///     The current container.
+    /// </returns>
     public static BuilderT WithSection<BuilderT>(this BuilderT container, SectionBuilder section)
         where BuilderT : class, IStaticComponentContainer
     {
@@ -27,6 +45,12 @@ public static class ComponentContainerExtensions
         return container;
     }
 
+    /// <summary>
+    ///     Adds a <see cref="SectionBuilder"/> to the container.
+    /// </summary>
+    /// <returns>
+    ///     The current container.
+    /// </returns>
     public static BuilderT WithSection<BuilderT>(this BuilderT container,
         IEnumerable<TextDisplayBuilder> components,
         IMessageComponentBuilder accessory,
@@ -38,6 +62,12 @@ public static class ComponentContainerExtensions
             .WithAccessory(accessory)
             .WithId(id));
 
+    /// <summary>
+    ///     Adds a <see cref="MediaGalleryBuilder"/> to the container.
+    /// </summary>
+    /// <returns>
+    ///     The current container.
+    /// </returns>
     public static BuilderT WithMediaGallery<BuilderT>(this BuilderT container, MediaGalleryBuilder mediaGallery)
         where BuilderT : class, IStaticComponentContainer
     {
@@ -45,6 +75,12 @@ public static class ComponentContainerExtensions
         return container;
     }
 
+    /// <summary>
+    ///     Adds a <see cref="MediaGalleryBuilder"/> to the container.
+    /// </summary>
+    /// <returns>
+    ///     The current container.
+    /// </returns>
     public static BuilderT WithMediaGallery<BuilderT>(this BuilderT container,
         IEnumerable<MediaGalleryItemProperties> items,
         int? id = null) where BuilderT : class, IStaticComponentContainer
@@ -52,6 +88,12 @@ public static class ComponentContainerExtensions
             .WithItems(items)
             .WithId(id));
 
+    /// <summary>
+    ///     Adds a <see cref="MediaGalleryBuilder"/> to the container.
+    /// </summary>
+    /// <returns>
+    ///     The current container.
+    /// </returns>
     public static BuilderT WithMediaGallery<BuilderT>(this BuilderT container,
         IEnumerable<string> urls,
         int? id = null)
@@ -60,6 +102,12 @@ public static class ComponentContainerExtensions
             .WithItems(urls.Select(x => new MediaGalleryItemProperties(new UnfurledMediaItemProperties(x))))
             .WithId(id));
 
+    /// <summary>
+    ///     Adds a <see cref="SeparatorBuilder"/> to the container.
+    /// </summary>
+    /// <returns>
+    ///     The current container.
+    /// </returns>
     public static BuilderT WithSeparator<BuilderT>(this BuilderT container, SeparatorBuilder separator)
         where BuilderT : class, IStaticComponentContainer
     {
@@ -67,6 +115,12 @@ public static class ComponentContainerExtensions
         return container;
     }
 
+    /// <summary>
+    ///     Adds a <see cref="SeparatorBuilder"/> to the container.
+    /// </summary>
+    /// <returns>
+    ///     The current container.
+    /// </returns>
     public static BuilderT WithSeparator<BuilderT>(this BuilderT container,
         SeparatorSpacingSize spacing = SeparatorSpacingSize.Small,
         bool isDivider = true,
@@ -77,6 +131,12 @@ public static class ComponentContainerExtensions
             .WithIsDivider(isDivider)
             .WithId(id));
 
+    /// <summary>
+    ///     Adds a <see cref="FileComponentBuilder"/> to the container.
+    /// </summary>
+    /// <returns>
+    ///     The current container.
+    /// </returns>
     public static BuilderT WithFile<BuilderT>(this BuilderT container, FileComponentBuilder file)
         where BuilderT : class, IStaticComponentContainer
     {
@@ -84,6 +144,12 @@ public static class ComponentContainerExtensions
         return container;
     }
 
+    /// <summary>
+    ///     Adds a <see cref="FileComponentBuilder"/> to the container.
+    /// </summary>
+    /// <returns>
+    ///     The current container.
+    /// </returns>
     public static BuilderT WithFile<BuilderT>(this BuilderT container,
         UnfurledMediaItemProperties file,
         bool isSpoiler = false,
@@ -94,6 +160,12 @@ public static class ComponentContainerExtensions
             .WithIsSpoiler(isSpoiler)
             .WithId(id));
 
+    /// <summary>
+    ///     Adds a <see cref="ContainerBuilder"/> to the container.
+    /// </summary>
+    /// <returns>
+    ///     The current container.
+    /// </returns>
     public static BuilderT WithContainer<BuilderT>(this BuilderT container, ContainerBuilder containerComponent)
         where BuilderT : class, IStaticComponentContainer
     {
@@ -101,6 +173,12 @@ public static class ComponentContainerExtensions
         return container;
     }
 
+    /// <summary>
+    ///     Adds a <see cref="ContainerBuilder"/> to the container.
+    /// </summary>
+    /// <returns>
+    ///     The current container.
+    /// </returns>
     public static BuilderT WithContainer<BuilderT>(this BuilderT container,
         IEnumerable<IMessageComponentBuilder> components,
         Color? accentColor = null,
@@ -113,6 +191,24 @@ public static class ComponentContainerExtensions
             .WithSpoiler(isSpoiler)
             .WithId(id));
 
+    /// <summary>
+    ///     Adds a <see cref="ContainerBuilder"/> to the container.
+    /// </summary>
+    /// <returns>
+    ///     The current container.
+    /// </returns>
+    public static BuilderT WithContainer<BuilderT>(this BuilderT container,
+        params IMessageComponentBuilder[] components)
+        where BuilderT : class, IStaticComponentContainer
+        => container.WithContainer(new ContainerBuilder()
+            .WithComponents(components));
+
+    /// <summary>
+    ///     Adds a <see cref="ButtonBuilder"/> to the container.
+    /// </summary>
+    /// <returns>
+    ///     The current container.
+    /// </returns>
     public static BuilderT WithButton<BuilderT>(this BuilderT container, ButtonBuilder button)
         where BuilderT : class, IInteractableComponentContainer
     {
@@ -120,6 +216,12 @@ public static class ComponentContainerExtensions
         return container;
     }
 
+    /// <summary>
+    ///     Adds a <see cref="ButtonBuilder"/> to the container.
+    /// </summary>
+    /// <returns>
+    ///     The current container.
+    /// </returns>
     public static BuilderT WithButton<BuilderT>(this BuilderT container,
         string label = null,
         string customId = null,
@@ -140,6 +242,12 @@ public static class ComponentContainerExtensions
             .WithSkuId(skuId)
             .WithId(id));
 
+    /// <summary>
+    ///     Adds a <see cref="SelectMenuBuilder"/> to the container.
+    /// </summary>
+    /// <returns>
+    ///     The current container.
+    /// </returns>
     public static BuilderT WithSelectMenu<BuilderT>(this BuilderT container, SelectMenuBuilder selectMenu)
         where BuilderT : class, IInteractableComponentContainer
     {
@@ -147,6 +255,12 @@ public static class ComponentContainerExtensions
         return container;
     }
 
+    /// <summary>
+    ///     Adds a <see cref="SelectMenuBuilder"/> to the container.
+    /// </summary>
+    /// <returns>
+    ///     The current container.
+    /// </returns>
     public static BuilderT WithSelectMenu<BuilderT>(this BuilderT container,
         string customId,
         List<SelectMenuOptionBuilder> options = null,
@@ -172,6 +286,12 @@ public static class ComponentContainerExtensions
                 .WithDefaultValues(defaultValues)
                 .WithId(id));
 
+    /// <summary>
+    ///     Adds a <see cref="ActionRowBuilder"/> to the container.
+    /// </summary>
+    /// <returns>
+    ///     The current container.
+    /// </returns>
     public static BuilderT WithActionRow<BuilderT>(this BuilderT container, ActionRowBuilder actionRow)
         where BuilderT : class, IStaticComponentContainer
     {
@@ -179,6 +299,12 @@ public static class ComponentContainerExtensions
         return container;
     }
 
+    /// <summary>
+    ///     Adds a <see cref="ActionRowBuilder"/> to the container.
+    /// </summary>
+    /// <returns>
+    ///     The current container.
+    /// </returns>
     public static BuilderT WithActionRow<BuilderT>(this BuilderT container,
         IEnumerable<IMessageComponentBuilder> components,
         int? id = null)
