@@ -29,6 +29,13 @@ namespace Discord.Interactions
         public Task<IResult> ExecuteAsync(IInteractionContext context, IAutocompleteInteraction autocompleteInteraction, IParameterInfo parameter,
             IServiceProvider services)
         {
+            IServiceScope scope = null;
+            if(InteractionService._autoServiceScopes)
+            {
+                scope = services?.CreateScope();
+                services = scope?.ServiceProvider ?? EmptyServiceProvider.Instance;
+            }
+
             switch (InteractionService._runMode)
             {
                 case RunMode.Sync:
@@ -44,6 +51,8 @@ namespace Discord.Interactions
                 default:
                     throw new InvalidOperationException($"RunMode {InteractionService._runMode} is not supported.");
             }
+            
+            scope?.Dispose();
 
             return Task.FromResult((IResult)ExecuteResult.FromSuccess());
         }
