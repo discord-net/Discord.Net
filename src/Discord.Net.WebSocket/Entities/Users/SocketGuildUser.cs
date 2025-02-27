@@ -24,6 +24,9 @@ namespace Discord.WebSocket
         private long? _joinedAtTicks;
         private ImmutableArray<ulong> _roleIds;
 
+        private bool? _isDeafened;
+        private bool? _isMuted;
+
         internal override SocketGlobalUser GlobalUser { get; set; }
         /// <summary>
         ///     Gets the guild the user is in.
@@ -66,9 +69,9 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public bool IsSuppressed => VoiceState?.IsSuppressed ?? false;
         /// <inheritdoc />
-        public bool IsDeafened => VoiceState?.IsDeafened ?? false;
+        public bool IsDeafened => VoiceState?.IsDeafened ?? _isDeafened ?? false;
         /// <inheritdoc />
-        public bool IsMuted => VoiceState?.IsMuted ?? false;
+        public bool IsMuted => VoiceState?.IsMuted ?? _isMuted ?? false;
         /// <inheritdoc />
         public bool IsStreaming => VoiceState?.IsStreaming ?? false;
         /// <inheritdoc />
@@ -190,6 +193,11 @@ namespace Discord.WebSocket
                 IsPending = model.Pending.Value;
             if (model.Banner.IsSpecified)
                 GuildBannerHash = model.Banner.Value;
+
+            if (model.Mute.IsSpecified)
+                _isMuted = model.Mute.Value;
+            if (model.Deaf.IsSpecified)
+                _isDeafened = model.Deaf.Value;
 
             Flags = model.Flags;
         }
