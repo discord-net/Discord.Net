@@ -287,7 +287,7 @@ namespace Discord.Rest
         ///     Returns all entitlements for a given app.
         /// </summary>
         IAsyncEnumerable<IReadOnlyCollection<IEntitlement>> IDiscordClient.GetEntitlementsAsync(int limit, ulong? afterId, ulong? beforeId,
-            bool excludeEnded, ulong? guildId, ulong? userId, ulong[] skuIds, RequestOptions options) => AsyncEnumerable.Empty<IReadOnlyCollection<IEntitlement>>();
+            bool excludeEnded, ulong? guildId, ulong? userId, ulong[] skuIds, RequestOptions options, bool? excludeDeleted) => AsyncEnumerable.Empty<IReadOnlyCollection<IEntitlement>>();
 
         /// <summary>
         ///     Gets all SKUs for a given application.
