@@ -1024,7 +1024,7 @@ namespace Discord.WebSocket
             if (mode == CacheMode.CacheOnly)
                 return null;
 
-            var model = await Discord.ApiClient.GetGlobalApplicationCommandAsync(id, options);
+            var model = await Discord.ApiClient.GetGuildApplicationCommandAsync(Id, id, options);
 
             if (model == null)
                 return null;
