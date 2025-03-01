@@ -30,9 +30,6 @@ namespace Discord.Interactions
         public Task<IResult> ExecuteAsync(IInteractionContext context, IAutocompleteInteraction autocompleteInteraction, IParameterInfo parameter,
             IServiceProvider services)
         {
-            using IServiceScope scope = InteractionService._autoServiceScopes ? services?.CreateScope() : null;
-            services = InteractionService._autoServiceScopes ? scope?.ServiceProvider ?? EmptyServiceProvider.Instance : services;
-
             switch (InteractionService._runMode)
             {
                 case RunMode.Sync:
@@ -57,6 +54,14 @@ namespace Discord.Interactions
         {
             try
             {
+                await using var scope = InteractionService._autoServiceScopes
+                    ? services?.CreateAsyncScope()
+                    : null;
+
+                services = (InteractionService._autoServiceScopes
+                    ? scope?.ServiceProvider
+                    : services) ?? EmptyServiceProvider.Instance;
+
                 var result = await GenerateSuggestionsAsync(context, autocompleteInteraction, parameter, services).ConfigureAwait(false);
 
                 if (result.IsSuccess)
