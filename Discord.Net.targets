@@ -27,6 +27,7 @@
         <NoWarn>$(NoWarn);CS1573;CS1591</NoWarn>
         <WarningsAsErrors>true</WarningsAsErrors>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
     </PropertyGroup>
     <ItemGroup>
         <None Include="../../docs/marketing/logo/PackageLogo.png" Pack="true" PackagePath=""/>
