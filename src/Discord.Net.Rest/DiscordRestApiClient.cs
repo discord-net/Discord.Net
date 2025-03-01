@@ -2842,6 +2842,11 @@ namespace Discord.API
                 query += $"&exclude_ended={args.ExcludeEnded.Value}";
             }
 
+            if (args.ExcludeDeleted.IsSpecified)
+            {
+                query += $"&exclude_deleted={args.ExcludeDeleted.Value}";
+            }
+
             return SendAsync<Entitlement[]>("GET", () => $"applications/{CurrentApplicationId}/entitlements{query}", new BucketIds(), options: options);
         }
 

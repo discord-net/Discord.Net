@@ -343,7 +343,7 @@ namespace Discord
         /// </summary>
         IAsyncEnumerable<IReadOnlyCollection<IEntitlement>> GetEntitlementsAsync(int limit = 100,
             ulong? afterId = null, ulong? beforeId = null, bool excludeEnded = false, ulong? guildId = null, ulong? userId = null,
-            ulong[] skuIds = null, RequestOptions options = null);
+            ulong[] skuIds = null, RequestOptions options = null, bool? excludeDeleted = null);
 
         /// <summary>
         ///     Returns all SKUs for a given application. 
