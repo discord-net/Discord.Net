@@ -611,7 +611,7 @@ namespace Discord.WebSocket
             => await CreateGuildAsync(name, region, jpegIcon).ConfigureAwait(false);
 
         /// <inheritdoc />
-        async Task<IUser> IDiscordClient.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
+        public async Task<IUser> GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
         {
             var user = GetUser(id);
             if (user is not null || mode == CacheMode.CacheOnly)
