@@ -11,6 +11,7 @@
 - #3070 Possibly fix mute & deaf state for guild users (5f6c26b)
 - #3072 AutoServiceScopes strikes again (d71fcb1)
 - #3073 SocketGuild.GetApplicationCommandAsync was fetching global commands (aa66928)
+- #3078 Add `EmptyServiceScope` (54e8416) 
 
 ### Misc
 - #3075 Make Make GetShardFor(ulong guildId) & DiscordShardedClient.GetUserAsync() public (41ad6ac)
