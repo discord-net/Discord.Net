@@ -67,7 +67,7 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public MessageReference Reference { get; private set; }
 
-        /// <inheritdoc/>
+        /// <inheritdoc cref="IMessage.Components"/>
         public IReadOnlyCollection<IMessageComponent> Components { get; private set; }
 
         /// <summary>

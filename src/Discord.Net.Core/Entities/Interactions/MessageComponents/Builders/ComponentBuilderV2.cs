@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Discord;
 
-public class ComponentBuilderV2 : IStaticComponentContainer, IInteractableComponentContainer
+public class ComponentBuilderV2 : IStaticComponentContainer
 {
     /// <summary>
     ///    Gets the maximum number of components that can be added to this container.

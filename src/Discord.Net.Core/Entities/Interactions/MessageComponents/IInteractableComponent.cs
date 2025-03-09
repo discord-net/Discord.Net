@@ -1,5 +1,8 @@
 namespace Discord;
 
+/// <summary>
+///     Represents a message component that can be interacted with.
+/// </summary>
 public interface IInteractableComponent : IMessageComponent
 {
     /// <summary>
