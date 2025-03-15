@@ -257,6 +257,7 @@ namespace Discord
             {
                 StickerFormatType.None or StickerFormatType.Png or StickerFormatType.Apng => "png", // In the case of the Sticker endpoint, the sticker will be available as PNG if its format_type is PNG or APNG, and as Lottie if its format_type is LOTTIE.
                 StickerFormatType.Lottie => "lottie",
+                StickerFormatType.Gif => "gif",
                 _ => throw new ArgumentException(nameof(format)),
             };
         }
