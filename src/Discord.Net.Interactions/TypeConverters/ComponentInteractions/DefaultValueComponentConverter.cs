@@ -17,9 +17,9 @@ namespace Discord.Interactions
                     _ => Task.FromResult(TypeConverterResult.FromError(InteractionCommandError.ConvertFailed, $"{option.Type} doesn't have a convertible value."))
                 };
             }
-            catch (InvalidCastException castEx)
+            catch (Exception ex) when (ex is FormatException or InvalidCastException)
             {
-                return Task.FromResult(TypeConverterResult.FromError(castEx));
+                return Task.FromResult(TypeConverterResult.FromError(ex));
             }
         }
     }
