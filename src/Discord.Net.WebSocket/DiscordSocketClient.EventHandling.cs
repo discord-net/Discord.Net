@@ -2506,6 +2506,8 @@ public partial class DiscordSocketClient
                         default:
                             if (!SuppressUnknownDispatchWarnings)
                                 await _gatewayLogger.WarningAsync($"Unknown Dispatch ({type})").ConfigureAwait(false);
+
+                            await TimedInvokeAsync(_unknownDispatchReceived, nameof(UnknownDispatchReceived), type, (payload as JToken));
                             break;
                             #endregion
                     }
