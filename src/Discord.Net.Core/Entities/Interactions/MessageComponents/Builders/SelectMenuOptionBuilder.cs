@@ -80,6 +80,11 @@ public class SelectMenuOptionBuilder
     /// </summary>
     public bool? IsDefault { get; set; }
 
+    /// <summary>
+    ///     Gets or sets whether this option is disabled.
+    /// </summary>
+    public bool? IsDisabled { get; set; }
+
     private string _label;
     private string _value;
     private string _description;
@@ -97,13 +102,15 @@ public class SelectMenuOptionBuilder
     /// <param name="description">The description of this option.</param>
     /// <param name="emote">The emote of this option.</param>
     /// <param name="isDefault">Render this option as selected by default or not.</param>
-    public SelectMenuOptionBuilder(string label, string value, string description = null, IEmote emote = null, bool? isDefault = null)
+    /// <param name="isDisabled">Set whether the option should be disabled.</param>
+    public SelectMenuOptionBuilder(string label, string value, string description = null, IEmote emote = null, bool? isDefault = null, bool? isDisabled = null)
     {
         Label = label;
         Value = value;
         Description = description;
         Emote = emote;
         IsDefault = isDefault;
+        IsDisabled = isDisabled;
     }
 
     /// <summary>
@@ -116,6 +123,7 @@ public class SelectMenuOptionBuilder
         Description = option.Description;
         Emote = option.Emote;
         IsDefault = option.IsDefault;
+        IsDisabled = option.Disabled;
     }
 
     /// <summary>
@@ -187,6 +195,19 @@ public class SelectMenuOptionBuilder
     }
 
     /// <summary>
+    ///     Sets whether this option is disabled.
+    /// </summary>
+    /// <param name="isDisabled">The value to set the disabled state to.</param>
+    /// <returns>
+    ///     The current builder.
+    /// </returns>
+    public SelectMenuOptionBuilder WithDisabled(bool isDisabled)
+    {
+        IsDisabled = isDisabled;
+        return this;
+    }
+
+    /// <summary>
     ///     Builds a <see cref="SelectMenuOption"/>.
     /// </summary>
     /// <returns>The newly built <see cref="SelectMenuOption"/>.</returns>
@@ -202,6 +223,6 @@ public class SelectMenuOptionBuilder
 
         Preconditions.AtMost(Value.Length, MaxSelectValueLength, nameof(Value), $"Value length must be less or equal to {MaxSelectValueLength}.");
 
-        return new SelectMenuOption(Label, Value, Description, Emote, IsDefault);
+        return new SelectMenuOption(Label, Value, Description, Emote, IsDefault, IsDisabled);
     }
 }

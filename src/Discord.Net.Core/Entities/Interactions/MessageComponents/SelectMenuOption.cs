@@ -30,13 +30,19 @@ namespace Discord
         /// </summary>
         public bool? IsDefault { get; }
 
-        internal SelectMenuOption(string label, string value, string description, IEmote emote, bool? defaultValue)
+        /// <summary>
+        ///     Gets whether or not this option is disabled.
+        /// </summary>
+        public bool? Disabled { get; }
+
+        internal SelectMenuOption(string label, string value, string description, IEmote emote, bool? defaultValue, bool? disabled = null)
         {
             Label = label;
             Value = value;
             Description = description;
             Emote = emote;
             IsDefault = defaultValue;
+            Disabled = disabled;
         }
     }
 }
