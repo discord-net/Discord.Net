@@ -177,7 +177,8 @@ namespace Discord.Interactions
         {
             var instanceParam = Expression.Parameter(typeof(T), "instance");
             var prop = Expression.Property(instanceParam, propertyInfo);
-            return Expression.Lambda<Func<T, object>>(prop, instanceParam).Compile();
+            var cast = Expression.Convert(prop, typeof(object));
+            return Expression.Lambda<Func<T, object>>(cast, instanceParam).Compile();
         }
 
         internal static Func<T, object> CreateLambdaPropertyGetter(Type type, PropertyInfo propertyInfo)
@@ -185,7 +186,8 @@ namespace Discord.Interactions
             var instanceParam = Expression.Parameter(typeof(T), "instance");
             var instanceAccess = Expression.Convert(instanceParam, type);
             var prop = Expression.Property(instanceAccess, propertyInfo);
-            return Expression.Lambda<Func<T, object>>(prop, instanceParam).Compile();
+            var cast = Expression.Convert(prop, typeof(object));
+            return Expression.Lambda<Func<T, object>>(cast, instanceParam).Compile();
         }
 
         internal static Func<object[], object[], T> CreateLambdaMemberInit(TypeInfo typeInfo, ConstructorInfo constructor, Predicate<PropertyInfo> propertySelect = null)
@@ -226,6 +228,30 @@ namespace Discord.Interactions
 
                 return instance;
             };
+        }
+
+        /// <summary>
+        /// Checks whether <paramref name="type"/> or any base type of it overrides <see cref="object.ToString"/>.
+        /// </summary>
+        /// <param name="type">The type to check. If <c>null</c> <typeparamref name="T"/> will be used.</param>
+        internal static bool OverridesToString(Type type = null)
+        {
+            type ??= typeof(T);
+
+            do
+            {
+#if NET6_0_OR_GREATER
+                var method = type.GetMethod(nameof(ToString), bindingAttr: BindingFlags.Public | BindingFlags.Instance, types: Type.EmptyTypes);
+#else
+                var method = type.GetMethods(BindingFlags.Public | BindingFlags.Instance)
+                    .SingleOrDefault(m => m.Name == nameof(ToString) && m.GetParameters().Length == 0);
+#endif
+                if (method != null)
+                    return true;
+            }
+            while ((type = type.BaseType) != typeof(object));
+
+            return false;
         }
     }
 }

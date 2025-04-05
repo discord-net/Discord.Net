@@ -68,8 +68,13 @@ namespace Discord.Interactions
                 {
                     case TextInputComponentInfo textComponent:
                         {
+                            var boxedValue = textComponent.Getter(modal);
+                            var value = ReflectionUtils<object>.OverridesToString(textComponent.Type)
+                                ? boxedValue.ToString()
+                                : boxedValue as string;
+
                             builder.AddTextInput(textComponent.Label, textComponent.CustomId, textComponent.Style, textComponent.Placeholder, textComponent.IsRequired ? textComponent.MinLength : null,
-                            textComponent.MaxLength, textComponent.IsRequired, textComponent.Getter(modal) as string);
+                                textComponent.MaxLength, textComponent.IsRequired, value);
                         }
                         break;
                     default:
