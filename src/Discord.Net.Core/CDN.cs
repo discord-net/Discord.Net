@@ -140,8 +140,8 @@ namespace Discord
         /// <returns>
         ///     A URL pointing to the guild's splash.
         /// </returns>
-        public static string GetGuildSplashUrl(ulong guildId, string splashId)
-            => splashId != null ? $"{DiscordConfig.CDNUrl}splashes/{guildId}/{splashId}.jpg" : null;
+        public static string GetGuildSplashUrl(ulong guildId, string splashId, ushort size = 2048)
+            => splashId != null ? $"{DiscordConfig.CDNUrl}splashes/{guildId}/{splashId}.jpg?size={size}" : null;
         /// <summary>
         ///     Returns a guild discovery splash URL.
         /// </summary>
