@@ -1,6 +1,7 @@
 using Discord.Utils;
 
 using System;
+using System.Xml.Linq;
 
 namespace Discord;
 
@@ -22,12 +23,12 @@ public class ButtonBuilder
     public string Label
     {
         get => _label;
-        set => _label = value?.Length switch
+        set
         {
-            > MaxButtonLabelLength => throw new ArgumentOutOfRangeException(nameof(value), $"Label length must be less or equal to {MaxButtonLabelLength}."),
-            0 => throw new ArgumentOutOfRangeException(nameof(value), "Label length must be at least 1."),
-            _ => value
-        };
+            Preconditions.AtLeast(value.Length, 1, nameof(Label));
+            Preconditions.AtMost(value.Length, MaxButtonLabelLength, nameof(Label));
+            _label = value;
+        }
     }
 
     /// <summary>
@@ -38,12 +39,12 @@ public class ButtonBuilder
     public string CustomId
     {
         get => _customId;
-        set => _customId = value?.Length switch
+        set
         {
-            > ComponentBuilder.MaxCustomIdLength => throw new ArgumentOutOfRangeException(nameof(value), $"Custom Id length must be less or equal to {ComponentBuilder.MaxCustomIdLength}."),
-            0 => throw new ArgumentOutOfRangeException(nameof(value), "Custom Id length must be at least 1."),
-            _ => value
-        };
+            Preconditions.AtLeast(value.Length, 1, nameof(CustomId));
+            Preconditions.AtMost(value.Length, ComponentBuilder.MaxCustomIdLength, nameof(CustomId));
+            _customId = value;
+        }
     }
 
     /// <summary>
@@ -294,7 +295,6 @@ public class ButtonBuilder
                     throw new InvalidOperationException("A button must have an Emote or a label!");
                 if (string.IsNullOrWhiteSpace(CustomId))
                     throw new InvalidOperationException("Non-link and non-premium buttons must have a custom id associated with them");
-
             }
             break;
 

@@ -1,7 +1,5 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace Discord
@@ -21,12 +19,12 @@ namespace Discord
         public string Name
         {
             get => _name;
-            set => _name = value?.Length switch
+            set
             {
-                > 100 => throw new ArgumentOutOfRangeException(nameof(value), "Name length must be less than or equal to 100."),
-                0 => throw new ArgumentOutOfRangeException(nameof(value), "Name length must at least 1."),
-                _ => value
-            };
+                Preconditions.AtLeast(value.Length, 1, nameof(Name));
+                Preconditions.AtMost(value.Length, 100, nameof(Name));
+                _name = value;
+            }
         }
 
         /// <summary>
@@ -41,7 +39,7 @@ namespace Discord
             set
             {
                 if (value != null && value is not string && !value.IsNumericType())
-                    throw new ArgumentException("The value of a choice must be a string or a numeric type!");
+                    throw new ArgumentException($"The value of a choice must be a string or a numeric type! Value: \"{value}\"");
                 _value = value;
             }
         }
@@ -60,16 +58,10 @@ namespace Discord
                     foreach (var (locale, name) in value)
                     {
                         if (!Regex.IsMatch(locale, @"^\w{2}(?:-\w{2})?$"))
-                            throw new ArgumentException("Key values of the dictionary must be valid language codes.");
+                            throw new ArgumentException($"Key values of the dictionary must be valid language codes. Locale: \"{locale}\"");
 
-                        switch (name.Length)
-                        {
-                            case > 100:
-                                throw new ArgumentOutOfRangeException(nameof(value),
-                                    "Name length must be less than or equal to 100.");
-                            case 0:
-                                throw new ArgumentOutOfRangeException(nameof(value), "Name length must at least 1.");
-                        }
+                        Preconditions.AtLeast(name.Length, 1, nameof(name), msg: $"Name value of locale {locale} cannot be empty.");
+                        Preconditions.AtMost(name.Length, 100, nameof(name), msg: $"Name value of locale {locale} have to contains 100 chars at most.");
                     }
                 }
 

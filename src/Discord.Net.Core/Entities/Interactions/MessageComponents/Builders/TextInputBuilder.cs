@@ -22,12 +22,12 @@ public class TextInputBuilder
     public string CustomId
     {
         get => _customId;
-        set => _customId = value?.Length switch
+        set
         {
-            > ComponentBuilder.MaxCustomIdLength => throw new ArgumentOutOfRangeException(nameof(value), $"Custom Id length must be less or equal to {ComponentBuilder.MaxCustomIdLength}."),
-            0 => throw new ArgumentOutOfRangeException(nameof(value), "Custom Id length must be at least 1."),
-            _ => value
-        };
+            Preconditions.AtLeast(value.Length, 1, nameof(CustomId));
+            Preconditions.AtMost(value.Length, ComponentBuilder.MaxCustomIdLength, nameof(CustomId));
+            _customId = value;
+        }
     }
 
     /// <summary>
@@ -49,7 +49,7 @@ public class TextInputBuilder
         get => _placeholder;
         set => _placeholder = (value?.Length ?? 0) <= MaxPlaceholderLength
             ? value
-            : throw new ArgumentException($"Placeholder cannot have more than {MaxPlaceholderLength} characters.");
+            : throw new ArgumentException($"Placeholder cannot have more than {MaxPlaceholderLength} characters. Value: \"{value}\"");
     }
 
     /// <summary>
@@ -115,9 +115,9 @@ public class TextInputBuilder
         set
         {
             if (value?.Length > (MaxLength ?? LargestMaxLength))
-                throw new ArgumentOutOfRangeException(nameof(value), $"Value must not be longer than {MaxLength ?? LargestMaxLength}.");
+                throw new ArgumentOutOfRangeException(nameof(value), $"Value must not be longer than {MaxLength ?? LargestMaxLength}. Value: \"{value}\"");
             if (value?.Length < (MinLength ?? 0))
-                throw new ArgumentOutOfRangeException(nameof(value), $"Value must not be shorter than {MinLength}");
+                throw new ArgumentOutOfRangeException(nameof(value), $"Value must not be shorter than {MinLength}. Value: \"{value}\"");
 
             _value = value;
         }

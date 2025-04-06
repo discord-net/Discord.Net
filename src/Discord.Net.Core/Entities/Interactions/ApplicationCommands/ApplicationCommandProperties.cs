@@ -46,7 +46,7 @@ namespace Discord
                         Preconditions.AtMost(name.Length, SlashCommandBuilder.MaxNameLength, nameof(name));
 
                         if (Type == ApplicationCommandType.Slash && !Regex.IsMatch(name, @"^[-_\p{L}\p{N}\p{IsDevanagari}\p{IsThai}]{1,32}$"))
-                            throw new ArgumentException(@"Name must match the regex ^[-_\p{L}\p{N}\p{IsDevanagari}\p{IsThai}]{1,32}$", nameof(name));
+                            throw new ArgumentException(@$"Name must match the regex ^[-_\p{{L}}\p{{N}}\p{{IsDevanagari}}\p{{IsThai}}]{{1,32}}$. Value: ""{name}""", nameof(name));
                     }
                 }
 
