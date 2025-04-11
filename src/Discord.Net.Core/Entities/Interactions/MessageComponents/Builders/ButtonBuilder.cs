@@ -1,7 +1,6 @@
 using Discord.Utils;
 
 using System;
-using System.Xml.Linq;
 
 namespace Discord;
 
