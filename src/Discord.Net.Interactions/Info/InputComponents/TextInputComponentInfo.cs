@@ -1,3 +1,5 @@
+using System;
+
 namespace Discord.Interactions
 {
     /// <summary>
@@ -5,6 +7,12 @@ namespace Discord.Interactions
     /// </summary>
     public class TextInputComponentInfo : InputComponentInfo
     {
+        /// <summary>
+        /// <c>true</c> when <see cref="InputComponentInfo.Type"/> overrides <see cref="object.ToString"/>.
+        /// </summary>
+        internal bool TypeOverridesToString => _typeOverridesToString.Value;
+        private readonly Lazy<bool> _typeOverridesToString;
+
         /// <summary>
         ///     Gets the style of the text input.
         /// </summary>
@@ -37,6 +45,8 @@ namespace Discord.Interactions
             MinLength = builder.MinLength;
             MaxLength = builder.MaxLength;
             InitialValue = builder.InitialValue;
+
+            _typeOverridesToString = new(() => ReflectionUtils<object>.OverridesToString(Type));
         }
     }
 }

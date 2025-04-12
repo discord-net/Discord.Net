@@ -69,7 +69,7 @@ namespace Discord.Interactions
                     case TextInputComponentInfo textComponent:
                         {
                             var boxedValue = textComponent.Getter(modal);
-                            var value = ReflectionUtils<object>.OverridesToString(textComponent.Type)
+                            var value = textComponent.TypeOverridesToString
                                 ? boxedValue.ToString()
                                 : boxedValue as string;
 
