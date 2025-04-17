@@ -41,7 +41,10 @@ namespace Discord.Audio.Streams
 
             // The rest of the array is already zeroes, so no need to fill the rest.
 
-            const int frameCount = 5;
+            // Discard any remaining partial frame.
+            _partialFramePos = 0;
+
+            const int frameCount = 5; // Discord specifically asks for 5 frames.
             for (int i = 0; i < frameCount; i += 1)
             {
                 await WriteAsync(frameBytes, 0, frameBytes.Length).ConfigureAwait(false);
