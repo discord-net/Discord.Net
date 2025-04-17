@@ -77,10 +77,8 @@ namespace Discord.Rest
             _syncedAtTicks = model.SyncedAt.IsSpecified ? model.SyncedAt.Value.UtcTicks : null;
         }
 
-        public async Task DeleteAsync()
-        {
-            await Discord.ApiClient.DeleteIntegrationAsync(GuildId, Id).ConfigureAwait(false);
-        }
+        public Task DeleteAsync()
+            => Discord.ApiClient.DeleteIntegrationAsync(GuildId, Id);
 
         public override string ToString() => Name;
         private string DebuggerDisplay => $"{Name} ({Id}{(IsEnabled ? ", Enabled" : "")})";

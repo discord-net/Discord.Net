@@ -8,5 +8,5 @@ internal class InstallParams
     public string[] Scopes { get; set; }
 
     [JsonProperty("permissions")]
-    public ulong Permission { get; set; }
+    public GuildPermission Permission { get; set; }
 }

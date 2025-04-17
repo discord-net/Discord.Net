@@ -24,6 +24,9 @@ namespace Discord.WebSocket
         private long? _joinedAtTicks;
         private ImmutableArray<ulong> _roleIds;
 
+        private bool? _isDeafened;
+        private bool? _isMuted;
+
         internal override SocketGlobalUser GlobalUser { get; set; }
         /// <summary>
         ///     Gets the guild the user is in.
@@ -50,6 +53,9 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public override string GlobalName { get { return GlobalUser.GlobalName; } internal set { GlobalUser.GlobalName = value; } }
 
+        /// <inheritdoc/>
+        public string GuildBannerHash { get; private set; }
+
         /// <inheritdoc />
         public GuildPermissions GuildPermissions => new GuildPermissions(Permissions.ResolveGuild(Guild, this));
         internal override SocketPresence Presence { get; set; }
@@ -63,9 +69,9 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public bool IsSuppressed => VoiceState?.IsSuppressed ?? false;
         /// <inheritdoc />
-        public bool IsDeafened => VoiceState?.IsDeafened ?? false;
+        public bool IsDeafened => VoiceState?.IsDeafened ?? _isDeafened ?? false;
         /// <inheritdoc />
-        public bool IsMuted => VoiceState?.IsMuted ?? false;
+        public bool IsMuted => VoiceState?.IsMuted ?? _isMuted ?? false;
         /// <inheritdoc />
         public bool IsStreaming => VoiceState?.IsStreaming ?? false;
         /// <inheritdoc />
@@ -149,7 +155,7 @@ namespace Discord.WebSocket
         {
             var entity = new SocketGuildUser(guild, guild.Discord.GetOrCreateUser(state, model));
             entity.Update(state, model);
-            entity.UpdateRoles(new ulong[0]);
+            entity.UpdateRoles([]);
             return entity;
         }
         internal static SocketGuildUser Create(SocketGuild guild, ClientState state, MemberModel model)
@@ -157,7 +163,7 @@ namespace Discord.WebSocket
             var entity = new SocketGuildUser(guild, guild.Discord.GetOrCreateUser(state, model.User));
             entity.Update(state, model);
             if (!model.Roles.IsSpecified)
-                entity.UpdateRoles(new ulong[0]);
+                entity.UpdateRoles([]);
             return entity;
         }
         internal static SocketGuildUser Create(SocketGuild guild, ClientState state, PresenceModel model)
@@ -165,7 +171,7 @@ namespace Discord.WebSocket
             var entity = new SocketGuildUser(guild, guild.Discord.GetOrCreateUser(state, model.User));
             entity.Update(state, model, false);
             if (!model.Roles.IsSpecified)
-                entity.UpdateRoles(new ulong[0]);
+                entity.UpdateRoles([]);
             return entity;
         }
         internal void Update(ClientState state, MemberModel model)
@@ -185,6 +191,13 @@ namespace Discord.WebSocket
                 _timedOutTicks = model.TimedOutUntil.Value?.UtcTicks;
             if (model.Pending.IsSpecified)
                 IsPending = model.Pending.Value;
+            if (model.Banner.IsSpecified)
+                GuildBannerHash = model.Banner.Value;
+
+            if (model.Mute.IsSpecified)
+                _isMuted = model.Mute.Value;
+            if (model.Deaf.IsSpecified)
+                _isDeafened = model.Deaf.Value;
 
             Flags = model.Flags;
         }
@@ -260,14 +273,16 @@ namespace Discord.WebSocket
             => new ChannelPermissions(Permissions.ResolveChannel(Guild, this, channel, GuildPermissions.RawValue));
 
         /// <inheritdoc />
-        public string GetDisplayAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
-            => GuildAvatarId is not null
-                ? GetGuildAvatarUrl(format, size)
-                : GetAvatarUrl(format, size);
-
-        /// <inheritdoc />
         public string GetGuildAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
             => CDN.GetGuildUserAvatarUrl(Id, Guild.Id, GuildAvatarId, size, format);
+
+        /// <inheritdoc />
+        public string GetGuildBannerUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
+            => CDN.GetGuildUserBannerUrl(Id, Guild.Id, GuildBannerHash, size, format);
+
+        /// <inheritdoc />
+        public override string GetDisplayAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
+            => GetGuildAvatarUrl(format, size) ?? base.GetDisplayAvatarUrl(format, size);
 
         private string DebuggerDisplay => DiscriminatorValue != 0
             ? $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")}, Guild)"

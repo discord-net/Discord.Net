@@ -39,6 +39,11 @@ namespace Discord.WebSocket
         public VideoQualityMode VideoQualityMode { get; private set; }
 
         /// <summary>
+        ///     Gets the voice channel status set in this channel. <see langword="null" /> if it is not set.
+        /// </summary>
+        public virtual string Status { get; private set; }
+
+        /// <summary>
         ///     Gets a collection of users that are currently connected to this voice channel.
         /// </summary>
         /// <returns>
@@ -51,12 +56,19 @@ namespace Discord.WebSocket
             : base(discord, id, guild)
         {
         }
+
         internal new static SocketVoiceChannel Create(SocketGuild guild, ClientState state, Model model)
         {
             var entity = new SocketVoiceChannel(guild?.Discord, model.Id, guild);
             entity.Update(state, model);
             return entity;
         }
+
+        internal void UpdateVoiceStatus(string status)
+        {
+            Status = status;
+        }
+
         /// <inheritdoc />
         internal override void Update(ClientState state, Model model)
         {
@@ -65,27 +77,29 @@ namespace Discord.WebSocket
             UserLimit = model.UserLimit.GetValueOrDefault() != 0 ? model.UserLimit.Value : (int?)null;
             VideoQualityMode = model.VideoQualityMode.GetValueOrDefault(VideoQualityMode.Auto);
             RTCRegion = model.RTCRegion.GetValueOrDefault(null);
+            Status = model.Status.GetValueOrDefault(null);
         }
+
+        /// <inheritdoc />
+        public virtual Task SetStatusAsync(string status, RequestOptions options = null)
+            => ChannelHelper.ModifyVoiceChannelStatusAsync(this, status, Discord, options);
 
         /// <inheritdoc />
         public Task ModifyAsync(Action<VoiceChannelProperties> func, RequestOptions options = null)
             => ChannelHelper.ModifyAsync(this, Discord, func, options);
 
         /// <inheritdoc />
-        public async Task<IAudioClient> ConnectAsync(bool selfDeaf = false, bool selfMute = false, bool external = false)
-        {
-            return await Guild.ConnectAudioAsync(Id, selfDeaf, selfMute, external).ConfigureAwait(false);
-        }
+        public Task<IAudioClient> ConnectAsync(bool selfDeaf = false, bool selfMute = false, bool external = false, bool disconnect = true)
+            => Guild.ConnectAudioAsync(Id, selfDeaf, selfMute, external, disconnect);
 
         /// <inheritdoc />
-        public async Task DisconnectAsync()
-            => await Guild.DisconnectAudioAsync();
+        public Task DisconnectAsync()
+            => Guild.DisconnectAudioAsync();
 
         /// <inheritdoc />
-        public async Task ModifyAsync(Action<AudioChannelProperties> func, RequestOptions options = null)
-        {
-            await Guild.ModifyAudioAsync(Id, func, options).ConfigureAwait(false);
-        }
+        public Task ModifyAsync(Action<AudioChannelProperties> func, RequestOptions options = null)
+            => Guild.ModifyAudioAsync(Id, func, options);
+        
 
         /// <inheritdoc />
         public override SocketGuildUser GetUser(ulong id)

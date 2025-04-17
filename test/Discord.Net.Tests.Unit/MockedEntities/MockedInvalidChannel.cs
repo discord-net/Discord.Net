@@ -10,6 +10,7 @@ namespace Discord
     /// </summary>
     internal sealed class MockedInvalidChannel : IChannel
     {
+        public ChannelType ChannelType => ChannelType.Text;
         public string Name => throw new NotImplementedException();
 
         public DateTimeOffset CreatedAt => throw new NotImplementedException();

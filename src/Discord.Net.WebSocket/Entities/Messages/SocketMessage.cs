@@ -16,8 +16,8 @@ namespace Discord.WebSocket
     {
         #region SocketMessage
         private long _timestampTicks;
-        private readonly List<SocketReaction> _reactions = new List<SocketReaction>();
-        private ImmutableArray<SocketUser> _userMentions = ImmutableArray.Create<SocketUser>();
+        private readonly List<SocketReaction> _reactions = [];
+        private ImmutableArray<SocketUser> _userMentions = [];
 
         /// <summary>
         ///     Gets the author of this message.
@@ -81,11 +81,17 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public MessageRoleSubscriptionData RoleSubscriptionData { get; private set; }
 
+        /// <inheritdoc />
+        public PurchaseNotification PurchaseNotification { get; private set; }
+
         /// <inheritdoc cref="IMessage.Thread"/>
         public SocketThreadChannel Thread { get; private set; }
 
         /// <inheritdoc />
         IThreadChannel IMessage.Thread => Thread;
+
+        /// <inheritdoc />
+        public MessageCallData? CallData { get; private set; }
 
         /// <summary>
         ///     Returns all attachments included in this message.
@@ -107,18 +113,26 @@ namespace Discord.WebSocket
         /// <returns>
         ///     Collection of WebSocket-based guild channels.
         /// </returns>
-        public virtual IReadOnlyCollection<SocketGuildChannel> MentionedChannels => ImmutableArray.Create<SocketGuildChannel>();
+        public virtual IReadOnlyCollection<SocketGuildChannel> MentionedChannels => [];
         /// <summary>
         ///     Returns the roles mentioned in this message.
         /// </summary>
+        /// <remarks>
+        ///     This collection may be missing values due to the guild being missing from cache (i.e. in user app interaction context).
+        ///     In that case you can use the <see cref="MentionedRoleIds"/> property.
+        /// </remarks>
         /// <returns>
         ///     Collection of WebSocket-based roles.
         /// </returns>
-        public virtual IReadOnlyCollection<SocketRole> MentionedRoles => ImmutableArray.Create<SocketRole>();
+        public virtual IReadOnlyCollection<SocketRole> MentionedRoles => [];
+
         /// <inheritdoc />
-        public virtual IReadOnlyCollection<ITag> Tags => ImmutableArray.Create<ITag>();
+        public virtual IReadOnlyCollection<ulong> MentionedRoleIds => [];
+
         /// <inheritdoc />
-        public virtual IReadOnlyCollection<SocketSticker> Stickers => ImmutableArray.Create<SocketSticker>();
+        public virtual IReadOnlyCollection<ITag> Tags => [];
+        /// <inheritdoc />
+        public virtual IReadOnlyCollection<SocketSticker> Stickers => [];
         /// <inheritdoc />
         public IReadOnlyDictionary<IEmote, ReactionMetadata> Reactions => _reactions.GroupBy(r => r.Emote).ToDictionary(x => x.Key, x => new ReactionMetadata { ReactionCount = x.Count(), IsMe = x.Any(y => y.UserId == Discord.CurrentUser.Id) });
         /// <summary>
@@ -192,13 +206,15 @@ namespace Discord.WebSocket
                     GuildId = model.Reference.Value.GuildId,
                     InternalChannelId = model.Reference.Value.ChannelId,
                     MessageId = model.Reference.Value.MessageId,
-                    FailIfNotExists = model.Reference.Value.FailIfNotExists
+                    FailIfNotExists = model.Reference.Value.FailIfNotExists,
+                    ReferenceType = model.Reference.Value.Type
                 };
             }
 
             if (model.Components.IsSpecified)
             {
-                Components = model.Components.Value.Select(x => new ActionRowComponent(x.Components.Select<IMessageComponent, IMessageComponent>(y =>
+                Components = model.Components.Value.Where(x => x.Type is ComponentType.ActionRow)
+                    .Select(x => new ActionRowComponent(((API.ActionRowComponent)x).Components.Select<IMessageComponent, IMessageComponent>(y =>
                 {
                     switch (y.Type)
                     {
@@ -215,7 +231,8 @@ namespace Discord.WebSocket
                                         : null,
                                     parsed.CustomId.GetValueOrDefault(),
                                     parsed.Url.GetValueOrDefault(),
-                                    parsed.Disabled.GetValueOrDefault());
+                                    parsed.Disabled.GetValueOrDefault(),
+                                    parsed.SkuId.ToNullable());
                             }
                         case ComponentType.SelectMenu:
                             {
@@ -237,7 +254,10 @@ namespace Discord.WebSocket
                                     parsed.MaxValues,
                                     parsed.Disabled,
                                     parsed.Type,
-                                    parsed.ChannelTypes.GetValueOrDefault()
+                                    parsed.ChannelTypes.GetValueOrDefault(),
+                                    parsed.DefaultValues.IsSpecified
+                                        ? parsed.DefaultValues.Value.Select(x => new SelectMenuDefaultValue(x.Id, x.Type))
+                                        : Array.Empty<SelectMenuDefaultValue>()
                                     );
                             }
                         default:
@@ -259,7 +279,8 @@ namespace Discord.WebSocket
                         var val = value[i];
                         if (val != null)
                         {
-                            var user = Channel.GetUserAsync(val.Id, CacheMode.CacheOnly).GetAwaiter().GetResult() as SocketUser;
+                            // TODO: this is cursed af and should be yeeted
+                            var user = Channel?.GetUserAsync(val.Id, CacheMode.CacheOnly).GetAwaiter().GetResult() as SocketUser;
                             if (user != null)
                                 newMentions.Add(user);
                             else
@@ -295,6 +316,17 @@ namespace Discord.WebSocket
                 SocketGuild guild = (Channel as SocketGuildChannel)?.Guild;
                 Thread = guild?.AddOrUpdateChannel(state, model.Thread.Value) as SocketThreadChannel;
             }
+
+            if (model.PurchaseNotification.IsSpecified)
+            {
+                PurchaseNotification = new PurchaseNotification(model.PurchaseNotification.Value.Type,
+                    model.PurchaseNotification.Value.ProductPurchase.IsSpecified
+                        ? new GuildProductPurchase(model.PurchaseNotification.Value.ProductPurchase.Value.ListingId, model.PurchaseNotification.Value.ProductPurchase.Value.ProductName)
+                        : null);
+            }
+            
+            if (model.Call.IsSpecified)
+                CallData = new MessageCallData(model.Call.Value.Participants, model.Call.Value.EndedTimestamp.ToNullable());
         }
 
         /// <inheritdoc />
@@ -323,14 +355,13 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         IReadOnlyCollection<ulong> IMessage.MentionedChannelIds => MentionedChannels.Select(x => x.Id).ToImmutableArray();
         /// <inheritdoc />
-        IReadOnlyCollection<ulong> IMessage.MentionedRoleIds => MentionedRoles.Select(x => x.Id).ToImmutableArray();
-        /// <inheritdoc />
         IReadOnlyCollection<ulong> IMessage.MentionedUserIds => MentionedUsers.Select(x => x.Id).ToImmutableArray();
 
         /// <inheritdoc/>
         IReadOnlyCollection<IMessageComponent> IMessage.Components => Components;
 
         /// <inheritdoc/>
+        [Obsolete("This property will be deprecated soon. Use IUserMessage.InteractionMetadata instead.")]
         IMessageInteraction IMessage.Interaction => Interaction;
 
         /// <inheritdoc />
@@ -371,8 +402,8 @@ namespace Discord.WebSocket
         public Task RemoveAllReactionsForEmoteAsync(IEmote emote, RequestOptions options = null)
             => MessageHelper.RemoveAllReactionsForEmoteAsync(this, emote, Discord, options);
         /// <inheritdoc />
-        public IAsyncEnumerable<IReadOnlyCollection<IUser>> GetReactionUsersAsync(IEmote emote, int limit, RequestOptions options = null)
-            => MessageHelper.GetReactionUsersAsync(this, emote, limit, Discord, options);
+        public IAsyncEnumerable<IReadOnlyCollection<IUser>> GetReactionUsersAsync(IEmote emote, int limit, RequestOptions options = null, ReactionType type = ReactionType.Normal)
+            => MessageHelper.GetReactionUsersAsync(this, emote, limit, Discord, type, options);
         #endregion
     }
 }

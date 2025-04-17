@@ -9,6 +9,11 @@ namespace Discord
     public interface IChannel : ISnowflakeEntity
     {
         /// <summary>
+        ///     Get the type of this channel.
+        /// </summary>
+        ChannelType ChannelType { get; }
+
+        /// <summary>
         ///     Gets the name of this channel.
         /// </summary>
         /// <returns>

@@ -73,6 +73,10 @@ namespace Discord.WebSocket
             => GuildUser.GuildAvatarId;
 
         /// <inheritdoc/>
+        public string GuildBannerHash
+            => GuildUser.GuildBannerHash;
+
+        /// <inheritdoc/>
         public override ushort DiscriminatorValue
         {
             get => GuildUser.DiscriminatorValue;
@@ -238,14 +242,18 @@ namespace Discord.WebSocket
         IReadOnlyCollection<ulong> IGuildUser.RoleIds => GuildUser.Roles.Select(x => x.Id).ToImmutableArray();
 
         /// <inheritdoc />
-        string IGuildUser.GetDisplayAvatarUrl(ImageFormat format, ushort size) => GuildUser.GetDisplayAvatarUrl(format, size);
-
-        /// <inheritdoc />
         string IGuildUser.GetGuildAvatarUrl(ImageFormat format, ushort size) => GuildUser.GetGuildAvatarUrl(format, size);
 
-        internal override SocketGlobalUser GlobalUser { get => GuildUser.GlobalUser; set => GuildUser.GlobalUser = value; }
+        /// <inheritdoc />
+        string IGuildUser.GetGuildBannerUrl(ImageFormat format, ushort size) => GuildUser.GetGuildBannerUrl(format, size);
 
-        internal override SocketPresence Presence { get => GuildUser.Presence; set => GuildUser.Presence = value; }
+        /// <inheritdoc />
+        public override string GetDisplayAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
+            => GuildUser.GetGuildAvatarUrl() ?? base.GetDisplayAvatarUrl(format, size);
+
+        internal override SocketGlobalUser GlobalUser { get => GuildUser?.GlobalUser; set => GuildUser.GlobalUser = value; }
+
+        internal override SocketPresence Presence { get => GuildUser?.Presence; set => GuildUser.Presence = value; }
 
         /// <summary>
         ///     Gets the guild user of this thread user.

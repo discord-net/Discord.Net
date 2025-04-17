@@ -1,10 +1,8 @@
 public class Program
 {
-	private DiscordSocketClient _client;
+	private static DiscordSocketClient _client;
 	
-	public static Task Main(string[] args) => new Program().MainAsync();
-
-	public async Task MainAsync()
+	public async Task Main()
 	{
 		_client = new DiscordSocketClient();
 		_client.Log += Log;

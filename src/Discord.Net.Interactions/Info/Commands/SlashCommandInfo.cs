@@ -46,15 +46,25 @@ namespace Discord.Interactions
         /// </summary>
         public IReadOnlyList<SlashCommandParameterInfo> FlattenedParameters { get; }
 
+        /// <inheritdoc/>
+        public IReadOnlyCollection<InteractionContextType> ContextTypes { get; }
+
+        /// <inheritdoc/>
+        public IReadOnlyCollection<ApplicationIntegrationType> IntegrationTypes { get; }
+
         internal SlashCommandInfo(Builders.SlashCommandBuilder builder, ModuleInfo module, InteractionService commandService) : base(builder, module, commandService)
         {
             Description = builder.Description;
+#pragma warning disable CS0618 // Type or member is obsolete
             DefaultPermission = builder.DefaultPermission;
+#pragma warning restore CS0618 // Type or member is obsolete
             IsEnabledInDm = builder.IsEnabledInDm;
             IsNsfw = builder.IsNsfw;
             DefaultMemberPermissions = builder.DefaultMemberPermissions;
             Parameters = builder.Parameters.Select(x => x.Build(this)).ToImmutableArray();
             FlattenedParameters = FlattenParameters(Parameters).ToImmutableArray();
+            ContextTypes = builder.ContextTypes?.ToImmutableArray();
+            IntegrationTypes = builder.IntegrationTypes?.ToImmutableArray();
 
             for (var i = 0; i < FlattenedParameters.Count - 1; i++)
                 if (!FlattenedParameters.ElementAt(i).IsRequired && FlattenedParameters.ElementAt(i + 1).IsRequired)
@@ -64,12 +74,12 @@ namespace Discord.Interactions
         }
 
         /// <inheritdoc/>
-        public override async Task<IResult> ExecuteAsync(IInteractionContext context, IServiceProvider services)
+        public override Task<IResult> ExecuteAsync(IInteractionContext context, IServiceProvider services)
         {
             if (context.Interaction is not ISlashCommandInteraction)
-                return ExecuteResult.FromError(InteractionCommandError.ParseFailed, $"Provided {nameof(IInteractionContext)} doesn't belong to a Slash Command Interaction");
+                return Task.FromResult((IResult)ExecuteResult.FromError(InteractionCommandError.ParseFailed, $"Provided {nameof(IInteractionContext)} doesn't belong to a Slash Command Interaction"));
 
-            return await base.ExecuteAsync(context, services);
+            return base.ExecuteAsync(context, services);
         }
 
         protected override async Task<IResult> ParseArgumentsAsync(IInteractionContext context, IServiceProvider services)

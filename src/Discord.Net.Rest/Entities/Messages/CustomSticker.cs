@@ -34,6 +34,7 @@ namespace Discord.Rest
         {
             AuthorId = authorId;
             Guild = guild;
+            GuildId = guild.Id;
         }
         internal CustomSticker(BaseDiscordClient client, ulong id, ulong guildId, ulong? authorId = null)
             : base(client, id)

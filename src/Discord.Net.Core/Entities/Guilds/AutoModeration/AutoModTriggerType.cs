@@ -35,5 +35,10 @@ namespace Discord
         ///     Check if content contains more unique mentions than allowed.
         /// </summary>
         MentionSpam = 5,
+
+        /// <summary>
+        ///     Check if member profile contains words from a user defined list of keywords.
+        /// </summary>
+        MemberProfile = 6
     }
 }

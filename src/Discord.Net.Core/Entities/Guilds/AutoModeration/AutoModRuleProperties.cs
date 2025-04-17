@@ -69,7 +69,7 @@ namespace Discord
         /// <summary>
         ///     Returns the max custom message length AutoMod rule action allowed by Discord.
         /// </summary>
-        public const int MaxCustomBlockMessageLength = 50;
+        public const int MaxCustomBlockMessageLength = 150;
 
 
         /// <summary>
@@ -131,6 +131,11 @@ namespace Discord
         ///     Gets or sets the exempt channels for the rule. Empty if the rule has no exempt channels.
         /// </summary>
         public Optional<ulong[]> ExemptChannels { get; set; }
+
+        /// <summary>
+        ///     Gets or sets whether to automatically detect mention raids.
+        /// </summary>
+        public Optional<bool> MentionRaidProtectionEnabled { get; set; }
     }
 
     /// <summary>

@@ -279,7 +279,7 @@ namespace Discord
         ///     This is the number of users who have boosted this guild.
         /// </remarks>
         /// <returns>
-        ///     The number of premium subscribers of this guild; <see langword="null" /> if not available.
+        ///     The number of premium subscribers of this guild.
         /// </returns>
         int PremiumSubscriptionCount { get; }
         /// <summary>
@@ -375,6 +375,16 @@ namespace Discord
         ///     Gets the upload limit in bytes for this guild. This number is dependent on the guild's boost status.
         /// </summary>
         ulong MaxUploadLimit { get; }
+
+        /// <summary>
+        ///     Get the inventory settings on the guild. <see langword="null"/> if not available in the guild.
+        /// </summary>
+        GuildInventorySettings? InventorySettings { get; }
+
+        /// <summary>
+        ///     Gets the incidents data for this guild.
+        /// </summary>
+        GuildIncidentsData IncidentsData { get; }
 
         /// <summary>
         ///     Modifies this guild.
@@ -534,6 +544,29 @@ namespace Discord
         ///     A task that represents the asynchronous add operation for the ban.
         /// </returns>
         Task AddBanAsync(ulong userId, int pruneDays = 0, string reason = null, RequestOptions options = null);
+
+        /// <summary>
+        ///     Bans the user from this guild and optionally prunes their recent messages.
+        /// </summary>
+        /// <param name="user">The user to ban.</param>
+        /// <param name="pruneSeconds">The number of seconds to remover messages from this user for, between 0 and 604800</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous add operation for the ban.
+        /// </returns>
+        Task BanUserAsync(IUser user, uint pruneSeconds = 0, RequestOptions options = null);
+
+        /// <summary>
+        ///     Bans the user from this guild and optionally prunes their recent messages.
+        /// </summary>
+        /// <param name="userId">The ID of the user to ban.</param>
+        /// <param name="pruneSeconds">The number of seconds to remover messages from this user for, between 0 and 604800</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous add operation for the ban.
+        /// </returns>
+        Task BanUserAsync(ulong userId, uint pruneSeconds = 0, RequestOptions options = null);
+
         /// <summary>
         ///     Unbans the user if they are currently banned.
         /// </summary>
@@ -729,12 +762,58 @@ namespace Discord
         Task<IReadOnlyCollection<IThreadChannel>> GetThreadChannelsAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
 
         /// <summary>
+        ///     Gets a forum channel in this guild.
+        /// </summary>
+        /// <param name="id">The snowflake identifier for the stage channel.</param>
+        /// <param name="mode">The <see cref="CacheMode"/> that determines whether the object should be fetched from cache.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains the stage channel associated
+        ///     with the specified <paramref name="id"/>; <see langword="null" /> if none is found.
+        /// </returns>
+        Task<IForumChannel> GetForumChannelAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+
+        /// <summary>
+        ///     Gets a collection of all forum channels in this guild.
+        /// </summary>
+        /// <param name="mode">The <see cref="CacheMode"/> that determines whether the object should be fetched from cache.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains a read-only collection of
+        ///     forum channels found within this guild.
+        /// </returns>
+        Task<IReadOnlyCollection<IForumChannel>> GetForumChannelsAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+
+        /// <summary>
+        ///     Gets a forum channel in this guild.
+        /// </summary>
+        /// <param name="id">The snowflake identifier for the stage channel.</param>
+        /// <param name="mode">The <see cref="CacheMode"/> that determines whether the object should be fetched from cache.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains the stage channel associated
+        ///     with the specified <paramref name="id"/>; <see langword="null" /> if none is found.
+        /// </returns>
+        Task<IMediaChannel> GetMediaChannelAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+
+        /// <summary>
+        ///     Gets a collection of all forum channels in this guild.
+        /// </summary>
+        /// <param name="mode">The <see cref="CacheMode"/> that determines whether the object should be fetched from cache.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains a read-only collection of
+        ///     media channels found within this guild.
+        /// </returns>
+        Task<IReadOnlyCollection<IMediaChannel>> GetMediaChannelsAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+
+        /// <summary>
         ///     Creates a new text channel in this guild.
         /// </summary>
         /// <example>
         ///     <para>The following example creates a new text channel under an existing category named <c>Wumpus</c> with a set topic.</para>
         ///     <code language="cs" region="CreateTextChannelAsync"
-        ///           source="..\..\..\Discord.Net.Examples\Core\Entities\Guilds\IGuild.Examples.cs"/>
+        ///           source="../../../Discord.Net.Examples/Core/Entities/Guilds/IGuild.Examples.cs"/>
         /// </example>
         /// <param name="name">The new name for the text channel.</param>
         /// <param name="func">The delegate containing the properties to be applied to the channel upon its creation.</param>
@@ -744,6 +823,21 @@ namespace Discord
         ///     text channel.
         /// </returns>
         Task<ITextChannel> CreateTextChannelAsync(string name, Action<TextChannelProperties> func = null, RequestOptions options = null);
+        /// <summary>
+        ///     Creates a new announcement channel in this guild.
+        /// </summary>
+        /// <remarks>
+        ///     Announcement channels are only available in Community guilds.
+        /// </remarks>
+        /// <param name="name">The new name for the announcement channel.</param>
+        /// <param name="func">The delegate containing the properties to be applied to the channel upon its creation.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous creation operation. The task result contains the newly created
+        ///     announcement channel.
+        /// </returns>
+        Task<INewsChannel> CreateNewsChannelAsync(string name, Action<TextChannelProperties> func = null, RequestOptions options = null);
+
         /// <summary>
         ///     Creates a new voice channel in this guild.
         /// </summary>
@@ -789,6 +883,18 @@ namespace Discord
         ///     forum channel.
         /// </returns>
         Task<IForumChannel> CreateForumChannelAsync(string name, Action<ForumChannelProperties> func = null, RequestOptions options = null);
+
+        /// <summary>
+        ///     Creates a new media channel in this guild.
+        /// </summary>
+        /// <param name="name">The new name for the media channel.</param>
+        /// <param name="func">The delegate containing the properties to be applied to the channel upon its creation.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous creation operation. The task result contains the newly created
+        ///     forum channel.
+        /// </returns>
+        Task<IMediaChannel> CreateMediaChannelAsync(string name, Action<ForumChannelProperties> func = null, RequestOptions options = null);
 
         /// <summary>
         ///     Gets a collection of all the voice regions this guild can access.
@@ -847,6 +953,17 @@ namespace Discord
         ///     A role that is associated with the specified <paramref name="id"/>; <see langword="null" /> if none is found.
         /// </returns>
         IRole GetRole(ulong id);
+
+        /// <summary>
+        ///     Gets a role in this guild.
+        /// </summary>
+        /// <param name="id">The snowflake identifier for the role.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous creation operation. The task result contains the role
+        ///     that is associated with the specified <paramref name="id"/>; <see langword="null" /> if none is found.
+        /// </returns>
+        Task<IRole> GetRoleAsync(ulong id, RequestOptions options = null);
+
         /// <summary>
         ///     Creates a new role with the provided name.
         /// </summary>
@@ -870,11 +987,13 @@ namespace Discord
         /// <param name="isHoisted">Whether the role is separated from others on the sidebar.</param>
         /// <param name="isMentionable">Whether the role can be mentioned.</param>
         /// <param name="options">The options to be used when sending the request.</param>
+        /// <param name="icon">The icon for the role.</param>
+        /// <param name="emoji">The unicode emoji to be used as an icon for the role.</param>
         /// <returns>
         ///     A task that represents the asynchronous creation operation. The task result contains the newly created
         ///     role.
         /// </returns>
-        Task<IRole> CreateRoleAsync(string name, GuildPermissions? permissions = null, Color? color = null, bool isHoisted = false, bool isMentionable = false, RequestOptions options = null);
+        Task<IRole> CreateRoleAsync(string name, GuildPermissions? permissions = null, Color? color = null, bool isHoisted = false, bool isMentionable = false, RequestOptions options = null, Image? icon = null, Emoji emoji = null);
 
         /// <summary>
         ///     Adds a user to this guild.
@@ -979,6 +1098,7 @@ namespace Discord
         ///     be or has been removed from this guild.
         /// </returns>
         Task<int> PruneUsersAsync(int days = 30, bool simulate = false, RequestOptions options = null, IEnumerable<ulong> includeRoleIds = null);
+
         /// <summary>
         ///     Gets a collection of users in this guild that the name or nickname starts with the
         ///     provided <see cref="string"/> at <paramref name="query"/>.
@@ -995,6 +1115,11 @@ namespace Discord
         ///     users that the name or nickname starts with the provided <see cref="string"/> at <paramref name="query"/>.
         /// </returns>
         Task<IReadOnlyCollection<IGuildUser>> SearchUsersAsync(string query, int limit = DiscordConfig.MaxUsersPerBatch, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+
+        /// <summary>
+        ///     Gets a collection of users in this guild that match the provided search criteria.
+        /// </summary>
+        Task<MemberSearchResult> SearchUsersAsyncV2(int limit = DiscordConfig.MaxUsersPerBatch, MemberSearchPropertiesV2 args = null, RequestOptions options = null);
 
         /// <summary>
         ///     Gets the specified number of audit log entries for this guild.
@@ -1325,5 +1450,24 @@ namespace Discord
         ///     A task that represents the asynchronous creation operation. The task result contains the modified <see cref="IGuildOnboarding"/>.
         /// </returns>
         Task<IGuildOnboarding> ModifyOnboardingAsync(Action<GuildOnboardingProperties> props, RequestOptions options = null);
+
+        /// <summary>
+        ///     Modifies the incident actions of the guild.
+        /// </summary>
+        /// <returns>
+        ///     A task that represents the asynchronous creation operation. The task result contains the modified <see cref="IncidentsData"/>.
+        /// </returns>
+        Task<GuildIncidentsData> ModifyIncidentActionsAsync(Action<GuildIncidentsDataProperties> props, RequestOptions options = null);
+
+        /// <summary>
+        ///     Executes a bulk ban on the specified users.
+        /// </summary>
+        /// <param name="userIds">A collection of user ids to ban.</param>
+        /// <param name="deleteMessageSeconds">The number of seconds to delete messages for. Max 604800.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous creation operation. The task result contains a <see cref="BulkBanResult"/>.
+        /// </returns>
+        Task<BulkBanResult> BulkBanAsync(IEnumerable<ulong> userIds, int? deleteMessageSeconds = null, RequestOptions options = null);
     }
 }

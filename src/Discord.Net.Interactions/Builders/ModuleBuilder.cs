@@ -1,3 +1,4 @@
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -51,12 +52,13 @@ namespace Discord.Interactions.Builders
         /// <summary>
         ///     Gets and sets the default permission of this module.
         /// </summary>
-        [Obsolete($"To be deprecated soon, use {nameof(IsEnabledInDm)} and {nameof(DefaultMemberPermissions)} instead.")]
+        [Obsolete($"To be deprecated soon, use {nameof(ContextTypes)} and {nameof(DefaultMemberPermissions)} instead.")]
         public bool DefaultPermission { get; set; } = true;
 
         /// <summary>
         ///     Gets whether this command can be used in DMs.
         /// </summary>
+        [Obsolete("This property will be deprecated soon. Use ContextTypes instead.")]
         public bool IsEnabledInDm { get; set; } = true;
 
         /// <summary>
@@ -113,6 +115,16 @@ namespace Discord.Interactions.Builders
         ///     Gets a collection of the Modal Commands of this module.
         /// </summary>
         public IReadOnlyList<ModalCommandBuilder> ModalCommands => _modalCommands;
+
+        /// <summary>
+        ///     Gets or sets the install method for this command.
+        /// </summary>
+        public HashSet<ApplicationIntegrationType> IntegrationTypes { get; set; } = null;
+
+        /// <summary>
+        ///     Gets or sets the context types this command can be executed in.
+        /// </summary>
+        public HashSet<InteractionContextType> ContextTypes { get; set; } = null;
 
         internal TypeInfo TypeInfo { get; set; }
 
@@ -189,6 +201,7 @@ namespace Discord.Interactions.Builders
         /// <returns>
         ///     The builder instance.
         /// </returns>
+        [Obsolete("This method will be deprecated soon. Use WithContextTypes instead.")]
         public ModuleBuilder SetEnabledInDm(bool isEnabled)
         {
             IsEnabledInDm = isEnabled;
@@ -358,6 +371,11 @@ namespace Discord.Interactions.Builders
             return this;
         }
 
+        /// <inheritdoc cref="Discord.Interactions.Builders.ModuleBuilder.AddAutocompleteCommand(System.String,Discord.Interactions.ExecuteCallback,System.Action{Discord.Interactions.Builders.AutocompleteCommandBuilder})" />
+        [Obsolete("This method will be deprecated soon. Use AddAutocompleteCommand instead.")]
+        public ModuleBuilder AddSlashCommand(string name, ExecuteCallback callback, Action<AutocompleteCommandBuilder> configure)
+            => AddAutocompleteCommand(name, callback, configure);
+
         /// <summary>
         ///     Adds autocomplete command builder to <see cref="AutocompleteCommands"/>.
         /// </summary>
@@ -367,7 +385,7 @@ namespace Discord.Interactions.Builders
         /// <returns>
         ///     The builder instance.
         /// </returns>
-        public ModuleBuilder AddSlashCommand(string name, ExecuteCallback callback, Action<AutocompleteCommandBuilder> configure)
+        public ModuleBuilder AddAutocompleteCommand(string name, ExecuteCallback callback, Action<AutocompleteCommandBuilder> configure)
         {
             var command = new AutocompleteCommandBuilder(this, name, callback);
             configure(command);
@@ -390,7 +408,7 @@ namespace Discord.Interactions.Builders
             _modalCommands.Add(command);
             return this;
         }
-        
+
         /// <summary>
         ///     Adds a modal command builder to <see cref="ModalCommands"/>.
         /// </summary>
@@ -423,10 +441,40 @@ namespace Discord.Interactions.Builders
             return this;
         }
 
+        /// <summary>
+        ///     Sets the <see cref="IntegrationTypes"/> on this <see cref="ModuleBuilder"/>.
+        /// </summary>
+        /// <param name="integrationTypes">Install types for this command.</param>
+        /// <returns>The builder instance.</returns>
+        public ModuleBuilder WithIntegrationTypes(params ApplicationIntegrationType[] integrationTypes)
+        {
+            IntegrationTypes = new HashSet<ApplicationIntegrationType>(integrationTypes);
+            return this;
+        }
+
+        /// <summary>
+        ///     Sets  the <see cref="ContextTypes"/> on this <see cref="ModuleBuilder"/>.
+        /// </summary>
+        /// <param name="contextTypes">Context types the command can be executed in.</param>
+        /// <returns>The builder instance.</returns>
+        public ModuleBuilder WithContextTypes(params InteractionContextType[] contextTypes)
+        {
+            ContextTypes = new HashSet<InteractionContextType>(contextTypes);
+            return this;
+        }
+
         internal ModuleInfo Build(InteractionService interactionService, IServiceProvider services, ModuleInfo parent = null)
         {
             if (TypeInfo is not null && ModuleClassBuilder.IsValidModuleDefinition(TypeInfo))
             {
+                using var scope = InteractionService._autoServiceScopes
+                    ? services.CreateScope()
+                    : null;
+
+                services = (InteractionService._autoServiceScopes
+                    ? scope?.ServiceProvider
+                    : services) ?? EmptyServiceProvider.Instance;
+
                 var instance = ReflectionUtils<IInteractionModuleBase>.CreateObject(TypeInfo, interactionService, services);
 
                 try
@@ -434,6 +482,7 @@ namespace Discord.Interactions.Builders
                     instance.Construct(this, interactionService);
                     var moduleInfo = new ModuleInfo(this, interactionService, services, parent);
                     instance.OnModuleBuilding(interactionService, moduleInfo);
+
                     return moduleInfo;
                 }
                 finally

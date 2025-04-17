@@ -5,7 +5,8 @@ title: Buttons in Depth
 
 # Buttons in depth
 
-There are many changes you can make to buttons, lets take a look at the parameters in the `WithButton` function"
+There are many changes you can make to buttons, lets take a look at the parameters in the `WithButton` function.
+
 | Name | Type | Description |
 |----------|---------------|----------------------------------------------------------------|
 | label | `string` | The label text for the button. |

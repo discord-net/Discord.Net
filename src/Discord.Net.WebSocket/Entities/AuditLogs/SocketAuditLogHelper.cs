@@ -40,7 +40,7 @@ internal static class SocketAuditLogHelper
             
             [ActionType.WebhookCreated] = SocketWebhookCreateAuditLogData.Create,
             [ActionType.WebhookUpdated] = SocketWebhookUpdateAuditLogData.Create,
-            [ActionType.WebhookDeleted] = SocketWebhookDeleteAuditLogData.Create,
+            [ActionType.WebhookDeleted] = SocketWebhookDeletedAuditLogData.Create,
             
             [ActionType.EmojiCreated] = SocketEmoteCreateAuditLogData.Create,
             [ActionType.EmojiUpdated] = SocketEmoteUpdateAuditLogData.Create,
@@ -84,6 +84,10 @@ internal static class SocketAuditLogHelper
             [ActionType.OnboardingQuestionCreated] = SocketOnboardingPromptCreatedAuditLogData.Create,
             [ActionType.OnboardingQuestionUpdated] = SocketOnboardingPromptUpdatedAuditLogData.Create,
             [ActionType.OnboardingUpdated] = SocketOnboardingUpdatedAuditLogData.Create,
+
+            [ActionType.VoiceChannelStatusUpdated] = SocketVoiceChannelStatusUpdatedAuditLogData.Create,
+            [ActionType.VoiceChannelStatusDeleted] = SocketVoiceChannelStatusDeleteAuditLogData.Create,
+
         };
 
     public static ISocketAuditLogData CreateData(DiscordSocketClient discord, EntryModel entry)

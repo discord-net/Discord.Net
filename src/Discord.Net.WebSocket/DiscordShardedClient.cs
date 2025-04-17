@@ -110,10 +110,10 @@ namespace Discord.WebSocket
             => new DiscordSocketApiClient(config.RestClientProvider, config.WebSocketProvider, DiscordRestConfig.UserAgent, config.GatewayHost,
                 useSystemClock: config.UseSystemClock, defaultRatelimitCallback: config.DefaultRatelimitCallback);
 
-        internal async Task AcquireIdentifyLockAsync(int shardId, CancellationToken token)
+        internal Task AcquireIdentifyLockAsync(int shardId, CancellationToken token)
         {
             int semaphoreIdx = shardId % _baseConfig.IdentifyMaxConcurrency;
-            await _identifySemaphores[semaphoreIdx].WaitAsync(token).ConfigureAwait(false);
+            return _identifySemaphores[semaphoreIdx].WaitAsync(token);
         }
 
         internal void ReleaseIdentifyLock()
@@ -198,11 +198,12 @@ namespace Discord.WebSocket
         }
 
         /// <inheritdoc />
-        public override async Task StartAsync()
-            => await Task.WhenAll(_shards.Select(x => x.StartAsync())).ConfigureAwait(false);
+        public override Task StartAsync()
+            => Task.WhenAll(_shards.Select(x => x.StartAsync()));
+
         /// <inheritdoc />
-        public override async Task StopAsync()
-            => await Task.WhenAll(_shards.Select(x => x.StopAsync())).ConfigureAwait(false);
+        public override Task StopAsync()
+            => Task.WhenAll(_shards.Select(x => x.StopAsync()));
 
         public DiscordSocketClient GetShard(int id)
         {
@@ -214,14 +215,14 @@ namespace Discord.WebSocket
             => (int)((guildId >> 22) % (uint)_totalShards);
         public int GetShardIdFor(IGuild guild)
             => GetShardIdFor(guild?.Id ?? 0);
-        private DiscordSocketClient GetShardFor(ulong guildId)
+        public DiscordSocketClient GetShardFor(ulong guildId)
             => GetShard(GetShardIdFor(guildId));
         public DiscordSocketClient GetShardFor(IGuild guild)
             => GetShardFor(guild?.Id ?? 0);
 
         /// <inheritdoc />
-        public override async Task<RestApplication> GetApplicationInfoAsync(RequestOptions options = null)
-            => await _shards[0].GetApplicationInfoAsync(options).ConfigureAwait(false);
+        public override Task<RestApplication> GetApplicationInfoAsync(RequestOptions options = null)
+            => _shards[0].GetApplicationInfoAsync(options);
 
         /// <inheritdoc />
         public override SocketGuild GetGuild(ulong id)
@@ -355,16 +356,12 @@ namespace Discord.WebSocket
         }
 
         /// <inheritdoc />
-        public override async ValueTask<IReadOnlyCollection<RestVoiceRegion>> GetVoiceRegionsAsync(RequestOptions options = null)
-        {
-            return await _shards[0].GetVoiceRegionsAsync().ConfigureAwait(false);
-        }
+        public override ValueTask<IReadOnlyCollection<RestVoiceRegion>> GetVoiceRegionsAsync(RequestOptions options = null)
+            => _shards[0].GetVoiceRegionsAsync();
 
         /// <inheritdoc />
-        public override async ValueTask<RestVoiceRegion> GetVoiceRegionAsync(string id, RequestOptions options = null)
-        {
-            return await _shards[0].GetVoiceRegionAsync(id, options).ConfigureAwait(false);
-        }
+        public override ValueTask<RestVoiceRegion> GetVoiceRegionAsync(string id, RequestOptions options = null)
+            => _shards[0].GetVoiceRegionAsync(id, options);
 
         /// <inheritdoc />
         /// <exception cref="ArgumentNullException"><paramref name="guilds"/> is <see langword="null"/></exception>
@@ -396,14 +393,14 @@ namespace Discord.WebSocket
                 await _shards[i].SetStatusAsync(status).ConfigureAwait(false);
         }
         /// <inheritdoc />
-        public override async Task SetGameAsync(string name, string streamUrl = null, ActivityType type = ActivityType.Playing)
+        public override Task SetGameAsync(string name, string streamUrl = null, ActivityType type = ActivityType.Playing)
         {
             IActivity activity = null;
             if (!string.IsNullOrEmpty(streamUrl))
                 activity = new StreamingGame(name, streamUrl);
             else if (!string.IsNullOrEmpty(name))
                 activity = new Game(name, type);
-            await SetActivityAsync(activity).ConfigureAwait(false);
+            return SetActivityAsync(activity);
         }
         /// <inheritdoc />
         public override async Task SetActivityAsync(IActivity activity)
@@ -431,8 +428,10 @@ namespace Discord.WebSocket
                     //Should only happen if token is changed
                     var _ = LogoutAsync(); //Signal the logout, fire and forget
                 }
-                return Task.Delay(0);
+                return Task.CompletedTask;
             };
+
+            client.SentRequest += (method, endpoint, millis) => _sentRequest.InvokeAsync(method, endpoint, millis);
 
             client.Connected += () => _shardConnectedEvent.InvokeAsync(client);
             client.Disconnected += (exception) => _shardDisconnectedEvent.InvokeAsync(exception, client);
@@ -516,9 +515,66 @@ namespace Discord.WebSocket
             client.GuildScheduledEventUserAdd += (arg1, arg2) => _guildScheduledEventUserAdd.InvokeAsync(arg1, arg2);
             client.GuildScheduledEventUserRemove += (arg1, arg2) => _guildScheduledEventUserRemove.InvokeAsync(arg1, arg2);
 
+            client.AutoModActionExecuted += (guild, action, arg3) => _autoModActionExecuted.InvokeAsync(guild, action, arg3);
+            client.AutoModRuleCreated += rule => _autoModRuleCreated.InvokeAsync(rule);
+            client.AutoModRuleDeleted += rule => _autoModRuleDeleted.InvokeAsync(rule);
+            client.AutoModRuleUpdated += (arg1, arg2) => _autoModRuleUpdated.InvokeAsync(arg1, arg2);
+
             client.WebhooksUpdated += (arg1, arg2) => _webhooksUpdated.InvokeAsync(arg1, arg2);
             client.AuditLogCreated += (arg1, arg2) => _auditLogCreated.InvokeAsync(arg1, arg2);
+
+            client.VoiceChannelStatusUpdated += (arg1, arg2, arg3) => _voiceChannelStatusUpdated.InvokeAsync(arg1, arg2, arg3);
+            
+            client.EntitlementCreated += (arg1) => _entitlementCreated.InvokeAsync(arg1);
+            client.EntitlementUpdated += (arg1, arg2) => _entitlementUpdated.InvokeAsync(arg1, arg2);
+            client.EntitlementDeleted += (arg1) => _entitlementDeleted.InvokeAsync(arg1);
+
+            client.PollVoteAdded += (arg1, arg2, arg3, arg4, arg5) => _pollVoteAdded.InvokeAsync(arg1, arg2, arg3, arg4, arg5);
+            client.PollVoteRemoved += (arg1, arg2, arg3, arg4, arg5) => _pollVoteRemoved.InvokeAsync(arg1, arg2, arg3, arg4, arg5);
         }
+
+        public async Task<SocketApplicationCommand> CreateGlobalApplicationCommandAsync(ApplicationCommandProperties properties, RequestOptions options = null)
+        {
+            var model = await InteractionHelper.CreateGlobalCommandAsync(this, properties, options).ConfigureAwait(false);
+
+            SocketApplicationCommand entity = null;
+
+            foreach (var shard in _shards)
+            {
+                entity = shard.State.GetOrAddCommand(model.Id, (id) => SocketApplicationCommand.Create(shard, model));
+
+                //Update it in case it was cached
+                entity.Update(model);
+            }
+
+            System.Diagnostics.Debug.Assert(entity != null, "There should be at least one shard to get the entity");
+
+            return entity;
+        }
+
+        public async Task<IReadOnlyCollection<SocketApplicationCommand>> BulkOverwriteGlobalApplicationCommandsAsync(
+            ApplicationCommandProperties[] properties, RequestOptions options = null)
+        {
+            var models = await InteractionHelper.BulkOverwriteGlobalCommandsAsync(this, properties, options);
+
+            IEnumerable<SocketApplicationCommand> entities = null;
+
+            foreach (var shard in _shards)
+            {
+                entities = models.Select(x => SocketApplicationCommand.Create(shard, x));
+                //Purge our previous commands
+                shard.State.PurgeCommands(x => x.IsGlobalCommand);
+
+                foreach (var entity in entities)
+                {
+                    shard.State.AddCommand(entity);
+                }
+            }
+
+            System.Diagnostics.Debug.Assert(entities != null, "There should be at least one shard to get the entities");
+            return entities.ToImmutableArray();
+        }
+
         #endregion
 
         #region IDiscordClient
@@ -555,7 +611,7 @@ namespace Discord.WebSocket
             => await CreateGuildAsync(name, region, jpegIcon).ConfigureAwait(false);
 
         /// <inheritdoc />
-        async Task<IUser> IDiscordClient.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
+        public async Task<IUser> GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
         {
             var user = GetUser(id);
             if (user is not null || mode == CacheMode.CacheOnly)
@@ -578,6 +634,12 @@ namespace Discord.WebSocket
         {
             return await GetVoiceRegionAsync(id).ConfigureAwait(false);
         }
+        /// <inheritdoc />
+        async Task<IApplicationCommand> IDiscordClient.CreateGlobalApplicationCommand(ApplicationCommandProperties properties, RequestOptions options)
+            => await CreateGlobalApplicationCommandAsync(properties, options).ConfigureAwait(false);
+        /// <inheritdoc />
+        async Task<IReadOnlyCollection<IApplicationCommand>> IDiscordClient.BulkOverwriteGlobalApplicationCommand(ApplicationCommandProperties[] properties, RequestOptions options)
+            => await BulkOverwriteGlobalApplicationCommandsAsync(properties, options);
         #endregion
 
         #region Dispose

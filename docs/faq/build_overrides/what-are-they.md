@@ -1,6 +1,6 @@
 ---
 uid: FAQ.BuildOverrides.WhatAreThey
-title: Build Overrides, What are they?
+title: Build Overrides
 ---
 
 # Build Overrides

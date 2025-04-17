@@ -327,5 +327,70 @@ namespace Discord
         ///     that represents the gateway information related to the bot.
         /// </returns>
         Task<BotGateway> GetBotGatewayAsync(RequestOptions options = null);
+
+        /// <summary>
+        ///     Creates a test entitlement to a given SKU for a given guild or user. 
+        /// </summary>
+        Task<IEntitlement> CreateTestEntitlementAsync(ulong skuId, ulong ownerId, SubscriptionOwnerType ownerType, RequestOptions options = null);
+
+        /// <summary>
+        ///     Deletes a currently-active test entitlement.
+        /// </summary>
+        Task DeleteTestEntitlementAsync(ulong entitlementId, RequestOptions options = null);
+
+        /// <summary>
+        ///     Returns all entitlements for a given app, active and expired.
+        /// </summary>
+        IAsyncEnumerable<IReadOnlyCollection<IEntitlement>> GetEntitlementsAsync(int limit = 100,
+            ulong? afterId = null, ulong? beforeId = null, bool excludeEnded = false, ulong? guildId = null, ulong? userId = null,
+            ulong[] skuIds = null, RequestOptions options = null, bool? excludeDeleted = null);
+
+        /// <summary>
+        ///     Returns all SKUs for a given application. 
+        /// </summary>
+        Task<IReadOnlyCollection<SKU>> GetSKUsAsync(RequestOptions options = null);
+
+        /// <summary>
+        ///     Marks a given one-time purchase entitlement for the user as consumed.
+        /// </summary>
+        /// <param name="entitlementId">The id of the entitlement.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        Task ConsumeEntitlementAsync(ulong entitlementId, RequestOptions options = null);
+
+        /// <summary>
+        ///     Returns all subscriptions for a given SKU. 
+        /// </summary>
+        IAsyncEnumerable<IReadOnlyCollection<ISubscription>> GetSKUSubscriptionsAsync(ulong skuId, int limit = 100, ulong? afterId = null,
+            ulong? beforeId = null, ulong? userId = null, RequestOptions options = null);
+
+        /// <summary>
+        ///     Gets a subscription by its id.
+        /// </summary>
+        Task<ISubscription> GetSKUSubscriptionAsync(ulong skuId, ulong subscriptionId, RequestOptions options = null);
+
+        /// <summary>
+        ///     Gets an emote for the current application.
+        /// </summary>
+        public Task<Emote> GetApplicationEmoteAsync(ulong emoteId, RequestOptions options = null);
+
+        /// <summary>
+        ///     Gets all emotes for the current application.
+        /// </summary>
+        public Task<IReadOnlyCollection<Emote>> GetApplicationEmotesAsync(RequestOptions options = null);
+
+        /// <summary>
+        ///     Modifies an emote for the current application.
+        /// </summary>
+        public Task<Emote> ModifyApplicationEmoteAsync(ulong emoteId, Action<ApplicationEmoteProperties> args, RequestOptions options = null);
+
+        /// <summary>
+        ///    Creates an emote for the current application.
+        /// </summary>
+        public Task<Emote> CreateApplicationEmoteAsync(string name, Image image, RequestOptions options = null);
+
+        /// <summary>
+        ///     Deletes an emote for the current application.
+        /// </summary>
+        public Task DeleteApplicationEmoteAsync(ulong emoteId, RequestOptions options = null);
     }
 }

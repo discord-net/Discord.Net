@@ -120,13 +120,16 @@ public class RoleConnectionProperties
     {
         PlatformName = platformName;
         PlatformUsername = platformUsername;
-        Metadata = metadata.ToDictionary();
+        Metadata = metadata?.ToDictionary() ?? new ();
     }
 
     /// <summary>
     ///     Initializes a new instance of <see cref="RoleConnectionProperties"/>.
     /// </summary>
-    public RoleConnectionProperties() { }
+    public RoleConnectionProperties()
+    {
+        Metadata = new();
+    }
 
     /// <summary>
     ///     Initializes a new <see cref="RoleConnectionProperties"/> with the data from provided <see cref="RoleConnection"/>.
@@ -136,6 +139,6 @@ public class RoleConnectionProperties
         {
             PlatformName = roleConnection.PlatformName,
             PlatformUsername = roleConnection.PlatformUsername,
-            Metadata = roleConnection.Metadata.ToDictionary()
+            Metadata = roleConnection.Metadata?.ToDictionary()
         };
 }

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace Discord.Interactions.Builders
 {
@@ -35,7 +36,24 @@ namespace Discord.Interactions.Builders
         /// </summary>
         public GuildPermission? DefaultMemberPermissions { get; set; } = null;
 
-        internal SlashCommandBuilder(ModuleBuilder module) : base(module) { }
+        /// <summary>
+        ///     Gets or sets the install method for this command.
+        /// </summary>
+        public HashSet<ApplicationIntegrationType> IntegrationTypes { get; set; } = null;
+
+        /// <summary>
+        ///     Gets or sets the context types this command can be executed in.
+        /// </summary>
+        public HashSet<InteractionContextType> ContextTypes { get; set; } = null;
+
+        internal SlashCommandBuilder(ModuleBuilder module) : base(module)
+        {
+            IntegrationTypes = module.IntegrationTypes;
+            ContextTypes = module.ContextTypes;
+#pragma warning disable CS0618 // Type or member is obsolete
+            IsEnabledInDm = module.IsEnabledInDm;
+#pragma warning restore CS0618 // Type or member is obsolete
+        }
 
         /// <summary>
         ///     Initializes a new <see cref="SlashCommandBuilder"/>.
@@ -123,6 +141,32 @@ namespace Discord.Interactions.Builders
         public SlashCommandBuilder WithDefaultMemberPermissions(GuildPermission permissions)
         {
             DefaultMemberPermissions = permissions;
+            return this;
+        }
+
+        /// <summary>
+        ///     Sets the <see cref="IntegrationTypes"/> on this <see cref="SlashCommandBuilder"/>.
+        /// </summary>
+        /// <param name="integrationTypes">Install types for this command.</param>
+        /// <returns>The builder instance.</returns>
+        public SlashCommandBuilder WithIntegrationTypes(params ApplicationIntegrationType[] integrationTypes)
+        {
+            IntegrationTypes = integrationTypes is not null
+                ? new HashSet<ApplicationIntegrationType>(integrationTypes)
+                : null;
+            return this;
+        }
+
+        /// <summary>
+        ///     Sets the <see cref="ContextTypes"/> on this <see cref="SlashCommandBuilder"/>.
+        /// </summary>
+        /// <param name="contextTypes">Context types the command can be executed in.</param>
+        /// <returns>The builder instance.</returns>
+        public SlashCommandBuilder WithContextTypes(params InteractionContextType[] contextTypes)
+        {
+            ContextTypes = contextTypes is not null
+                ? new HashSet<InteractionContextType>(contextTypes)
+                : null;
             return this;
         }
 

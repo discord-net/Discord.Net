@@ -9,8 +9,9 @@ namespace Discord.Rest;
 /// </summary>
 public class StickerDeletedAuditLogData : IAuditLogData
 {
-    internal StickerDeletedAuditLogData(StickerInfo data)
+    internal StickerDeletedAuditLogData(ulong id, StickerInfo data)
     {
+        StickerId = id;
         Data = data;
     }
 
@@ -19,8 +20,16 @@ public class StickerDeletedAuditLogData : IAuditLogData
         var changes = entry.Changes;
         var (data, _) = AuditLogHelper.CreateAuditLogEntityInfo<StickerInfoAuditLogModel>(changes, discord);
 
-        return new StickerDeletedAuditLogData(new(data));
+        return new StickerDeletedAuditLogData(entry.TargetId.Value, new(data));
     }
+
+    /// <summary>
+    ///     Gets the snowflake ID of the deleted sticker.
+    /// </summary>
+    /// <returns>
+    ///     A <see cref="ulong"/> representing the snowflake identifier of the deleted sticker.
+    /// </returns>
+    public ulong StickerId { get; }
 
     /// <summary>
     ///     Gets the sticker information before the changes.

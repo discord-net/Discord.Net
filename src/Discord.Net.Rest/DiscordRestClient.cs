@@ -15,7 +15,7 @@ namespace Discord.Rest
     /// <summary>
     ///     Provides a client to send REST-based requests to Discord.
     /// </summary>
-    public class DiscordRestClient : BaseDiscordClient, IDiscordClient
+    public class DiscordRestClient : BaseDiscordClient, IDiscordClient, IRestClientProvider
     {
         #region DiscordRestClient
         private RestApplication _applicationInfo;
@@ -85,7 +85,7 @@ namespace Discord.Rest
         internal override Task OnLogoutAsync()
         {
             _applicationInfo = null;
-            return Task.Delay(0);
+            return Task.CompletedTask;
         }
 
         #region Rest interactions
@@ -249,10 +249,10 @@ namespace Discord.Rest
         public Task DeleteAllGlobalCommandsAsync(RequestOptions options = null)
             => InteractionHelper.DeleteAllGlobalCommandsAsync(this, options);
 
-        public Task AddRoleAsync(ulong guildId, ulong userId, ulong roleId)
-            => ClientHelper.AddRoleAsync(this, guildId, userId, roleId);
-        public Task RemoveRoleAsync(ulong guildId, ulong userId, ulong roleId)
-            => ClientHelper.RemoveRoleAsync(this, guildId, userId, roleId);
+        public Task AddRoleAsync(ulong guildId, ulong userId, ulong roleId, RequestOptions options = null)
+            => ClientHelper.AddRoleAsync(this, guildId, userId, roleId, options);
+        public Task RemoveRoleAsync(ulong guildId, ulong userId, ulong roleId, RequestOptions options = null)
+            => ClientHelper.RemoveRoleAsync(this, guildId, userId, roleId, options);
 
         public Task AddReactionAsync(ulong channelId, ulong messageId, IEmote emote, RequestOptions options = null)
             => MessageHelper.AddReactionAsync(channelId, messageId, emote, this, options);
@@ -278,12 +278,74 @@ namespace Discord.Rest
         public Task<RoleConnection> ModifyUserApplicationRoleConnectionAsync(ulong applicationId, RoleConnectionProperties roleConnection, RequestOptions options = null)
             => ClientHelper.ModifyUserRoleConnectionAsync(applicationId, roleConnection, this, options);
 
+        /// <inheritdoc cref="IDiscordClient.CreateTestEntitlementAsync" />
+        public Task<RestEntitlement> CreateTestEntitlementAsync(ulong skuId, ulong ownerId, SubscriptionOwnerType ownerType, RequestOptions options = null)
+            => ClientHelper.CreateTestEntitlementAsync(this, skuId, ownerId, ownerType, options);
+
+        /// <inheritdoc />
+        public Task DeleteTestEntitlementAsync(ulong entitlementId, RequestOptions options = null)
+            => ApiClient.DeleteEntitlementAsync(entitlementId, options);
+
+        /// <inheritdoc cref="IDiscordClient.GetEntitlementsAsync" />
+        public IAsyncEnumerable<IReadOnlyCollection<IEntitlement>> GetEntitlementsAsync(int? limit = 100,
+            ulong? afterId = null, ulong? beforeId = null, bool excludeEnded = false, ulong? guildId = null, ulong? userId = null,
+            ulong[] skuIds = null, RequestOptions options = null, bool? excludeDeleted = null)
+            => ClientHelper.ListEntitlementsAsync(this, limit, afterId, beforeId, excludeEnded, guildId, userId, skuIds, excludeDeleted, options);
+
+        /// <inheritdoc />
+        public Task<IReadOnlyCollection<SKU>> GetSKUsAsync(RequestOptions options = null)
+            => ClientHelper.ListSKUsAsync(this, options);
+
+        /// <inheritdoc />
+        public Task ConsumeEntitlementAsync(ulong entitlementId, RequestOptions options = null)
+            => ClientHelper.ConsumeEntitlementAsync(this, entitlementId, options);
+
+        /// <inheritdoc cref="IDiscordClient.GetSKUSubscriptionAsync" />
+        public Task<RestSubscription> GetSKUSubscriptionAsync(ulong skuId, ulong subscriptionId, RequestOptions options = null)
+            => ClientHelper.GetSKUSubscriptionAsync(this, skuId, subscriptionId, options);
+
+        /// <inheritdoc cref="IDiscordClient.GetSKUSubscriptionsAsync" />
+        public IAsyncEnumerable<IReadOnlyCollection<RestSubscription>> GetSKUSubscriptionsAsync(ulong skuId, int limit = 100, ulong? afterId = null,
+            ulong? beforeId = null, ulong? userId = null, RequestOptions options = null)
+            => ClientHelper.ListSubscriptionsAsync(this, skuId, limit, afterId, beforeId, userId, options);
+
+        /// <inheritdoc />
+        public Task<Emote> GetApplicationEmoteAsync(ulong emoteId, RequestOptions options = null)
+            => ClientHelper.GetApplicationEmojiAsync(this, emoteId, options);
+
+        /// <inheritdoc />
+        public Task<IReadOnlyCollection<Emote>> GetApplicationEmotesAsync(RequestOptions options = null)
+            => ClientHelper.GetApplicationEmojisAsync(this, options);
+
+        /// <inheritdoc />
+        public Task<Emote> ModifyApplicationEmoteAsync(ulong emoteId, Action<ApplicationEmoteProperties> args, RequestOptions options = null)
+            => ClientHelper.ModifyApplicationEmojiAsync(this, emoteId, args, options);
+
+        /// <inheritdoc />
+        public Task<Emote> CreateApplicationEmoteAsync(string name, Image image, RequestOptions options = null)
+            => ClientHelper.CreateApplicationEmojiAsync(this, name, image, options);
+
+        /// <inheritdoc />
+        public Task DeleteApplicationEmoteAsync(ulong emoteId, RequestOptions options = null)
+            => ClientHelper.DeleteApplicationEmojiAsync(this, emoteId, options);
+
         #endregion
 
         #region IDiscordClient
+        async Task<IEntitlement> IDiscordClient.CreateTestEntitlementAsync(ulong skuId, ulong ownerId, SubscriptionOwnerType ownerType, RequestOptions options)
+            => await CreateTestEntitlementAsync(skuId, ownerId, ownerType, options).ConfigureAwait(false);
+
         /// <inheritdoc />
         async Task<IApplication> IDiscordClient.GetApplicationInfoAsync(RequestOptions options)
             => await GetApplicationInfoAsync(options).ConfigureAwait(false);
+
+        /// <inheritdoc />
+        async Task<ISubscription> IDiscordClient.GetSKUSubscriptionAsync(ulong skuId, ulong subscriptionId, RequestOptions options)
+            => await GetSKUSubscriptionAsync(skuId, subscriptionId, options);
+
+        /// <inheritdoc />
+        IAsyncEnumerable<IReadOnlyCollection<ISubscription>> IDiscordClient.GetSKUSubscriptionsAsync(ulong skuId, int limit, ulong? afterId,
+            ulong? beforeId, ulong? userId, RequestOptions options) => GetSKUSubscriptionsAsync(skuId, limit, afterId, beforeId, userId, options);
 
         /// <inheritdoc />
         async Task<IChannel> IDiscordClient.GetChannelAsync(ulong id, CacheMode mode, RequestOptions options)
@@ -371,6 +433,14 @@ namespace Discord.Rest
         /// <inheritdoc />
         async Task<IApplicationCommand> IDiscordClient.GetGlobalApplicationCommandAsync(ulong id, RequestOptions options)
             => await ClientHelper.GetGlobalApplicationCommandAsync(this, id, options).ConfigureAwait(false);
+        /// <inheritdoc />
+        async Task<IApplicationCommand> IDiscordClient.CreateGlobalApplicationCommand(ApplicationCommandProperties properties, RequestOptions options)
+            => await CreateGlobalCommand(properties, options).ConfigureAwait(false);
+        /// <inheritdoc />
+        async Task<IReadOnlyCollection<IApplicationCommand>> IDiscordClient.BulkOverwriteGlobalApplicationCommand(ApplicationCommandProperties[] properties, RequestOptions options)
+            => await BulkOverwriteGlobalCommands(properties, options).ConfigureAwait(false);
         #endregion
+
+        DiscordRestClient IRestClientProvider.RestClient => this;
     }
 }

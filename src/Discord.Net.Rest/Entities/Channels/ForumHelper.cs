@@ -8,7 +8,7 @@ namespace Discord.Rest;
 
 internal static class ForumHelper
 {
-    public static async Task<Model> ModifyAsync(IForumChannel channel, BaseDiscordClient client,
+    public static Task<Model> ModifyAsync(IForumChannel channel, BaseDiscordClient client,
         Action<ForumChannelProperties> func,
         RequestOptions options)
     {
@@ -57,9 +57,8 @@ internal static class ForumHelper
                         emoji.Name : Optional<string>.Unspecified
                 }
                 : Optional<ModifyForumReactionEmojiParams>.Unspecified,
-            DefaultSortOrder = args.DefaultSortOrder,
-            DefaultLayout = args.DefaultLayout,
+            DefaultSortOrder = args.DefaultSortOrder
         };
-        return await client.ApiClient.ModifyGuildChannelAsync(channel.Id, apiArgs, options).ConfigureAwait(false);
+        return client.ApiClient.ModifyGuildChannelAsync(channel.Id, apiArgs, options);
     }
 }

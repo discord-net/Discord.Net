@@ -206,6 +206,14 @@ namespace Discord
         public bool UseInteractionSnowflakeDate { get; set; } = true;
 
         /// <summary>
+        ///     Gets or sets whether or not any responses to Discord will make an internal expiration check.
+        /// </summary>
+        /// <remarks>
+        ///     This should generally be set to <see langword="false"/> in a development environment due to potential latency issues.
+        /// </remarks>
+        public bool ResponseInternalTimeCheck { get; set; } = true;
+
+        /// <summary>
         ///     Gets or sets if the Rest/Socket user <see cref="object.ToString"/> override formats the string in respect to bidirectional unicode.
         /// </summary>
         /// <remarks>
@@ -237,5 +245,49 @@ namespace Discord
         ///     Returns the max amount of tags applied to an application.
         /// </summary>
         public const int MaxApplicationTagCount = 5;
+
+        /// <summary>
+        ///     Returns the factor to reduce the heartbeat interval.
+        /// </summary>
+        /// <remarks>
+        ///     If a heartbeat takes longer than the interval estimated by Discord, the connection will be closed.
+        ///     This factor is used to reduce the interval and ensure that Discord will get the heartbeat within the estimated interval.
+        /// </remarks>
+        internal const double HeartbeatIntervalFactor = 0.9;
+
+        /// <summary>
+        ///     Returns the maximum length of a voice channel status.
+        /// </summary>
+        public const int MaxVoiceChannelStatusLength = 500;
+      
+        /// <summary>
+        ///     Returns the maximum number of entitlements that can be gotten per-batch.
+        /// </summary>
+        public const int MaxEntitlementsPerBatch = 100;
+
+        /// <summary>
+        ///     Returns the maximum number of subscriptions that can be gotten per-batch.
+        /// </summary>
+        public const int MaxSubscriptionsPerBatch = 100;
+
+        /// <summary>
+        ///     Returns the maximum number of poll answer voters that can be gotten per-batch.
+        /// </summary>
+        public const int MaxPollVotersPerBatch = 100;
+
+        /// <summary>
+        ///     Returns the maximum length of a poll answer text.
+        /// </summary>
+        public const int MaxPollAnswerTextLength = 55;
+
+        /// <summary>
+        ///     Returns the maximum length of a poll question text.
+        /// </summary>
+        public const int MaxPollQuestionTextLength = 300;
+      
+        /// <summary>
+        ///     Returns the maximum number of bans that can be banned in a single bulk request.
+        /// </summary>
+        public const int MaxBansPerBulkBatch = 200;
     }
 }

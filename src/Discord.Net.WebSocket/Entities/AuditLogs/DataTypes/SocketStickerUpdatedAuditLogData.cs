@@ -9,8 +9,9 @@ namespace Discord.WebSocket;
 /// </summary>
 public class SocketStickerUpdatedAuditLogData : ISocketAuditLogData
 {
-    internal SocketStickerUpdatedAuditLogData(SocketStickerInfo before, SocketStickerInfo after)
+    internal SocketStickerUpdatedAuditLogData(ulong id, SocketStickerInfo before, SocketStickerInfo after)
     {
+        StickerId = id;
         Before = before;
         After = after;
     }
@@ -20,8 +21,16 @@ public class SocketStickerUpdatedAuditLogData : ISocketAuditLogData
         var changes = entry.Changes;
         var (before, after) = AuditLogHelper.CreateAuditLogEntityInfo<StickerInfoAuditLogModel>(changes, discord);
 
-        return new SocketStickerUpdatedAuditLogData(new(before), new (after));
+        return new SocketStickerUpdatedAuditLogData(entry.TargetId.Value, new(before), new (after));
     }
+
+    /// <summary>
+    ///     Gets the snowflake ID of the updated sticker.
+    /// </summary>
+    /// <returns>
+    ///     A <see cref="ulong"/> representing the snowflake identifier of the updated sticker.
+    /// </returns>
+    public ulong StickerId { get; }
 
     /// <summary>
     ///     Gets the sticker information before the changes.

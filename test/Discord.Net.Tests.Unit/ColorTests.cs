@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
 using Xunit;
 
 namespace Discord
@@ -72,6 +70,26 @@ namespace Discord
             Assert.Throws<ArgumentOutOfRangeException>("b", () => new Color(0, 0, 2.0f));
             Assert.Throws<ArgumentOutOfRangeException>(() => new Color(-2.0f, -2.0f, -2.0f));
             Assert.Throws<ArgumentOutOfRangeException>(() => new Color(2.0f, 2.0f, 2.0f));
+        }
+        [Fact]
+        public void Color_FromRgb_String_CssHexColor()
+        {
+            Assert.Equal(0xFF0000u, Color.Parse("#F00", ColorType.CssHexColor).RawValue);
+            Assert.Equal(0x22BB44u, Color.Parse("#2B4", ColorType.CssHexColor).RawValue);
+            Assert.Equal(0xAABBAAu, Color.Parse("FABA", ColorType.CssHexColor).RawValue);
+            Assert.Equal(0x00F672u, Color.Parse("00F672", ColorType.CssHexColor).RawValue);
+            Assert.Equal(0x257777u, Color.Parse("0xFF257777", ColorType.CssHexColor).RawValue);
+        }
+        [Fact]
+        public void Color_FromRgb_String_Invalid()
+        {
+            Assert.Throws<ArgumentOutOfRangeException>(() => Color.Parse(" ", ColorType.CssHexColor));
+            Assert.Throws<ArgumentOutOfRangeException>(() => Color.Parse(null, ColorType.CssHexColor));
+            Assert.Throws<ArgumentOutOfRangeException>(() => Color.Parse("#F"));
+            Assert.Throws<ArgumentOutOfRangeException>(() => Color.Parse("F0", ColorType.CssHexColor));
+            Assert.Throws<ArgumentOutOfRangeException>(() => Color.Parse("FF000"));
+            Assert.Throws<ArgumentOutOfRangeException>(() => Color.Parse("FF00000"));
+            Assert.Throws<ArgumentOutOfRangeException>(() => Color.Parse("FF0000000"));
         }
         [Fact]
         public void Color_Red()

@@ -130,5 +130,7 @@
   topicUid: Guides.BearerToken
 - name: Voice
   topicUid: Guides.Voice.SendingVoice
+- name: Polls
+  topicUid: Guides.Polls
 - name: Deployment
   topicUid: Guides.Deployment

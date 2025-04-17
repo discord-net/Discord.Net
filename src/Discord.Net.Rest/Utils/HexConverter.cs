@@ -11,7 +11,7 @@ namespace Discord.Rest
         public static byte[] HexToByteArray(string hex)
         {
             if (hex.Length % 2 == 1)
-                throw new Exception("The binary key cannot have an odd number of digits");
+                throw new ArgumentException("The binary key cannot have an odd number of digits");
 
             byte[] arr = new byte[hex.Length >> 1];
 

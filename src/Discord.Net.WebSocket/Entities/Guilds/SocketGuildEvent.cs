@@ -65,6 +65,9 @@ namespace Discord.WebSocket
         /// <inheritdoc/>
         public int? UserCount { get; private set; }
 
+        /// <inheritdoc/>
+        public GuildScheduledEventRecurrenceRule? RecurrenceRule { get; private set; }
+
         internal SocketGuildEvent(DiscordSocketClient client, SocketGuild guild, ulong id)
             : base(client, id)
         {
@@ -87,7 +90,7 @@ namespace Discord.WebSocket
 
             if (model.CreatorId.IsSpecified)
             {
-                var guildUser = Guild.GetUser(model.CreatorId.Value);
+                var guildUser = Guild.GetUser(model.CreatorId.GetValueOrDefault(0) ?? 0);
 
                 if (guildUser != null)
                 {
@@ -96,7 +99,7 @@ namespace Discord.WebSocket
 
                     Creator = guildUser;
                 }
-                else if (guildUser == null && model.Creator.IsSpecified)
+                else if (model.Creator.IsSpecified)
                 {
                     guildUser = SocketGuildUser.Create(Guild, Discord.State, model.Creator.Value);
                     Creator = guildUser;
@@ -117,11 +120,13 @@ namespace Discord.WebSocket
             UserCount = model.UserCount.ToNullable();
             CoverImageId = model.Image;
             GuildId = model.GuildId;
+
+            RecurrenceRule = model.RecurrenceRule?.ToEntity();
         }
 
         /// <inheritdoc/>
         public string GetCoverImageUrl(ImageFormat format = ImageFormat.Auto, ushort size = 1024)
-            => CDN.GetEventCoverImageUrl(Guild.Id, Id, CoverImageId, format, size);
+            => CDN.GetEventCoverImageUrl(GuildId, Id, CoverImageId, format, size);
 
         /// <inheritdoc/>
         public Task DeleteAsync(RequestOptions options = null)

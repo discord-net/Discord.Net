@@ -35,7 +35,7 @@ namespace Discord.Rest
                 ? (DataModel)model.Data.Value
                 : null;
 
-            Data = await RestMessageCommandData.CreateAsync(client, dataModel, Guild, Channel, doApiCall).ConfigureAwait(false);
+            Data = await RestMessageCommandData.CreateAsync(client, dataModel, Guild, model.GuildId.ToNullable(), Channel, doApiCall).ConfigureAwait(false);
         }
 
         //IMessageCommandInteraction

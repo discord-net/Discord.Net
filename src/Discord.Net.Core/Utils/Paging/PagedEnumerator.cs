@@ -26,7 +26,7 @@ namespace Discord
         }
 
         public IAsyncEnumerator<IReadOnlyCollection<T>> GetAsyncEnumerator(CancellationToken cancellationToken = new CancellationToken()) => new Enumerator(this, cancellationToken);
-        internal class Enumerator : IAsyncEnumerator<IReadOnlyCollection<T>>
+        internal sealed class Enumerator : IAsyncEnumerator<IReadOnlyCollection<T>>
         {
             private readonly PagedAsyncEnumerable<T> _source;
             private readonly CancellationToken _token;

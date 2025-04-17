@@ -99,6 +99,22 @@ namespace Discord
         public PermValue SendMessagesInThreads => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.SendMessagesInThreads);
         /// <summary> If <see langword="true" />, a user launch application activities in voice channels in this guild. </summary>
         public PermValue StartEmbeddedActivities => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.StartEmbeddedActivities);
+        /// <summary> If <see langword="true"/>, a user can use soundboard in a voice channel.</summary>
+        public PermValue UseSoundboard => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.UseSoundboard);
+        /// <summary> If <see langword="true"/>, a user can edit and cancel events in this channel.</summary>
+        public PermValue CreateEvents => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.CreateEvents);
+        /// <summary> If <see langword="true"/>, a user can send voice messages in this channel.</summary>
+        public PermValue SendVoiceMessages => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.SendVoiceMessages);
+        /// <summary> If <see langword="true"/>, a user can use the Clyde AI bot in this channel.</summary>
+        public PermValue UseClydeAI => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.UseClydeAI);
+        /// <summary> If <see langword="true"/>, a user can set the status of a voice channel.</summary>
+        public PermValue SetVoiceChannelStatus => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.SetVoiceChannelStatus);
+        /// <summary> If <see langword="true"/>, a user can send polls.</summary>
+        public PermValue SendPolls => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.SendPolls);
+        /// <summary> If <see langword="true"/>, a user-installed application can send public responses.</summary>
+        public PermValue UserExternalApps => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.UseExternalApps);
+        /// <summary> If <see langword="true"/>, a user-installed application can send public responses.</summary>
+        public PermValue UseExternalSounds => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.UseExternalSounds);
 
         /// <summary> Creates a new OverwritePermissions with the provided allow and deny packed values. </summary>
         public OverwritePermissions(ulong allowValue, ulong denyValue)
@@ -147,7 +163,15 @@ namespace Discord
             PermValue? usePrivateThreads = null,
             PermValue? useExternalStickers = null,
             PermValue? sendMessagesInThreads = null,
-            PermValue? startEmbeddedActivities = null)
+            PermValue? startEmbeddedActivities = null,
+            PermValue? useSoundboard = null,
+            PermValue? createEvents = null,
+            PermValue? sendVoiceMessages = null,
+            PermValue? useClydeAI = null,
+            PermValue? setVoiceChannelStatus = null,
+            PermValue? sendPolls = null,
+            PermValue? useExternalApps = null,
+            PermValue? useExternalSounds = null)
         {
             Permissions.SetValue(ref allowValue, ref denyValue, createInstantInvite, ChannelPermission.CreateInstantInvite);
             Permissions.SetValue(ref allowValue, ref denyValue, manageChannel, ChannelPermission.ManageChannels);
@@ -179,6 +203,14 @@ namespace Discord
             Permissions.SetValue(ref allowValue, ref denyValue, useExternalStickers, ChannelPermission.UseExternalStickers);
             Permissions.SetValue(ref allowValue, ref denyValue, sendMessagesInThreads, ChannelPermission.SendMessagesInThreads);
             Permissions.SetValue(ref allowValue, ref denyValue, startEmbeddedActivities, ChannelPermission.StartEmbeddedActivities);
+            Permissions.SetValue(ref allowValue, ref denyValue, useSoundboard, ChannelPermission.UseSoundboard);
+            Permissions.SetValue(ref allowValue, ref denyValue, createEvents, ChannelPermission.CreateEvents);
+            Permissions.SetValue(ref allowValue, ref denyValue, sendVoiceMessages, ChannelPermission.SendVoiceMessages);
+            Permissions.SetValue(ref allowValue, ref denyValue, useClydeAI, ChannelPermission.UseClydeAI);
+            Permissions.SetValue(ref allowValue, ref denyValue, setVoiceChannelStatus, ChannelPermission.SetVoiceChannelStatus);
+            Permissions.SetValue(ref allowValue, ref denyValue, sendPolls, ChannelPermission.SendPolls);
+            Permissions.SetValue(ref allowValue, ref denyValue, useExternalApps, ChannelPermission.UseExternalApps);
+            Permissions.SetValue(ref allowValue, ref denyValue, useExternalSounds, ChannelPermission.UseExternalSounds);
 
             AllowValue = allowValue;
             DenyValue = denyValue;
@@ -220,12 +252,21 @@ namespace Discord
             PermValue usePrivateThreads = PermValue.Inherit,
             PermValue useExternalStickers = PermValue.Inherit,
             PermValue sendMessagesInThreads = PermValue.Inherit,
-            PermValue startEmbeddedActivities = PermValue.Inherit)
+            PermValue startEmbeddedActivities = PermValue.Inherit,
+            PermValue useSoundboard = PermValue.Inherit,
+            PermValue createEvents = PermValue.Inherit,
+            PermValue sendVoiceMessages = PermValue.Inherit,
+            PermValue useClydeAI = PermValue.Inherit,
+            PermValue setVoiceChannelStatus = PermValue.Inherit,
+            PermValue sendPolls = PermValue.Inherit,
+            PermValue useExternalApps = PermValue.Inherit,
+            PermValue useExternalSounds = PermValue.Inherit)
             : this(0, 0, createInstantInvite, manageChannel, addReactions, viewChannel, sendMessages, sendTTSMessages, manageMessages,
                   embedLinks, attachFiles, readMessageHistory, mentionEveryone, useExternalEmojis, connect, speak, muteMembers, deafenMembers,
                   moveMembers, useVoiceActivation, manageRoles, manageWebhooks, prioritySpeaker, stream, useSlashCommands, useApplicationCommands,
                   requestToSpeak, manageThreads, createPublicThreads, createPrivateThreads, usePublicThreads, usePrivateThreads, useExternalStickers,
-                  sendMessagesInThreads, startEmbeddedActivities)
+                  sendMessagesInThreads, startEmbeddedActivities, useSoundboard, createEvents, sendVoiceMessages, useClydeAI, setVoiceChannelStatus,
+                  sendPolls, useExternalApps, useExternalSounds)
         { }
 
         /// <summary>
@@ -265,12 +306,21 @@ namespace Discord
             PermValue? usePrivateThreads = null,
             PermValue? useExternalStickers = null,
             PermValue? sendMessagesInThreads = null,
-            PermValue? startEmbeddedActivities = null)
+            PermValue? startEmbeddedActivities = null,
+            PermValue? useSoundboard = null,
+            PermValue? createEvents = null,
+            PermValue? sendVoiceMessages = null,
+            PermValue? useClydeAI = null,
+            PermValue? setVoiceChannelStatus = null,
+            PermValue? sendPolls = null,
+            PermValue? useExternalApps = null,
+            PermValue? useExternalSounds = null)
             => new OverwritePermissions(AllowValue, DenyValue, createInstantInvite, manageChannel, addReactions, viewChannel, sendMessages, sendTTSMessages, manageMessages,
                 embedLinks, attachFiles, readMessageHistory, mentionEveryone, useExternalEmojis, connect, speak, muteMembers, deafenMembers,
                 moveMembers, useVoiceActivation, manageRoles, manageWebhooks, prioritySpeaker, stream, useSlashCommands, useApplicationCommands,
                   requestToSpeak, manageThreads, createPublicThreads, createPrivateThreads, usePublicThreads, usePrivateThreads, useExternalStickers,
-                  sendMessagesInThreads, startEmbeddedActivities);
+                  sendMessagesInThreads, startEmbeddedActivities, useSoundboard, createEvents, sendVoiceMessages, useClydeAI, setVoiceChannelStatus,
+                sendPolls, useExternalApps, useExternalSounds);
 
         /// <summary>
         ///     Creates a <see cref="List{T}"/> of all the <see cref="ChannelPermission"/> values that are allowed.

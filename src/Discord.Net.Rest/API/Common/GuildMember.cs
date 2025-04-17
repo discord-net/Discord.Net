@@ -28,5 +28,8 @@ namespace Discord.API
 
         [JsonProperty("flags")]
         public GuildUserFlags Flags { get; set; }
+
+        [JsonProperty("banner")]
+        public Optional<string> Banner { get; set; }
     }
 }

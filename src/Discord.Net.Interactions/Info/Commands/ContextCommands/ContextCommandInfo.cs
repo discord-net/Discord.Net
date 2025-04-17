@@ -27,6 +27,12 @@ namespace Discord.Interactions
         public GuildPermission? DefaultMemberPermissions { get; }
 
         /// <inheritdoc/>
+        public IReadOnlyCollection<InteractionContextType> ContextTypes { get; }
+
+        /// <inheritdoc/>
+        public IReadOnlyCollection<ApplicationIntegrationType> IntegrationTypes { get; }
+
+        /// <inheritdoc/>
         public override IReadOnlyList<CommandParameterInfo> Parameters { get; }
 
         /// <inheritdoc/>
@@ -39,11 +45,15 @@ namespace Discord.Interactions
             : base(builder, module, commandService)
         {
             CommandType = builder.CommandType;
+#pragma warning disable CS0618 // Type or member is obsolete
             DefaultPermission = builder.DefaultPermission;
+#pragma warning restore CS0618 // Type or member is obsolete
             IsNsfw = builder.IsNsfw;
             IsEnabledInDm = builder.IsEnabledInDm;
             DefaultMemberPermissions = builder.DefaultMemberPermissions;
             Parameters = builder.Parameters.Select(x => x.Build(this)).ToImmutableArray();
+            ContextTypes = builder.ContextTypes?.ToImmutableArray();
+            IntegrationTypes = builder.IntegrationTypes?.ToImmutableArray();
         }
 
         internal static ContextCommandInfo Create(Builders.ContextCommandBuilder builder, ModuleInfo module, InteractionService commandService)

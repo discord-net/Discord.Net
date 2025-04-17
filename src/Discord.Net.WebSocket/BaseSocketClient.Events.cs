@@ -1,4 +1,5 @@
 using Discord.Rest;
+
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -22,7 +23,7 @@ namespace Discord.WebSocket
         /// </remarks>
         /// <example>
         ///     <code language="cs" region="ChannelCreated"
-        ///           source="..\Discord.Net.Examples\WebSocket\BaseSocketClient.Events.Examples.cs"/>
+        ///           source="../Discord.Net.Examples/WebSocket/BaseSocketClient.Events.Examples.cs"/>
         /// </example>
         public event Func<SocketChannel, Task> ChannelCreated
         {
@@ -44,7 +45,7 @@ namespace Discord.WebSocket
         /// </remarks>
         /// <example>
         ///     <code language="cs" region="ChannelDestroyed"
-        ///           source="..\Discord.Net.Examples\WebSocket\BaseSocketClient.Events.Examples.cs"/>
+        ///           source="../Discord.Net.Examples/WebSocket/BaseSocketClient.Events.Examples.cs"/>
         /// </example>
         public event Func<SocketChannel, Task> ChannelDestroyed
         {
@@ -67,7 +68,7 @@ namespace Discord.WebSocket
         /// </remarks>
         /// <example>
         ///     <code language="cs" region="ChannelUpdated"
-        ///           source="..\Discord.Net.Examples\WebSocket\BaseSocketClient.Events.Examples.cs"/>
+        ///           source="../Discord.Net.Examples/WebSocket/BaseSocketClient.Events.Examples.cs"/>
         /// </example>
         public event Func<SocketChannel, SocketChannel, Task> ChannelUpdated
         {
@@ -75,6 +76,22 @@ namespace Discord.WebSocket
             remove { _channelUpdatedEvent.Remove(value); }
         }
         internal readonly AsyncEvent<Func<SocketChannel, SocketChannel, Task>> _channelUpdatedEvent = new AsyncEvent<Func<SocketChannel, SocketChannel, Task>>();
+
+        /// <summary>
+        ///     Fired when status of a voice channel is updated.
+        /// </summary>
+        /// <remarks>
+        ///     The previous state of the channel is passed into the first parameter; the updated channel is passed into the second one.
+        /// </remarks>
+        public event Func<Cacheable<SocketVoiceChannel, ulong>, string, string, Task> VoiceChannelStatusUpdated
+        {
+            add { _voiceChannelStatusUpdated.Add(value); }
+            remove { _voiceChannelStatusUpdated.Remove(value); }
+        }
+
+        internal readonly AsyncEvent<Func<Cacheable<SocketVoiceChannel, ulong>, string, string, Task>> _voiceChannelStatusUpdated = new();
+
+
         #endregion
 
         #region Messages
@@ -94,7 +111,7 @@ namespace Discord.WebSocket
         /// <example>
         ///     <para>The example below checks if the newly received message contains the target user.</para>
         ///     <code language="cs" region="MessageReceived"
-        ///           source="..\Discord.Net.Examples\WebSocket\BaseSocketClient.Events.Examples.cs"/>
+        ///           source="../Discord.Net.Examples/WebSocket/BaseSocketClient.Events.Examples.cs"/>
         /// </example>
         public event Func<SocketMessage, Task> MessageReceived
         {
@@ -127,7 +144,7 @@ namespace Discord.WebSocket
         /// </remarks>
         /// <example>
         ///     <code language="cs" region="MessageDeleted"
-        ///           source="..\Discord.Net.Examples\WebSocket\BaseSocketClient.Events.Examples.cs" />
+        ///           source="../Discord.Net.Examples/WebSocket/BaseSocketClient.Events.Examples.cs" />
         /// </example>
 
         public event Func<Cacheable<IMessage, ulong>, Cacheable<IMessageChannel, ulong>, Task> MessageDeleted
@@ -223,7 +240,7 @@ namespace Discord.WebSocket
         /// </remarks>
         /// <example>
         ///     <code language="cs" region="ReactionAdded"
-        ///           source="..\Discord.Net.Examples\WebSocket\BaseSocketClient.Events.Examples.cs"/>
+        ///           source="../Discord.Net.Examples/WebSocket/BaseSocketClient.Events.Examples.cs"/>
         /// </example>
         public event Func<Cacheable<IUserMessage, ulong>, Cacheable<IMessageChannel, ulong>, SocketReaction, Task> ReactionAdded
         {
@@ -267,6 +284,31 @@ namespace Discord.WebSocket
             remove { _reactionsRemovedForEmoteEvent.Remove(value); }
         }
         internal readonly AsyncEvent<Func<Cacheable<IUserMessage, ulong>, Cacheable<IMessageChannel, ulong>, IEmote, Task>> _reactionsRemovedForEmoteEvent = new AsyncEvent<Func<Cacheable<IUserMessage, ulong>, Cacheable<IMessageChannel, ulong>, IEmote, Task>>();
+        #endregion
+
+        #region Polls
+
+        /// <summary>
+        ///     Fired when a vote is added to a poll.
+        /// </summary>
+        public event Func<Cacheable<IUser, ulong>, Cacheable<ISocketMessageChannel, IRestMessageChannel, IMessageChannel, ulong>, Cacheable<IUserMessage, ulong>, Cacheable<SocketGuild, RestGuild, IGuild, ulong>?, ulong, Task> PollVoteAdded
+        {
+            add { _pollVoteAdded.Add(value); }
+            remove { _pollVoteAdded.Remove(value); }
+        }
+        internal readonly AsyncEvent<Func<Cacheable<IUser, ulong>, Cacheable<ISocketMessageChannel, IRestMessageChannel, IMessageChannel, ulong>, Cacheable<IUserMessage, ulong>, Cacheable<SocketGuild, RestGuild, IGuild, ulong>?, ulong, Task>> _pollVoteAdded = new ();
+
+        /// <summary>
+        ///     Fired when a vote is removed from a poll.
+        /// </summary>
+        public event Func<Cacheable< IUser, ulong>, Cacheable<ISocketMessageChannel, IRestMessageChannel, IMessageChannel, ulong>, Cacheable<IUserMessage, ulong>, Cacheable<SocketGuild, RestGuild, IGuild, ulong>?, ulong, Task> PollVoteRemoved
+        {
+            add { _pollVoteRemoved.Add(value); }
+            remove { _pollVoteRemoved.Remove(value); }
+        }
+
+        internal readonly AsyncEvent<Func<Cacheable<IUser, ulong>, Cacheable<ISocketMessageChannel, IRestMessageChannel, IMessageChannel, ulong>, Cacheable<IUserMessage, ulong>, Cacheable<SocketGuild, RestGuild, IGuild, ulong>?, ulong, Task>> _pollVoteRemoved = new ();
+
         #endregion
 
         #region Roles
@@ -907,7 +949,7 @@ namespace Discord.WebSocket
         internal readonly AsyncEvent<Func<SocketAuditLogEntry, SocketGuild, Task>> _auditLogCreated = new();
 
         #endregion
-        
+
         #region AutoModeration
 
         /// <summary>
@@ -918,7 +960,7 @@ namespace Discord.WebSocket
             add => _autoModRuleCreated.Add(value);
             remove => _autoModRuleCreated.Remove(value);
         }
-        internal readonly AsyncEvent<Func<SocketAutoModRule, Task>> _autoModRuleCreated = new ();
+        internal readonly AsyncEvent<Func<SocketAutoModRule, Task>> _autoModRuleCreated = new();
 
         /// <summary>
         ///     Fired when an auto moderation rule is modified.
@@ -928,7 +970,7 @@ namespace Discord.WebSocket
             add => _autoModRuleUpdated.Add(value);
             remove => _autoModRuleUpdated.Remove(value);
         }
-        internal readonly AsyncEvent<Func<Cacheable<SocketAutoModRule, ulong>, SocketAutoModRule, Task>> _autoModRuleUpdated = new ();
+        internal readonly AsyncEvent<Func<Cacheable<SocketAutoModRule, ulong>, SocketAutoModRule, Task>> _autoModRuleUpdated = new();
 
         /// <summary>
         ///     Fired when an auto moderation rule is deleted.
@@ -938,7 +980,7 @@ namespace Discord.WebSocket
             add => _autoModRuleDeleted.Add(value);
             remove => _autoModRuleDeleted.Remove(value);
         }
-        internal readonly AsyncEvent<Func<SocketAutoModRule, Task>> _autoModRuleDeleted = new ();
+        internal readonly AsyncEvent<Func<SocketAutoModRule, Task>> _autoModRuleDeleted = new();
 
         /// <summary>
         ///     Fired when an auto moderation rule is triggered by a user.
@@ -948,8 +990,84 @@ namespace Discord.WebSocket
             add => _autoModActionExecuted.Add(value);
             remove => _autoModActionExecuted.Remove(value);
         }
-        internal readonly AsyncEvent<Func<SocketGuild, AutoModRuleAction, AutoModActionExecutedData, Task>> _autoModActionExecuted = new ();
-        
+        internal readonly AsyncEvent<Func<SocketGuild, AutoModRuleAction, AutoModActionExecutedData, Task>> _autoModActionExecuted = new();
+
+        #endregion
+
+        #region App Subscriptions
+
+        /// <summary>
+        ///     Fired when a user subscribes to a SKU.
+        /// </summary>
+        public event Func<SocketEntitlement, Task> EntitlementCreated
+        {
+            add { _entitlementCreated.Add(value); }
+            remove { _entitlementCreated.Remove(value); }
+        }
+
+        internal readonly AsyncEvent<Func<SocketEntitlement, Task>> _entitlementCreated = new();
+
+
+        /// <summary>
+        ///     Fired when a subscription to a SKU is updated.
+        /// </summary>
+        public event Func<Cacheable<SocketEntitlement, ulong>, SocketEntitlement, Task> EntitlementUpdated
+        {
+            add { _entitlementUpdated.Add(value); }
+            remove { _entitlementUpdated.Remove(value); }
+        }
+
+        internal readonly AsyncEvent<Func<Cacheable<SocketEntitlement, ulong>, SocketEntitlement, Task>> _entitlementUpdated = new();
+
+
+        /// <summary>
+        ///     Fired when a user's entitlement is deleted.
+        /// </summary>
+        public event Func<Cacheable<SocketEntitlement, ulong>, Task> EntitlementDeleted
+        {
+            add { _entitlementDeleted.Add(value); }
+            remove { _entitlementDeleted.Remove(value); }
+        }
+
+        internal readonly AsyncEvent<Func<Cacheable<SocketEntitlement, ulong>, Task>> _entitlementDeleted = new();
+
+
+
+        /// <summary>
+        ///     Fired when a user subscribes to a SKU.
+        /// </summary>
+        public event Func<SocketSubscription, Task> SubscriptionCreated
+        {
+            add { _subscriptionCreated.Add(value); }
+            remove { _subscriptionCreated.Remove(value); }
+        }
+
+        internal readonly AsyncEvent<Func<SocketSubscription, Task>> _subscriptionCreated = new();
+
+
+        /// <summary>
+        ///     Fired when a subscription to a SKU is updated.
+        /// </summary>
+        public event Func<Cacheable<SocketSubscription, ulong>, SocketSubscription, Task> SubscriptionUpdated
+        {
+            add { _subscriptionUpdated.Add(value); }
+            remove { _subscriptionUpdated.Remove(value); }
+        }
+
+        internal readonly AsyncEvent<Func<Cacheable<SocketSubscription, ulong>, SocketSubscription, Task>> _subscriptionUpdated = new();
+
+
+        /// <summary>
+        ///     Fired when a user's subscription is deleted.
+        /// </summary>
+        public event Func<Cacheable<SocketSubscription, ulong>, Task> SubscriptionDeleted
+        {
+            add { _subscriptionDeleted.Add(value); }
+            remove { _subscriptionDeleted.Remove(value); }
+        }
+
+        internal readonly AsyncEvent<Func<Cacheable<SocketSubscription, ulong>, Task>> _subscriptionDeleted = new();
+
         #endregion
     }
 }

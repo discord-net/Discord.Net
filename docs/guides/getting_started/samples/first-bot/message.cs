@@ -1,11 +1,11 @@
-public async Task MainAsync()
+public static async Task Main()
 {
 	// ...
 	_client.MessageReceived += MessageReceived;
 	// ...
 }
 
-private async Task MessageReceived(SocketMessage message)
+private static async Task MessageReceived(SocketMessage message)
 {
 	if (message.Content == "!ping")
 	{

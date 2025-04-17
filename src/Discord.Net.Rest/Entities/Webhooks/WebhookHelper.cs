@@ -8,7 +8,7 @@ namespace Discord.Rest
 {
     internal static class WebhookHelper
     {
-        public static async Task<Model> ModifyAsync(IWebhook webhook, BaseDiscordClient client,
+        public static Task<Model> ModifyAsync(IWebhook webhook, BaseDiscordClient client,
             Action<WebhookProperties> func, RequestOptions options)
         {
             var args = new WebhookProperties();
@@ -27,11 +27,10 @@ namespace Discord.Rest
             else if (args.ChannelId.IsSpecified)
                 apiArgs.ChannelId = args.ChannelId.Value;
 
-            return await client.ApiClient.ModifyWebhookAsync(webhook.Id, apiArgs, options).ConfigureAwait(false);
+            return client.ApiClient.ModifyWebhookAsync(webhook.Id, apiArgs, options);
         }
-        public static async Task DeleteAsync(IWebhook webhook, BaseDiscordClient client, RequestOptions options)
-        {
-            await client.ApiClient.DeleteWebhookAsync(webhook.Id, options).ConfigureAwait(false);
-        }
+
+        public static Task DeleteAsync(IWebhook webhook, BaseDiscordClient client, RequestOptions options)
+            => client.ApiClient.DeleteWebhookAsync(webhook.Id, options);
     }
 }

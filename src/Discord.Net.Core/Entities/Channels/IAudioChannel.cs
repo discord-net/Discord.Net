@@ -23,11 +23,12 @@ namespace Discord
         /// <param name="selfDeaf">Determines whether the client should deaf itself upon connection.</param>
         /// <param name="selfMute">Determines whether the client should mute itself upon connection.</param>
         /// <param name="external">Determines whether the audio client is an external one or not.</param>
+        /// <param name="disconnect">Determines whether the client should send a disconnect call before sending the new voice state.</param>
         /// <returns>
         ///     A task representing the asynchronous connection operation. The task result contains the
         ///     <see cref="IAudioClient"/> responsible for the connection.
         /// </returns>
-        Task<IAudioClient> ConnectAsync(bool selfDeaf = false, bool selfMute = false, bool external = false);
+        Task<IAudioClient> ConnectAsync(bool selfDeaf = false, bool selfMute = false, bool external = false, bool disconnect = true);
 
         /// <summary>
         ///     Disconnects from this audio channel.

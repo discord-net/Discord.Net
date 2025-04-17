@@ -27,21 +27,22 @@ namespace Discord.Rest
         {
         }
 
-        internal static async Task<RestCommandBaseData> CreateAsync(DiscordRestClient client, Model model, RestGuild guild, IRestMessageChannel channel, bool doApiCall)
+        internal static async Task<RestCommandBaseData> CreateAsync(DiscordRestClient client, Model model, RestGuild guild, ulong? guildId, IRestMessageChannel channel, bool doApiCall)
         {
             var entity = new RestCommandBaseData(client, model);
-            await entity.UpdateAsync(client, model, guild, channel, doApiCall).ConfigureAwait(false);
+            await entity.UpdateAsync(client, model, guild, guildId, channel, doApiCall).ConfigureAwait(false);
             return entity;
         }
 
-        internal virtual async Task UpdateAsync(DiscordRestClient client, Model model, RestGuild guild, IRestMessageChannel channel, bool doApiCall)
+        internal virtual Task UpdateAsync(DiscordRestClient client, Model model, RestGuild guild, ulong? guildId, IRestMessageChannel channel, bool doApiCall)
         {
             Name = model.Name;
             if (model.Resolved.IsSpecified && ResolvableData == null)
             {
                 ResolvableData = new RestResolvableData<Model>();
-                await ResolvableData.PopulateAsync(client, guild, channel, model, doApiCall).ConfigureAwait(false);
+                return ResolvableData.PopulateAsync(client, guild, guildId, channel, model, doApiCall);
             }
+            return Task.CompletedTask;
         }
 
         IReadOnlyCollection<IApplicationCommandInteractionDataOption> IApplicationCommandInteractionData.Options

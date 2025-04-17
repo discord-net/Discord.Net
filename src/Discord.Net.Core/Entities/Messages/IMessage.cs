@@ -215,6 +215,7 @@ namespace Discord
         /// <returns>
         ///     A <see cref="IMessageInteraction"/> if the message is a response to an interaction; otherwise <see langword="null"/>.
         /// </returns>
+        [Obsolete("This property will be deprecated soon. Use IUserMessage.InteractionMetadata instead.")]
         IMessageInteraction Interaction { get; }
 
         /// <summary>
@@ -224,6 +225,16 @@ namespace Discord
         ///     A <see cref="MessageRoleSubscriptionData"/> if the message is a role subscription purchase message; otherwise <see langword="null"/>.
         /// </returns>
         MessageRoleSubscriptionData RoleSubscriptionData { get; }
+
+        /// <summary>
+        ///     Gets the purchase notification for this message.
+        /// </summary>
+        PurchaseNotification PurchaseNotification { get; }
+        
+        /// <summary>
+        ///     Gets the call data of the message.
+        /// </summary>
+        MessageCallData? CallData { get; }
 
         /// <summary>
         ///     Adds a reaction to this message.
@@ -323,9 +334,11 @@ namespace Discord
         /// <param name="emoji">The emoji that represents the reaction that you wish to get.</param>
         /// <param name="limit">The number of users to request.</param>
         /// <param name="options">The options to be used when sending the request.</param>
+        /// <param name="type">The type of the reaction you wish to get users for.</param>
         /// <returns>
         ///      Paged collection of users.
         /// </returns>
-        IAsyncEnumerable<IReadOnlyCollection<IUser>> GetReactionUsersAsync(IEmote emoji, int limit, RequestOptions options = null);
+        IAsyncEnumerable<IReadOnlyCollection<IUser>> GetReactionUsersAsync(IEmote emoji, int limit, RequestOptions options = null,
+            ReactionType type = ReactionType.Normal);
     }
 }

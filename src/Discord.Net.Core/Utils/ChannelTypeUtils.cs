@@ -9,6 +9,6 @@ public static class ChannelTypeUtils
         {
             ChannelType.Forum, ChannelType.Category, ChannelType.DM, ChannelType.Group, ChannelType.GuildDirectory,
             ChannelType.News, ChannelType.NewsThread, ChannelType.PrivateThread, ChannelType.PublicThread,
-            ChannelType.Stage, ChannelType.Store, ChannelType.Text, ChannelType.Voice
+            ChannelType.Stage, ChannelType.Store, ChannelType.Text, ChannelType.Voice, ChannelType.Media
         };
 }

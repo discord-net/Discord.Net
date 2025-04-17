@@ -16,7 +16,6 @@ namespace Discord.Rest
             {
                 ContractResolver = new DiscordContractResolver()
             };
-            serializer.Converters.Add(new EmbedTypeConverter());
             return serializer;
         });
 
@@ -24,7 +23,7 @@ namespace Discord.Rest
         ///     Gets a Json formatted <see langword="string"/> from an <see cref="EmbedBuilder"/>.
         /// </summary>
         /// <remarks>
-        ///     See <see cref="EmbedBuilder.TryParse(string, out EmbedBuilder)"/> to parse Json back into embed.
+        ///     See <see cref="EmbedBuilderUtils.TryParse(string, out EmbedBuilder)"/> to parse Json back into embed.
         /// </remarks>
         /// <param name="builder">The builder to format as Json <see langword="string"/>.</param>
         /// <param name="formatting">The formatting in which the Json will be returned.</param>
@@ -36,7 +35,7 @@ namespace Discord.Rest
         ///     Gets a Json formatted <see langword="string"/> from an <see cref="Embed"/>.
         /// </summary>
         /// <remarks>
-        ///     See <see cref="EmbedBuilder.TryParse(string, out EmbedBuilder)"/> to parse Json back into embed.
+        ///     See <see cref="EmbedBuilderUtils.TryParse(string, out EmbedBuilder)"/> to parse Json back into embed.
         /// </remarks>
         /// <param name="embed">The embed to format as Json <see langword="string"/>.</param>
         /// <param name="formatting">The formatting in which the Json will be returned.</param>

@@ -13,12 +13,10 @@ namespace Discord.Rest
     internal static class ChannelHelper
     {
         #region General
-        public static async Task DeleteAsync(IChannel channel, BaseDiscordClient client,
-            RequestOptions options)
-        {
-            await client.ApiClient.DeleteChannelAsync(channel.Id, options).ConfigureAwait(false);
-        }
-        public static async Task<Model> ModifyAsync(IGuildChannel channel, BaseDiscordClient client,
+        public static Task DeleteAsync(IChannel channel, BaseDiscordClient client, RequestOptions options)
+            => client.ApiClient.DeleteChannelAsync(channel.Id, options);
+
+        public static Task<Model> ModifyAsync(IGuildChannel channel, BaseDiscordClient client,
             Action<GuildChannelProperties> func,
             RequestOptions options)
         {
@@ -40,9 +38,10 @@ namespace Discord.Rest
                     : Optional.Create<API.Overwrite[]>(),
                 Flags = args.Flags.GetValueOrDefault(),
             };
-            return await client.ApiClient.ModifyGuildChannelAsync(channel.Id, apiArgs, options).ConfigureAwait(false);
+            return client.ApiClient.ModifyGuildChannelAsync(channel.Id, apiArgs, options);
         }
-        public static async Task<Model> ModifyAsync(ITextChannel channel, BaseDiscordClient client,
+
+        public static Task<Model> ModifyAsync(ITextChannel channel, BaseDiscordClient client,
             Action<TextChannelProperties> func,
             RequestOptions options)
         {
@@ -50,6 +49,7 @@ namespace Discord.Rest
             func(args);
             var apiArgs = new API.Rest.ModifyTextChannelParams
             {
+                Type = args.ChannelType,
                 Name = args.Name,
                 Position = args.Position,
                 CategoryId = args.CategoryId,
@@ -67,9 +67,10 @@ namespace Discord.Rest
                     : Optional.Create<API.Overwrite[]>(),
                 DefaultSlowModeInterval = args.DefaultSlowModeInterval
             };
-            return await client.ApiClient.ModifyGuildChannelAsync(channel.Id, apiArgs, options).ConfigureAwait(false);
+            return client.ApiClient.ModifyGuildChannelAsync(channel.Id, apiArgs, options);
         }
-        public static async Task<Model> ModifyAsync(IVoiceChannel channel, BaseDiscordClient client,
+
+        public static Task<Model> ModifyAsync(IVoiceChannel channel, BaseDiscordClient client,
             Action<VoiceChannelProperties> func,
             RequestOptions options)
         {
@@ -95,10 +96,10 @@ namespace Discord.Rest
                 SlowModeInterval = args.SlowModeInterval,
                 IsNsfw = args.IsNsfw,
             };
-            return await client.ApiClient.ModifyGuildChannelAsync(channel.Id, apiArgs, options).ConfigureAwait(false);
+            return client.ApiClient.ModifyGuildChannelAsync(channel.Id, apiArgs, options);
         }
 
-        public static async Task<StageInstance> ModifyAsync(IStageChannel channel, BaseDiscordClient client,
+        public static Task<StageInstance> ModifyAsync(IStageChannel channel, BaseDiscordClient client,
             Action<StageInstanceProperties> func, RequestOptions options = null)
         {
             var args = new StageInstanceProperties();
@@ -110,7 +111,7 @@ namespace Discord.Rest
                 Topic = args.Topic
             };
 
-            return await client.ApiClient.ModifyStageInstanceAsync(channel.Id, apiArgs, options);
+            return client.ApiClient.ModifyStageInstanceAsync(channel.Id, apiArgs, options);
         }
         #endregion
 
@@ -273,7 +274,7 @@ namespace Discord.Rest
         /// <exception cref="ArgumentException">The only valid <see cref="MessageFlags"/> are <see cref="MessageFlags.SuppressEmbeds"/> and <see cref="MessageFlags.None"/>.</exception>
         public static async Task<RestUserMessage> SendMessageAsync(IMessageChannel channel, BaseDiscordClient client,
             string text, bool isTTS, Embed embed, AllowedMentions allowedMentions, MessageReference messageReference,
-            MessageComponent components, ISticker[] stickers, RequestOptions options, Embed[] embeds, MessageFlags flags)
+            MessageComponent components, ISticker[] stickers, RequestOptions options, Embed[] embeds, MessageFlags flags, PollProperties poll)
         {
             embeds ??= Array.Empty<Embed>();
             if (embed != null)
@@ -283,7 +284,8 @@ namespace Discord.Rest
             Preconditions.AtMost(allowedMentions?.UserIds?.Count ?? 0, 100, nameof(allowedMentions.UserIds), "A max of 100 user Ids are allowed.");
             Preconditions.AtMost(embeds.Length, DiscordConfig.MaxEmbedsPerMessage, nameof(embeds), $"A max of {DiscordConfig.MaxEmbedsPerMessage} Embeds are allowed.");
 
-            Preconditions.MessageAtLeastOneOf(text, components, embeds, stickers);
+            Preconditions.MessageAtLeastOneOf(text, components, embeds, stickers, poll: poll, messageReference: messageReference);
+            Preconditions.ValidatePoll(poll);
 
             // check that user flag and user Id list are exclusive, same with role flag and role Id list
             if (allowedMentions != null && allowedMentions.AllowedTypes.HasValue)
@@ -307,7 +309,9 @@ namespace Discord.Rest
             }
 
             if (flags is not MessageFlags.None and not MessageFlags.SuppressEmbeds and not MessageFlags.SuppressNotification)
-                throw new ArgumentException("The only valid MessageFlags are SuppressEmbeds and none.", nameof(flags));
+                throw new ArgumentException("The only valid MessageFlags are SuppressEmbeds, SuppressNotification and none.", nameof(flags));
+
+            
 
             var args = new CreateMessageParams
             {
@@ -318,7 +322,8 @@ namespace Discord.Rest
                 MessageReference = messageReference?.ToModel(),
                 Components = components?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Optional<API.ActionRowComponent[]>.Unspecified,
                 Stickers = stickers?.Any() ?? false ? stickers.Select(x => x.Id).ToArray() : Optional<ulong[]>.Unspecified,
-                Flags = flags
+                Flags = flags,
+                Poll = poll?.ToModel() ?? Optional<CreatePollParams>.Unspecified
             };
             var model = await client.ApiClient.CreateMessageAsync(channel.Id, args, options).ConfigureAwait(false);
             return RestUserMessage.Create(client, channel, client.CurrentUser, model);
@@ -352,12 +357,12 @@ namespace Discord.Rest
         public static async Task<RestUserMessage> SendFileAsync(IMessageChannel channel, BaseDiscordClient client,
             string filePath, string text, bool isTTS, Embed embed, AllowedMentions allowedMentions,
             MessageReference messageReference, MessageComponent components, ISticker[] stickers, RequestOptions options,
-            bool isSpoiler, Embed[] embeds, MessageFlags flags = MessageFlags.None)
+            bool isSpoiler, Embed[] embeds, MessageFlags flags = MessageFlags.None, PollProperties poll = null)
         {
             string filename = Path.GetFileName(filePath);
             using (var file = File.OpenRead(filePath))
                 return await SendFileAsync(channel, client, file, filename, text, isTTS, embed, allowedMentions,
-                messageReference, components, stickers, options, isSpoiler, embeds, flags).ConfigureAwait(false);
+                messageReference, components, stickers, options, isSpoiler, embeds, flags, poll).ConfigureAwait(false);
         }
 
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
@@ -365,11 +370,11 @@ namespace Discord.Rest
         public static async Task<RestUserMessage> SendFileAsync(IMessageChannel channel, BaseDiscordClient client,
             Stream stream, string filename, string text, bool isTTS, Embed embed, AllowedMentions allowedMentions,
             MessageReference messageReference, MessageComponent components, ISticker[] stickers, RequestOptions options,
-            bool isSpoiler, Embed[] embeds, MessageFlags flags = MessageFlags.None)
+            bool isSpoiler, Embed[] embeds, MessageFlags flags = MessageFlags.None, PollProperties poll = null)
         {
             using (var file = new FileAttachment(stream, filename, isSpoiler: isSpoiler))
                 return await SendFileAsync(channel, client, file, text, isTTS, embed, allowedMentions, messageReference,
-                components, stickers, options, embeds, flags).ConfigureAwait(false);
+                components, stickers, options, embeds, flags, poll).ConfigureAwait(false);
         }
 
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
@@ -377,15 +382,15 @@ namespace Discord.Rest
         public static Task<RestUserMessage> SendFileAsync(IMessageChannel channel, BaseDiscordClient client,
             FileAttachment attachment, string text, bool isTTS, Embed embed, AllowedMentions allowedMentions,
             MessageReference messageReference, MessageComponent components, ISticker[] stickers, RequestOptions options,
-            Embed[] embeds, MessageFlags flags = MessageFlags.None)
+            Embed[] embeds, MessageFlags flags = MessageFlags.None, PollProperties poll = null)
             => SendFilesAsync(channel, client, new[] { attachment }, text, isTTS, embed, allowedMentions, messageReference,
-                components, stickers, options, embeds, flags);
+                components, stickers, options, embeds, flags, poll);
 
         /// <exception cref="ArgumentException">The only valid <see cref="MessageFlags"/> are <see cref="MessageFlags.SuppressEmbeds"/>, <see cref="MessageFlags.SuppressNotification"/> and <see cref="MessageFlags.None"/>.</exception>
         public static async Task<RestUserMessage> SendFilesAsync(IMessageChannel channel, BaseDiscordClient client,
             IEnumerable<FileAttachment> attachments, string text, bool isTTS, Embed embed, AllowedMentions allowedMentions,
             MessageReference messageReference, MessageComponent components, ISticker[] stickers, RequestOptions options,
-            Embed[] embeds, MessageFlags flags)
+            Embed[] embeds, MessageFlags flags, PollProperties poll = null)
         {
             embeds ??= Array.Empty<Embed>();
             if (embed != null)
@@ -395,21 +400,17 @@ namespace Discord.Rest
             Preconditions.AtMost(allowedMentions?.UserIds?.Count ?? 0, 100, nameof(allowedMentions.UserIds), "A max of 100 user Ids are allowed.");
             Preconditions.AtMost(embeds.Length, DiscordConfig.MaxEmbedsPerMessage, nameof(embeds), $"A max of {DiscordConfig.MaxEmbedsPerMessage} Embeds are allowed.");
 
-            Preconditions.MessageAtLeastOneOf(text, components, embeds, stickers, attachments);
+            Preconditions.MessageAtLeastOneOf(text, components, embeds, stickers, attachments, poll, messageReference);
+            Preconditions.ValidatePoll(poll);
 
             foreach (var attachment in attachments)
             {
                 Preconditions.NotNullOrEmpty(attachment.FileName, nameof(attachment.FileName), "File Name must not be empty or null");
-            }
 
-            if (channel is ITextChannel guildTextChannel)
-            {
-                ulong contentSize = (ulong)attachments.Where(x => x.Stream.CanSeek).Sum(x => x.Stream.Length);
-
-                if (contentSize > guildTextChannel.Guild.MaxUploadLimit)
-                {
-                    throw new ArgumentOutOfRangeException(nameof(attachments), $"Collective file size exceeds the max file size of {guildTextChannel.Guild.MaxUploadLimit} bytes in that guild!");
-                }
+                if (channel is ITextChannel guildTextChannel &&
+                    attachment.Stream.CanSeek &&
+                    (ulong)attachment.Stream.Length > guildTextChannel.Guild.MaxUploadLimit)
+                    throw new ArgumentOutOfRangeException(nameof(attachments), $"File size exceeds the max file size of {guildTextChannel.Guild.MaxUploadLimit} bytes in that guild!");
             }
 
             // check that user flag and user Id list are exclusive, same with role flag and role Id list
@@ -445,7 +446,8 @@ namespace Discord.Rest
                 MessageReference = messageReference?.ToModel() ?? Optional<API.MessageReference>.Unspecified,
                 MessageComponent = components?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Optional<API.ActionRowComponent[]>.Unspecified,
                 Stickers = stickers?.Any() ?? false ? stickers.Select(x => x.Id).ToArray() : Optional<ulong[]>.Unspecified,
-                Flags = flags
+                Flags = flags,
+                Poll = poll?.ToModel() ?? Optional<CreatePollParams>.Unspecified
             };
 
             var model = await client.ApiClient.UploadFileAsync(channel.Id, args, options).ConfigureAwait(false);
@@ -492,28 +494,27 @@ namespace Discord.Rest
         #endregion
 
         #region Permission Overwrites
-        public static async Task AddPermissionOverwriteAsync(IGuildChannel channel, BaseDiscordClient client,
+        public static Task AddPermissionOverwriteAsync(IGuildChannel channel, BaseDiscordClient client,
             IUser user, OverwritePermissions perms, RequestOptions options)
         {
             var args = new ModifyChannelPermissionsParams((int)PermissionTarget.User, perms.AllowValue.ToString(), perms.DenyValue.ToString());
-            await client.ApiClient.ModifyChannelPermissionsAsync(channel.Id, user.Id, args, options).ConfigureAwait(false);
+            return client.ApiClient.ModifyChannelPermissionsAsync(channel.Id, user.Id, args, options);
         }
-        public static async Task AddPermissionOverwriteAsync(IGuildChannel channel, BaseDiscordClient client,
+
+        public static Task AddPermissionOverwriteAsync(IGuildChannel channel, BaseDiscordClient client,
             IRole role, OverwritePermissions perms, RequestOptions options)
         {
             var args = new ModifyChannelPermissionsParams((int)PermissionTarget.Role, perms.AllowValue.ToString(), perms.DenyValue.ToString());
-            await client.ApiClient.ModifyChannelPermissionsAsync(channel.Id, role.Id, args, options).ConfigureAwait(false);
+            return client.ApiClient.ModifyChannelPermissionsAsync(channel.Id, role.Id, args, options);
         }
-        public static async Task RemovePermissionOverwriteAsync(IGuildChannel channel, BaseDiscordClient client,
+
+        public static Task RemovePermissionOverwriteAsync(IGuildChannel channel, BaseDiscordClient client,
             IUser user, RequestOptions options)
-        {
-            await client.ApiClient.DeleteChannelPermissionAsync(channel.Id, user.Id, options).ConfigureAwait(false);
-        }
-        public static async Task RemovePermissionOverwriteAsync(IGuildChannel channel, BaseDiscordClient client,
+            => client.ApiClient.DeleteChannelPermissionAsync(channel.Id, user.Id, options);
+
+        public static Task RemovePermissionOverwriteAsync(IGuildChannel channel, BaseDiscordClient client,
             IRole role, RequestOptions options)
-        {
-            await client.ApiClient.DeleteChannelPermissionAsync(channel.Id, role.Id, options).ConfigureAwait(false);
-        }
+            => client.ApiClient.DeleteChannelPermissionAsync(channel.Id, role.Id, options);
         #endregion
 
         #region Users
@@ -564,11 +565,9 @@ namespace Discord.Rest
         #endregion
 
         #region Typing
-        public static async Task TriggerTypingAsync(IMessageChannel channel, BaseDiscordClient client,
-            RequestOptions options = null)
-        {
-            await client.ApiClient.TriggerTypingIndicatorAsync(channel.Id, options).ConfigureAwait(false);
-        }
+        public static Task TriggerTypingAsync(IMessageChannel channel, BaseDiscordClient client, RequestOptions options = null)
+            => client.ApiClient.TriggerTypingIndicatorAsync(channel.Id, options);
+
         public static IDisposable EnterTypingState(IMessageChannel channel, BaseDiscordClient client,
             RequestOptions options)
             => new TypingNotifier(channel, options);
@@ -635,6 +634,17 @@ namespace Discord.Rest
             };
             await client.ApiClient.ModifyGuildChannelAsync(channel.Id, apiArgs, options).ConfigureAwait(false);
         }
+        #endregion
+
+        #region Voice
+
+        public static async Task ModifyVoiceChannelStatusAsync(IVoiceChannel channel, string status, BaseDiscordClient client, RequestOptions options)
+        {
+            Preconditions.AtMost(status.Length, DiscordConfig.MaxVoiceChannelStatusLength, $"Voice channel status length must be less than {DiscordConfig.MaxVoiceChannelStatusLength}.");
+
+            await client.ApiClient.ModifyVoiceChannelStatusAsync(channel.Id, status, options).ConfigureAwait(false);
+        }
+
         #endregion
     }
 }

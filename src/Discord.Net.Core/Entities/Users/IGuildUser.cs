@@ -39,6 +39,7 @@ namespace Discord
         ///     If the user also does not have a regular avatar, this will be <see langword="null"/>.
         /// </returns>
         string DisplayAvatarId { get; }
+
         /// <summary>
         ///     Gets the guild specific avatar for this user.
         /// </summary>
@@ -46,6 +47,15 @@ namespace Discord
         ///     The users guild avatar hash if they have one; otherwise <see langword="null"/>.
         /// </returns>
         string GuildAvatarId { get; }
+
+        /// <summary>
+        ///     Gets the guild specific banner for this user.
+        /// </summary>
+        /// <returns>
+        ///     The user's guild banner hash if they have one; otherwise <see langword="null"/>.
+        /// </returns>
+        string GuildBannerHash { get; }
+
         /// <summary>
         ///     Gets the guild-level permissions for this user.
         /// </summary>
@@ -121,7 +131,7 @@ namespace Discord
         /// </summary>
         /// <example>
         ///     <para>The following example checks if the current user has the ability to send a message with attachment in
-        ///     this channel; if so, uploads a file via <see cref="IMessageChannel.SendFileAsync(string, string, bool, Embed, RequestOptions, bool, AllowedMentions, MessageReference, MessageComponent, ISticker[], Embed[], MessageFlags)"/>.</para>
+        ///     this channel; if so, uploads a file via <see cref="IMessageChannel.SendFileAsync(string, string, bool, Embed, RequestOptions, bool, AllowedMentions, MessageReference, MessageComponent, ISticker[], Embed[], MessageFlags, PollProperties)"/>.</para>
         /// <code language="cs">
         ///     if (currentUser?.GetPermissions(targetChannel)?.AttachFiles)
         ///         await targetChannel.SendFileAsync("fortnite.png");
@@ -133,34 +143,31 @@ namespace Discord
         ///     specified channel.
         /// </returns>
         ChannelPermissions GetPermissions(IGuildChannel channel);
-
         /// <summary>
-        ///     Gets the guild avatar URL for this user.
+        ///     Gets the guild-specific avatar URL for this user, if it is set.
         /// </summary>
         /// <remarks>
-        ///     This property retrieves a URL for this guild user's guild specific avatar. In event that the user does not have a valid guild avatar
-        ///     (i.e. their avatar identifier is not set), this method will return <see langword="null"/>.
+        ///     <note type="tip">
+        ///         If you wish to retrieve the display avatar for this user, consider using <see cref="IUser.GetDisplayAvatarUrl"/>.
+        ///     </note>
         /// </remarks>
-        /// <param name="format">The format to return.</param>
-        /// <param name="size">The size of the image to return in. This can be any power of two between 16 and 2048.
-        /// </param>
+        /// <param name="format">The format of the image.</param>
+        /// <param name="size">The size of the image that matches any power of two, ranging from 16 to 2048.</param>
         /// <returns>
-        ///     A string representing the user's avatar URL; <see langword="null"/> if the user does not have an avatar in place.
+        ///     A string representing the user's guild-specific avatar URL; <see langword="null"/> if the user has no guild avatar set.
         /// </returns>
         string GetGuildAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128);
+
         /// <summary>
-        ///     Gets the display avatar URL for this user.
+        ///     Gets the guild-specific banner URL for this user, if it is set.
         /// </summary>
-        /// <remarks>
-        ///     This property retrieves an URL for this guild user's displayed avatar.
-        ///     If the user does not have a guild avatar, this will be the user's regular avatar.
-        /// </remarks>
-        /// <param name="format">The format to return.</param>
-        /// <param name="size">The size of the image to return in. This can be any power of two between 16 and 2048.</param>
+        /// <param name="format">The format of the image.</param>
+        /// <param name="size">The size of the image that matches any power of two, ranging from 16 to 2048.</param>
         /// <returns>
-        ///     A string representing the URL of the displayed avatar for this user. <see langword="null"/> if the user does not have an avatar in place.
+        ///     A string representing the user's guild-specific banner URL; <see langword="null"/> if the user has no guild banner set.
         /// </returns>
-        string GetDisplayAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128);
+        string GetGuildBannerUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128);
+
         /// <summary>
         ///     Kicks this user from this guild.
         /// </summary>

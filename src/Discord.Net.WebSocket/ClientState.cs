@@ -17,6 +17,8 @@ namespace Discord.WebSocket
         private readonly ConcurrentDictionary<ulong, SocketGlobalUser> _users;
         private readonly ConcurrentHashSet<ulong> _groupChannels;
         private readonly ConcurrentDictionary<ulong, SocketApplicationCommand> _commands;
+        private readonly ConcurrentDictionary<ulong, SocketEntitlement> _entitlements;
+        private readonly ConcurrentDictionary<ulong, SocketSubscription> _subscriptions;
 
         internal IReadOnlyCollection<SocketChannel> Channels => _channels.ToReadOnlyCollection();
         internal IReadOnlyCollection<SocketDMChannel> DMChannels => _dmChannels.ToReadOnlyCollection();
@@ -24,6 +26,8 @@ namespace Discord.WebSocket
         internal IReadOnlyCollection<SocketGuild> Guilds => _guilds.ToReadOnlyCollection();
         internal IReadOnlyCollection<SocketGlobalUser> Users => _users.ToReadOnlyCollection();
         internal IReadOnlyCollection<SocketApplicationCommand> Commands => _commands.ToReadOnlyCollection();
+        internal IReadOnlyCollection<SocketEntitlement> Entitlements => _entitlements.ToReadOnlyCollection();
+        internal IReadOnlyCollection<SocketSubscription> Subscriptions => _subscriptions.ToReadOnlyCollection();
 
         internal IReadOnlyCollection<ISocketPrivateChannel> PrivateChannels =>
             _dmChannels.Select(x => x.Value as ISocketPrivateChannel).Concat(
@@ -40,6 +44,8 @@ namespace Discord.WebSocket
             _users = new ConcurrentDictionary<ulong, SocketGlobalUser>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(estimatedUsersCount * CollectionMultiplier));
             _groupChannels = new ConcurrentHashSet<ulong>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(10 * CollectionMultiplier));
             _commands = new ConcurrentDictionary<ulong, SocketApplicationCommand>();
+            _entitlements = new();
+            _subscriptions = new();
         }
 
         internal SocketChannel GetChannel(ulong id)
@@ -169,6 +175,54 @@ namespace Discord.WebSocket
 
             foreach (var id in ids)
                 _commands.TryRemove(id, out var _);
+        }
+
+        internal void AddEntitlement(ulong id, SocketEntitlement entitlement)
+        {
+            _entitlements.TryAdd(id, entitlement);
+        }
+
+        internal SocketEntitlement GetEntitlement(ulong id)
+        {
+            if (_entitlements.TryGetValue(id, out var entitlement))
+                return entitlement;
+            return null;
+        }
+
+        internal SocketEntitlement GetOrAddEntitlement(ulong id, Func<ulong, SocketEntitlement> entitlementFactory)
+        {
+            return _entitlements.GetOrAdd(id, entitlementFactory);
+        }
+
+        internal SocketEntitlement RemoveEntitlement(ulong id)
+        {
+            if(_entitlements.TryRemove(id, out var entitlement))
+                return entitlement;
+            return null;
+        }
+
+        internal void AddSubscription(ulong id, SocketSubscription subscription)
+        {
+            _subscriptions.TryAdd(id, subscription);
+        }
+
+        internal SocketSubscription GetSubscription(ulong id)
+        {
+            if (_subscriptions.TryGetValue(id, out var subscription))
+                return subscription;
+            return null;
+        }
+
+        internal SocketSubscription GetOrAddSubscription(ulong id, Func<ulong, SocketSubscription> subscriptionFactory)
+        {
+            return _subscriptions.GetOrAdd(id, subscriptionFactory);
+        }
+
+        internal SocketSubscription RemoveSubscription(ulong id)
+        {
+            if (_subscriptions.TryRemove(id, out var subscription))
+                return subscription;
+            return null;
         }
     }
 }

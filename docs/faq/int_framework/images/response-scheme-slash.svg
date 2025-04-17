@@ -1,0 +1,429 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Создано Microsoft Visio, экспорт SVG DNetInteractionResponseMap.svg Slash Command Interaction -->
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ev="http://www.w3.org/2001/xml-events"
+		xmlns:v="http://schemas.microsoft.com/visio/2003/SVGExtensions/" width="8.99814in" height="7.27176in"
+		viewBox="0 0 647.866 523.567" xml:space="preserve" color-interpolation-filters="sRGB" class="st16">
+	<v:documentProperties v:langID="1049" v:metric="true" v:viewMarkup="false">
+		<v:userDefs>
+			<v:ud v:nameU="msvSubprocessMaster" v:prompt="" v:val="VT4(Rectangle)"/>
+			<v:ud v:nameU="msvNoAutoConnect" v:val="VT0(1):26"/>
+		</v:userDefs>
+	</v:documentProperties>
+
+	<style type="text/css">
+	<![CDATA[
+		.st1 {fill:#ffffff;stroke:#fdbf01;stroke-linecap:round;stroke-linejoin:round;stroke-width:2}
+		.st2 {fill:#ffffcc;stroke:#fdbf01;stroke-linecap:round;stroke-linejoin:round;stroke-width:2}
+		.st3 {fill:#f2f2f2;stroke:#a5a5a5;stroke-linecap:round;stroke-linejoin:round;stroke-width:2}
+		.st4 {fill:#5c5c5c;font-family:Calibri;font-size:1.5em}
+		.st5 {font-size:1em}
+		.st6 {fill:#2b91af;font-family:Cascadia Mono;font-size:0.527771em}
+		.st7 {fill:#5c5c5c;font-family:Calibri;font-size:0.833336em}
+		.st8 {font-size:1em;text-decoration:underline}
+		.st9 {font-size:0.899997em}
+		.st10 {marker-end:url(#mrkr4-30);stroke:#a5a5a5;stroke-linecap:round;stroke-linejoin:round;stroke-width:1}
+		.st11 {fill:#a5a5a5;fill-opacity:1;stroke:#a5a5a5;stroke-opacity:1;stroke-width:0.28409090909091}
+		.st12 {fill:none;stroke:none;stroke-linecap:round;stroke-linejoin:round;stroke-width:2}
+		.st13 {fill:#8d6b01;font-family:Calibri;font-size:1.00001em;font-stretch:semi-expanded;font-weight:bold}
+		.st14 {font-size:0.83333em;font-weight:normal}
+		.st15 {fill:#5c5c5c;font-size:0.83333em;font-stretch:normal;font-weight:normal}
+		.st16 {fill:none;fill-rule:evenodd;font-size:12px;overflow:visible;stroke-linecap:square;stroke-miterlimit:3}
+	]]>
+	</style>
+
+	<defs id="Markers">
+		<g id="lend4">
+			<path d="M 2 1 L 0 0 L 2 -1 L 2 1 " style="stroke:none"/>
+		</g>
+		<marker id="mrkr4-30" class="st11" v:arrowType="4" v:arrowSize="2" v:setback="7.04" refX="-7.04" orient="auto"
+				markerUnits="strokeWidth" overflow="visible">
+			<use xlink:href="#lend4" transform="scale(-3.52,-3.52) "/>
+		</marker>
+	</defs>
+	<g v:mID="0" v:index="1" v:groupContext="foregroundPage">
+		<v:userDefs>
+			<v:ud v:nameU="msvThemeOrder" v:val="VT0(0):26"/>
+		</v:userDefs>
+		<title>Slash Command Interaction</title>
+		<v:pageProperties v:drawingScale="0.0393701" v:pageScale="0.0393701" v:drawingUnits="24" v:shadowOffsetX="8.50394"
+				v:shadowOffsetY="-8.50394"/>
+		<v:layer v:name="Соединительная линия" v:index="0"/>
+		<v:layer v:name="Контейнер" v:index="1"/>
+		<g id="group34-1" transform="translate(19,-338.315)" v:mID="34" v:groupContext="group" v:layerMember="1">
+			<v:userDefs>
+				<v:ud v:nameU="msvShapeCategories" v:prompt="" v:val="VT4(ContainerStyleDefaults)"/>
+				<v:ud v:nameU="msvStructureType" v:prompt="" v:val="VT4(Container)"/>
+				<v:ud v:nameU="msvSDContainerMargin" v:prompt="" v:val="VT0(0.11811023622047):24"/>
+				<v:ud v:nameU="msvSDContainerResize" v:prompt="" v:val="VT0(1):26"/>
+				<v:ud v:nameU="msvSDContainerLocked" v:prompt="" v:val="VT0(0):5"/>
+				<v:ud v:nameU="msvSDContainerNoHighlight" v:prompt="" v:val="VT0(0):5"/>
+				<v:ud v:nameU="msvSDContainerNoRibbon" v:prompt="" v:val="VT0(0):5"/>
+				<v:ud v:nameU="msvSDContainerStyle" v:prompt="" v:val="VT0(1):26"/>
+				<v:ud v:nameU="msvSDContainerStyleCount" v:prompt="" v:val="VT0(14):26"/>
+				<v:ud v:nameU="msvSDContainerRequiredCategories" v:prompt="" v:val="VT0(0):26"/>
+				<v:ud v:nameU="msvSDContainerExcludedCategories" v:prompt="" v:val="VT4(DoNotContain)"/>
+				<v:ud v:nameU="msvSDHeadingStyle" v:prompt="" v:val="VT0(1):26"/>
+				<v:ud v:nameU="msvSDHeadingStyleCount" v:prompt="" v:val="VT0(4):26"/>
+				<v:ud v:nameU="HeadingSide" v:prompt="" v:val="VT0(0):26"/>
+				<v:ud v:nameU="HeadingSpan" v:prompt="" v:val="VT0(0):26"/>
+				<v:ud v:nameU="HeadingAlign" v:prompt="" v:val="VT0(0):26"/>
+				<v:ud v:nameU="RTL" v:prompt="" v:val="VT0(0):5"/>
+				<v:ud v:nameU="FnForceContrast" v:prompt="" v:val="VT5(#ffffff)"/>
+				<v:ud v:nameU="BaseColor" v:prompt="" v:val="VT0(1):26"/>
+				<v:ud v:nameU="HColor1" v:prompt="" v:val="VT5(#ffffff)"/>
+				<v:ud v:nameU="HColor2" v:prompt="" v:val="VT5(#fefefe)"/>
+				<v:ud v:nameU="HColor3" v:prompt="" v:val="VT5(#e9e9e9)"/>
+				<v:ud v:nameU="HColor4" v:prompt="" v:val="VT5(#efefef)"/>
+				<v:ud v:nameU="BColor1" v:prompt="" v:val="VT5(#ffffff)"/>
+				<v:ud v:nameU="BColor2" v:prompt="" v:val="VT5(#ffffff)"/>
+				<v:ud v:nameU="LineColor" v:prompt="" v:val="VT5(#d5d5d5)"/>
+				<v:ud v:nameU="visVersion" v:prompt="" v:val="VT0(15):26"/>
+				<v:ud v:nameU="Embellishment" v:prompt="" v:val="VT0(2):26"/>
+				<v:ud v:nameU="visMasterStencil" v:prompt="" v:val="VT4(SDCONT_M.vssx)"/>
+				<v:ud v:nameU="BaseColor" v:prompt="" v:val="VT5(#ffffff)"/>
+			</v:userDefs>
+			<title>Обычный.2</title>
+			<g id="group35-2" v:mID="35" v:groupContext="group" v:layerMember="1">
+				<v:userDefs>
+					<v:ud v:nameU="msvStructureType" v:prompt="" v:val="VT0(0):26"/>
+					<v:ud v:nameU="CStyle" v:prompt="" v:val="VT0(1):26"/>
+					<v:ud v:nameU="HSide" v:prompt="" v:val="VT0(0):26"/>
+					<v:ud v:nameU="HSpan" v:prompt="" v:val="VT0(0):26"/>
+					<v:ud v:nameU="HAlign" v:prompt="" v:val="VT0(0):26"/>
+					<v:ud v:nameU="HorzAlign" v:prompt="" v:val="VT0(0):26"/>
+					<v:ud v:nameU="SquareCorners" v:prompt="" v:val="VT0(0):26"/>
+					<v:ud v:nameU="Corner6" v:prompt="" v:val="VT0(0.19685039370079):24"/>
+					<v:ud v:nameU="FillForegndIn" v:prompt="" v:val="VT0(1):26"/>
+					<v:ud v:nameU="FillBkgndIn" v:prompt="" v:val="VT0(0):26"/>
+					<v:ud v:nameU="FillPatternIn" v:prompt="" v:val="VT0(1):26"/>
+					<v:ud v:nameU="BaseColor" v:prompt="" v:val="VT0(1):26"/>
+					<v:ud v:nameU="BackFillColor" v:prompt="" v:val="VT5(#96afcf)"/>
+					<v:ud v:nameU="BackLineColor" v:prompt="" v:val="VT5(#1f477d)"/>
+					<v:ud v:nameU="DarkerColor" v:prompt="" v:val="VT5(#1f477d)"/>
+					<v:ud v:nameU="HorzAlign" v:prompt="" v:val="VT0(2):26"/>
+					<v:ud v:nameU="FillForegndIn" v:prompt="" v:val="VT5(#ffffff)"/>
+					<v:ud v:nameU="FillBkgndIn" v:prompt="" v:val="VT5(#000000)"/>
+					<v:ud v:nameU="BaseColor" v:prompt="" v:val="VT5(#ffffff)"/>
+					<v:ud v:nameU="BackFillColor" v:prompt="" v:val="VT5(#ffffff)"/>
+					<v:ud v:nameU="BackLineColor" v:prompt="" v:val="VT5(#febf01)"/>
+					<v:ud v:nameU="DarkerColor" v:prompt="" v:val="VT5(#febf01)"/>
+				</v:userDefs>
+				<title>Лист.35</title>
+				<g id="shape36-3" v:mID="36" v:groupContext="shape" v:layerMember="1" transform="translate(2.83465,2.83465)">
+					<title>Лист.36</title>
+					<v:userDefs>
+						<v:ud v:nameU="msvStructureType" v:prompt="" v:val="VT0(0):26"/>
+						<v:ud v:nameU="msvThemeColors" v:prompt="" v:val="VT0(0):26"/>
+						<v:ud v:nameU="msvThemeEffects" v:prompt="" v:val="VT0(0):26"/>
+						<v:ud v:nameU="CStyle" v:prompt="" v:val="VT0(1):26"/>
+						<v:ud v:nameU="HSide" v:prompt="" v:val="VT0(0):26"/>
+						<v:ud v:nameU="HSpan" v:prompt="" v:val="VT0(0):26"/>
+						<v:ud v:nameU="HAlign" v:prompt="" v:val="VT0(0):26"/>
+						<v:ud v:nameU="HorzAlign" v:prompt="" v:val="VT0(0):26"/>
+						<v:ud v:nameU="SquareCorners" v:prompt="" v:val="VT0(0):26"/>
+						<v:ud v:nameU="OffsetX10" v:prompt="" v:val="VT0(0.039370078740157):24"/>
+						<v:ud v:nameU="OffsetY10" v:prompt="" v:val="VT0(-0.039370078740157):24"/>
+						<v:ud v:nameU="BackFillColor" v:prompt="" v:val="VT5(#96afcf)"/>
+						<v:ud v:nameU="BackLineColor" v:prompt="" v:val="VT5(#1f477d)"/>
+						<v:ud v:nameU="DarkerColor" v:prompt="" v:val="VT5(#1f477d)"/>
+						<v:ud v:nameU="HorzAlign" v:prompt="" v:val="VT0(2):26"/>
+					</v:userDefs>
+				</g>
+				<g id="shape35-5" v:mID="35" v:groupContext="groupContent" v:layerMember="1">
+					<path d="M0 523.57 L304.36 523.57 L608.72 523.57 L608.72 449.44 L304.36 449.44 L0 449.44 L0 523.57 Z"
+							class="st1"/>
+				</g>
+			</g>
+		</g>
+		<g id="group45-7" transform="translate(19,-22.6772)" v:mID="45" v:groupContext="group" v:layerMember="1">
+			<v:userDefs>
+				<v:ud v:nameU="msvShapeCategories" v:prompt="" v:val="VT4(ContainerStyleDefaults)"/>
+				<v:ud v:nameU="msvStructureType" v:prompt="" v:val="VT4(Container)"/>
+				<v:ud v:nameU="msvSDContainerMargin" v:prompt="" v:val="VT0(0.11811023622047):24"/>
+				<v:ud v:nameU="msvSDContainerResize" v:prompt="" v:val="VT0(1):26"/>
+				<v:ud v:nameU="msvSDContainerLocked" v:prompt="" v:val="VT0(0):5"/>
+				<v:ud v:nameU="msvSDContainerNoHighlight" v:prompt="" v:val="VT0(0):5"/>
+				<v:ud v:nameU="msvSDContainerNoRibbon" v:prompt="" v:val="VT0(0):5"/>
+				<v:ud v:nameU="msvSDContainerStyle" v:prompt="" v:val="VT0(1):26"/>
+				<v:ud v:nameU="msvSDContainerStyleCount" v:prompt="" v:val="VT0(14):26"/>
+				<v:ud v:nameU="msvSDContainerRequiredCategories" v:prompt="" v:val="VT0(0):26"/>
+				<v:ud v:nameU="msvSDContainerExcludedCategories" v:prompt="" v:val="VT4(DoNotContain)"/>
+				<v:ud v:nameU="msvSDHeadingStyle" v:prompt="" v:val="VT0(1):26"/>
+				<v:ud v:nameU="msvSDHeadingStyleCount" v:prompt="" v:val="VT0(4):26"/>
+				<v:ud v:nameU="HeadingSide" v:prompt="" v:val="VT0(0):26"/>
+				<v:ud v:nameU="HeadingSpan" v:prompt="" v:val="VT0(0):26"/>
+				<v:ud v:nameU="HeadingAlign" v:prompt="" v:val="VT0(0):26"/>
+				<v:ud v:nameU="RTL" v:prompt="" v:val="VT0(0):5"/>
+				<v:ud v:nameU="FnForceContrast" v:prompt="" v:val="VT5(#ffffff)"/>
+				<v:ud v:nameU="BaseColor" v:prompt="" v:val="VT0(1):26"/>
+				<v:ud v:nameU="HColor1" v:prompt="" v:val="VT5(#ffffff)"/>
+				<v:ud v:nameU="HColor2" v:prompt="" v:val="VT5(#fefefe)"/>
+				<v:ud v:nameU="HColor3" v:prompt="" v:val="VT5(#e9e9e9)"/>
+				<v:ud v:nameU="HColor4" v:prompt="" v:val="VT5(#efefef)"/>
+				<v:ud v:nameU="BColor1" v:prompt="" v:val="VT5(#ffffff)"/>
+				<v:ud v:nameU="BColor2" v:prompt="" v:val="VT5(#ffffff)"/>
+				<v:ud v:nameU="LineColor" v:prompt="" v:val="VT5(#d5d5d5)"/>
+				<v:ud v:nameU="visVersion" v:prompt="" v:val="VT0(15):26"/>
+				<v:ud v:nameU="Embellishment" v:prompt="" v:val="VT0(2):26"/>
+				<v:ud v:nameU="visMasterStencil" v:prompt="" v:val="VT4(SDCONT_M.vssx)"/>
+				<v:ud v:nameU="BaseColor" v:prompt="" v:val="VT5(#ffffff)"/>
+			</v:userDefs>
+			<title>Обычный.2.45</title>
+			<g id="group46-8" v:mID="46" v:groupContext="group" v:layerMember="1">
+				<v:userDefs>
+					<v:ud v:nameU="msvStructureType" v:prompt="" v:val="VT0(0):26"/>
+					<v:ud v:nameU="CStyle" v:prompt="" v:val="VT0(1):26"/>
+					<v:ud v:nameU="HSide" v:prompt="" v:val="VT0(0):26"/>
+					<v:ud v:nameU="HSpan" v:prompt="" v:val="VT0(0):26"/>
+					<v:ud v:nameU="HAlign" v:prompt="" v:val="VT0(0):26"/>
+					<v:ud v:nameU="HorzAlign" v:prompt="" v:val="VT0(0):26"/>
+					<v:ud v:nameU="SquareCorners" v:prompt="" v:val="VT0(0):26"/>
+					<v:ud v:nameU="Corner6" v:prompt="" v:val="VT0(0.19685039370079):24"/>
+					<v:ud v:nameU="FillForegndIn" v:prompt="" v:val="VT0(1):26"/>
+					<v:ud v:nameU="FillBkgndIn" v:prompt="" v:val="VT0(0):26"/>
+					<v:ud v:nameU="FillPatternIn" v:prompt="" v:val="VT0(1):26"/>
+					<v:ud v:nameU="BaseColor" v:prompt="" v:val="VT0(1):26"/>
+					<v:ud v:nameU="BackFillColor" v:prompt="" v:val="VT5(#96afcf)"/>
+					<v:ud v:nameU="BackLineColor" v:prompt="" v:val="VT5(#1f477d)"/>
+					<v:ud v:nameU="DarkerColor" v:prompt="" v:val="VT5(#1f477d)"/>
+					<v:ud v:nameU="HorzAlign" v:prompt="" v:val="VT0(2):26"/>
+					<v:ud v:nameU="FillForegndIn" v:prompt="" v:val="VT5(#ffffcc)"/>
+					<v:ud v:nameU="FillBkgndIn" v:prompt="" v:val="VT5(#000000)"/>
+					<v:ud v:nameU="FillPatternIn" v:prompt="" v:val="VT0(1):26"/>
+					<v:ud v:nameU="BaseColor" v:prompt="" v:val="VT5(#ffffcc)"/>
+					<v:ud v:nameU="BackFillColor" v:prompt="" v:val="VT5(#ffffff)"/>
+					<v:ud v:nameU="BackLineColor" v:prompt="" v:val="VT5(#febf01)"/>
+					<v:ud v:nameU="DarkerColor" v:prompt="" v:val="VT5(#febf01)"/>
+				</v:userDefs>
+				<title>Лист.46</title>
+				<g id="shape47-9" v:mID="47" v:groupContext="shape" v:layerMember="1" transform="translate(2.83465,2.83465)">
+					<title>Лист.47</title>
+					<v:userDefs>
+						<v:ud v:nameU="msvStructureType" v:prompt="" v:val="VT0(0):26"/>
+						<v:ud v:nameU="msvThemeColors" v:prompt="" v:val="VT0(0):26"/>
+						<v:ud v:nameU="msvThemeEffects" v:prompt="" v:val="VT0(0):26"/>
+						<v:ud v:nameU="CStyle" v:prompt="" v:val="VT0(1):26"/>
+						<v:ud v:nameU="HSide" v:prompt="" v:val="VT0(0):26"/>
+						<v:ud v:nameU="HSpan" v:prompt="" v:val="VT0(0):26"/>
+						<v:ud v:nameU="HAlign" v:prompt="" v:val="VT0(0):26"/>
+						<v:ud v:nameU="HorzAlign" v:prompt="" v:val="VT0(0):26"/>
+						<v:ud v:nameU="SquareCorners" v:prompt="" v:val="VT0(0):26"/>
+						<v:ud v:nameU="OffsetX10" v:prompt="" v:val="VT0(0.039370078740157):24"/>
+						<v:ud v:nameU="OffsetY10" v:prompt="" v:val="VT0(-0.039370078740157):24"/>
+						<v:ud v:nameU="BackFillColor" v:prompt="" v:val="VT5(#96afcf)"/>
+						<v:ud v:nameU="BackLineColor" v:prompt="" v:val="VT5(#1f477d)"/>
+						<v:ud v:nameU="DarkerColor" v:prompt="" v:val="VT5(#1f477d)"/>
+						<v:ud v:nameU="HorzAlign" v:prompt="" v:val="VT0(2):26"/>
+					</v:userDefs>
+				</g>
+				<g id="shape46-11" v:mID="46" v:groupContext="groupContent" v:layerMember="1">
+					<path d="M0 523.57 L304.44 523.57 L608.87 523.57 L608.87 207.49 L304.44 207.49 L0 207.49 L0 523.57 Z"
+							class="st2"/>
+				</g>
+			</g>
+		</g>
+		<g id="shape1-13" v:mID="1" v:groupContext="shape" transform="translate(158.74,-419.528)">
+			<title>Прямоугольник</title>
+			<desc>Slash Command Interaction IDiscordInteraction</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				<v:ud v:nameU="visMasterStencil" v:prompt="" v:val="VT4(Basic_M.vssx)"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="76.5354" cy="481.047" width="153.08" height="85.0394"/>
+			<rect x="0" y="438.528" width="153.071" height="85.0394" class="st3"/>
+			<text x="18.05" y="464.85" class="st4" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>Slash Command <tspan
+						x="36.24" dy="1.2em" class="st5">Interaction<v:newlineChar/></tspan><tspan x="23.66" dy="2.274em"
+						class="st6">IDiscordInteraction</tspan></text>		</g>
+		<g id="shape2-18" v:mID="2" v:groupContext="shape" transform="translate(32.5984,-348.024)">
+			<title>Прямоугольник.2</title>
+			<desc>RespondAsync RespondWithFileAsync RespondWithFilesAsync Creat...</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				<v:ud v:nameU="visMasterStencil" v:prompt="" v:val="VT4(Basic_M.vssx)"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="65.0551" cy="497.843" width="130.12" height="51.4488"/>
+			<rect x="0" y="472.118" width="130.11" height="51.4488" class="st3"/>
+			<text x="35.53" y="482.84" class="st7" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/><tspan class="st8">RespondAsync</tspan><v:newlineChar/><tspan
+						x="18.55" dy="1.2em" class="st8">RespondWithFileAsync<v:newlineChar/></tspan><tspan x="16.59" dy="1.2em"
+						class="st8">RespondWithFilesAsync<v:newlineChar/></tspan><tspan x="4.61" dy="1.333em" class="st9">Creates a new response message</tspan></text>		</g>
+		<g id="shape3-25" v:mID="3" v:groupContext="shape" v:layerMember="0" transform="translate(158.74,-462.047)">
+			<title>Динамическая соединительная линия</title>
+			<path d="M0 523.57 L-61.09 523.57 L-61.09 579.1" class="st10"/>
+		</g>
+		<g id="shape4-31" v:mID="4" v:groupContext="shape" transform="translate(178.583,-348.024)">
+			<title>Прямоугольник.4</title>
+			<desc>DeferAsync Creates a new “Bot is thinking” message</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				<v:ud v:nameU="visMasterStencil" v:prompt="" v:val="VT4(Basic_M.vssx)"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="56.6929" cy="497.843" width="113.39" height="51.4488"/>
+			<rect x="0" y="472.118" width="113.386" height="51.4488" class="st3"/>
+			<text x="33.52" y="489.44" class="st7" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/><tspan class="st8">DeferAsync</tspan><v:newlineChar/><tspan
+						x="17.78" dy="1.233em" class="st9">Creates a new </tspan><tspan class="st9">“</tspan><tspan class="st9">Bot is </tspan><tspan
+						x="23.1" dy="1.3em" class="st9">thinking</tspan><tspan class="st9">” </tspan><tspan class="st9">message</tspan></text>		</g>
+		<g id="shape5-41" v:mID="5" v:groupContext="shape" v:layerMember="0" transform="translate(242.362,-419.528)">
+			<title>Динамическая соединительная линия.5</title>
+			<path d="M-7.09 523.57 L-7.09 536.58" class="st10"/>
+		</g>
+		<g id="shape6-46" v:mID="6" v:groupContext="shape" transform="translate(106.299,-102.331)">
+			<title>Прямоугольник.6</title>
+			<desc>FollowupAsync FollowupWithFileAsync FollowupWithFilesAsync Se...</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				<v:ud v:nameU="visMasterStencil" v:prompt="" v:val="VT4(Basic_M.vssx)"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="65.9055" cy="497.843" width="131.82" height="51.4488"/>
+			<rect x="0" y="472.118" width="131.811" height="51.4488" class="st3"/>
+			<text x="35.36" y="482.84" class="st7" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/><tspan class="st8">FollowupAsync</tspan><v:newlineChar/><tspan
+						x="18.38" dy="1.2em" class="st8">FollowupWithFileAsync<v:newlineChar/></tspan><tspan x="16.42" dy="1.2em"
+						class="st8">FollowupWithFilesAsync<v:newlineChar/></tspan><tspan x="17.91" dy="1.333em" class="st9">Sends a followup message</tspan></text>		</g>
+		<g id="shape7-53" v:mID="7" v:groupContext="shape" transform="translate(106.299,-278.362)">
+			<title>Прямоугольник.7</title>
+			<desc>ModifyOriginalResponseAsync Modifies the response message</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				<v:ud v:nameU="visMasterStencil" v:prompt="" v:val="VT4(Basic_M.vssx)"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="65.9055" cy="497.843" width="131.82" height="51.4488"/>
+			<rect x="0" y="472.118" width="131.811" height="51.4488" class="st3"/>
+			<text x="4.21" y="494.84" class="st7" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/><tspan class="st8">ModifyOriginalResponseAsync</tspan><v:newlineChar/><tspan
+						x="8.19" dy="1.333em" class="st9">Modifies the response message</tspan></text>		</g>
+		<g id="shape8-58" v:mID="8" v:groupContext="shape" transform="translate(106.299,-161.008)">
+			<title>Прямоугольник.8</title>
+			<desc>GetOriginalResponseAsync Gets the response message</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				<v:ud v:nameU="visMasterStencil" v:prompt="" v:val="VT4(Basic_M.vssx)"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="65.9055" cy="497.843" width="131.82" height="51.4488"/>
+			<rect x="0" y="472.118" width="131.811" height="51.4488" class="st3"/>
+			<text x="11.37" y="494.84" class="st7" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/><tspan class="st8">GetOriginalResponseAsync</tspan><v:newlineChar/><tspan
+						x="15.86" dy="1.333em" class="st9">Gets the response message</tspan></text>		</g>
+		<g id="shape9-63" v:mID="9" v:groupContext="shape" transform="translate(106.299,-219.685)">
+			<title>Прямоугольник.9</title>
+			<desc>DeleteOriginalResponseAsync Deletes the response message</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				<v:ud v:nameU="visMasterStencil" v:prompt="" v:val="VT4(Basic_M.vssx)"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="65.9055" cy="497.843" width="131.82" height="51.4488"/>
+			<rect x="0" y="472.118" width="131.811" height="51.4488" class="st3"/>
+			<text x="5.33" y="494.84" class="st7" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/><tspan class="st8">DeleteOriginalResponseAsync</tspan><v:newlineChar/><tspan
+						x="10.42" dy="1.333em" class="st9">Deletes the response message</tspan></text>		</g>
+		<g id="shape15-68" v:mID="15" v:groupContext="shape" v:layerMember="0" transform="translate(94.8898,-348.024)">
+			<title>Динамическая соединительная линия.15</title>
+			<path d="M2.76 523.57 L-9.85 523.57 L-9.85 743.54 L4.37 743.54" class="st10"/>
+		</g>
+		<g id="shape16-73" v:mID="16" v:groupContext="shape" v:layerMember="0" transform="translate(94.8898,-348.024)">
+			<title>Динамическая соединительная линия.16</title>
+			<path d="M2.76 523.57 L-9.85 523.57 L-9.85 567.5 L4.37 567.5" class="st10"/>
+		</g>
+		<g id="shape17-78" v:mID="17" v:groupContext="shape" v:layerMember="0" transform="translate(94.8898,-348.024)">
+			<title>Динамическая соединительная линия.17</title>
+			<path d="M2.76 523.57 L-9.85 523.57 L-9.85 626.18 L4.37 626.18" class="st10"/>
+		</g>
+		<g id="shape18-83" v:mID="18" v:groupContext="shape" v:layerMember="0" transform="translate(94.8898,-348.024)">
+			<title>Динамическая соединительная линия.18</title>
+			<path d="M2.76 523.57 L-9.85 523.57 L-9.85 684.86 L4.37 684.86" class="st10"/>
+		</g>
+		<g id="shape19-88" v:mID="19" v:groupContext="shape" v:layerMember="0" transform="translate(229.606,-348.024)">
+			<title>Динамическая соединительная линия.19</title>
+			<path d="M5.67 523.57 L25.51 523.57 L25.51 743.54 L15.54 743.54" class="st10"/>
+		</g>
+		<g id="shape20-93" v:mID="20" v:groupContext="shape" v:layerMember="0" transform="translate(229.606,-348.024)">
+			<title>Динамическая соединительная линия.20</title>
+			<path d="M5.67 523.57 L25.51 523.57 L25.51 567.5 L15.54 567.5" class="st10"/>
+		</g>
+		<g id="shape21-98" v:mID="21" v:groupContext="shape" v:layerMember="0" transform="translate(229.606,-348.024)">
+			<title>Динамическая соединительная линия.21</title>
+			<path d="M5.67 523.57 L25.51 523.57 L25.51 626.18 L15.54 626.18" class="st10"/>
+		</g>
+		<g id="shape22-103" v:mID="22" v:groupContext="shape" transform="translate(308.976,-348.236)">
+			<title>Прямоугольник.22</title>
+			<desc>RespondWithModalAsync Responds with a modal</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				<v:ud v:nameU="visMasterStencil" v:prompt="" v:val="VT4(Basic_M.vssx)"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="56.6929" cy="497.843" width="113.39" height="51.4488"/>
+			<rect x="0" y="472.118" width="113.386" height="51.4488" class="st3"/>
+			<text x="4.19" y="494.84" class="st7" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/><tspan class="st8">RespondWithModalAsync</tspan><v:newlineChar/><tspan
+						x="14.18" dy="1.333em" class="st9">Responds with a modal</tspan></text>		</g>
+		<g id="shape23-108" v:mID="23" v:groupContext="shape" v:layerMember="0" transform="translate(311.811,-462.047)">
+			<title>Динамическая соединительная линия.23</title>
+			<path d="M0 523.57 L53.86 523.57 L53.86 578.89" class="st10"/>
+		</g>
+		<g id="shape27-113" v:mID="27" v:groupContext="shape" transform="translate(62.937,-35.4331)">
+			<title>Прямоугольник.27</title>
+			<desc>RestFollowupMessage.DeleteAsync Deletes a followup message</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				<v:ud v:nameU="visMasterStencil" v:prompt="" v:val="VT4(Basic_M.vssx)"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="81.4961" cy="497.843" width="163" height="51.4488"/>
+			<rect x="0" y="472.118" width="162.992" height="51.4488" class="st3"/>
+			<text x="9.58" y="494.84" class="st7" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/><tspan class="st8">RestFollowupMessage.DeleteAsync</tspan><v:newlineChar/><tspan
+						x="30.51" dy="1.333em" class="st9">Deletes a followup message</tspan></text>		</g>
+		<g id="shape29-118" v:mID="29" v:groupContext="shape" v:layerMember="0" transform="translate(172.205,-102.331)">
+			<title>Динамическая соединительная линия.29</title>
+			<path d="M0 523.57 L0 529.9 L-27.77 529.9 L-27.77 531.98" class="st10"/>
+		</g>
+		<g id="shape31-123" v:mID="31" v:groupContext="shape" transform="translate(243.646,-35.4331)">
+			<title>Прямоугольник.31</title>
+			<desc>RestFollowupMessage.ModifyAsync Modifies a followup message</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				<v:ud v:nameU="visMasterStencil" v:prompt="" v:val="VT4(Basic_M.vssx)"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="81.4961" cy="497.843" width="163" height="51.4488"/>
+			<rect x="0" y="472.118" width="162.992" height="51.4488" class="st3"/>
+			<text x="8.47" y="494.84" class="st7" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/><tspan class="st8">RestFollowupMessage.ModifyAsync</tspan><v:newlineChar/><tspan
+						x="28.27" dy="1.333em" class="st9">Modifies a followup message</tspan></text>		</g>
+		<g id="shape32-128" v:mID="32" v:groupContext="shape" v:layerMember="0" transform="translate(172.205,-102.331)">
+			<title>Динамическая соединительная линия.32</title>
+			<path d="M0 523.57 L0 529.9 L152.94 529.9 L152.94 531.98" class="st10"/>
+		</g>
+		<g id="shape50-133" v:mID="50" v:groupContext="shape" v:layerMember="0" transform="translate(229.606,-348.024)">
+			<title>Динамическая соединительная линия.50</title>
+			<path d="M5.67 523.57 L25.51 523.57 L25.51 684.86 L15.54 684.86" class="st10"/>
+		</g>
+		<g id="shape55-138" v:mID="55" v:groupContext="shape" transform="translate(418.11,-255.118)">
+			<title>Лист.55</title>
+			<desc>Followup methods Can be used in 15 minutes after sending an i...</desc>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="99.2126" cy="487.213" width="198.43" height="72.7087"/>
+			<rect x="0" y="450.858" width="198.425" height="72.7087" class="st12"/>
+			<text x="92.22" y="464.41" class="st13" v:langID="1033"><v:paragraph v:horizAlign="2"/><v:tabList/>Followup methods<v:newlineChar/><tspan
+						x="76.71" dy="1.26em" class="st14">Can be used in 15 minutes <v:newlineChar/></tspan><tspan x="51.42"
+						dy="1.38em" class="st14">after sending an initial response<v:newlineChar/></tspan><tspan x="55.64"
+						dy="1.26em" class="st15">Can be used multiple times during<v:newlineChar/></tspan><tspan x="82.06"
+						dy="1.38em" class="st15"> </tspan><tspan class="st15">interaction token</tspan><tspan class="st15">’</tspan><tspan
+						class="st15">s lifetime</tspan></text>		</g>
+		<g id="shape57-148" v:mID="57" v:groupContext="shape" transform="translate(439.37,-347.244)">
+			<title>Лист.57</title>
+			<desc>Initial Response methods Has to be executed in 3 seconds afte...</desc>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="89.9252" cy="495.22" width="179.86" height="56.6929"/>
+			<rect x="0" y="466.874" width="179.85" height="56.6929" class="st12"/>
+			<text x="37.46" y="479.62" class="st13" v:langID="1033"><v:paragraph v:horizAlign="2"/><v:tabList/>Initial Response methods<v:newlineChar/><tspan
+						x="32.72" dy="1.26em" class="st14">Has to be executed in 3 seconds <v:newlineChar/></tspan><tspan x="42.42"
+						dy="1.2em" class="st14">after receiving the interaction<v:newlineChar/></tspan><tspan x="22.26" dy="1.38em"
+						class="st15">Can be used only ones per interaction</tspan></text>		</g>
+		<g id="shape59-154" v:mID="59" v:groupContext="shape" v:layerMember="0" transform="translate(365.669,-348.236)">
+			<title>Динамическая соединительная линия.59</title>
+			<path d="M0 523.57 L0 751.33 L-120.52 751.33" class="st10"/>
+		</g>
+	</g>
+</svg>

@@ -263,7 +263,7 @@ namespace Discord
                 var result = await client.PostAsync($"{ApiUrl}/overrides/{id}/dependency", new StringContent($"{{ \"info\": \"{name}\"}}", Encoding.UTF8, "application/json"));
 
                 if (!result.IsSuccessStatusCode)
-                    throw new Exception("Failed to get dependency");
+                    throw new HttpRequestException("Failed to get dependency");
 
                 using (var ms = new MemoryStream())
                 {

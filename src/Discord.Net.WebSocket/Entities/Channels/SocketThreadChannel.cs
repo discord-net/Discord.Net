@@ -178,14 +178,14 @@ namespace Discord.WebSocket
                 member.Update(model);
             else
             {
-                member = SocketThreadUser.Create(Guild, this, model, guildMember);
-                member.GlobalUser.AddRef();
+                member = SocketThreadUser.Create(Guild, this, model, guildMember ?? Guild.GetUser(model.UserId.GetValueOrDefault(0)));
+                member.GlobalUser?.AddRef();
                 _members[member.Id] = member;
             }
             return member;
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc cref="SocketGuildChannel.GetUser"/>
         public new SocketThreadUser GetUser(ulong id)
         {
             var user = Users.FirstOrDefault(x => x.Id == id);

@@ -29,6 +29,7 @@ to use.
 * @Discord.Commands.RequireBotPermissionAttribute
 * @Discord.Commands.RequireUserPermissionAttribute
 * @Discord.Commands.RequireNsfwAttribute
+* @Discord.Commands.DoHierarchyCheckAttribute
 
 ## Using Preconditions
 

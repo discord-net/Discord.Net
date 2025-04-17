@@ -45,6 +45,12 @@ namespace Discord.API.Rest
         [JsonProperty("thread_name")]
         public Optional<string> ThreadName { get; set; }
 
+        [JsonProperty("applied_tags")]
+        public Optional<ulong[]> AppliedTags { get; set; }
+
+        [JsonProperty("poll")]
+        public Optional<CreatePollParams> Poll { get; set; }
+
         public IReadOnlyDictionary<string, object> ToDictionary()
         {
             var d = new Dictionary<string, object>();
@@ -75,6 +81,13 @@ namespace Discord.API.Rest
                 payload["components"] = Components.Value;
             if (ThreadName.IsSpecified)
                 payload["thread_name"] = ThreadName.Value;
+            if (AppliedTags.IsSpecified)
+                payload["applied_tags"] = AppliedTags.Value;
+            if (Flags.IsSpecified)
+                payload["flags"] = Flags.Value;
+            if (Poll.IsSpecified)
+                payload["poll"] = Poll.Value;
+
 
             var json = new StringBuilder();
             using (var text = new StringWriter(json))

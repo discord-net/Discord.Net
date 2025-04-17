@@ -20,6 +20,10 @@ namespace Discord
         /// <summary>
         ///     The sticker format type is lottie.
         /// </summary>
-        Lottie = 3
+        Lottie = 3,
+        /// <summary>
+        ///     The sticker format type is gif.
+        /// </summary>
+        Gif = 4
     }
 }

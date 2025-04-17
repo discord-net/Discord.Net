@@ -47,7 +47,7 @@ namespace Discord
         }
 
         /// <summary>
-        ///     Tests the behavior of the <see cref="Discord.ChannelPermissions"/> constructor for each
+        ///     Tests the behavior of the <see cref="ChannelPermissions"/> constructor for each
         ///     of it's flags.
         /// </summary>
         [Fact]
@@ -93,10 +93,15 @@ namespace Discord
             AssertFlag(() => new ChannelPermissions(useSoundboard: true), ChannelPermission.UseSoundboard);
             AssertFlag(() => new ChannelPermissions(createEvents: true), ChannelPermission.CreateEvents);
             AssertFlag(() => new ChannelPermissions(sendVoiceMessages: true), ChannelPermission.SendVoiceMessages);
+            AssertFlag(() => new ChannelPermissions(useClydeAI: true), ChannelPermission.UseClydeAI);
+            AssertFlag(() => new ChannelPermissions(setVoiceChannelStatus: true), ChannelPermission.SetVoiceChannelStatus);
+            AssertFlag(() => new ChannelPermissions(sendPolls: true), ChannelPermission.SendPolls);
+            AssertFlag(() => new ChannelPermissions(useExternalApps: true), ChannelPermission.UseExternalApps);
+            AssertFlag(() => new ChannelPermissions(useExternalSounds: true), ChannelPermission.UseExternalSounds);
         }
 
         /// <summary>
-        ///     Tests the behavior of <see cref="Discord.ChannelPermissions.Modify"/>
+        ///     Tests the behavior of <see cref="ChannelPermissions.Modify"/>
         ///     with each of the parameters.
         /// </summary>
         [Fact]
@@ -158,6 +163,11 @@ namespace Discord
             AssertUtil(ChannelPermission.PrioritySpeaker, x => x.PrioritySpeaker, (p, enable) => p.Modify(prioritySpeaker: enable));
             AssertUtil(ChannelPermission.Stream, x => x.Stream, (p, enable) => p.Modify(stream: enable));
             AssertUtil(ChannelPermission.SendVoiceMessages, x => x.SendVoiceMessages, (p, enable) => p.Modify(sendVoiceMessages: enable));
+            AssertUtil(ChannelPermission.UseClydeAI, x => x.UseClydeAI, (p, enable) => p.Modify(useClydeAI: enable));
+            AssertUtil(ChannelPermission.SetVoiceChannelStatus, x => x.SetVoiceChannelStatus, (p, enable) => p.Modify(setVoiceChannelStatus: enable));
+            AssertUtil(ChannelPermission.SendPolls, x => x.SendPolls, (p, enable) => p.Modify(sendPolls: enable));
+            AssertUtil(ChannelPermission.UseExternalApps, x => x.UserExternalApps, (p, enable) => p.Modify(useExternalApps: enable));
+            AssertUtil(ChannelPermission.UseExternalSounds, x => x.UseExternalSounds, (p, enable) => p.Modify(useExternalSounds: enable));
         }
 
         /// <summary>

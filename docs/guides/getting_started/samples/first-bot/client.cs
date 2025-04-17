@@ -1,6 +1,6 @@
-private DiscordSocketClient _client;
+private static DiscordSocketClient _client;
 
-public async Task MainAsync()
+public static async Task Main()
 {
     _client = new DiscordSocketClient();
 

@@ -15,7 +15,7 @@ namespace Discord.Rest
         /// <remarks>
         ///     This field is always true for stage channels.
         /// </remarks>
-        /// 
+        ///
         [Obsolete("This property is no longer used because Discord enabled text-in-voice and text-in-stage for all channels.")]
         public override bool IsTextInVoice
             => true;
@@ -28,12 +28,12 @@ namespace Discord.Rest
 
         /// <inheritdoc/>
         public bool IsLive { get; private set; }
-        internal RestStageChannel(BaseDiscordClient discord, IGuild guild, ulong id)
-            : base(discord, guild, id) { }
+        internal RestStageChannel(BaseDiscordClient discord, IGuild guild, ulong id, ulong guildId)
+            : base(discord, guild, id, guildId) { }
 
         internal new static RestStageChannel Create(BaseDiscordClient discord, IGuild guild, Model model)
         {
-            var entity = new RestStageChannel(discord, guild, model.Id);
+            var entity = new RestStageChannel(discord, guild, model.Id, guild?.Id ?? model.GuildId.Value);
             entity.Update(model);
             return entity;
         }
@@ -150,5 +150,13 @@ namespace Discord.Rest
 
             return Discord.ApiClient.ModifyUserVoiceState(Guild.Id, user.Id, args);
         }
+
+        /// <inheritdoc />
+        /// <remarks>
+        ///     Setting voice channel status is not supported in stage channels.
+        /// </remarks>
+        /// <exception cref="NotSupportedException">Setting voice channel status is not supported in stage channels.</exception>
+        public override Task SetStatusAsync(string status, RequestOptions options = null)
+            => throw new NotSupportedException("Setting voice channel status is not supported in stage channels.");
     }
 }

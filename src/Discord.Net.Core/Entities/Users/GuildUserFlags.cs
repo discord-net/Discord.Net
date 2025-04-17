@@ -39,4 +39,44 @@ public enum GuildUserFlags
     ///     Cannot be modified.
     /// </remarks>
     StartedOnboarding = 1 << 3,
+
+    /// <summary>
+    ///     Member is a guest.
+    /// </summary>
+    /// <remarks>
+    ///     Cannot be modified.
+    /// </remarks>
+    IsGuest = 1 << 4,
+
+    /// <summary>
+    ///     Member has started home actions.
+    /// </summary>
+    /// <remarks>
+    ///     Cannot be modified.
+    /// </remarks>
+    StartedHomeActions = 1 << 5,
+
+    /// <summary>
+    ///     Member has completed home actions.
+    /// </summary>
+    /// <remarks>
+    ///     Cannot be modified.
+    /// </remarks>
+    CompletedHomeActions = 1 << 6,
+
+    /// <summary>
+    ///     Member has been quarantined by Automod.
+    /// </summary>
+    /// <remarks>
+    ///     Cannot be modified.
+    /// </remarks>
+    AutomodQuarantinedUsername = 1 << 7,
+
+    /// <summary>
+    ///     Member has acknowledged the DM setting upsell.
+    /// </summary>
+    /// <remarks>
+    ///     Cannot be modified.
+    /// </remarks>
+    DmSettingUpsellAcknowledged = 1 << 9,
 }

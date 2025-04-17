@@ -20,6 +20,22 @@ namespace Discord.WebSocket
         public bool IsMfaEnabled { get; private set; }
         internal override SocketGlobalUser GlobalUser { get; set; }
 
+        /// <summary>
+        ///     Gets the hash of the banner.
+        /// </summary>
+        /// <remarks>
+        ///     <see langword="null"/> if the user has no banner set.
+        /// </remarks>
+        public string BannerId { get; internal set; }
+
+        /// <summary>
+        ///     Gets the color of the banner.
+        /// </summary>
+        /// <remarks>
+        ///     <see langword="null"/> if the user has no banner set.
+        /// </remarks>
+        public Color? BannerColor { get; internal set; }
+
         /// <inheritdoc />
         public override bool IsBot { get { return GlobalUser.IsBot; } internal set { GlobalUser.IsBot = value; } }
         /// <inheritdoc />
@@ -84,6 +100,18 @@ namespace Discord.WebSocket
             if (model.Locale.IsSpecified && model.Locale.Value != Locale)
             {
                 Locale = model.Locale.Value;
+                hasGlobalChanges = true;
+            }
+
+            if (model.BannerColor.IsSpecified && model.BannerColor.Value != BannerColor)
+            {
+                BannerColor = model.BannerColor.Value;
+                hasGlobalChanges = true;
+            }
+
+            if (model.Banner.IsSpecified && model.Banner.Value != BannerId)
+            {
+                BannerId = model.Banner.Value;
                 hasGlobalChanges = true;
             }
             return hasGlobalChanges;

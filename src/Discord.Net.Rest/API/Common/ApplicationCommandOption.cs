@@ -83,8 +83,8 @@ namespace Discord.API
             Type = cmd.Type;
             Description = cmd.Description;
 
-            NameLocalizations = cmd.NameLocalizations?.ToDictionary() ?? Optional<Dictionary<string, string>>.Unspecified;
-            DescriptionLocalizations = cmd.DescriptionLocalizations?.ToDictionary() ?? Optional<Dictionary<string, string>>.Unspecified;
+            NameLocalizations = cmd.NameLocalizations?.ToDictionary(x => x.Key, y => y.Value) ?? Optional<Dictionary<string, string>>.Unspecified;
+            DescriptionLocalizations = cmd.DescriptionLocalizations?.ToDictionary(x => x.Key, y => y.Value) ?? Optional<Dictionary<string, string>>.Unspecified;
             NameLocalized = cmd.NameLocalized;
             DescriptionLocalized = cmd.DescriptionLocalized;
         }
@@ -94,7 +94,7 @@ namespace Discord.API
             {
                 Name = x.Name,
                 Value = x.Value,
-                NameLocalizations = x.NameLocalizations?.ToDictionary() ?? Optional<Dictionary<string, string>>.Unspecified,
+                NameLocalizations = x.NameLocalizations?.ToDictionary(x => x.Key, y => y.Value) ?? Optional<Dictionary<string, string>>.Unspecified,
             }).ToArray() ?? Optional<ApplicationCommandOptionChoice[]>.Unspecified;
 
             Options = option.Options?.Select(x => new ApplicationCommandOption(x)).ToArray() ?? Optional<ApplicationCommandOption[]>.Unspecified;
@@ -114,8 +114,8 @@ namespace Discord.API
             Description = option.Description;
             Autocomplete = option.IsAutocomplete;
 
-            NameLocalizations = option.NameLocalizations?.ToDictionary() ?? Optional<Dictionary<string, string>>.Unspecified;
-            DescriptionLocalizations = option.DescriptionLocalizations?.ToDictionary() ?? Optional<Dictionary<string, string>>.Unspecified;
+            NameLocalizations = option.NameLocalizations?.ToDictionary(x => x.Key, y => y.Value) ?? Optional<Dictionary<string, string>>.Unspecified;
+            DescriptionLocalizations = option.DescriptionLocalizations?.ToDictionary(x => x.Key, y => y.Value) ?? Optional<Dictionary<string, string>>.Unspecified;
         }
     }
 }

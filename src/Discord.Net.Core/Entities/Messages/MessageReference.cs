@@ -34,6 +34,11 @@ namespace Discord
         public Optional<bool> FailIfNotExists { get; internal set; }
 
         /// <summary>
+        ///     Gets the type of message reference.
+        /// </summary>
+        public Optional<MessageReferenceType> ReferenceType { get; internal set; }
+
+        /// <summary>
         ///     Initializes a new instance of the <see cref="MessageReference"/> class.
         /// </summary>
         /// <param name="messageId">
@@ -48,12 +53,14 @@ namespace Discord
         /// <param name="failIfNotExists">
         ///     Whether to error if the referenced message doesn't exist instead of sending as a normal (non-reply) message. Defaults to true.
         /// </param>
-        public MessageReference(ulong? messageId = null, ulong? channelId = null, ulong? guildId = null, bool? failIfNotExists = null)
+        public MessageReference(ulong? messageId = null, ulong? channelId = null, ulong? guildId = null, bool? failIfNotExists = null,
+            MessageReferenceType referenceType = MessageReferenceType.Default)
         {
             MessageId = messageId ?? Optional.Create<ulong>();
             InternalChannelId = channelId ?? Optional.Create<ulong>();
             GuildId = guildId ?? Optional.Create<ulong>();
             FailIfNotExists = failIfNotExists ?? Optional.Create<bool>();
+            ReferenceType = referenceType;
         }
 
         private string DebuggerDisplay

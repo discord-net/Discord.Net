@@ -29,23 +29,28 @@ namespace Discord.Rest
         /// <summary>
         ///     Gets a collection that is the current logged-in user and the recipient.
         /// </summary>
-        public IReadOnlyCollection<RestUser> Users => ImmutableArray.Create(CurrentUser, Recipient);
+        public IReadOnlyCollection<RestUser> Users => Recipient is null
+            ? ImmutableArray<RestUser>.Empty
+            : ImmutableArray.Create(CurrentUser, Recipient);
 
-        internal RestDMChannel(BaseDiscordClient discord, ulong id, ulong recipientId)
+        internal RestDMChannel(BaseDiscordClient discord, ulong id, ulong? recipientId)
             : base(discord, id)
         {
-            Recipient = new RestUser(Discord, recipientId);
+            Recipient = recipientId.HasValue ? new RestUser(Discord, recipientId.Value) : null;
             CurrentUser = new RestUser(Discord, discord.CurrentUser.Id);
         }
         internal new static RestDMChannel Create(BaseDiscordClient discord, Model model)
         {
-            var entity = new RestDMChannel(discord, model.Id, model.Recipients.Value[0].Id);
+            var entity = new RestDMChannel(discord, model.Id, model.Recipients.GetValueOrDefault(null)?[0].Id);
             entity.Update(model);
             return entity;
         }
         internal override void Update(Model model)
         {
-            Recipient.Update(model.Recipients.Value[0]);
+            base.Update(model);
+
+            if(model.Recipients.IsSpecified)
+                Recipient?.Update(model.Recipients.Value[0]);
         }
 
         /// <inheritdoc />
@@ -68,7 +73,7 @@ namespace Discord.Rest
         /// </returns>
         public RestUser GetUser(ulong id)
         {
-            if (id == Recipient.Id)
+            if (id == Recipient?.Id)
                 return Recipient;
             else if (id == Discord.CurrentUser.Id)
                 return CurrentUser;
@@ -97,9 +102,9 @@ namespace Discord.Rest
         /// <exception cref="ArgumentException">The only valid <see cref="MessageFlags"/> are <see cref="MessageFlags.SuppressEmbeds"/> and <see cref="MessageFlags.None"/>.</exception>
         public Task<RestUserMessage> SendMessageAsync(string text = null, bool isTTS = false, Embed embed = null,
             RequestOptions options = null, AllowedMentions allowedMentions = null, MessageReference messageReference = null,
-            MessageComponent components = null, ISticker[] stickers = null, Embed[] embeds = null, MessageFlags flags = MessageFlags.None)
+            MessageComponent components = null, ISticker[] stickers = null, Embed[] embeds = null, MessageFlags flags = MessageFlags.None, PollProperties poll = null)
             => ChannelHelper.SendMessageAsync(this, Discord, text, isTTS, embed, allowedMentions, messageReference,
-                components, stickers, options, embeds, flags);
+                components, stickers, options, embeds, flags, poll);
 
         /// <inheritdoc />
         /// <exception cref="ArgumentException">
@@ -130,35 +135,35 @@ namespace Discord.Rest
         public Task<RestUserMessage> SendFileAsync(string filePath, string text = null, bool isTTS = false, Embed embed = null,
             RequestOptions options = null, bool isSpoiler = false, AllowedMentions allowedMentions = null,
             MessageReference messageReference = null, MessageComponent components = null, ISticker[] stickers = null,
-            Embed[] embeds = null, MessageFlags flags = MessageFlags.None)
+            Embed[] embeds = null, MessageFlags flags = MessageFlags.None, PollProperties poll = null)
             => ChannelHelper.SendFileAsync(this, Discord, filePath, text, isTTS, embed, allowedMentions, messageReference,
-            components, stickers, options, isSpoiler, embeds, flags);
+            components, stickers, options, isSpoiler, embeds, flags, poll);
         /// <inheritdoc />
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
         public Task<RestUserMessage> SendFileAsync(Stream stream, string filename, string text = null, bool isTTS = false,
             Embed embed = null, RequestOptions options = null, bool isSpoiler = false, AllowedMentions allowedMentions = null,
             MessageReference messageReference = null, MessageComponent components = null, ISticker[] stickers = null,
-            Embed[] embeds = null, MessageFlags flags = MessageFlags.None)
+            Embed[] embeds = null, MessageFlags flags = MessageFlags.None, PollProperties poll = null)
             => ChannelHelper.SendFileAsync(this, Discord, stream, filename, text, isTTS, embed, allowedMentions,
-                messageReference, components, stickers, options, isSpoiler, embeds, flags);
+                messageReference, components, stickers, options, isSpoiler, embeds, flags, poll);
 
         /// <inheritdoc />
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
         public Task<RestUserMessage> SendFileAsync(FileAttachment attachment, string text = null, bool isTTS = false,
             Embed embed = null, RequestOptions options = null, AllowedMentions allowedMentions = null,
             MessageReference messageReference = null, MessageComponent components = null, ISticker[] stickers = null,
-            Embed[] embeds = null, MessageFlags flags = MessageFlags.None)
+            Embed[] embeds = null, MessageFlags flags = MessageFlags.None, PollProperties poll = null)
             => ChannelHelper.SendFileAsync(this, Discord, attachment, text, isTTS, embed, allowedMentions, messageReference,
-                components, stickers, options, embeds, flags);
+                components, stickers, options, embeds, flags, poll);
 
         /// <inheritdoc />
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
         public Task<RestUserMessage> SendFilesAsync(IEnumerable<FileAttachment> attachments, string text = null, bool isTTS = false,
             Embed embed = null, RequestOptions options = null, AllowedMentions allowedMentions = null,
             MessageReference messageReference = null, MessageComponent components = null, ISticker[] stickers = null,
-            Embed[] embeds = null, MessageFlags flags = MessageFlags.None)
+            Embed[] embeds = null, MessageFlags flags = MessageFlags.None, PollProperties poll = null)
             => ChannelHelper.SendFilesAsync(this, Discord, attachments, text, isTTS, embed, allowedMentions, messageReference,
-                components, stickers, options, embeds, flags);
+                components, stickers, options, embeds, flags, poll);
 
         /// <inheritdoc />
         public Task DeleteMessageAsync(ulong messageId, RequestOptions options = null)
@@ -242,35 +247,35 @@ namespace Discord.Rest
         /// <inheritdoc />
         async Task<IUserMessage> IMessageChannel.SendFileAsync(string filePath, string text, bool isTTS, Embed embed,
             RequestOptions options, bool isSpoiler, AllowedMentions allowedMentions, MessageReference messageReference,
-            MessageComponent components, ISticker[] stickers, Embed[] embeds, MessageFlags flags)
+            MessageComponent components, ISticker[] stickers, Embed[] embeds, MessageFlags flags, PollProperties poll)
             => await SendFileAsync(filePath, text, isTTS, embed, options, isSpoiler, allowedMentions, messageReference,
-            components, stickers, embeds, flags).ConfigureAwait(false);
+            components, stickers, embeds, flags, poll).ConfigureAwait(false);
 
         /// <inheritdoc />
         async Task<IUserMessage> IMessageChannel.SendFileAsync(Stream stream, string filename, string text, bool isTTS,
             Embed embed, RequestOptions options, bool isSpoiler, AllowedMentions allowedMentions, MessageReference messageReference,
-            MessageComponent components, ISticker[] stickers, Embed[] embeds, MessageFlags flags)
+            MessageComponent components, ISticker[] stickers, Embed[] embeds, MessageFlags flags, PollProperties poll)
             => await SendFileAsync(stream, filename, text, isTTS, embed, options, isSpoiler, allowedMentions, messageReference,
-                components, stickers, embeds, flags).ConfigureAwait(false);
+                components, stickers, embeds, flags, poll).ConfigureAwait(false);
 
         /// <inheritdoc />
         async Task<IUserMessage> IMessageChannel.SendFileAsync(FileAttachment attachment, string text, bool isTTS,
             Embed embed, RequestOptions options, AllowedMentions allowedMentions, MessageReference messageReference,
-            MessageComponent components, ISticker[] stickers, Embed[] embeds, MessageFlags flags)
+            MessageComponent components, ISticker[] stickers, Embed[] embeds, MessageFlags flags, PollProperties poll)
             => await SendFileAsync(attachment, text, isTTS, embed, options, allowedMentions, messageReference, components,
-                stickers, embeds, flags).ConfigureAwait(false);
+                stickers, embeds, flags, poll).ConfigureAwait(false);
 
         /// <inheritdoc />
         async Task<IUserMessage> IMessageChannel.SendFilesAsync(IEnumerable<FileAttachment> attachments, string text,
             bool isTTS, Embed embed, RequestOptions options, AllowedMentions allowedMentions, MessageReference messageReference,
-            MessageComponent components, ISticker[] stickers, Embed[] embeds, MessageFlags flags)
-           => await SendFilesAsync(attachments, text, isTTS, embed, options, allowedMentions, messageReference, components, stickers, embeds, flags).ConfigureAwait(false);
+            MessageComponent components, ISticker[] stickers, Embed[] embeds, MessageFlags flags, PollProperties poll)
+           => await SendFilesAsync(attachments, text, isTTS, embed, options, allowedMentions, messageReference, components, stickers, embeds, flags, poll).ConfigureAwait(false);
 
         /// <inheritdoc />
         async Task<IUserMessage> IMessageChannel.SendMessageAsync(string text, bool isTTS, Embed embed, RequestOptions options,
             AllowedMentions allowedMentions, MessageReference messageReference, MessageComponent components,
-            ISticker[] stickers, Embed[] embeds, MessageFlags flags)
-            => await SendMessageAsync(text, isTTS, embed, options, allowedMentions, messageReference, components, stickers, embeds, flags).ConfigureAwait(false);
+            ISticker[] stickers, Embed[] embeds, MessageFlags flags, PollProperties poll)
+            => await SendMessageAsync(text, isTTS, embed, options, allowedMentions, messageReference, components, stickers, embeds, flags, poll).ConfigureAwait(false);
 
         #endregion
 

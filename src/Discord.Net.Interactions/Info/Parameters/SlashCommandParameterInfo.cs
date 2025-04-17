@@ -49,7 +49,7 @@ namespace Discord.Interactions
         public int? MaxLength { get; }
 
         /// <summary>
-        ///     Gets the <see cref="TypeConverter{T}"/> that will be used to convert the incoming <see cref="Discord.WebSocket.SocketSlashCommandDataOption"/> into
+        ///     Gets the <see cref="TypeConverter{T}"/> that will be used to convert the incoming <see cref="Discord.IDiscordInteractionData"/> into
         ///     <see cref="CommandParameterInfo.ParameterType"/>.
         /// </summary>
         public TypeConverter TypeConverter { get; }

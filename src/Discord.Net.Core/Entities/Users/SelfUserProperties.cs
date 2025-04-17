@@ -14,5 +14,10 @@ namespace Discord
         ///     Gets or sets the avatar.
         /// </summary>
         public Optional<Image?> Avatar { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the banner.
+        /// </summary>
+        public Optional<Image?> Banner { get; set; }
     }
 }

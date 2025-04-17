@@ -16,11 +16,16 @@ namespace Discord.API
         public Optional<string> Avatar { get; set; }
         [JsonProperty("banner")]
         public Optional<string> Banner { get; set; }
+        [JsonProperty("banner_color")]
+        public Optional<Color?> BannerColor { get; set; }
         [JsonProperty("accent_color")]
         public Optional<uint?> AccentColor { get; set; }
 
         [JsonProperty("global_name")]
         public Optional<string> GlobalName { get; set; }
+
+        [JsonProperty("avatar_decoration_data")]
+        public Optional<AvatarDecorationData> AvatarDecoration { get; set; }
 
         //CurrentUser
         [JsonProperty("verified")]

@@ -8,23 +8,23 @@ namespace Discord.Rest;
 /// </summary>
 public class AutoModFlaggedMessageAuditLogData : IAuditLogData
 {
-    internal AutoModFlaggedMessageAuditLogData(ulong channelId, string autoModRuleName, AutoModTriggerType autoModRuleTriggerType)
+    internal AutoModFlaggedMessageAuditLogData(ulong? channelId, string autoModRuleName, AutoModTriggerType autoModRuleTriggerType)
     {
-        ChannelId = channelId;
+        ChannelId = channelId ?? 0;
         AutoModRuleName = autoModRuleName;
         AutoModRuleTriggerType = autoModRuleTriggerType;
     }
 
     internal static AutoModFlaggedMessageAuditLogData Create(BaseDiscordClient discord, EntryModel entry, Model log)
     {
-        return new(entry.Options.ChannelId!.Value, entry.Options.AutoModRuleName,
+        return new(entry.Options.ChannelId, entry.Options.AutoModRuleName,
             entry.Options.AutoModRuleTriggerType!.Value);
     }
 
     /// <summary>
-    ///     Gets the channel the message was sent in.
+    ///     Gets the channel the message was sent in. Will be 0 if a user profile was flagged.
     /// </summary>
-    public ulong ChannelId { get; set; }
+    public ulong? ChannelId { get; set; }
 
     /// <summary>
     ///     Gets the name of the auto moderation rule that got triggered.

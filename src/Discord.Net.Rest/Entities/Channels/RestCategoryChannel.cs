@@ -13,13 +13,13 @@ namespace Discord.Rest
     public class RestCategoryChannel : RestGuildChannel, ICategoryChannel
     {
         #region RestCategoryChannel
-        internal RestCategoryChannel(BaseDiscordClient discord, IGuild guild, ulong id)
-            : base(discord, guild, id)
+        internal RestCategoryChannel(BaseDiscordClient discord, IGuild guild, ulong id, ulong guildId)
+            : base(discord, guild, id, guildId)
         {
         }
         internal new static RestCategoryChannel Create(BaseDiscordClient discord, IGuild guild, Model model)
         {
-            var entity = new RestCategoryChannel(discord, guild, model.Id);
+            var entity = new RestCategoryChannel(discord, guild, model.Id, guild?.Id ?? model.GuildId.Value);
             entity.Update(model);
             return entity;
         }

@@ -28,12 +28,12 @@ namespace Discord.Interactions
         }
 
         /// <inheritdoc/>
-        public override async Task<IResult> ExecuteAsync(IInteractionContext context, IServiceProvider services)
+        public override Task<IResult> ExecuteAsync(IInteractionContext context, IServiceProvider services)
         {
             if (context.Interaction is not IModalInteraction modalInteraction)
-                return ExecuteResult.FromError(InteractionCommandError.ParseFailed, $"Provided {nameof(IInteractionContext)} doesn't belong to a Modal Interaction.");
+                return Task.FromResult((IResult)ExecuteResult.FromError(InteractionCommandError.ParseFailed, $"Provided {nameof(IInteractionContext)} doesn't belong to a Modal Interaction."));
 
-            return await base.ExecuteAsync(context, services).ConfigureAwait(false);
+            return base.ExecuteAsync(context, services);
         }
 
         protected override async Task<IResult> ParseArgumentsAsync(IInteractionContext context, IServiceProvider services)

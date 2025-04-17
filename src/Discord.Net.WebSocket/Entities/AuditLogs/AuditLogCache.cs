@@ -18,8 +18,13 @@ internal class AuditLogCache
     public AuditLogCache(DiscordSocketClient client)
     {
         _size = client.AuditLogCacheSize;
+        var dictSize = _size;
+        if (dictSize * 1.05 > int.MaxValue)
+            dictSize = int.MaxValue;
+        else
+            dictSize = (int)(dictSize * 1.05);
 
-        _entries = new ConcurrentDictionary<ulong, SocketAuditLogEntry>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(_size * 1.05));
+        _entries = new ConcurrentDictionary<ulong, SocketAuditLogEntry>(ConcurrentHashSet.DefaultConcurrencyLevel, dictSize);
         _orderedEntries = new ConcurrentQueue<ulong>();
     }
 

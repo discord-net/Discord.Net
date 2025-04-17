@@ -26,6 +26,9 @@ from; typically the same directory as your csproj).
 
 ## Joining a Channel
 
+>[!NOTE]
+>`GatewayIntents.GuildVoiceStates` and `GatewayIntents.Guilds` intents are required to connect to a voice channel
+
 Joining a channel is the first step to sending audio, and will return
 an [IAudioClient] to send data with.
 

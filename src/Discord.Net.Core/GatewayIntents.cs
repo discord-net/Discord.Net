@@ -60,13 +60,23 @@ namespace Discord
         AutoModerationActionExecution = 1 << 21,
 
         /// <summary>
+        ///     This intent includes MESSAGE_POLL_VOTE_ADD and MESSAGE_POLL_VOTE_REMOVE
+        /// </summary>
+        GuildMessagePolls = 1 << 24,
+
+        /// <summary>
+        ///     This intent includes MESSAGE_POLL_VOTE_ADD and MESSAGE_POLL_VOTE_REMOVE
+        /// </summary>
+        DirectMessagePolls = 1 << 25,
+
+        /// <summary>
         ///     This intent includes all but <see cref="GuildMembers"/>, <see cref="GuildPresences"/> and <see cref="MessageContent"/>
         ///     which are privileged and must be enabled in the Developer Portal.
         /// </summary>
         AllUnprivileged = Guilds | GuildBans | GuildEmojis | GuildIntegrations | GuildWebhooks | GuildInvites |
             GuildVoiceStates | GuildMessages | GuildMessageReactions | GuildMessageTyping | DirectMessages |
             DirectMessageReactions | DirectMessageTyping | GuildScheduledEvents | AutoModerationConfiguration |
-            AutoModerationActionExecution,
+            AutoModerationActionExecution | GuildMessagePolls | DirectMessagePolls,
         /// <summary>
         ///     This intent includes all of them, including privileged ones.
         /// </summary>

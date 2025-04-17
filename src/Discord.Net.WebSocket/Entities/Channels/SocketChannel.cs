@@ -14,6 +14,9 @@ namespace Discord.WebSocket
     public abstract class SocketChannel : SocketEntity<ulong>, IChannel
     {
         #region SocketChannel
+        /// <inheritdoc />
+        public ChannelType ChannelType { get; internal set; }
+
         /// <summary>
         ///     Gets when the channel is created.
         /// </summary>
@@ -38,7 +41,11 @@ namespace Discord.WebSocket
                 _ => throw new InvalidOperationException($"Unexpected channel type: {model.Type}"),
             };
         }
-        internal abstract void Update(ClientState state, Model model);
+
+        internal virtual void Update(ClientState state, Model model)
+        {
+            ChannelType = model.Type;
+        }
         #endregion
 
         #region User

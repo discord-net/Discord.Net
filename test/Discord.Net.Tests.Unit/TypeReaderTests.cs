@@ -1,7 +1,6 @@
 using Discord.Commands;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -137,6 +136,6 @@ namespace Discord
     public sealed class TestModule : ModuleBase
     {
         [Command("test")]
-        public Task TestCommand(ArgumentType arg) => Task.Delay(0);
+        public Task TestCommand(ArgumentType arg) => Task.CompletedTask;
     }
 }

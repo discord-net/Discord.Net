@@ -4,6 +4,7 @@ using System;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Discord.Interactions
 {
@@ -26,14 +27,14 @@ namespace Discord.Interactions
         }
 
         /// <inheritdoc/>
-        public async Task<IResult> ExecuteAsync(IInteractionContext context, IAutocompleteInteraction autocompleteInteraction, IParameterInfo parameter,
+        public Task<IResult> ExecuteAsync(IInteractionContext context, IAutocompleteInteraction autocompleteInteraction, IParameterInfo parameter,
             IServiceProvider services)
         {
             switch (InteractionService._runMode)
             {
                 case RunMode.Sync:
                     {
-                        return await ExecuteInternalAsync(context, autocompleteInteraction, parameter, services).ConfigureAwait(false);
+                        return ExecuteInternalAsync(context, autocompleteInteraction, parameter, services);
                     }
                 case RunMode.Async:
                     _ = Task.Run(async () =>
@@ -44,8 +45,8 @@ namespace Discord.Interactions
                 default:
                     throw new InvalidOperationException($"RunMode {InteractionService._runMode} is not supported.");
             }
-
-            return ExecuteResult.FromSuccess();
+            
+            return Task.FromResult((IResult)ExecuteResult.FromSuccess());
         }
 
         private async Task<IResult> ExecuteInternalAsync(IInteractionContext context, IAutocompleteInteraction autocompleteInteraction, IParameterInfo parameter,
@@ -53,24 +54,32 @@ namespace Discord.Interactions
         {
             try
             {
+                await using var scope = InteractionService._autoServiceScopes
+                    ? services?.CreateAsyncScope()
+                    : null;
+
+                services = (InteractionService._autoServiceScopes
+                    ? scope?.ServiceProvider
+                    : services) ?? EmptyServiceProvider.Instance;
+
                 var result = await GenerateSuggestionsAsync(context, autocompleteInteraction, parameter, services).ConfigureAwait(false);
 
                 if (result.IsSuccess)
-                    switch (autocompleteInteraction)
+                {
+                    var task = autocompleteInteraction.RespondAsync(result.Suggestions);
+
+                    await task;
+
+                    if (task is Task<string> strTask)
                     {
-                        case RestAutocompleteInteraction restAutocomplete:
-                            var payload = restAutocomplete.Respond(result.Suggestions);
+                        var payload = strTask.Result;
 
-                            if (context is IRestInteractionContext restContext && restContext.InteractionResponseCallback != null)
-                                await restContext.InteractionResponseCallback.Invoke(payload).ConfigureAwait(false);
-                            else
-                                await InteractionService._restResponseCallback(context, payload).ConfigureAwait(false);
-                            break;
-                        case SocketAutocompleteInteraction socketAutocomplete:
-                            await socketAutocomplete.RespondAsync(result.Suggestions).ConfigureAwait(false);
-                            break;
+                        if (context is IRestInteractionContext {InteractionResponseCallback: not null} restContext)
+                            await restContext.InteractionResponseCallback.Invoke(payload).ConfigureAwait(false);
+                        else
+                            await InteractionService._restResponseCallback(context, payload).ConfigureAwait(false);
                     }
-
+                }
                 await InteractionService._autocompleteHandlerExecutedEvent.InvokeAsync(this, context, result).ConfigureAwait(false);
                 return result;
             }

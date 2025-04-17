@@ -24,7 +24,7 @@ namespace Discord.Net.Rest
         private CancellationToken _cancelToken;
         private bool _isDisposed;
 
-        public DefaultRestClient(string baseUrl, bool useProxy = false)
+        public DefaultRestClient(string baseUrl, bool useProxy = false, IWebProxy webProxy = null)
         {
             _baseUrl = baseUrl;
 
@@ -34,6 +34,7 @@ namespace Discord.Net.Rest
                 AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
                 UseCookies = false,
                 UseProxy = useProxy,
+                Proxy = webProxy
             });
 #pragma warning restore IDISP014
             SetHeader("accept-encoding", "gzip, deflate");
@@ -97,7 +98,7 @@ namespace Discord.Net.Rest
         }
 
         /// <exception cref="InvalidOperationException">Unsupported param type.</exception>
-        public async Task<RestResponse> SendAsync(string method, string endpoint, IReadOnlyDictionary<string, object> multipartParams, CancellationToken cancelToken, bool headerOnly, string reason = null,
+        public Task<RestResponse> SendAsync(string method, string endpoint, IReadOnlyDictionary<string, object> multipartParams, CancellationToken cancelToken, bool headerOnly, string reason = null,
             IEnumerable<KeyValuePair<string, IEnumerable<string>>> requestHeaders = null)
         {
             string uri = Path.Combine(_baseUrl, endpoint);
@@ -162,7 +163,7 @@ namespace Discord.Net.Rest
             }
 
             restRequest.Content = content;
-            return await SendInternalAsync(restRequest, cancelToken, headerOnly).ConfigureAwait(false);
+            return SendInternalAsync(restRequest, cancelToken, headerOnly);
         }
 
         private async Task<RestResponse> SendInternalAsync(HttpRequestMessage request, CancellationToken cancelToken, bool headerOnly)

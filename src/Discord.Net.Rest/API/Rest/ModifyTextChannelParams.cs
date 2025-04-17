@@ -16,5 +16,8 @@ namespace Discord.API.Rest
 
         [JsonProperty("default_thread_rate_limit_per_user")]
         public Optional<int> DefaultSlowModeInterval { get; set; }
+
+        [JsonProperty("type")]
+        public Optional<ChannelType> Type { get; set; }
     }
 }

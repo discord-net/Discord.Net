@@ -29,9 +29,7 @@ namespace Discord.Net.Queue
             Promise = new TaskCompletionSource<Stream>();
         }
 
-        public virtual async Task<RestResponse> SendAsync()
-        {
-            return await Client.SendAsync(Method, Endpoint, Options.CancelToken, Options.HeaderOnly, Options.AuditLogReason, Options.RequestHeaders).ConfigureAwait(false);
-        }
+        public virtual Task<RestResponse> SendAsync()
+            => Client.SendAsync(Method, Endpoint, Options.CancelToken, Options.HeaderOnly, Options.AuditLogReason, Options.RequestHeaders);
     }
 }

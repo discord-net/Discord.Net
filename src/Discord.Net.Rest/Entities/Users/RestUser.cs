@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Globalization;
 using System.Threading.Tasks;
+
 using EventUserModel = Discord.API.GuildScheduledEventUser;
 using Model = Discord.API.User;
 
@@ -24,8 +25,23 @@ namespace Discord.Rest
         public ushort DiscriminatorValue { get; private set; }
         /// <inheritdoc />
         public string AvatarId { get; private set; }
-        /// <inheritdoc />
+
+        /// <summary>
+        ///     Gets the hash of the banner.
+        /// </summary>
+        /// <remarks>
+        ///     <see langword="null"/> if the user has no banner set.
+        /// </remarks>
         public string BannerId { get; private set; }
+
+        /// <summary>
+        ///     Gets the color of the banner.
+        /// </summary>
+        /// <remarks>
+        ///     <see langword="null"/> if the user has no banner set.
+        /// </remarks>
+        public Color? BannerColor { get; private set; }
+
         /// <inheritdoc />
         public Color? AccentColor { get; private set; }
         /// <inheritdoc />
@@ -49,6 +65,13 @@ namespace Discord.Rest
         public virtual IReadOnlyCollection<IActivity> Activities => ImmutableList<IActivity>.Empty;
         /// <inheritdoc />
         public virtual bool IsWebhook => false;
+
+        /// <inheritdoc />
+        public string AvatarDecorationHash { get; private set; }
+
+        /// <inheritdoc />
+        public ulong? AvatarDecorationSkuId { get; private set; }
+
 
         internal RestUser(BaseDiscordClient discord, ulong id)
             : base(discord, id)
@@ -84,6 +107,8 @@ namespace Discord.Rest
                 AvatarId = model.Avatar.Value;
             if (model.Banner.IsSpecified)
                 BannerId = model.Banner.Value;
+            if (model.BannerColor.IsSpecified)
+                BannerColor = model.BannerColor.Value;
             if (model.AccentColor.IsSpecified)
                 AccentColor = model.AccentColor.Value;
             if (model.Discriminator.IsSpecified)
@@ -96,6 +121,11 @@ namespace Discord.Rest
                 PublicFlags = model.PublicFlags.Value;
             if (model.GlobalName.IsSpecified)
                 GlobalName = model.GlobalName.Value;
+            if (model.AvatarDecoration is { IsSpecified: true, Value: not null })
+            {
+                AvatarDecorationHash = model.AvatarDecoration.Value?.Asset;
+                AvatarDecorationSkuId = model.AvatarDecoration.Value?.SkuId;
+            }
         }
 
         /// <inheritdoc />
@@ -128,6 +158,15 @@ namespace Discord.Rest
             => DiscriminatorValue != 0
                 ? CDN.GetDefaultUserAvatarUrl(DiscriminatorValue)
                 : CDN.GetDefaultUserAvatarUrl(Id);
+
+        public virtual string GetDisplayAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
+            => GetAvatarUrl(format, size) ?? GetDefaultAvatarUrl(); 
+            
+        /// <inheritdoc />
+        public string GetAvatarDecorationUrl()
+            => AvatarDecorationHash is not null
+                ? CDN.GetAvatarDecorationUrl(AvatarDecorationHash)
+                : null;
 
         /// <summary>
         ///     Gets the Username#Discriminator of the user.

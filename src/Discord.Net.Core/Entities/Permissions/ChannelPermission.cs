@@ -179,8 +179,33 @@ namespace Discord
         CreateEvents = 1L << 44,
 
         /// <summary>
+        ///     Allows the usage of custom soundboard sounds from other servers.
+        /// </summary>
+        UseExternalSounds = 1L << 45,
+
+        /// <summary>
         ///     Allows sending voice messages.
         /// </summary>
         SendVoiceMessages = 1L << 46,
+
+        /// <summary>
+        ///     Allows members to interact with the Clyde AI bot.
+        /// </summary>
+        UseClydeAI = 1L << 47,
+        
+        /// <summary>
+        ///     Allows setting voice channel status.
+        /// </summary>
+        SetVoiceChannelStatus = 1L << 48,
+
+        /// <summary>
+        ///     Allows sending polls.
+        /// </summary>
+        SendPolls = 1L << 49,
+
+        /// <summary>
+        ///     Allows user-installed apps to send public responses.
+        /// </summary>
+        UseExternalApps = 1L << 50,
     }
 }

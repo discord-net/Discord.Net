@@ -1,15 +1,7 @@
 public class Program
 {
-    private readonly IServiceProvider _serviceProvider;
-
-    public Program()
-    {
-        _serviceProvider = CreateProvider();
-    }
-
-    static void Main(string[] args)
-        => new Program().RunAsync(args).GetAwaiter().GetResult();
-
+    private static IServiceProvider _serviceProvider;
+    
     static IServiceProvider CreateProvider()
     {
         var collection = new ServiceCollection();
@@ -17,8 +9,8 @@ public class Program
         return collection.BuildServiceProvider();
     }
 
-    async Task RunAsync(string[] args)
+    static async Task Main(string[] args)
     {
-        //...
+        _serviceProvider = CreateProvider();
     }
 }

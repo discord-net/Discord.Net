@@ -44,6 +44,7 @@ namespace Discord
         /// <summary>
         ///     Gets or sets whether or not this command can be used in DMs.
         /// </summary>
+        [Obsolete("This property will be deprecated soon. Configure with ContextTypes instead.")]
         public bool IsDMEnabled { get; set; } = true;
 
         /// <summary>
@@ -55,6 +56,16 @@ namespace Discord
         ///     Gets or sets the default permission required to use this slash command.
         /// </summary>
         public GuildPermission? DefaultMemberPermissions { get; set; }
+
+        /// <summary>
+        ///     Gets the installation method for this command. <see langword="null"/> if not set.
+        /// </summary>
+        public HashSet<ApplicationIntegrationType> IntegrationTypes { get; set; }
+
+        /// <summary>
+        ///     Gets the context types this command can be executed in. <see langword="null"/> if not set.
+        /// </summary>
+        public HashSet<InteractionContextType> ContextTypes { get; set; }
 
         private string _name;
         private Dictionary<string, string> _nameLocalizations;
@@ -69,10 +80,14 @@ namespace Discord
             {
                 Name = Name,
                 IsDefaultPermission = IsDefaultPermission,
+#pragma warning disable CS0618 // Type or member is obsolete
                 IsDMEnabled = IsDMEnabled,
+#pragma warning restore CS0618 // Type or member is obsolete
                 DefaultMemberPermissions = DefaultMemberPermissions ?? Optional<GuildPermission>.Unspecified,
                 NameLocalizations = NameLocalizations,
                 IsNsfw = IsNsfw,
+                ContextTypes = ContextTypes,
+                IntegrationTypes = IntegrationTypes
             };
 
             return props;
@@ -131,6 +146,7 @@ namespace Discord
         /// </summary>
         /// <param name="permission"><see langword="true"/> if the command is available in dms, otherwise <see langword="false"/>.</param>
         /// <returns>The current builder.</returns>
+        [Obsolete("This method will be deprecated soon. Configure with WithContextTypes instead.")]
         public UserCommandBuilder WithDMPermission(bool permission)
         {
             IsDMEnabled = permission;
@@ -183,6 +199,32 @@ namespace Discord
         public UserCommandBuilder WithDefaultMemberPermissions(GuildPermission? permissions)
         {
             DefaultMemberPermissions = permissions;
+            return this;
+        }
+
+        /// <summary>
+        ///     Sets the installation method for this command.
+        /// </summary>
+        /// <param name="integrationTypes">Installation types for this command.</param>
+        /// <returns>The builder instance.</returns>
+        public UserCommandBuilder WithIntegrationTypes(params ApplicationIntegrationType[] integrationTypes)
+        {
+            IntegrationTypes = integrationTypes is not null
+                ? new HashSet<ApplicationIntegrationType>(integrationTypes)
+                : null;
+            return this;
+        }
+
+        /// <summary>
+        ///     Sets context types this command can be executed in.
+        /// </summary>
+        /// <param name="contextTypes">Context types the command can be executed in.</param>
+        /// <returns>The builder instance.</returns>
+        public UserCommandBuilder WithContextTypes(params InteractionContextType[] contextTypes)
+        {
+            ContextTypes = contextTypes is not null
+                ? new HashSet<InteractionContextType>(contextTypes)
+                : null;
             return this;
         }
     }

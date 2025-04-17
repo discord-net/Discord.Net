@@ -3,10 +3,8 @@ using Discord.WebSocket;
 
 public class Program
 {
-	private DiscordSocketClient _client;
-	static void Main(string[] args) => new Program().MainAsync().GetAwaiter().GetResult();
-	
-	public async Task MainAsync()
+	private static DiscordSocketClient _client;	
+	public static async Task MainAsync()
 	{
 		// When working with events that have Cacheable<IMessage, ulong> parameters,
 		// you must enable the message cache in your config settings if you plan to
@@ -27,7 +25,7 @@ public class Program
 		await Task.Delay(-1);
 	}
 
-	private async Task MessageUpdated(Cacheable<IMessage, ulong> before, SocketMessage after, ISocketMessageChannel channel)
+	private static async Task MessageUpdated(Cacheable<IMessage, ulong> before, SocketMessage after, ISocketMessageChannel channel)
 	{
 		// If the message was not in the cache, downloading it will result in getting a copy of `after`.
 		var message = await before.GetOrDownloadAsync();

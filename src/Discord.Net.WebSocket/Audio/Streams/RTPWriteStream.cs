@@ -38,7 +38,7 @@ namespace Discord.Audio.Streams
             _nextSeq = seq;
             _nextTimestamp = timestamp;
         }
-        public override async Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancelToken)
+        public override Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancelToken)
         {
             cancelToken.ThrowIfCancellationRequested();
             if (!_hasHeader)
@@ -58,17 +58,14 @@ namespace Discord.Audio.Streams
             Buffer.BlockCopy(buffer, offset, _buffer, 12, count);
 
             _next.WriteHeader(_nextSeq, _nextTimestamp, false);
-            await _next.WriteAsync(_buffer, 0, count + 12).ConfigureAwait(false);
+            return _next.WriteAsync(_buffer, 0, count + 12);
         }
 
-        public override async Task FlushAsync(CancellationToken cancelToken)
-        {
-            await _next.FlushAsync(cancelToken).ConfigureAwait(false);
-        }
-        public override async Task ClearAsync(CancellationToken cancelToken)
-        {
-            await _next.ClearAsync(cancelToken).ConfigureAwait(false);
-        }
+        public override Task FlushAsync(CancellationToken cancelToken)
+            => _next.FlushAsync(cancelToken);
+
+        public override  Task ClearAsync(CancellationToken cancelToken)
+            => _next.ClearAsync(cancelToken);
 
         protected override void Dispose(bool disposing)
         {

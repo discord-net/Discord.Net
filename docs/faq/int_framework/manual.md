@@ -1,9 +1,9 @@
 ---
 uid: FAQ.Interactions.Manual
-title: Manual handling
+title: Manual Handling
 ---
 
-# Manually handing interactions.
+# Manually Handling Interactions
 
 This section talks about the manual building and responding to interactions.
 If you are using the interaction framework (highly recommended) this section does not apply to you.

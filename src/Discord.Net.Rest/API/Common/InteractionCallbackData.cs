@@ -1,3 +1,4 @@
+using Discord.API.Rest;
 using Newtonsoft.Json;
 
 namespace Discord.API
@@ -30,5 +31,8 @@ namespace Discord.API
 
         [JsonProperty("custom_id")]
         public Optional<string> CustomId { get; set; }
+
+        [JsonProperty("poll")]
+        public Optional<CreatePollParams> Poll { get; set; }
     }
 }

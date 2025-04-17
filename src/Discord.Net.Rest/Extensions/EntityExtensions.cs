@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -13,14 +14,23 @@ namespace Discord.Rest
             return new Emoji(model.Name);
         }
 
+        public static Emote ToEmote(this API.Emoji model, BaseDiscordClient discord = null)
+            => new(model.Id.GetValueOrDefault(),
+                model.Name,
+                model.Animated.GetValueOrDefault(false),
+                model.User.IsSpecified ?
+                    RestUser.Create(discord, model.User.Value)
+                    : null);
+
         public static GuildEmote ToEntity(this API.Emoji model)
             => new GuildEmote(model.Id.Value,
                 model.Name,
-                model.Animated.GetValueOrDefault(),
-                model.Managed,
-                model.RequireColons,
-                ImmutableArray.Create(model.Roles),
-                model.User.IsSpecified ? model.User.Value.Id : (ulong?)null);
+                model.Animated.GetValueOrDefault(false),
+                model.Managed.GetValueOrDefault(false),
+                model.RequireColons.GetValueOrDefault(false),
+                model.Roles.GetValueOrDefault([]).ToImmutableArray(),
+                model.User.IsSpecified ? model.User.Value.Id : null,
+                model.IsAvailable.ToNullable());
 
         public static Embed ToEntity(this API.Embed model)
         {
@@ -37,9 +47,12 @@ namespace Discord.Rest
         public static RoleTags ToEntity(this API.RoleTags model)
         {
             return new RoleTags(
-                model.BotId.IsSpecified ? model.BotId.Value : null,
-                model.IntegrationId.IsSpecified ? model.IntegrationId.Value : null,
-                model.IsPremiumSubscriber.IsSpecified);
+                model.BotId.ToNullable(),
+                model.IntegrationId.ToNullable(),
+                model.IsPremiumSubscriber.IsSpecified,
+                model.SubscriptionListingId.ToNullable(),
+                model.IsAvailableForPurchase.IsSpecified,
+                model.GuildConnections.IsSpecified);
         }
         public static API.Embed ToModel(this Embed entity)
         {
@@ -89,7 +102,8 @@ namespace Discord.Rest
                 ChannelId = entity.InternalChannelId,
                 GuildId = entity.GuildId,
                 MessageId = entity.MessageId,
-                FailIfNotExists = entity.FailIfNotExists
+                FailIfNotExists = entity.FailIfNotExists,
+                Type = entity.ReferenceType,
             };
         }
         public static IEnumerable<string> EnumerateMentionTypes(this AllowedMentionTypes mentionTypes)
@@ -185,7 +199,7 @@ namespace Discord.Rest
                     Content = (data.Content.IsSpecified && data.Content.Value == null) ? Optional<string>.Unspecified : data.Content,
                     Embeds = data.Embeds,
                     AllowedMentions = data.AllowedMentions,
-                    Components = data.Components,
+                    Components = data.Components.GetValueOrDefault(Array.Empty<API.ActionRowComponent>()),
                     Flags = data.Flags,
                 };
 
@@ -217,5 +231,34 @@ namespace Discord.Rest
                 Id = interaction.Id,
             };
         }
+
+        public static GuildScheduledEventRecurrenceRule ToEntity(this API.GuildScheduledEventRecurrenceRule rule)
+            => new(
+                rule.StartAt,
+                rule.EndAt,
+                rule.Frequency,
+                rule.Interval,
+                rule.ByWeekday?.ToReadOnlyCollection() ?? ImmutableArray<RecurrenceRuleWeekday>.Empty,
+                rule.ByNWeekday?.Select(x => new RecurrenceRuleByNWeekday(x.WeekNumber, x.Day)).ToImmutableArray() ?? ImmutableArray<RecurrenceRuleByNWeekday>.Empty,
+                rule.ByMonth?.ToReadOnlyCollection() ?? ImmutableArray<RecurrenceRuleMonth>.Empty,
+                rule.ByMonthDay?.ToReadOnlyCollection() ?? ImmutableArray<int>.Empty,
+                rule.ByYearDay?.ToReadOnlyCollection() ?? ImmutableArray<int>.Empty,
+                rule.Count);
+
+        public static API.GuildScheduledEventRecurrenceRule ToModel(this GuildScheduledEventRecurrenceRuleProperties rule)
+            => new()
+            {
+                Frequency = rule.Frequency,
+                ByMonthDay = rule.ByMonthDay?.ToArray(),
+                ByNWeekday = rule.ByNWeekday?.Select(x => new API.GuildScheduledEventRecurrenceRuleByNWeekday
+                {
+                    Day = x.Day,
+                    WeekNumber = x.Week
+                }).ToArray(),
+                ByWeekday = rule.ByWeekday?.ToArray(),
+                ByMonth = rule.ByMonth?.ToArray(),
+                Interval = rule.Interval,
+                StartAt = rule.StartsAt
+            };
     }
 }

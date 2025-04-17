@@ -1,9 +1,5 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Discord
 {
@@ -26,6 +22,21 @@ namespace Discord
         /// </summary>
         public bool IsSpoiler { get; set; }
 
+        /// <summary>
+        ///     Gets or sets if this file should be a thumbnail for a media channel post.
+        /// </summary>
+        public bool IsThumbnail { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the duration of a voice message. <see langword="null"/> if the attachment is not a voice message.
+        /// </summary>
+        public double? DurationSeconds { get; set; }
+
+        /// <summary>
+        ///     Gets or sets bytearray representing a sampled waveform. <see langword="null"/> if the attachment is not a voice message.
+        /// </summary>
+        public byte[] Waveform { get; set; } 
+
 #pragma warning disable IDISP008
         /// <summary>
         ///     Gets the stream containing the file content.
@@ -42,18 +53,22 @@ namespace Discord
         /// <param name="fileName">The name of the attachment.</param>
         /// <param name="description">The description of the attachment.</param>
         /// <param name="isSpoiler">Whether or not the attachment is a spoiler.</param>
-        public FileAttachment(Stream stream, string fileName, string description = null, bool isSpoiler = false)
+        /// <param name="isThumbnail">Whether or not this attachment should be a thumbnail for a media channel post.</param>
+        public FileAttachment(Stream stream, string fileName, string description = null, bool isSpoiler = false, bool isThumbnail = false, double? durationSeconds = null, byte[] waveform = null)
         {
             _isDisposed = false;
             FileName = fileName;
             Description = description;
             Stream = stream;
+            IsThumbnail = isThumbnail;
             try
             {
                 Stream.Position = 0;
             }
             catch { }
             IsSpoiler = isSpoiler;
+            DurationSeconds = durationSeconds;
+            Waveform = waveform;
         }
 
         /// <summary>
@@ -67,6 +82,7 @@ namespace Discord
         /// <param name="fileName">The name of the attachment.</param>
         /// <param name="description">The description of the attachment.</param>
         /// <param name="isSpoiler">Whether or not the attachment is a spoiler.</param>
+        /// <param name="isThumbnail">Whether or not this attachment should be a thumbnail for a media channel post.</param>
         /// <exception cref="System.ArgumentException">
         /// <paramref name="path" /> is a zero-length string, contains only white space, or contains one or more invalid
         /// characters as defined by <see cref="Path.GetInvalidPathChars"/>.
@@ -87,13 +103,16 @@ namespace Discord
         /// <exception cref="FileNotFoundException">The file specified in <paramref name="path" /> was not found.
         /// </exception>
         /// <exception cref="IOException">An I/O error occurred while opening the file. </exception>
-        public FileAttachment(string path, string fileName = null, string description = null, bool isSpoiler = false)
+        public FileAttachment(string path, string fileName = null, string description = null, bool isSpoiler = false, bool isThumbnail = false, double? durationSeconds = null, byte[] waveform = null)
         {
             _isDisposed = false;
             Stream = File.OpenRead(path);
             FileName = fileName ?? Path.GetFileName(path);
             Description = description;
             IsSpoiler = isSpoiler;
+            IsThumbnail = isThumbnail;
+            DurationSeconds = durationSeconds;
+            Waveform = waveform;
         }
 
         public void Dispose()

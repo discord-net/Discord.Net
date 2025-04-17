@@ -7,6 +7,7 @@ namespace Discord
 {
     internal sealed class MockedCategoryChannel : ICategoryChannel
     {
+        public ChannelType ChannelType => ChannelType.Category;
         public int Position => throw new NotImplementedException();
 
         public IGuild Guild => throw new NotImplementedException();

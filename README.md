@@ -1,27 +1,43 @@
-<p align="center">
-  <a href="https://discordnet.dev/" title="Click to visit the documentation!">
-    <img src="https://raw.githubusercontent.com/discord-net/Discord.Net/dev/docs/marketing/logo/SVG/Combinationmark%20White%20Border.svg" alt="Logo">
-  </a>
-    <br />
-    <br />
+<div align="center">
+
+  ![Discord.NET Logo](/docs/marketing/logo/SVG/Combinationmark.svg#gh-light-mode-only)
+  ![Discord.NET Logo](/docs/marketing/logo/SVG/Combinationmark%20White.svg#gh-dark-mode-only)
+
+  <br/>
+  
   <a href="https://www.nuget.org/packages/Discord.Net/">
     <img src="https://img.shields.io/nuget/vpre/Discord.Net.svg?maxAge=2592000?style=plastic" alt="NuGet">
   </a>
   <a href="https://www.myget.org/feed/Packages/discord-net">
     <img src="https://img.shields.io/myget/discord-net/vpre/Discord.Net.svg" alt="MyGet">
   </a>
-  <a href="https://dev.azure.com/discord-net/Discord.Net/_build/latest?definitionId=1&branchName=dev">
-    <img src="https://dev.azure.com/discord-net/Discord.Net/_apis/build/status/discord-net.Discord.Net?branchName=dev" alt="Build Status">
+  <a href="https://github.com/discord-net/Discord.Net/actions/workflows/docs.yml">
+    <img src="https://github.com/discord-net/Discord.Net/actions/workflows/docs.yml/badge.svg" alt="Docs Build Status">
+  </a>
+  <a href="https://github.com/discord-net/Discord.Net/actions/workflows/dotnet.yml">
+    <img src="https://github.com/discord-net/Discord.Net/actions/workflows/dotnet.yml/badge.svg" alt="Dotnet Build Status">
   </a>
   <a href="https://discord.gg/dnet">
-    <img src="https://discord.com/api/guilds/848176216011046962/widget.png" alt="Discord">
+    <img src="https://img.shields.io/discord/848176216011046962?logo=discord&logoColor=white&label=discord&color=%235865F2" alt="Discord">
   </a>
-</p>
-Discord.Net is an unofficial .NET API Wrapper for the Discord client (https://discord.com).
+
+  #
+  
+</div>
+Discord.Net is an unofficial .NET API Wrapper for the Discord API (https://discord.com).
 
 ## 📄 Documentation
 
-- https://discordnet.dev
+Documentation can be found at https://docs.discordnet.dev/index.html
+
+## 🩷 Supporting Discord.Net
+
+Discord.Net is an MIT-licensed open source project with its development made possible entirely by volunteers. 
+If you'd like to support our efforts financially, please consider:
+
+- [Open Collective](https://opencollective.com/discordnet)
+- [GitHub Sponsors](https://github.com/sponsors/quinchs)
+- [PayPal](https://paypal.me/quinchs)
 
 ## 📥 Installation
 
@@ -47,10 +63,15 @@ The individual components may also be installed from NuGet:
 - _The API core. Implements only entities and barebones functionality._
   - [Discord.Net.Core](https://www.nuget.org/packages/Discord.Net.Core/)
 
-### Unstable
+### Nightlies
 
-Nightly builds are available through our MyGet feed (`https://www.myget.org/F/discord-net/api/v3/index.json`).
-These builds target the dev branch.
+Nightlies are builds of Discord.NET that are still in an experimental phase, and have not been released.  
+They are available through 2 different sources:
+- [BaGet](https://baget.discordnet.dev/)
+- [GitHub Packages](https://github.com/orgs/discord-net/packages?repo_name=Discord.Net)
+
+> [!NOTE]
+> GitHub Packages requires authentication. You can find more information [here](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-nuget-registry#authenticating-to-github-packages).
 
 ## 🛑 Known Issues
 

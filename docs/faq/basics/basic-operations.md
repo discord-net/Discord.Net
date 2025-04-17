@@ -1,6 +1,6 @@
 ---
 uid: FAQ.Basics.BasicOp
-title: Questions about Basic Operations
+title: Basic Operations Questions
 ---
 
 # Basic Operations Questions

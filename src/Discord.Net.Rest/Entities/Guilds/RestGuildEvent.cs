@@ -58,6 +58,9 @@ namespace Discord.Rest
         /// <inheritdoc/>
         public int? UserCount { get; private set; }
 
+        /// <inheritdoc/>
+        public GuildScheduledEventRecurrenceRule? RecurrenceRule { get; private set; }
+
         internal RestGuildEvent(BaseDiscordClient client, IGuild guild, ulong id)
             : base(client, id)
         {
@@ -92,7 +95,7 @@ namespace Discord.Rest
                 Creator = RestUser.Create(Discord, model.Creator.Value);
             }
 
-            CreatorId = model.CreatorId.ToNullable() ?? 0; // should be changed?
+            CreatorId = model.CreatorId.GetValueOrDefault(null) ?? 0; // should be changed?
             ChannelId = model.ChannelId.IsSpecified ? model.ChannelId.Value : null;
             Name = model.Name;
             Description = model.Description.GetValueOrDefault();
@@ -106,11 +109,13 @@ namespace Discord.Rest
             UserCount = model.UserCount.ToNullable();
             CoverImageId = model.Image;
             GuildId = model.GuildId;
+
+            RecurrenceRule = model.RecurrenceRule?.ToEntity();
         }
 
         /// <inheritdoc/>
         public string GetCoverImageUrl(ImageFormat format = ImageFormat.Auto, ushort size = 1024)
-            => CDN.GetEventCoverImageUrl(Guild.Id, Id, CoverImageId, format, size);
+            => CDN.GetEventCoverImageUrl(GuildId, Id, CoverImageId, format, size);
 
         /// <inheritdoc/>
         public Task StartAsync(RequestOptions options = null)
