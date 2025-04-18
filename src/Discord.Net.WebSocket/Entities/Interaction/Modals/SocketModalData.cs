@@ -1,3 +1,4 @@
+using Discord.Rest;
 using System.Collections.Generic;
 using System.Linq;
 using Model = Discord.API.ModalInteractionData;
@@ -23,7 +24,7 @@ namespace Discord.WebSocket
         {
             CustomId = model.CustomId;
             Components = model.Components
-                .SelectMany(x => x.Components.OfType<IInteractableComponent>())
+                .SelectMany(x => x.Components.Select(y => y.ToEntity()).OfType<IInteractableComponent>())
                 .Select(x => new SocketMessageComponentData(x, discord, state, guild, dmUser))
                 .ToArray();
         }

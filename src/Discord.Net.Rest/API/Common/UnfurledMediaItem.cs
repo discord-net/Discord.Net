@@ -11,10 +11,10 @@ internal class UnfurledMediaItem
     public Optional<string> ProxyUrl { get; set; }
 
     [JsonProperty("height")]
-    public Optional<int> Height { get; set; }
+    public Optional<int?> Height { get; set; }
 
     [JsonProperty("width")]
-    public Optional<int> Width { get; set; }
+    public Optional<int?> Width { get; set; }
 
     [JsonProperty("content_type")]
     public Optional<string> ContentType { get; set; }

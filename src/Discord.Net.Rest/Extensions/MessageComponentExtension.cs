@@ -181,11 +181,11 @@ internal static class MessageComponentExtension
     internal static UnfurledMediaItem ToEntity(this API.UnfurledMediaItem mediaItem)
     {
         return new ResolvedUnfurledMediaItem(mediaItem.Url,
-            mediaItem.ProxyUrl.Value,
-            mediaItem.Height.Value,
-            mediaItem.Width.Value,
-            mediaItem.ContentType.Value,
-            mediaItem.LoadingState.Value);
+            mediaItem.ProxyUrl.GetValueOrDefault(null),
+            mediaItem.Height.GetValueOrDefault(0).GetValueOrDefault(0),
+            mediaItem.Width.GetValueOrDefault(0).GetValueOrDefault(0),
+            mediaItem.ContentType.GetValueOrDefault(null),
+            mediaItem.LoadingState.GetValueOrDefault(UnfurledMediaItemLoadingState.Unknown));
     }
 
     internal static API.UnfurledMediaItem ToModel(this UnfurledMediaItem mediaItem)
