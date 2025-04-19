@@ -1,5 +1,5 @@
 using Discord.Rest;
-using Newtonsoft.Json.Linq;
+
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -142,6 +142,8 @@ namespace Discord.WebSocket
         ///     Collection of WebSocket-based users.
         /// </returns>
         public IReadOnlyCollection<SocketUser> MentionedUsers => _userMentions;
+
+        public IReadOnlyCollection<ulong> MentionedUserIds { get; private set; }
         /// <inheritdoc />
         public DateTimeOffset Timestamp => DateTimeUtils.FromTicks(_timestampTicks);
 
@@ -270,23 +272,30 @@ namespace Discord.WebSocket
 
             if (model.UserMentions.IsSpecified)
             {
-                var value = model.UserMentions.Value;
-                if (value.Length > 0)
+                if (model.UserMentions.Value.Length == 0)
                 {
-                    var newMentions = ImmutableArray.CreateBuilder<SocketUser>(value.Length);
-                    for (int i = 0; i < value.Length; i++)
+                    _userMentions = ImmutableArray<SocketUser>.Empty;
+                    MentionedUserIds = ImmutableArray<ulong>.Empty;
+                }
+                else
+                {
+                    MentionedUserIds = model.UserMentions.Value.Select(x => x.Id).ToImmutableArray();
+
+                    // Create a new list of mentions from the API model
+                    var newMentions = ImmutableArray.CreateBuilder<SocketUser>(model.UserMentions.Value.Length);
+                    foreach (var mention in model.UserMentions.Value)
                     {
-                        var val = value[i];
-                        if (val != null)
+                        if (mention is not null)
                         {
-                            // TODO: this is cursed af and should be yeeted
-                            var user = Channel?.GetUserAsync(val.Id, CacheMode.CacheOnly).GetAwaiter().GetResult() as SocketUser;
-                            if (user != null)
-                                newMentions.Add(user);
-                            else
-                                newMentions.Add(SocketUnknownUser.Create(Discord, state, val));
+                            SocketUser user = null;
+
+                            if (Channel is SocketChannel socketChannel)
+                                user = socketChannel.GetUser(mention.Id);
+
+                            newMentions.Add(user ?? SocketUnknownUser.Create(Discord, state, mention));
                         }
                     }
+
                     _userMentions = newMentions.ToImmutable();
                 }
             }
@@ -355,7 +364,7 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         IReadOnlyCollection<ulong> IMessage.MentionedChannelIds => MentionedChannels.Select(x => x.Id).ToImmutableArray();
         /// <inheritdoc />
-        IReadOnlyCollection<ulong> IMessage.MentionedUserIds => MentionedUsers.Select(x => x.Id).ToImmutableArray();
+        IReadOnlyCollection<ulong> IMessage.MentionedUserIds => MentionedUserIds;
 
         /// <inheritdoc/>
         IReadOnlyCollection<IMessageComponent> IMessage.Components => Components;
