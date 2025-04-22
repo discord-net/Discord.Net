@@ -189,7 +189,12 @@ namespace Discord.WebSocket
             ApiClient.ReceivedGatewayEvent += ProcessMessageAsync;
 
             LeftGuild += async g => await _gatewayLogger.InfoAsync($"Left {g.Name}").ConfigureAwait(false);
-            JoinedGuild += async g => await _gatewayLogger.InfoAsync($"Joined {g.Name}").ConfigureAwait(false);
+            JoinedGuild += async g =>
+            {
+                await _gatewayLogger.InfoAsync($"Joined {g.Name}").ConfigureAwait(false);
+                if(BaseConfig.AutoTrackAllGuilds)
+                    await TrackGuildAsync(g).ConfigureAwait(false);
+            };
             GuildAvailable += async g => await _gatewayLogger.VerboseAsync($"Connected to {g.Name}").ConfigureAwait(false);
             GuildUnavailable += async g => await _gatewayLogger.VerboseAsync($"Disconnected from {g.Name}").ConfigureAwait(false);
             LatencyUpdated += async (old, val) => await _gatewayLogger.DebugAsync($"Latency = {val} ms").ConfigureAwait(false);
@@ -329,6 +334,9 @@ namespace Discord.WebSocket
             // Log warnings on ready event
             if (LogGatewayIntentWarnings)
                 await LogGatewayIntentsWarning().ConfigureAwait(false);
+
+            if(TokenType == TokenType.User && BaseConfig.AutoTrackAllGuilds)
+                await TrackAllGuilds().ConfigureAwait(false);
         }
         private async Task OnDisconnectingAsync(Exception ex)
         {
@@ -1324,6 +1332,24 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         Task IDiscordClient.StopAsync()
             => StopAsync();
+        #endregion
+
+        #region Self Bots
+        private async Task TrackAllGuilds()
+        {
+            await _gatewayLogger.LogAsync(LogSeverity.Debug, $"Attempting to track: {Guilds.Count} guilds");
+            foreach(var guild in Guilds)
+            {
+                await TrackGuildAsync(guild);
+                await Task.Delay(BaseConfig.AutoTrackRate * 100);
+            }
+            await _gatewayLogger.LogAsync(LogSeverity.Debug, $"Tracked: {Guilds.Count} guilds");
+        }
+        public async Task TrackGuildAsync(IGuild guild)
+        {
+            await ApiClient.TrackGuildEventsAsync(guild);
+            await _gatewayLogger.LogAsync(LogSeverity.Verbose, $"Tracking guild: {guild.Name}");
+        }
         #endregion
     }
 }

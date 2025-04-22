@@ -27,6 +27,8 @@ namespace Discord.API.Gateway
         /// <summary> C←S - Used to reply to a client's heartbeat. </summary>
         HeartbeatAck = 11,
         /// <summary> C→S - Used to request presence updates from particular guilds. </summary>
-        GuildSync = 12
+        GuildSync = 12,
+        /// <summary> C→S - Used to request guild updates for self bots. </summary>
+        LazyGuild = 14
     }
 }

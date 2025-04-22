@@ -16,6 +16,10 @@ namespace Discord
         /// <summary>
         ///     A webhook token type.
         /// </summary>
-        Webhook
+        Webhook,
+        /// <summary>
+        ///     A user token type.
+        /// </summary>
+        User
     }
 }

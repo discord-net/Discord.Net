@@ -1,4 +1,5 @@
 using Discord.API.Gateway;
+using Discord.API.Self;
 using Discord.Net.Queue;
 using Discord.Net.Rest;
 using Discord.Net.WebSockets;
@@ -8,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -384,7 +386,23 @@ namespace Discord.API
             options.BucketId = GatewayBucket.Get(GatewayBucketType.PresenceUpdate).Id;
             return SendGatewayAsync(GatewayOpCode.PresenceUpdate, args, options: options);
         }
-
+        public async Task TrackGuildEventsAsync(IGuild guild)
+        {
+            if (AuthTokenType != TokenType.User)
+                throw new ArgumentException("TrackGuildEventsAsync can only be called on self bots. It is not required for any other bots.");
+            var channels = await guild.GetChannelsAsync();
+            var param = new LazyGuildParams()
+            {
+                Typing = true,
+                Activities = true,
+                Threads = false,
+                Channels = new Dictionary<ulong, int[][]>(),
+                GuildId = guild.Id,
+                Members = []
+            };
+            param.Channels.Add(channels.ElementAt(0).Id, [[0, 99]]);
+            await SendGatewayAsync(GatewayOpCode.LazyGuild, param, new RequestOptions());
+        }
         public Task SendRequestMembersAsync(IEnumerable<ulong> guildIds, RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);

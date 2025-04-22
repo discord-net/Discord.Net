@@ -26,6 +26,15 @@ namespace Discord.WebSocket
     public class DiscordSocketConfig : DiscordRestConfig
     {
         /// <summary>
+        /// Gets or sets whether or not all guilds should be automatically tracked for self bots.
+        /// </summary>
+        public bool AutoTrackAllGuilds { get; set; } = true;
+        /// <summary>
+        /// Gets or sets the rate at which guilds are auto tracked for self bots.
+        /// </summary>
+        public int AutoTrackRate { get; set; } = 1;
+
+        /// <summary>
         ///    Returns the encoding gateway should use.
         /// </summary>
         public const string GatewayEncoding = "json";
