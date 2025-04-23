@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="../../Discord.Net.targets" />
+  <Import Project="../../StyleAnalyzer.targets" />
+  <PropertyGroup>
+    <TargetFrameworks>net9.0;net8.0;net6.0;net5.0;net461;netstandard2.0;netstandard2.1</TargetFrameworks>
+    <RootNamespace>Discord.OpenTelemetry</RootNamespace>
+    <AssemblyName>Discord.Net.OpenTelemetry</AssemblyName>
+    <Description>A Discord.Net extension adding support for the OpenTelemetry (otel) Sdk.</Description>
+    <WarningLevel>5</WarningLevel>
+    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="OpenTelemetry.Api.ProviderBuilderExtensions" Version="1.11.2" />
+  </ItemGroup>
+  <ItemGroup Condition="$(TargetFramework.StartsWith('net4')) AND '$(MSBuildRuntimeType)' == 'Core'">
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="All" />
+  </ItemGroup>
+
+</Project>
