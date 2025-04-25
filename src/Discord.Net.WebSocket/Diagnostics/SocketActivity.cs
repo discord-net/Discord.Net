@@ -1,6 +1,9 @@
-using Discord.API.Gateway;
 using System;
+
+#if NET5_0_OR_GREATER
+using Discord.API.Gateway;
 using System.Diagnostics;
+#endif
 
 namespace Discord.WebSocket.Diagnostics
 {
@@ -34,6 +37,7 @@ namespace Discord.WebSocket.Diagnostics
             }));
 #endif
         }
+
 #else
         internal static IDisposable StartSocketDispatchActivity(string type, DiscordSocketConfig config) => null;
 
