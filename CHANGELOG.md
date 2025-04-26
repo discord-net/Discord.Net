@@ -1,9 +1,15 @@
 # Changelog
 
+## [3.17.4] - 2025-04-26
+
+### Fixed
+- #3100 Fix NRE introduced in 3.17.3 (f67f1894)
+  
+
 ## [3.17.3] - 2025-04-26
 ### Added
 - #3088 Add handler for unknown Discord dispatch events (9b79f0b)
-- #3090 Per file attachement size limits (649f52b)
+- #3090 Per file attachment size limits (649f52b)
 
 ### Fixed
 - #3084 Fixed type reader/converter parsing exception (88cfbe5)
