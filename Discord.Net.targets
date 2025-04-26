@@ -1,6 +1,6 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
-        <VersionPrefix>3.17.2</VersionPrefix>
+        <VersionPrefix>3.17.3</VersionPrefix>
         <LangVersion>latest</LangVersion>
         <Authors>Discord.Net Contributors</Authors>
         <PackageTags>discord;discordapp</PackageTags>

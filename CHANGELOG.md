@@ -1,5 +1,22 @@
 # Changelog
 
+## [3.17.3] - 2025-04-26
+### Added
+- #3088 Add handler for unknown Discord dispatch events (9b79f0b)
+- #3090 Per file attachement size limits (649f52b)
+
+### Fixed
+- #3084 Fixed type reader/converter parsing exception (88cfbe5)
+- #3091 Fixed modals with value type properties (a8523c5)
+- #3094 Fix WriteSilentFramesAsync sending a partial frame at first (2da25f3)
+
+### Misc
+- #3081 add missing gif sticker format (6f623a6)
+- #3087 Add size in CDN.GetGuildSplashUrl (fb90701)
+- #3092 Improved exception messages of builders (cce6274)
+- #3096 Refactor MentionedUsers in the SocketMessage (0c3e7a8)
+
+
 ## [3.17.2] - 2025-03-09
 ### Added 
 - #3074 Add `excludeDeleted` argument to `GetEntitlementsAsync` (9c9407b)
