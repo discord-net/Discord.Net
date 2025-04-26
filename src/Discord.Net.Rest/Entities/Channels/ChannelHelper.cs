@@ -308,10 +308,10 @@ namespace Discord.Rest
                 Preconditions.AtMost(stickers.Length, 3, nameof(stickers), "A max of 3 stickers are allowed.");
             }
 
-            if (components?.Components?.Any(x => x.Type != ComponentType.ActionRow) ?? false)
-                flags |= MessageFlags.ComponentsV2;
+            if (flags is not MessageFlags.None and not MessageFlags.SuppressEmbeds and not MessageFlags.SuppressNotification)
+                throw new ArgumentException("The only valid MessageFlags are SuppressEmbeds, SuppressNotification and none.", nameof(flags));
 
-            Preconditions.ValidateMessageFlags(flags);
+            
 
             var args = new CreateMessageParams
             {
@@ -320,7 +320,7 @@ namespace Discord.Rest
                 Embeds = embeds.Any() ? embeds.Select(x => x.ToModel()).ToArray() : Optional<API.Embed[]>.Unspecified,
                 AllowedMentions = allowedMentions?.ToModel(),
                 MessageReference = messageReference?.ToModel(),
-                Components = components?.Components.Select(x => x.ToModel()).ToArray() ?? Optional<IMessageComponent[]>.Unspecified,
+                Components = components?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Optional<API.ActionRowComponent[]>.Unspecified,
                 Stickers = stickers?.Any() ?? false ? stickers.Select(x => x.Id).ToArray() : Optional<ulong[]>.Unspecified,
                 Flags = flags,
                 Poll = poll?.ToModel() ?? Optional<CreatePollParams>.Unspecified
@@ -429,10 +429,8 @@ namespace Discord.Rest
                 }
             }
 
-            if (components?.Components?.Any(x => x.Type != ComponentType.ActionRow) ?? false)
-                flags |= MessageFlags.ComponentsV2;
-
-            Preconditions.ValidateMessageFlags(flags);
+            if (flags is not MessageFlags.None and not MessageFlags.SuppressEmbeds and not MessageFlags.SuppressNotification)
+                throw new ArgumentException("The only valid MessageFlags are SuppressEmbeds, SuppressNotification and none.", nameof(flags));
 
             if (stickers != null)
             {
@@ -446,7 +444,7 @@ namespace Discord.Rest
                 Embeds = embeds.Any() ? embeds.Select(x => x.ToModel()).ToArray() : Optional<API.Embed[]>.Unspecified,
                 AllowedMentions = allowedMentions?.ToModel() ?? Optional<API.AllowedMentions>.Unspecified,
                 MessageReference = messageReference?.ToModel() ?? Optional<API.MessageReference>.Unspecified,
-                MessageComponent = components?.Components.Select(x => x.ToModel()).ToArray() ?? Optional<IMessageComponent[]>.Unspecified,
+                MessageComponent = components?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Optional<API.ActionRowComponent[]>.Unspecified,
                 Stickers = stickers?.Any() ?? false ? stickers.Select(x => x.Id).ToArray() : Optional<ulong[]>.Unspecified,
                 Flags = flags,
                 Poll = poll?.ToModel() ?? Optional<CreatePollParams>.Unspecified

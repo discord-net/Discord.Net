@@ -123,16 +123,5 @@ namespace Discord
                 _isDisposed = true;
             }
         }
-
-        /// <summary>
-        ///    Gets the url formatted with <c>attachment://</c> protocol.
-        /// </summary>
-        /// <returns>
-        ///     The formatted url.
-        /// </returns>
-        public string GetAttachmentUrl()
-        {
-            return $"attachment://{FileName}";
-        }
     }
 }

@@ -2,13 +2,10 @@ using Newtonsoft.Json;
 
 namespace Discord.API
 {
-    internal class ButtonComponent : IInteractableComponent
+    internal class ButtonComponent : IMessageComponent
     {
         [JsonProperty("type")]
         public ComponentType Type { get; set; }
-
-        [JsonProperty("id")]
-        public Optional<int> Id { get; set; }
 
         [JsonProperty("style")]
         public ButtonStyle Style { get; set; }
@@ -42,7 +39,6 @@ namespace Discord.API
             Url = c.Url;
             Disabled = c.IsDisabled;
             SkuId = c.SkuId ?? Optional<ulong>.Unspecified;
-            Id = c.Id ?? Optional<int>.Unspecified;
 
             if (c.Emote != null)
             {
@@ -66,9 +62,6 @@ namespace Discord.API
         }
 
         [JsonIgnore]
-        string IInteractableComponent.CustomId => CustomId.GetValueOrDefault();
-
-        [JsonIgnore]
-        int? IMessageComponent.Id => Id.ToNullable();
+        string IMessageComponent.CustomId => CustomId.GetValueOrDefault();
     }
 }

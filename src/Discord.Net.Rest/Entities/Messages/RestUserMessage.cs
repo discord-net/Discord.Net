@@ -84,7 +84,7 @@ namespace Discord.Rest
             if (model.MentionEveryone.IsSpecified)
                 _isMentioningEveryone = model.MentionEveryone.Value;
             if (model.RoleMentions.IsSpecified)
-                _roleMentionIds = [..model.RoleMentions.Value];
+                _roleMentionIds = model.RoleMentions.Value.ToImmutableArray();
 
             if (model.Attachments.IsSpecified)
             {
@@ -92,13 +92,12 @@ namespace Discord.Rest
                 if (value.Length > 0)
                 {
                     var attachments = ImmutableArray.CreateBuilder<Attachment>(value.Length);
-                    foreach (var t in value)
-                        attachments.Add(Attachment.Create(t, Discord));
-
+                    for (int i = 0; i < value.Length; i++)
+                        attachments.Add(Attachment.Create(value[i], Discord));
                     _attachments = attachments.ToImmutable();
                 }
                 else
-                    _attachments = [];
+                    _attachments = ImmutableArray.Create<Attachment>();
             }
 
             if (model.Embeds.IsSpecified)
@@ -107,13 +106,12 @@ namespace Discord.Rest
                 if (value.Length > 0)
                 {
                     var embeds = ImmutableArray.CreateBuilder<Embed>(value.Length);
-                    foreach (var t in value)
-                        embeds.Add(t.ToEntity());
-
+                    for (int i = 0; i < value.Length; i++)
+                        embeds.Add(value[i].ToEntity());
                     _embeds = embeds.ToImmutable();
                 }
                 else
-                    _embeds = [];
+                    _embeds = ImmutableArray.Create<Embed>();
             }
 
             var guildId = (Channel as IGuildChannel)?.GuildId;
@@ -125,7 +123,7 @@ namespace Discord.Rest
                 model.Content = text;
             }
 
-            if (model.ReferencedMessage is { IsSpecified: true, Value: not null })
+            if (model.ReferencedMessage.IsSpecified && model.ReferencedMessage.Value != null)
             {
                 var refMsg = model.ReferencedMessage.Value;
                 IUser refMsgAuthor = MessageHelper.GetAuthor(Discord, guild, refMsg.Author.Value, refMsg.WebhookId.ToNullable());
@@ -143,7 +141,7 @@ namespace Discord.Rest
                     _stickers = stickers.ToImmutable();
                 }
                 else
-                    _stickers = [];
+                    _stickers = ImmutableArray.Create<StickerItem>();
             }
 
             if (model.Resolved.IsSpecified)

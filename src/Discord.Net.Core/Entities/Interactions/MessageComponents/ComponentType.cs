@@ -44,19 +44,5 @@ namespace Discord
         ///     A select menu for picking from channels.
         /// </summary>
         ChannelSelect = 8,
-
-        Section = 9,
-
-        TextDisplay = 10,
-
-        Thumbnail = 11,
-
-        MediaGallery = 12,
-
-        File = 13,
-
-        Separator = 14,
-
-        Container = 17,
     }
 }

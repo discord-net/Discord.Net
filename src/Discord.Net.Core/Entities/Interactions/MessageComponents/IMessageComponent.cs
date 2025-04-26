@@ -1,14 +1,18 @@
-namespace Discord;
-
-/// <summary>
-///     Represents a message component on a message.
-/// </summary>
-public interface IMessageComponent
+namespace Discord
 {
     /// <summary>
-    ///     Gets the <see cref="ComponentType"/> of this Message Component.
+    ///     Represents a message component on a message.
     /// </summary>
-    ComponentType Type { get; }
+    public interface IMessageComponent
+    {
+        /// <summary>
+        ///     Gets the <see cref="ComponentType"/> of this Message Component.
+        /// </summary>
+        ComponentType Type { get; }
 
-    int? Id { get; }
+        /// <summary>
+        ///     Gets the custom id of the component if possible; otherwise <see langword="null"/>.
+        /// </summary>
+        string CustomId { get; }
+    }
 }

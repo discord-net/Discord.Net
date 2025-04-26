@@ -57,10 +57,5 @@ namespace Discord
         ///     This message is a voice message.
         /// </summary>
         VoiceMessage = 1 << 13,
-
-        /// <summary>
-        ///     This message is using v2 components.
-        /// </summary>
-        ComponentsV2 = 1 << 15,
     }
 }

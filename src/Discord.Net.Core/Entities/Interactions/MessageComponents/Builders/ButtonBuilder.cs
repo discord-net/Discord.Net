@@ -7,10 +7,8 @@ namespace Discord;
 /// <summary>
 ///     Represents a class used to build <see cref="ButtonComponent"/>'s.
 /// </summary>
-public class ButtonBuilder : IInteractableComponentBuilder
+public class ButtonBuilder
 {
-    public ComponentType Type => ComponentType.Button;
-
     /// <summary>
     ///     The max length of a <see cref="ButtonComponent.Label"/>.
     /// </summary>
@@ -76,8 +74,6 @@ public class ButtonBuilder : IInteractableComponentBuilder
     /// </remarks>
     public ulong? SkuId { get; set; }
 
-    public int? Id { get; set; }
-
     private string _label;
     private string _customId;
 
@@ -96,7 +92,7 @@ public class ButtonBuilder : IInteractableComponentBuilder
     /// <param name="emote">The emote of this button.</param>
     /// <param name="isDisabled">Disabled this button or not.</param>
     /// <param name="skuId">The sku id of this button.</param>
-    public ButtonBuilder(string label = null, string customId = null, ButtonStyle style = ButtonStyle.Primary, string url = null, IEmote emote = null, bool isDisabled = false, ulong? skuId = null, int? id = null)
+    public ButtonBuilder(string label = null, string customId = null, ButtonStyle style = ButtonStyle.Primary, string url = null, IEmote emote = null, bool isDisabled = false, ulong? skuId = null)
     {
         CustomId = customId;
         Style = style;
@@ -105,7 +101,6 @@ public class ButtonBuilder : IInteractableComponentBuilder
         IsDisabled = isDisabled;
         Emote = emote;
         SkuId = skuId;
-        Id = id;
     }
 
     /// <summary>
@@ -120,7 +115,6 @@ public class ButtonBuilder : IInteractableComponentBuilder
         IsDisabled = button.IsDisabled;
         Emote = button.Emote;
         SkuId = button.SkuId;
-        Id = button.Id;
     }
 
     /// <summary>
@@ -321,8 +315,6 @@ public class ButtonBuilder : IInteractableComponentBuilder
             break;
         }
 
-        return new ButtonComponent(Style, Label, Emote, CustomId, Url, IsDisabled, SkuId, Id);
+        return new ButtonComponent(Style, Label, Emote, CustomId, Url, IsDisabled, SkuId);
     }
-
-    IMessageComponent IMessageComponentBuilder.Build() => Build();
 }

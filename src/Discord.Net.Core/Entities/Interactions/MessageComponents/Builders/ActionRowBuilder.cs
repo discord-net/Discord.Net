@@ -8,12 +8,8 @@ namespace Discord;
 /// <summary>
 ///     Represents a class used to build Action rows.
 /// </summary>
-public class ActionRowBuilder : IMessageComponentBuilder, IInteractableComponentContainer
+public class ActionRowBuilder
 {
-    public ComponentType Type => ComponentType.ActionRow;
-
-    public int? Id { get; set; }
-
     /// <summary>
     ///     The max amount of child components this row can hold.
     /// </summary>
@@ -24,7 +20,7 @@ public class ActionRowBuilder : IMessageComponentBuilder, IInteractableComponent
     /// </summary>
     /// <exception cref="ArgumentNullException" accessor="set"><see cref="Components"/> cannot be null.</exception>
     /// <exception cref="ArgumentException" accessor="set"><see cref="Components"/> count exceeds <see cref="MaxChildCount"/>.</exception>
-    public List<IMessageComponentBuilder> Components
+    public List<IMessageComponent> Components
     {
         get => _components;
         set
@@ -41,21 +37,7 @@ public class ActionRowBuilder : IMessageComponentBuilder, IInteractableComponent
         }
     }
 
-
-    public ActionRowBuilder AddComponents(params IMessageComponentBuilder[] components)
-    {
-        foreach (var component in components)
-            AddComponent(component);
-        return this;
-    }
-
-    public ActionRowBuilder WithComponents(IEnumerable<IMessageComponentBuilder> components)
-    {
-        Components = components.ToList();
-        return this;
-    }
-
-    private List<IMessageComponentBuilder> _components = new ();
+    private List<IMessageComponent> _components = new List<IMessageComponent>();
 
     /// <summary>
     ///     Adds a list of components to the current row.
@@ -63,7 +45,7 @@ public class ActionRowBuilder : IMessageComponentBuilder, IInteractableComponent
     /// <param name="components">The list of components to add.</param>
     /// <inheritdoc cref="Components"/>
     /// <returns>The current builder.</returns>
-    public ActionRowBuilder WithComponents(List<IMessageComponentBuilder> components)
+    public ActionRowBuilder WithComponents(List<IMessageComponent> components)
     {
         Components = components;
         return this;
@@ -75,7 +57,7 @@ public class ActionRowBuilder : IMessageComponentBuilder, IInteractableComponent
     /// <param name="component">The component to add.</param>
     /// <exception cref="InvalidOperationException">Components count reached <see cref="MaxChildCount"/></exception>
     /// <returns>The current builder.</returns>
-    public ActionRowBuilder AddComponent(IMessageComponentBuilder component)
+    public ActionRowBuilder AddComponent(IMessageComponent component)
     {
         if (Components.Count >= MaxChildCount)
             throw new InvalidOperationException($"Components count reached {MaxChildCount}");
@@ -121,11 +103,13 @@ public class ActionRowBuilder : IMessageComponentBuilder, IInteractableComponent
     {
         if (menu.Options is not null && menu.Options.Distinct().Count() != menu.Options.Count)
             throw new InvalidOperationException("Please make sure that there is no duplicates values.");
-        
+
+        var builtMenu = menu.Build();
+
         if (Components.Count != 0)
             throw new InvalidOperationException($"A Select Menu cannot exist in a pre-occupied ActionRow.");
 
-        AddComponent(menu);
+        AddComponent(builtMenu);
 
         return this;
     }
@@ -168,13 +152,15 @@ public class ActionRowBuilder : IMessageComponentBuilder, IInteractableComponent
     /// <returns>The current builder.</returns>
     public ActionRowBuilder WithButton(ButtonBuilder button)
     {
+        var builtButton = button.Build();
+
         if (Components.Count >= 5)
             throw new InvalidOperationException($"Components count reached {MaxChildCount}");
 
         if (Components.Any(x => x.Type.IsSelectType()))
             throw new InvalidOperationException($"A button cannot be added to a row with a SelectMenu");
 
-        AddComponent(button);
+        AddComponent(builtButton);
 
         return this;
     }
@@ -185,11 +171,10 @@ public class ActionRowBuilder : IMessageComponentBuilder, IInteractableComponent
     /// <returns>A <see cref="ActionRowComponent"/> that can be used within a <see cref="ComponentBuilder"/></returns>
     public ActionRowComponent Build()
     {
-        return new ActionRowComponent(_components.Select(x => x.Build()).ToList());
+        return new ActionRowComponent(_components);
     }
-    IMessageComponent IMessageComponentBuilder.Build() => Build();
 
-    internal bool CanTakeComponent(IMessageComponentBuilder component)
+    internal bool CanTakeComponent(IMessageComponent component)
     {
         switch (component.Type)
         {
@@ -210,11 +195,4 @@ public class ActionRowBuilder : IMessageComponentBuilder, IInteractableComponent
                 return false;
         }
     }
-
-
-    IComponentContainer IComponentContainer.AddComponent(IMessageComponentBuilder component) => AddComponent(component);
-
-    IComponentContainer IComponentContainer.AddComponents(params IMessageComponentBuilder[] components) => AddComponents(components);
-
-    IComponentContainer IComponentContainer.WithComponents(IEnumerable<IMessageComponentBuilder> components) => WithComponents(components);
 }

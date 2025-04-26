@@ -24,7 +24,7 @@ namespace Discord.API.Rest
         public Optional<string> Content { get; set; }
         public Optional<Embed[]> Embeds { get; set; }
         public Optional<AllowedMentions> AllowedMentions { get; set; }
-        public Optional<IMessageComponent[]> MessageComponent { get; set; }
+        public Optional<ActionRowComponent[]> MessageComponent { get; set; }
         public Optional<MessageFlags?> Flags { get; set; }
         public Optional<ulong[]> Stickers { get; set; }
         public Optional<ulong[]> TagIds { get; set; }

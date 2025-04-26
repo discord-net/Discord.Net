@@ -90,13 +90,13 @@ namespace Discord.WebSocket
             }
         }
 
-        internal SocketMessageComponentData(IInteractableComponent component, DiscordSocketClient discord, ClientState state, SocketGuild guild, API.User dmUser)
+        internal SocketMessageComponentData(IMessageComponent component, DiscordSocketClient discord, ClientState state, SocketGuild guild, API.User dmUser)
         {
             CustomId = component.CustomId;
             Type = component.Type;
 
             Value = component.Type == ComponentType.TextInput
-                ? ((TextInputComponent)component).Value
+                ? (component as API.TextInputComponent).Value.Value
                 : null;
 
             if (component is API.SelectMenuComponent select)

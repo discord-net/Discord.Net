@@ -3,13 +3,10 @@ namespace Discord;
 /// <summary>
 ///     Represents a <see cref="IMessageComponent"/> Button.
 /// </summary>
-public class ButtonComponent : IInteractableComponent
+public class ButtonComponent : IMessageComponent
 {
     /// <inheritdoc/>
     public ComponentType Type => ComponentType.Button;
-
-    /// <inheritdoc/>
-    public int? Id { get; }
 
     /// <summary>
     ///     Gets the <see cref="ButtonStyle"/> of this button, example buttons with each style can be found <see href="https://discord.com/assets/7bb017ce52cfd6575e21c058feb3883b.png">Here</see>.
@@ -59,10 +56,9 @@ public class ButtonComponent : IInteractableComponent
     public ButtonBuilder ToBuilder()
         => new (Label, CustomId, Style, Url, Emote, IsDisabled);
 
-    internal ButtonComponent(ButtonStyle style, string label, IEmote emote, string customId, string url, bool isDisabled, ulong? skuId, int? id)
+    internal ButtonComponent(ButtonStyle style, string label, IEmote emote, string customId, string url, bool isDisabled, ulong? skuId)
     {
         Style = style;
-        Id = id;
         Label = label;
         Emote = emote;
         CustomId = customId;

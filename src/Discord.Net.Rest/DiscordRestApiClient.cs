@@ -2779,8 +2779,6 @@ namespace Discord.API
             if (threadId.HasValue)
                 querys.Add($"thread_id={threadId}");
 
-            querys.Add("with_components=true");
-
             return $"{string.Join("&", querys)}";
         }
 

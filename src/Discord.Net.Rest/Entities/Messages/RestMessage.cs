@@ -95,12 +95,12 @@ namespace Discord.Rest
 
         /// <inheritdoc />
         public PurchaseNotification PurchaseNotification { get; private set; }
-
+        
         /// <inheritdoc />
         public MessageCallData? CallData { get; private set; }
 
         /// <inheritdoc cref="IMessage.Components"/>
-        public IReadOnlyCollection<IMessageComponent> Components { get; private set; }
+        public IReadOnlyCollection<ActionRowComponent> Components { get; private set; }
         /// <summary>
         ///     Gets a collection of the mentioned users in the message.
         /// </summary>
@@ -150,7 +150,7 @@ namespace Discord.Rest
             if (model.Activity.IsSpecified)
             {
                 // create a new Activity from the API model
-                Activity = new MessageActivity
+                Activity = new MessageActivity()
                 {
                     Type = model.Activity.Value.Type.Value,
                     PartyId = model.Activity.Value.PartyId.GetValueOrDefault()
@@ -170,9 +170,62 @@ namespace Discord.Rest
                 };
             }
 
-            Components = model.Components.IsSpecified
-                ? model.Components.Value.Select(x => x.ToEntity()).ToImmutableArray()
-                : [];
+            if (model.Components.IsSpecified)
+            {
+                Components = model.Components.Value.Where(x => x.Type is ComponentType.ActionRow)
+                    .Select(x => new ActionRowComponent(((API.ActionRowComponent)x).Components.Select<IMessageComponent, IMessageComponent>(y =>
+                {
+                    switch (y.Type)
+                    {
+                        case ComponentType.Button:
+                            {
+                                var parsed = (API.ButtonComponent)y;
+                                return new Discord.ButtonComponent(
+                                    parsed.Style,
+                                    parsed.Label.GetValueOrDefault(),
+                                    parsed.Emote.IsSpecified
+                                        ? parsed.Emote.Value.Id.HasValue
+                                            ? new Emote(parsed.Emote.Value.Id.Value, parsed.Emote.Value.Name, parsed.Emote.Value.Animated.GetValueOrDefault())
+                                            : new Emoji(parsed.Emote.Value.Name)
+                                        : null,
+                                    parsed.CustomId.GetValueOrDefault(),
+                                    parsed.Url.GetValueOrDefault(),
+                                    parsed.Disabled.GetValueOrDefault(),
+                                    parsed.SkuId.ToNullable());
+                            }
+                        case ComponentType.SelectMenu or ComponentType.ChannelSelect or ComponentType.RoleSelect or ComponentType.MentionableSelect or ComponentType.UserSelect:
+                            {
+                                var parsed = (API.SelectMenuComponent)y;
+                                return new SelectMenuComponent(
+                                    parsed.CustomId,
+                                    parsed.Options?.Select(z => new SelectMenuOption(
+                                        z.Label,
+                                        z.Value,
+                                        z.Description.GetValueOrDefault(),
+                                        z.Emoji.IsSpecified
+                                            ? z.Emoji.Value.Id.HasValue
+                                                ? new Emote(z.Emoji.Value.Id.Value, z.Emoji.Value.Name, z.Emoji.Value.Animated.GetValueOrDefault())
+                                                : new Emoji(z.Emoji.Value.Name)
+                                            : null,
+                                        z.Default.ToNullable())).ToList(),
+                                    parsed.Placeholder.GetValueOrDefault(),
+                                    parsed.MinValues,
+                                    parsed.MaxValues,
+                                    parsed.Disabled,
+                                    parsed.Type,
+                                    parsed.ChannelTypes.GetValueOrDefault(),
+                                    parsed.DefaultValues.IsSpecified
+                                        ? parsed.DefaultValues.Value.Select(x => new SelectMenuDefaultValue(x.Id, x.Type))
+                                        : Array.Empty<SelectMenuDefaultValue>()
+                                );
+                            }
+                        default:
+                            return null;
+                    }
+                }).ToList())).ToImmutableArray();
+            }
+            else
+                Components = new List<ActionRowComponent>();
 
             if (model.Flags.IsSpecified)
                 Flags = model.Flags.Value;
@@ -183,16 +236,15 @@ namespace Discord.Rest
                 if (value.Length > 0)
                 {
                     var reactions = ImmutableArray.CreateBuilder<RestReaction>(value.Length);
-                    foreach (var t in value)
-                        reactions.Add(RestReaction.Create(t));
-
+                    for (int i = 0; i < value.Length; i++)
+                        reactions.Add(RestReaction.Create(value[i]));
                     _reactions = reactions.ToImmutable();
                 }
                 else
-                    _reactions = [];
+                    _reactions = ImmutableArray.Create<RestReaction>();
             }
             else
-                _reactions = [];
+                _reactions = ImmutableArray.Create<RestReaction>();
 
             if (model.Interaction.IsSpecified)
             {
@@ -237,11 +289,11 @@ namespace Discord.Rest
                         ? new GuildProductPurchase(model.PurchaseNotification.Value.ProductPurchase.Value.ListingId, model.PurchaseNotification.Value.ProductPurchase.Value.ProductName)
                         : null);
             }
-
+            
             if (model.Call.IsSpecified)
                 CallData = new MessageCallData(model.Call.Value.Participants, model.Call.Value.EndedTimestamp.ToNullable());
         }
-
+        
         /// <inheritdoc />
         public async Task UpdateAsync(RequestOptions options = null)
         {

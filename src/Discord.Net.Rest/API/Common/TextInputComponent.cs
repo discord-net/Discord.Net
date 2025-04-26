@@ -2,13 +2,10 @@ using Newtonsoft.Json;
 
 namespace Discord.API
 {
-    internal class TextInputComponent : IInteractableComponent
+    internal class TextInputComponent : IMessageComponent
     {
         [JsonProperty("type")]
         public ComponentType Type { get; set; }
-
-        [JsonProperty("id")]
-        public Optional<int> Id { get; set; }
 
         [JsonProperty("style")]
         public TextInputStyle Style { get; set; }
@@ -47,10 +44,6 @@ namespace Discord.API
             MaxLength = component.MaxLength ?? Optional<int>.Unspecified;
             Required = component.Required ?? Optional<bool>.Unspecified;
             Value = component.Value ?? Optional<string>.Unspecified;
-            Id = component.Id ?? Optional<int>.Unspecified;
         }
-
-        [JsonIgnore]
-        int? IMessageComponent.Id => Id.ToNullable();
     }
 }

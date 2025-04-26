@@ -6,10 +6,8 @@ namespace Discord;
 /// <summary>
 ///     Represents a builder for creating a <see cref="TextInputComponent"/>.
 /// </summary>
-public class TextInputBuilder : IInteractableComponentBuilder
+public class TextInputBuilder
 {
-    public ComponentType Type => ComponentType.TextInput;
-
     /// <summary>
     ///     The max length of a <see cref="TextInputComponent.Placeholder"/>.
     /// </summary>
@@ -101,8 +99,6 @@ public class TextInputBuilder : IInteractableComponentBuilder
     /// </summary>
     public bool? Required { get; set; }
 
-    public int? Id { get; set; }
-
     /// <summary>
     ///     Gets or sets the default value of the text input.
     /// </summary>
@@ -144,7 +140,7 @@ public class TextInputBuilder : IInteractableComponentBuilder
     /// <param name="maxLength">The text input's maximum length.</param>
     /// <param name="required">The text input's required value.</param>
     public TextInputBuilder(string label, string customId, TextInputStyle style = TextInputStyle.Short, string placeholder = null,
-        int? minLength = null, int? maxLength = null, bool? required = null, string value = null, int? id = null)
+        int? minLength = null, int? maxLength = null, bool? required = null, string value = null)
     {
         Label = label;
         Style = style;
@@ -154,7 +150,6 @@ public class TextInputBuilder : IInteractableComponentBuilder
         MaxLength = maxLength;
         Required = required;
         Value = value;
-        Id = id;
     }
 
     /// <summary>
@@ -262,8 +257,6 @@ public class TextInputBuilder : IInteractableComponentBuilder
         if (Style is TextInputStyle.Short && Value?.Any(x => x == '\n') is true)
             throw new ArgumentException($"Value must not contain new line characters when style is {TextInputStyle.Short}.", nameof(Value));
 
-        return new TextInputComponent(CustomId, Label, Placeholder, MinLength, MaxLength, Style, Required, Value, Id);
+        return new TextInputComponent(CustomId, Label, Placeholder, MinLength, MaxLength, Style, Required, Value);
     }
-
-    IMessageComponent IMessageComponentBuilder.Build() => Build();
 }

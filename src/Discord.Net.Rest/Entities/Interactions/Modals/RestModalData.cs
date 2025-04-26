@@ -1,5 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using DataModel = Discord.API.MessageComponentInteractionData;
+using InterationModel = Discord.API.Interaction;
 using Model = Discord.API.ModalInteractionData;
 
 namespace Discord.Rest
@@ -23,7 +26,7 @@ namespace Discord.Rest
         {
             CustomId = model.CustomId;
             Components = model.Components
-                .SelectMany(x => x.Components.OfType<IInteractableComponent>())
+                .SelectMany(x => x.Components)
                 .Select(x => new RestMessageComponentData(x, discord, guild))
                 .ToArray();
         }

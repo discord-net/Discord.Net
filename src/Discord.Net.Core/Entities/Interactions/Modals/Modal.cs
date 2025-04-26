@@ -1,10 +1,19 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
 namespace Discord
 {
     /// <summary>
     ///     Represents a modal interaction.
     /// </summary>
-    public class Modal
+    public class Modal : IMessageComponent
     {
+        /// <inheritdoc/>
+        public ComponentType Type => throw new NotSupportedException("Modals do not have a component type.");
+
         /// <summary>
         ///     Gets the title of the modal.
         /// </summary>
