@@ -35,8 +35,12 @@ public class SelectMenuBuilder
         get => _customId;
         set
         {
-            Preconditions.AtLeast(value.Length, 1, nameof(CustomId));
-            Preconditions.AtMost(value.Length, ComponentBuilder.MaxCustomIdLength, nameof(CustomId));
+            if (value is not null)
+            {
+                Preconditions.AtLeast(value.Length, 1, nameof(CustomId));
+                Preconditions.AtMost(value.Length, ComponentBuilder.MaxCustomIdLength, nameof(CustomId));
+            }
+
             _customId = value;
         }
     }
@@ -63,8 +67,12 @@ public class SelectMenuBuilder
         get => _placeholder;
         set
         {
-            Preconditions.AtLeast(value.Length, 1, nameof(Placeholder));
-            Preconditions.AtMost(value.Length, MaxPlaceholderLength, nameof(Placeholder));
+            if (value is not null)
+            {
+                Preconditions.AtLeast(value.Length, 1, nameof(Placeholder));
+                Preconditions.AtMost(value.Length, MaxPlaceholderLength, nameof(Placeholder));
+            }
+
             _placeholder = value;
         }
     }

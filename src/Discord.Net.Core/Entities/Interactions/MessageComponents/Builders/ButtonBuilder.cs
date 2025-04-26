@@ -24,8 +24,12 @@ public class ButtonBuilder
         get => _label;
         set
         {
-            Preconditions.AtLeast(value.Length, 1, nameof(Label));
-            Preconditions.AtMost(value.Length, MaxButtonLabelLength, nameof(Label));
+            if (value is not null)
+            {
+                Preconditions.AtLeast(value.Length, 1, nameof(Label));
+                Preconditions.AtMost(value.Length, MaxButtonLabelLength, nameof(Label));
+            }
+
             _label = value;
         }
     }
@@ -40,8 +44,12 @@ public class ButtonBuilder
         get => _customId;
         set
         {
-            Preconditions.AtLeast(value.Length, 1, nameof(CustomId));
-            Preconditions.AtMost(value.Length, ComponentBuilder.MaxCustomIdLength, nameof(CustomId));
+            if (value is not null)
+            {
+                Preconditions.AtLeast(value.Length, 1, nameof(CustomId));
+                Preconditions.AtMost(value.Length, ComponentBuilder.MaxCustomIdLength, nameof(CustomId));
+            }
+
             _customId = value;
         }
     }

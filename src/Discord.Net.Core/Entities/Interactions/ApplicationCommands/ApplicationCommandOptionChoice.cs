@@ -21,8 +21,12 @@ namespace Discord
             get => _name;
             set
             {
-                Preconditions.AtLeast(value.Length, 1, nameof(Name));
-                Preconditions.AtMost(value.Length, 100, nameof(Name));
+                if (value is not null)
+                {
+                    Preconditions.AtLeast(value.Length, 1, nameof(Name));
+                    Preconditions.AtMost(value.Length, 100, nameof(Name));
+                }
+
                 _name = value;
             }
         }
@@ -38,7 +42,7 @@ namespace Discord
             get => _value;
             set
             {
-                if (value != null && value is not string && !value.IsNumericType())
+                if (value is not null && value is not string && !value.IsNumericType())
                     throw new ArgumentException($"The value of a choice must be a string or a numeric type! Value: \"{value}\"");
                 _value = value;
             }

@@ -32,8 +32,12 @@ public class SelectMenuOptionBuilder
         get => _label;
         set
         {
-            Preconditions.AtLeast(value.Length, 1, nameof(Label));
-            Preconditions.AtMost(value.Length, MaxSelectLabelLength, nameof(Label));
+            if (value is not null)
+            {
+                Preconditions.AtLeast(value.Length, 1, nameof(Label));
+                Preconditions.AtMost(value.Length, MaxSelectLabelLength, nameof(Label));
+            }
+
             _label = value;
         }
     }
@@ -48,8 +52,12 @@ public class SelectMenuOptionBuilder
         get => _value;
         set
         {
-            Preconditions.AtLeast(value.Length, 1, nameof(Value));
-            Preconditions.AtMost(value.Length, MaxSelectValueLength, nameof(Value));
+            if (value is not null)
+            {
+                Preconditions.AtLeast(value.Length, 1, nameof(Value));
+                Preconditions.AtMost(value.Length, MaxSelectValueLength, nameof(Value));
+            }
+
             _value = value;
         }
     }
@@ -64,8 +72,12 @@ public class SelectMenuOptionBuilder
         get => _description;
         set
         {
-            Preconditions.AtLeast(value.Length, 1, nameof(Description));
-            Preconditions.AtMost(value.Length, MaxDescriptionLength, nameof(Description));
+            if (value is not null)
+            {
+                Preconditions.AtLeast(value.Length, 1, nameof(Description));
+                Preconditions.AtMost(value.Length, MaxDescriptionLength, nameof(Description));
+            }   
+
             _description = value;
         }
     }

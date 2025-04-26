@@ -40,8 +40,12 @@ namespace Discord
             get => _customId;
             set
             {
-                Preconditions.AtLeast(value.Length, 1, nameof(CustomId));
-                Preconditions.AtMost(value.Length, ComponentBuilder.MaxCustomIdLength, nameof(CustomId));
+                if (value is not null)
+                {
+                    Preconditions.AtLeast(value.Length, 1, nameof(CustomId));
+                    Preconditions.AtMost(value.Length, ComponentBuilder.MaxCustomIdLength, nameof(CustomId));
+                }
+
                 _customId = value;
             }
         }
