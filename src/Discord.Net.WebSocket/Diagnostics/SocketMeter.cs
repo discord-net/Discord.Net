@@ -15,9 +15,9 @@ namespace Discord.WebSocket.Diagnostics
         private readonly static Meter _meter = new(Options.SourceName, Options.Version);
 
 #if NET7_0_OR_GREATER
-        private readonly static UpDownCounter<int> _clientShards;
+        private readonly static BufferedUpDownCounter _clientShards;     // Buffering is especially here required because Add gets called so early where the instrument isn't enabled yet.
 
-        private readonly static UpDownCounter<int> _socketConnections;
+        private readonly static BufferedUpDownCounter _socketConnections;
 #endif
         private readonly static Histogram<double> _socketConnectionsLatency;
 
@@ -39,15 +39,15 @@ namespace Discord.WebSocket.Diagnostics
         static SocketMeter()
         {
 #if NET7_0_OR_GREATER
-            _clientShards = _meter.CreateUpDownCounter<int>(
+            _clientShards = new(_meter.CreateUpDownCounter<int>(
                 name: "client.shards_count",
                 unit: "Shards",
-                description: "The amount of shards that currently exists.");
+                description: "The amount of shards that currently exists."));
 
-            _socketConnections = _meter.CreateUpDownCounter<int>(
+            _socketConnections = new(_meter.CreateUpDownCounter<int>(
                 name: "socket.connections_count",
                 unit: "Connections",
-                description: "The total amount of WebSocket connections currently connected (should match the amount of shards).");
+                description: "The total amount of WebSocket connections currently connected (should match the amount of shards)."));
 #endif
             _socketConnectionsLatency = _meter.CreateHistogram<double>(
                 name: "socket.connections.latency",

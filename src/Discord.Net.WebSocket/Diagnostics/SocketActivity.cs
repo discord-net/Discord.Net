@@ -14,6 +14,7 @@ namespace Discord.WebSocket.Diagnostics
 
         internal static Activity StartSocketDispatchActivity(string type, DiscordSocketConfig config)
         {
+            Activity.Current = null;     // This activity doesn't have a parent so it have to be explicitly set
             return _source.StartActivity(
                 "dispatch socket event",
                 ActivityKind.Consumer,

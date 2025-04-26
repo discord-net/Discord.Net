@@ -88,8 +88,10 @@ public partial class DiscordSocketClient
                 }
                 break;
                 case GatewayOpCode.Dispatch:
+                    // An extra Stopwatch is required due to `activity.Duration` cannot be used because its only useable when its stopped but then the metrics wont be associated with this trace.
                     var activity = SocketActivity.StartSocketDispatchActivity(type, BaseConfig);
-                    var watch = activity is null ? Stopwatch.StartNew() : null;
+                    var watch =  Stopwatch.StartNew();
+
                     try
                     {
                         switch (type)
@@ -2525,16 +2527,10 @@ public partial class DiscordSocketClient
                     }
                     finally
                     {
-                        activity.Dispose();
-                        watch?.Stop();
+                        watch.Stop();
+                        SocketMeter.RecordSocketDispatch(watch.Elapsed, type, BaseConfig);
 
-                        SocketMeter.RecordSocketDispatch(
-#if NET5_0_OR_GREATER
-                            activity?.Duration ?? watch.Elapsed,
-#else
-                            watch.Elapsed,
-#endif
-                            type, BaseConfig);
+                        activity?.Dispose();
                     }
                 default:
                     await _gatewayLogger.WarningAsync($"Unknown OpCode ({opCode})").ConfigureAwait(false);
