@@ -4,6 +4,7 @@ using System;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Discord.Interactions
 {
@@ -44,7 +45,7 @@ namespace Discord.Interactions
                 default:
                     throw new InvalidOperationException($"RunMode {InteractionService._runMode} is not supported.");
             }
-
+            
             return Task.FromResult((IResult)ExecuteResult.FromSuccess());
         }
 
@@ -53,6 +54,14 @@ namespace Discord.Interactions
         {
             try
             {
+                await using var scope = InteractionService._autoServiceScopes
+                    ? services?.CreateAsyncScope()
+                    : null;
+
+                services = (InteractionService._autoServiceScopes
+                    ? scope?.ServiceProvider
+                    : services) ?? EmptyServiceProvider.Instance;
+
                 var result = await GenerateSuggestionsAsync(context, autocompleteInteraction, parameter, services).ConfigureAwait(false);
 
                 if (result.IsSuccess)

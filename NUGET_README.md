@@ -39,10 +39,15 @@ The individual components may also be installed from NuGet:
 - _The API core. Implements only entities and barebones functionality._
   - [Discord.Net.Core](https://www.nuget.org/packages/Discord.Net.Core/)
 
-### Unstable
+### Nightlies
 
-Nightly builds are available through our MyGet feed (`https://www.myget.org/F/discord-net/api/v3/index.json`).
-These builds target the dev branch.
+Nightlies are builds of Discord.NET that are still in an experimental phase, and have not been released.  
+They are available through 2 different sources:
+- [BaGet](https://baget.discordnet.dev/)
+- [GitHub Packages](https://github.com/orgs/discord-net/packages?repo_name=Discord.Net)
+
+> [!NOTE]
+> GitHub Packages requires authentication. You can find more information [here](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-nuget-registry#authenticating-to-github-packages).
 
 ## 🩷 Supporting Discord.Net
 

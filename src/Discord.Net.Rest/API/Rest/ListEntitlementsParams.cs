@@ -15,4 +15,6 @@ internal class ListEntitlementsParams
     public Optional<ulong> GuildId { get; set; }
 
     public Optional<bool> ExcludeEnded { get; set; }
+
+    public Optional<bool> ExcludeDeleted { get; set; }
 }

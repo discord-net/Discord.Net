@@ -23,14 +23,10 @@ namespace Discord
             get => _name;
             set
             {
-                if (value == null)
-                    throw new ArgumentNullException(nameof(value), $"{nameof(Name)} cannot be null.");
-                _name = value.Length switch
-                {
-                    > 100 => throw new ArgumentOutOfRangeException(nameof(value), "Name length must be less than or equal to 100."),
-                    0 => throw new ArgumentOutOfRangeException(nameof(value), "Name length must be at least 1."),
-                    _ => value
-                };
+                Preconditions.NotNull(value, nameof(Name));
+                Preconditions.AtLeast(value.Length, 1, nameof(Name));
+                Preconditions.AtMost(value.Length, 100, nameof(Name));
+                _name = value;
             }
         }
 
@@ -48,7 +44,7 @@ namespace Discord
             set
             {
                 if (value is not string && !value.IsNumericType())
-                    throw new ArgumentException($"{nameof(value)} must be a numeric type or a string!");
+                    throw new ArgumentException($"{nameof(value)} must be a numeric type or a string! Value: \"{value}\"");
 
                 _value = value;
             }

@@ -1,6 +1,24 @@
 # Changelog
 
-## [3.17.0] - 2025-01-19
+## [3.17.2] - 2025-03-09
+### Added 
+- #3074 Add `excludeDeleted` argument to `GetEntitlementsAsync` (9c9407b)
+
+### Fixed
+- #3063 `SocketApplicationCommand` missing `GuildId` (c625f5f)
+- #3064 Correct empty value exception (6e7b3c2)
+- #3068 Consider `AutoServiceScopes` in autocomplete handler executions (7fb537f)
+- #3070 Possibly fix mute & deaf state for guild users (5f6c26b)
+- #3072 AutoServiceScopes strikes again (d71fcb1)
+- #3073 SocketGuild.GetApplicationCommandAsync was fetching global commands (aa66928)
+- #3078 Add `EmptyServiceScope` (54e8416) 
+
+### Misc
+- #3075 Make Make GetShardFor(ulong guildId) & DiscordShardedClient.GetUserAsync() public (41ad6ac)
+- #3061 yeet `FluentAssertions` (52c2f0d)
+
+
+## [3.17.1] - 2025-01-19
 
 ### Added
 - #3056 Add IAutomodRule.MentionRaidProtectionEnabled (0e9caf3)

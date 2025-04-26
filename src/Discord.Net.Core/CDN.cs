@@ -140,8 +140,8 @@ namespace Discord
         /// <returns>
         ///     A URL pointing to the guild's splash.
         /// </returns>
-        public static string GetGuildSplashUrl(ulong guildId, string splashId)
-            => splashId != null ? $"{DiscordConfig.CDNUrl}splashes/{guildId}/{splashId}.jpg" : null;
+        public static string GetGuildSplashUrl(ulong guildId, string splashId, ushort size = 2048)
+            => splashId != null ? $"{DiscordConfig.CDNUrl}splashes/{guildId}/{splashId}.jpg?size={size}" : null;
         /// <summary>
         ///     Returns a guild discovery splash URL.
         /// </summary>
@@ -257,6 +257,7 @@ namespace Discord
             {
                 StickerFormatType.None or StickerFormatType.Png or StickerFormatType.Apng => "png", // In the case of the Sticker endpoint, the sticker will be available as PNG if its format_type is PNG or APNG, and as Lottie if its format_type is LOTTIE.
                 StickerFormatType.Lottie => "lottie",
+                StickerFormatType.Gif => "gif",
                 _ => throw new ArgumentException(nameof(format)),
             };
         }

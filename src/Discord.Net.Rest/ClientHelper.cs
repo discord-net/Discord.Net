@@ -405,7 +405,7 @@ namespace Discord.Rest
 
         public static IAsyncEnumerable<IReadOnlyCollection<RestEntitlement>> ListEntitlementsAsync(BaseDiscordClient client, int? limit = 100,
             ulong? afterId = null, ulong? beforeId = null, bool excludeEnded = false, ulong? guildId = null, ulong? userId = null,
-             ulong[] skuIds = null, RequestOptions options = null)
+             ulong[] skuIds = null, bool? excludeDeleted = null, RequestOptions options = null)
         {
             return new PagedAsyncEnumerable<RestEntitlement>(
                 DiscordConfig.MaxEntitlementsPerBatch,
@@ -419,6 +419,7 @@ namespace Discord.Rest
                         GuildId = guildId ?? Optional<ulong>.Unspecified,
                         UserId = userId ?? Optional<ulong>.Unspecified,
                         SkuIds = skuIds ?? Optional<ulong[]>.Unspecified,
+                        ExcludeDeleted = excludeDeleted ?? Optional<bool>.Unspecified
                     };
                     if (info.Position != null)
                         args.AfterId = info.Position.Value;

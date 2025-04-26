@@ -442,8 +442,8 @@ namespace Discord.WebSocket
         /// <inheritdoc cref="IDiscordClient.GetEntitlementsAsync"/>
         public IAsyncEnumerable<IReadOnlyCollection<IEntitlement>> GetEntitlementsAsync(int? limit = 100,
             ulong? afterId = null, ulong? beforeId = null, bool excludeEnded = false, ulong? guildId = null, ulong? userId = null,
-            ulong[] skuIds = null, RequestOptions options = null)
-            => ClientHelper.ListEntitlementsAsync(this, limit, afterId, beforeId, excludeEnded, guildId, userId, skuIds, options);
+            ulong[] skuIds = null, RequestOptions options = null, bool? excludeDeleted = null)
+            => ClientHelper.ListEntitlementsAsync(this, limit, afterId, beforeId, excludeEnded, guildId, userId, skuIds, excludeDeleted, options);
 
         /// <inheritdoc />
         public Task<IReadOnlyCollection<SKU>> GetSKUsAsync(RequestOptions options = null)

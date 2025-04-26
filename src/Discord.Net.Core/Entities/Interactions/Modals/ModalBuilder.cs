@@ -38,12 +38,12 @@ namespace Discord
         public string CustomId
         {
             get => _customId;
-            set => _customId = value?.Length switch
+            set
             {
-                > ComponentBuilder.MaxCustomIdLength => throw new ArgumentOutOfRangeException(nameof(value), $"Custom ID length must be less or equal to {ComponentBuilder.MaxCustomIdLength}."),
-                0 => throw new ArgumentOutOfRangeException(nameof(value), "Custom ID length must be at least 1."),
-                _ => value
-            };
+                Preconditions.AtLeast(value.Length, 1, nameof(CustomId));
+                Preconditions.AtMost(value.Length, ComponentBuilder.MaxCustomIdLength, nameof(CustomId));
+                _customId = value;
+            }
         }
 
         /// <summary>

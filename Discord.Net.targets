@@ -1,6 +1,6 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
-        <VersionPrefix>3.17.1</VersionPrefix>
+        <VersionPrefix>3.17.2</VersionPrefix>
         <LangVersion>latest</LangVersion>
         <Authors>Discord.Net Contributors</Authors>
         <PackageTags>discord;discordapp</PackageTags>
@@ -27,6 +27,7 @@
         <NoWarn>$(NoWarn);CS1573;CS1591</NoWarn>
         <WarningsAsErrors>true</WarningsAsErrors>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
     </PropertyGroup>
     <ItemGroup>
         <None Include="../../docs/marketing/logo/PackageLogo.png" Pack="true" PackagePath=""/>

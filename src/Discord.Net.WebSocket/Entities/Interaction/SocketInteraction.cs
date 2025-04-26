@@ -91,6 +91,9 @@ namespace Discord.WebSocket
         public IReadOnlyCollection<RestEntitlement> Entitlements { get; private set; }
 
         /// <inheritdoc/>
+        public ulong AttachmentSizeLimit { get; private set; }
+
+        /// <inheritdoc/>
         public IReadOnlyDictionary<ApplicationIntegrationType, ulong> IntegrationOwners { get; private set; }
 
         internal SocketInteraction(DiscordSocketClient client, ulong id, ISocketMessageChannel channel, SocketUser user)
@@ -194,6 +197,8 @@ namespace Discord.WebSocket
                     _ => null
                 };
             }
+
+            AttachmentSizeLimit = model.AttachmentSizeLimit;
         }
 
         /// <summary>

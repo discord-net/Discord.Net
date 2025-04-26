@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -147,29 +146,20 @@ namespace Discord
 
         private static void EnsureValidOptionName(string name)
         {
-            if (name == null)
-                throw new ArgumentNullException(nameof(name), $"{nameof(Name)} cannot be null.");
-
-            if (name.Length > 32)
-                throw new ArgumentOutOfRangeException(nameof(name), "Name length must be less than or equal to 32.");
+            Preconditions.NotNull(name, nameof(Name));
+            Preconditions.AtMost(name.Length, 32, nameof(Name));
 
             if (!Regex.IsMatch(name, @"^[-_\p{L}\p{N}\p{IsDevanagari}\p{IsThai}]{1,32}$"))
-                throw new ArgumentException(@"Name must match the regex ^[-_\p{L}\p{N}\p{IsDevanagari}\p{IsThai}]{1,32}$", nameof(name));
+                throw new ArgumentException(@$"Name must match the regex ^[-_\p{{L}}\p{{N}}\p{{IsDevanagari}}\p{{IsThai}}]{{1,32}}$. Value: ""{name}""", nameof(name));
 
             if (name.Any(char.IsUpper))
-                throw new FormatException("Name cannot contain any uppercase characters.");
+                throw new FormatException($"Name cannot contain any uppercase characters. Value: \"{name}\"");
         }
 
         private static void EnsureValidOptionDescription(string description)
         {
-            switch (description.Length)
-            {
-                case > 100:
-                    throw new ArgumentOutOfRangeException(nameof(description),
-                        "Description length must be less than or equal to 100.");
-                case 0:
-                    throw new ArgumentOutOfRangeException(nameof(description), "Description length must at least 1.");
-            }
+            Preconditions.AtLeast(description.Length, 1, nameof(Description));
+            Preconditions.AtMost(description.Length, 100, nameof(Description));
         }
     }
 }

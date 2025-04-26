@@ -102,6 +102,9 @@ namespace Discord.Rest
         /// <inheritdoc/>
         public IReadOnlyDictionary<ApplicationIntegrationType, ulong> IntegrationOwners { get; private set; }
 
+        /// <inheritdoc/>
+        public ulong AttachmentSizeLimit { get; private set; }
+
         internal RestInteraction(BaseDiscordClient discord, ulong id)
             : base(discord, id)
         {
@@ -248,6 +251,8 @@ namespace Discord.Rest
                 : null;
 
             Permissions = new GuildPermissions((ulong)model.ApplicationPermissions);
+
+            AttachmentSizeLimit = model.AttachmentSizeLimit;
         }
 
         internal string SerializePayload(object payload)

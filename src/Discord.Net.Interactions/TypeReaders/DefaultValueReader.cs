@@ -13,9 +13,9 @@ namespace Discord.Interactions
                 var converted = Convert.ChangeType(option, typeof(T));
                 return Task.FromResult(TypeConverterResult.FromSuccess(converted));
             }
-            catch (InvalidCastException castEx)
+            catch (Exception ex) when (ex is FormatException or InvalidCastException)
             {
-                return Task.FromResult(TypeConverterResult.FromError(castEx));
+                return Task.FromResult(TypeConverterResult.FromError(ex));
             }
         }
     }

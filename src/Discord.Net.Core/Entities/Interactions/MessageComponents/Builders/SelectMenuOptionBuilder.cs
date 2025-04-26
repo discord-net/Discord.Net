@@ -30,12 +30,12 @@ public class SelectMenuOptionBuilder
     public string Label
     {
         get => _label;
-        set => _label = value?.Length switch
+        set
         {
-            > MaxSelectLabelLength => throw new ArgumentOutOfRangeException(nameof(value), $"Label length must be less or equal to {MaxSelectLabelLength}."),
-            0 => throw new ArgumentOutOfRangeException(nameof(value), "Label length must be at least 1."),
-            _ => value
-        };
+            Preconditions.AtLeast(value.Length, 1, nameof(Label));
+            Preconditions.AtMost(value.Length, MaxSelectLabelLength, nameof(Label));
+            _label = value;
+        }
     }
 
     /// <summary>
@@ -46,12 +46,12 @@ public class SelectMenuOptionBuilder
     public string Value
     {
         get => _value;
-        set => _value = value?.Length switch
+        set
         {
-            > MaxSelectValueLength => throw new ArgumentOutOfRangeException(nameof(value), $"Value length must be less or equal to {MaxSelectValueLength}."),
-            0 => throw new ArgumentOutOfRangeException(nameof(value), "Value length must be at least 1."),
-            _ => value
-        };
+            Preconditions.AtLeast(value.Length, 1, nameof(Value));
+            Preconditions.AtMost(value.Length, MaxSelectValueLength, nameof(Value));
+            _value = value;
+        }
     }
 
     /// <summary>
@@ -62,12 +62,12 @@ public class SelectMenuOptionBuilder
     public string Description
     {
         get => _description;
-        set => _description = value?.Length switch
+        set
         {
-            > MaxDescriptionLength => throw new ArgumentOutOfRangeException(nameof(value), $"Description length must be less or equal to {MaxDescriptionLength}."),
-            0 => throw new ArgumentOutOfRangeException(nameof(value), "Description length must be at least 1."),
-            _ => value
-        };
+            Preconditions.AtLeast(value.Length, 1, nameof(Description));
+            Preconditions.AtMost(value.Length, MaxDescriptionLength, nameof(Description));
+            _description = value;
+        }
     }
 
     /// <summary>

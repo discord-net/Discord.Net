@@ -146,6 +146,9 @@ namespace Discord.WebSocket
 
             IntegrationTypes = model.IntegrationTypes.GetValueOrDefault(null)?.ToImmutableArray();
             ContextTypes = model.ContextTypes.GetValueOrDefault(null)?.ToImmutableArray();
+
+            if (model.GuildId.IsSpecified)
+                GuildId = model.GuildId.Value;
         }
 
         /// <inheritdoc/>

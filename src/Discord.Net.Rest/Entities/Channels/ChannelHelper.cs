@@ -406,16 +406,11 @@ namespace Discord.Rest
             foreach (var attachment in attachments)
             {
                 Preconditions.NotNullOrEmpty(attachment.FileName, nameof(attachment.FileName), "File Name must not be empty or null");
-            }
 
-            if (channel is ITextChannel guildTextChannel)
-            {
-                ulong contentSize = (ulong)attachments.Where(x => x.Stream.CanSeek).Sum(x => x.Stream.Length);
-
-                if (contentSize > guildTextChannel.Guild.MaxUploadLimit)
-                {
-                    throw new ArgumentOutOfRangeException(nameof(attachments), $"Collective file size exceeds the max file size of {guildTextChannel.Guild.MaxUploadLimit} bytes in that guild!");
-                }
+                if (channel is ITextChannel guildTextChannel &&
+                    attachment.Stream.CanSeek &&
+                    (ulong)attachment.Stream.Length > guildTextChannel.Guild.MaxUploadLimit)
+                    throw new ArgumentOutOfRangeException(nameof(attachments), $"File size exceeds the max file size of {guildTextChannel.Guild.MaxUploadLimit} bytes in that guild!");
             }
 
             // check that user flag and user Id list are exclusive, same with role flag and role Id list

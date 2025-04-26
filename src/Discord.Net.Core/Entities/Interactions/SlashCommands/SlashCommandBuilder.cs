@@ -272,7 +272,7 @@ namespace Discord
 
             // https://discord.com/developers/docs/interactions/application-commands
             if (!Regex.IsMatch(name, @"^[-_\p{L}\p{N}\p{IsDevanagari}\p{IsThai}]{1,32}$"))
-                throw new ArgumentException(@"Name must match the regex ^[-_\p{L}\p{N}\p{IsDevanagari}\p{IsThai}]{1,32}$", nameof(name));
+                throw new ArgumentException(@$"Name must match the regex ^[-_\p{{L}}\p{{N}}\p{{IsDevanagari}}\p{{IsThai}}]{{1,32}}$. Value: ""{name}""", nameof(name));
 
             // make sure theres only one option with default set to true
             if (isDefault == true && Options?.Any(x => x.IsDefault == true) == true)
@@ -440,10 +440,10 @@ namespace Discord
 
             // https://discord.com/developers/docs/interactions/application-commands
             if (!Regex.IsMatch(name, @"^[-_\p{L}\p{N}\p{IsDevanagari}\p{IsThai}]{1,32}$"))
-                throw new ArgumentException(@"Name must match the regex ^[-_\p{L}\p{N}\p{IsDevanagari}\p{IsThai}]{1,32}$", nameof(name));
+                throw new ArgumentException(@$"Name must match the regex ^[-_\p{{L]}}\p{{N}}\p{{IsDevanagari}}\p{{IsThai}}]{{1,32}}$. Value: ""{name}""", nameof(name));
 
             if (name.Any(char.IsUpper))
-                throw new FormatException("Name cannot contain any uppercase characters.");
+                throw new FormatException($"Name cannot contain any uppercase characters. Value: \"{name}\"");
         }
 
         internal static void EnsureValidCommandDescription(string description)
@@ -650,7 +650,7 @@ namespace Discord
 
             // https://discord.com/developers/docs/interactions/application-commands
             if (!Regex.IsMatch(name, @"^[-_\p{L}\p{N}\p{IsDevanagari}\p{IsThai}]{1,32}$"))
-                throw new ArgumentException(@"Name must match the regex ^[-_\p{L}\p{N}\p{IsDevanagari}\p{IsThai}]{1,32}$", nameof(name));
+                throw new ArgumentException(@$"Name must match the regex ^[-_\p{{L}}\p{{N}}\p{{IsDevanagari}}\p{{IsThai}}]{{1,32}}$. Value: ""{name}""", nameof(name));
 
             // make sure theres only one option with default set to true
             if (isDefault && Options?.Any(x => x.IsDefault == true) == true)
@@ -1031,7 +1031,7 @@ namespace Discord
 
             // https://discord.com/developers/docs/interactions/application-commands
             if (!Regex.IsMatch(name, @"^[-_\p{L}\p{N}\p{IsDevanagari}\p{IsThai}]{1,32}$"))
-                throw new ArgumentException(@"Name must match the regex ^[-_\p{L}\p{N}\p{IsDevanagari}\p{IsThai}]{1,32}$", nameof(name));
+                throw new ArgumentException(@$"Name must match the regex ^[-_\p{{L}}\p{{N}}\p{{IsDevanagari}}\p{{IsThai}}]{{1,32}}$. Value: ""{name}""", nameof(name));
         }
 
         private static void EnsureValidCommandOptionDescription(string description)

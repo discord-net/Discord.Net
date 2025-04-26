@@ -60,4 +60,7 @@ internal class Interaction
 
     [JsonProperty("app_permissions")]
     public GuildPermission ApplicationPermissions { get; set; }
+
+    [JsonProperty("attachment_size_limit")]
+    public ulong AttachmentSizeLimit { get; set; }
 }
