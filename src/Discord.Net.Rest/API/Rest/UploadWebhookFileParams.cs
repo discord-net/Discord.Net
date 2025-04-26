@@ -22,7 +22,7 @@ namespace Discord.API.Rest
         public Optional<string> AvatarUrl { get; set; }
         public Optional<Embed[]> Embeds { get; set; }
         public Optional<AllowedMentions> AllowedMentions { get; set; }
-        public Optional<ActionRowComponent[]> MessageComponents { get; set; }
+        public Optional<IMessageComponent[]> MessageComponents { get; set; }
         public Optional<MessageFlags> Flags { get; set; }
         public Optional<string> ThreadName { get; set; }
         public Optional<ulong[]> AppliedTags { get; set; }
@@ -37,8 +37,10 @@ namespace Discord.API.Rest
         {
             var d = new Dictionary<string, object>();
 
+            var extraFlags = MessageFlags.None;
+
             if (Files.Any(x => x.Waveform is not null && x.DurationSeconds is not null))
-                Flags = Flags.GetValueOrDefault(MessageFlags.None) | MessageFlags.VoiceMessage;
+                extraFlags |= MessageFlags.VoiceMessage;
 
             var payload = new Dictionary<string, object>();
             if (Content.IsSpecified)
@@ -51,14 +53,20 @@ namespace Discord.API.Rest
                 payload["username"] = Username.Value;
             if (AvatarUrl.IsSpecified)
                 payload["avatar_url"] = AvatarUrl.Value;
-            if (MessageComponents.IsSpecified)
-                payload["components"] = MessageComponents.Value;
             if (Embeds.IsSpecified)
                 payload["embeds"] = Embeds.Value;
             if (AllowedMentions.IsSpecified)
                 payload["allowed_mentions"] = AllowedMentions.Value;
-            if (Flags.IsSpecified)
-                payload["flags"] = Flags.Value;
+
+            if (MessageComponents.IsSpecified)
+            {
+                payload["components"] = MessageComponents.Value;
+                if (MessageComponents.Value.Any(x => x.Type is not ComponentType.ActionRow))
+                    extraFlags |= MessageFlags.ComponentsV2;
+            }
+
+            payload["flags"] = Flags.GetValueOrDefault(MessageFlags.None) | extraFlags;
+
             if (ThreadName.IsSpecified)
                 payload["thread_name"] = ThreadName.Value;
             if (AppliedTags.IsSpecified)

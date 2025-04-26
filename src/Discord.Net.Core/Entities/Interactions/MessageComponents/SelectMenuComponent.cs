@@ -7,10 +7,13 @@ namespace Discord
     /// <summary>
     ///     Represents a select menu component defined at <see href="https://discord.com/developers/docs/interactions/message-components#select-menu-object"/>
     /// </summary>
-    public class SelectMenuComponent : IMessageComponent
+    public class SelectMenuComponent : IInteractableComponent
     {
         /// <inheritdoc/>
         public ComponentType Type { get; }
+
+        /// <inheritdoc/>
+        public int? Id { get; }
 
         /// <inheritdoc/>
         public string CustomId { get; }
@@ -67,7 +70,7 @@ namespace Discord
                 DefaultValues.ToList());
 
         internal SelectMenuComponent(string customId, List<SelectMenuOption> options, string placeholder, int minValues, int maxValues,
-            bool disabled, ComponentType type, IEnumerable<ChannelType> channelTypes = null, IEnumerable<SelectMenuDefaultValue> defaultValues = null)
+            bool disabled, ComponentType type, int? id, IEnumerable<ChannelType> channelTypes = null, IEnumerable<SelectMenuDefaultValue> defaultValues = null)
         {
             CustomId = customId;
             Options = options;
@@ -76,8 +79,9 @@ namespace Discord
             MaxValues = maxValues;
             IsDisabled = disabled;
             Type = type;
-            ChannelTypes = channelTypes?.ToArray() ?? Array.Empty<ChannelType>();
-            DefaultValues = defaultValues?.ToArray() ?? Array.Empty<SelectMenuDefaultValue>();
+            Id = id;
+            ChannelTypes = channelTypes?.ToArray() ?? [];
+            DefaultValues = defaultValues?.ToArray() ?? [];
         }
     }
 }

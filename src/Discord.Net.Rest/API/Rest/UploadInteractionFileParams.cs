@@ -21,7 +21,7 @@ namespace Discord.API.Rest
         public Optional<bool> IsTTS { get; set; }
         public Optional<Embed[]> Embeds { get; set; }
         public Optional<AllowedMentions> AllowedMentions { get; set; }
-        public Optional<ActionRowComponent[]> MessageComponents { get; set; }
+        public Optional<IMessageComponent[]> MessageComponents { get; set; }
         public Optional<MessageFlags> Flags { get; set; }
         public Optional<CreatePollParams> Poll { get; set; }
 
@@ -44,8 +44,10 @@ namespace Discord.API.Rest
         {
             var d = new Dictionary<string, object>();
 
+            var extraFlags = MessageFlags.None;
+
             if (Files.Any(x => x.Waveform is not null && x.DurationSeconds is not null))
-                Flags = Flags.GetValueOrDefault(MessageFlags.None) | MessageFlags.VoiceMessage;
+                extraFlags |= MessageFlags.VoiceMessage;
 
             var payload = new Dictionary<string, object>();
             payload["type"] = Type;
@@ -55,20 +57,26 @@ namespace Discord.API.Rest
                 data["content"] = Content.Value;
             if (IsTTS.IsSpecified)
                 data["tts"] = IsTTS.Value;
-            if (MessageComponents.IsSpecified)
-                data["components"] = MessageComponents.Value;
             if (Embeds.IsSpecified)
                 data["embeds"] = Embeds.Value;
             if (AllowedMentions.IsSpecified)
                 data["allowed_mentions"] = AllowedMentions.Value;
-            if (Flags.IsSpecified)
-                data["flags"] = Flags.Value;
+
+            if (MessageComponents.IsSpecified)
+            {
+                data["components"] = MessageComponents.Value;
+                if (MessageComponents.Value.Any(x => x.Type is not ComponentType.ActionRow))
+                    extraFlags |= MessageFlags.ComponentsV2;
+            }
+
+            data["flags"] = Flags.GetValueOrDefault(MessageFlags.None) | extraFlags;
+
             if (Poll.IsSpecified)
                 data["poll"] = Poll.Value;
 
-            List<object> attachments = new();
+            List<object> attachments = [];
 
-            for (int n = 0; n != Files.Length; n++)
+            for (var n = 0; n != Files.Length; n++)
             {
                 var attachment = Files[n];
 

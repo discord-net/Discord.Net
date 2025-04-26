@@ -3,6 +3,7 @@ using Discord.Rest;
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -137,12 +138,13 @@ namespace Discord.Rest
             MessageComponent component = null,
             Embed embed = null,
             RequestOptions options = null,
-            PollProperties poll = null)
+            PollProperties poll = null, 
+            MessageFlags flags = MessageFlags.None)
         {
             if (!IsValidToken)
                 throw new InvalidOperationException("Interaction token is no longer valid");
 
-            embeds ??= Array.Empty<Embed>();
+            embeds ??= [];
             if (embed != null)
                 embeds = new[] { embed }.Concat(embeds).ToArray();
 
@@ -157,12 +159,14 @@ namespace Discord.Rest
                 AllowedMentions = allowedMentions?.ToModel() ?? Optional<API.AllowedMentions>.Unspecified,
                 IsTTS = isTTS,
                 Embeds = embeds.Select(x => x.ToModel()).ToArray(),
-                Components = component?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ??Optional<API.ActionRowComponent[]>.Unspecified,
-                Poll = poll?.ToModel() ?? Optional<API.Rest.CreatePollParams>.Unspecified
+                Components = component?.Components.Select(x => x.ToModel()).ToArray() ?? Optional<IMessageComponent[]>.Unspecified,
+                Poll = poll?.ToModel() ?? Optional<API.Rest.CreatePollParams>.Unspecified,
+                Flags = ephemeral
+                    ? flags | MessageFlags.Ephemeral
+                    : flags == MessageFlags.None
+                        ? Optional<MessageFlags>.Unspecified
+                        : flags,
             };
-
-            if (ephemeral)
-                args.Flags = MessageFlags.Ephemeral;
 
             return InteractionHelper.SendFollowupAsync(Discord, args, Token, Channel, options);
         }
@@ -194,12 +198,13 @@ namespace Discord.Rest
             MessageComponent component = null,
             Embed embed = null,
             RequestOptions options = null,
-            PollProperties poll = null)
+            PollProperties poll = null,
+            MessageFlags flags = MessageFlags.None)
         {
             if (!IsValidToken)
                 throw new InvalidOperationException("Interaction token is no longer valid");
 
-            embeds ??= Array.Empty<Embed>();
+            embeds ??= [];
             if (embed != null)
                 embeds = new[] { embed }.Concat(embeds).ToArray();
 
@@ -216,13 +221,15 @@ namespace Discord.Rest
                 AllowedMentions = allowedMentions?.ToModel() ?? Optional<API.AllowedMentions>.Unspecified,
                 IsTTS = isTTS,
                 Embeds = embeds.Select(x => x.ToModel()).ToArray(),
-                Components = component?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Optional<API.ActionRowComponent[]>.Unspecified,
+                Components = component?.Components.Select(x => x.ToModel()).ToArray() ?? Optional<IMessageComponent[]>.Unspecified,
                 File = fileStream is not null ? new MultipartFile(fileStream, fileName) : Optional<MultipartFile>.Unspecified,
                 Poll = poll?.ToModel() ?? Optional<API.Rest.CreatePollParams>.Unspecified,
+                Flags = ephemeral
+                    ? flags | MessageFlags.Ephemeral
+                    : flags == MessageFlags.None
+                        ? Optional<MessageFlags>.Unspecified
+                        : flags,
             };
-
-            if (ephemeral)
-                args.Flags = MessageFlags.Ephemeral;
 
             return InteractionHelper.SendFollowupAsync(Discord, args, Token, Channel, options);
         }
@@ -254,12 +261,13 @@ namespace Discord.Rest
             MessageComponent component = null,
             Embed embed = null,
             RequestOptions options = null,
-            PollProperties poll = null)
+            PollProperties poll = null,
+            MessageFlags flags = MessageFlags.None)
         {
             if (!IsValidToken)
                 throw new InvalidOperationException("Interaction token is no longer valid");
 
-            embeds ??= Array.Empty<Embed>();
+            embeds ??= [];
             if (embed != null)
                 embeds = new[] { embed }.Concat(embeds).ToArray();
 
@@ -279,13 +287,15 @@ namespace Discord.Rest
                 AllowedMentions = allowedMentions?.ToModel() ?? Optional<API.AllowedMentions>.Unspecified,
                 IsTTS = isTTS,
                 Embeds = embeds.Select(x => x.ToModel()).ToArray(),
-                Components = component?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Optional<API.ActionRowComponent[]>.Unspecified,
+                Components = component?.Components.Select(x => x.ToModel()).ToArray() ?? Optional<IMessageComponent[]>.Unspecified,
                 File = fileStream != null ? new MultipartFile(fileStream, fileName) : Optional<MultipartFile>.Unspecified,
-                Poll = poll?.ToModel() ?? Optional<API.Rest.CreatePollParams>.Unspecified
+                Poll = poll?.ToModel() ?? Optional<API.Rest.CreatePollParams>.Unspecified,
+                Flags = ephemeral
+                    ? flags | MessageFlags.Ephemeral
+                    : flags == MessageFlags.None
+                        ? Optional<MessageFlags>.Unspecified
+                        : flags,
             };
-
-            if (ephemeral)
-                args.Flags = MessageFlags.Ephemeral;
 
             return await InteractionHelper.SendFollowupAsync(Discord, args, Token, Channel, options);
         }
@@ -315,7 +325,8 @@ namespace Discord.Rest
             MessageComponent component = null,
             Embed embed = null,
             RequestOptions options = null,
-            PollProperties poll = null)
+            PollProperties poll = null,
+            MessageFlags flags = MessageFlags.None)
         {
             if (!IsValidToken)
                 throw new InvalidOperationException("Interaction token is no longer valid");
@@ -323,7 +334,7 @@ namespace Discord.Rest
             if (!InteractionHelper.CanSendResponse(this) && Discord.ResponseInternalTimeCheck)
                 throw new TimeoutException($"Cannot respond to an interaction after {InteractionHelper.ResponseTimeLimit} seconds!");
 
-            embeds ??= Array.Empty<Embed>();
+            embeds ??= [];
             if (embed != null)
                 embeds = new[] { embed }.Concat(embeds).ToArray();
 
@@ -357,8 +368,12 @@ namespace Discord.Rest
                     AllowedMentions = allowedMentions?.ToModel() ?? Optional<API.AllowedMentions>.Unspecified,
                     Embeds = embeds.Select(x => x.ToModel()).ToArray(),
                     TTS = isTTS,
-                    Components = component?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Optional<API.ActionRowComponent[]>.Unspecified,
-                    Flags = ephemeral ? MessageFlags.Ephemeral : Optional<MessageFlags>.Unspecified,
+                    Components = component?.Components.Select(x => x.ToModel()).ToArray() ?? Optional<IMessageComponent[]>.Unspecified,
+                    Flags = ephemeral
+                        ? flags | MessageFlags.Ephemeral
+                        : flags == MessageFlags.None
+                            ? Optional<MessageFlags>.Unspecified
+                            : flags,
                     Poll = poll?.ToModel() ?? Optional<API.Rest.CreatePollParams>.Unspecified
                 }
             };
@@ -390,12 +405,13 @@ namespace Discord.Rest
             MessageComponent components = null,
             Embed embed = null,
             RequestOptions options = null,
-            PollProperties poll = null)
+            PollProperties poll = null,
+            MessageFlags flags = MessageFlags.None)
         {
             if (!IsValidToken)
                 throw new InvalidOperationException("Interaction token is no longer valid");
 
-            embeds ??= Array.Empty<Embed>();
+            embeds ??= [];
             if (embed != null)
                 embeds = new[] { embed }.Concat(embeds).ToArray();
 
@@ -425,19 +441,18 @@ namespace Discord.Rest
                 }
             }
 
-            var flags = MessageFlags.None;
-
-            if (ephemeral)
-                flags |= MessageFlags.Ephemeral;
-
             var args = new API.Rest.UploadWebhookFileParams(attachments.ToArray())
             {
-                Flags = flags,
+                Flags = ephemeral
+                    ? flags | MessageFlags.Ephemeral
+                    : flags == MessageFlags.None
+                        ? Optional<MessageFlags>.Unspecified
+                        : flags,
                 Content = text,
                 IsTTS = isTTS,
                 Embeds = embeds.Any() ? embeds.Select(x => x.ToModel()).ToArray() : Optional<API.Embed[]>.Unspecified,
                 AllowedMentions = allowedMentions?.ToModel() ?? Optional<API.AllowedMentions>.Unspecified,
-                MessageComponents = components?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Optional<API.ActionRowComponent[]>.Unspecified,
+                MessageComponents = components?.Components.Select(x => x.ToModel()).ToArray() ?? Optional<IMessageComponent[]>.Unspecified,
                 Poll = poll?.ToModel() ?? Optional<API.Rest.CreatePollParams>.Unspecified
             };
             return InteractionHelper.SendFollowupAsync(Discord, args, Token, Channel, options);
@@ -454,9 +469,10 @@ namespace Discord.Rest
             MessageComponent components = null,
             Embed embed = null,
             RequestOptions options = null,
-            PollProperties poll = null)
+            PollProperties poll = null,
+            MessageFlags flags = MessageFlags.None)
         {
-            return FollowupWithFilesAsync(new FileAttachment[] { attachment }, text, embeds, isTTS, ephemeral, allowedMentions, components, embed, options, poll);
+            return FollowupWithFilesAsync([attachment], text, embeds, isTTS, ephemeral, allowedMentions, components, embed, options, poll, flags);
         }
 
         /// <inheritdoc/>
@@ -541,8 +557,8 @@ namespace Discord.Rest
                         AllowedMentions = args.AllowedMentions.IsSpecified ? args.AllowedMentions.Value?.ToModel() : Optional<API.AllowedMentions>.Unspecified,
                         Embeds = apiEmbeds?.ToArray() ?? Optional<API.Embed[]>.Unspecified,
                         Components = args.Components.IsSpecified
-                            ? args.Components.Value?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Array.Empty<API.ActionRowComponent>()
-                            : Optional<API.ActionRowComponent[]>.Unspecified,
+                            ? args.Components.Value?.Components.Select(x => x.ToModel()).ToArray() ?? []
+                            : Optional<IMessageComponent[]>.Unspecified,
                         Flags = args.Flags.IsSpecified ? args.Flags.Value ?? Optional<MessageFlags>.Unspecified : Optional<MessageFlags>.Unspecified
                     }
                 };
@@ -551,7 +567,7 @@ namespace Discord.Rest
             }
             else
             {
-                var attachments = args.Attachments.Value?.ToArray() ?? Array.Empty<FileAttachment>();
+                var attachments = args.Attachments.Value?.ToArray() ?? [];
 
                 var response = new API.Rest.UploadInteractionFileParams(attachments)
                 {
@@ -560,8 +576,8 @@ namespace Discord.Rest
                     AllowedMentions = args.AllowedMentions.IsSpecified ? args.AllowedMentions.Value?.ToModel() : Optional<API.AllowedMentions>.Unspecified,
                     Embeds = apiEmbeds?.ToArray() ?? Optional<API.Embed[]>.Unspecified,
                     MessageComponents = args.Components.IsSpecified
-                        ? args.Components.Value?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Array.Empty<API.ActionRowComponent>()
-                        : Optional<API.ActionRowComponent[]>.Unspecified,
+                        ? args.Components.Value?.Components.Select(x => x.ToModel()).ToArray() ?? []
+                        : Optional<IMessageComponent[]>.Unspecified,
                     Flags = args.Flags.IsSpecified ? args.Flags.Value ?? Optional<MessageFlags>.Unspecified : Optional<MessageFlags>.Unspecified
                 };
 

@@ -6,6 +6,7 @@ namespace Discord
         ///     Intended for short, single-line text.
         /// </summary>
         Short = 1,
+
         /// <summary>
         ///     Intended for longer or multiline text.
         /// </summary>

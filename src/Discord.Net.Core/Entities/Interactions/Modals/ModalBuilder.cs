@@ -111,21 +111,20 @@ namespace Discord
         }
 
         /// <summary>
-        ///     Gets a <typeparamref name="TMessageComponent"/> by the specified <paramref name="customId"/>.
+        ///     Gets a <typeparamref name="TMessageComponentBuilder"/> by the specified <paramref name="customId"/>.
         /// </summary>
-        /// <typeparam name="TMessageComponent">The type of the component to get.</typeparam>
-        /// <param name="customId">The <see cref="IMessageComponent.CustomId"/> of the component to get.</param>
+        /// <typeparam name="TMessageComponentBuilder">The type of the component to get.</typeparam>
+        /// <param name="customId">The <see cref="IInteractableComponentBuilder.CustomId"/> of the component to get.</param>
         /// <returns>
-        ///     The component of type <typeparamref name="TMessageComponent"/> that was found, <see langword="null"/> otherwise.
+        ///     The component of type <typeparamref name="TMessageComponentBuilder"/> that was found, <see langword="null"/> otherwise.
         /// </returns>
-        public TMessageComponent GetComponent<TMessageComponent>(string customId)
-            where TMessageComponent : class, IMessageComponent
+        public TMessageComponentBuilder GetComponent<TMessageComponentBuilder>(string customId)
+            where TMessageComponentBuilder : class, IInteractableComponentBuilder
         {
             Preconditions.NotNull(customId, nameof(customId));
 
-            return Components.ActionRows
-                ?.SelectMany(r => r.Components.OfType<TMessageComponent>())
-                .FirstOrDefault(c => c?.CustomId == customId);
+            return Components.ActionRows?.SelectMany(r => r.Components.OfType<TMessageComponentBuilder>())
+                .FirstOrDefault(c => c.CustomId == customId);
         }
 
         /// <summary>
@@ -141,7 +140,7 @@ namespace Discord
         {
             Preconditions.NotNull(customId, nameof(customId));
 
-            var component = GetComponent<TextInputComponent>(customId) ?? throw new ArgumentException($"There is no component of type {nameof(TextInputComponent)} with the specified custom ID in this modal builder.", nameof(customId));
+            var component = GetComponent<TextInputBuilder>(customId) ?? throw new ArgumentException($"There is no component of type {nameof(TextInputComponent)} with the specified custom ID in this modal builder.", nameof(customId));
             var row = Components.ActionRows.First(r => r.Components.Contains(component));
 
             var builder = new TextInputBuilder
@@ -159,7 +158,7 @@ namespace Discord
             updateTextInput(builder);
 
             row.Components.Remove(component);
-            row.AddComponent(builder.Build());
+            row.AddComponent(builder);
 
             return this;
         }
@@ -179,13 +178,13 @@ namespace Discord
         /// <summary>
         ///     Removes a component from this builder by the specified <paramref name="customId"/>.
         /// </summary>
-        /// <param name="customId">The <see cref="IMessageComponent.CustomId"/> of the component to remove.</param>
+        /// <param name="customId">The <see cref="IInteractableComponent.CustomId"/> of the component to remove.</param>
         /// <returns>The current builder.</returns>
         public ModalBuilder RemoveComponent(string customId)
         {
             Preconditions.NotNull(customId, nameof(customId));
 
-            Components.ActionRows?.ForEach(r => r.Components.RemoveAll(c => c.CustomId == customId));
+            Components.ActionRows?.ForEach(r => r.Components.RemoveAll(c => c is IInteractableComponentBuilder ic && ic.CustomId == customId));
             return this;
         }
 
@@ -226,7 +225,7 @@ namespace Discord
     public class ModalComponentBuilder
     {
         /// <summary>
-        ///     The max length of a <see cref="IMessageComponent.CustomId"/>.
+        ///     The max length of a <see cref="IInteractableComponent.CustomId"/>.
         /// </summary>
         public const int MaxCustomIdLength = 100;
 
@@ -314,19 +313,17 @@ namespace Discord
         {
             Preconditions.LessThan(row, MaxActionRowCount, nameof(row));
 
-            var builtButton = text.Build();
-
             if (_actionRows == null)
             {
                 _actionRows = new List<ActionRowBuilder>
                 {
-                    new ActionRowBuilder().AddComponent(builtButton)
+                    new ActionRowBuilder().AddComponent(text)
                 };
             }
             else
             {
                 if (_actionRows.Count == row)
-                    _actionRows.Add(new ActionRowBuilder().AddComponent(builtButton));
+                    _actionRows.Add(new ActionRowBuilder().AddComponent(text));
                 else
                 {
                     ActionRowBuilder actionRow;
@@ -338,8 +335,8 @@ namespace Discord
                         _actionRows.Add(actionRow);
                     }
 
-                    if (actionRow.CanTakeComponent(builtButton))
-                        actionRow.AddComponent(builtButton);
+                    if (actionRow.CanTakeComponent(text))
+                        actionRow.AddComponent(text);
                     else if (row < MaxActionRowCount)
                         WithTextInput(text, row + 1);
                     else

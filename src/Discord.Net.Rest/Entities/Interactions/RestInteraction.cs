@@ -342,7 +342,7 @@ namespace Discord.Rest
 
         /// <inheritdoc/>
         public abstract string Respond(string text = null, Embed[] embeds = null, bool isTTS = false, bool ephemeral = false,
-            AllowedMentions allowedMentions = null, MessageComponent components = null, Embed embed = null, RequestOptions options = null, PollProperties poll = null);
+            AllowedMentions allowedMentions = null, MessageComponent components = null, Embed embed = null, RequestOptions options = null, PollProperties poll = null, MessageFlags flags = MessageFlags.None);
 
         /// <summary>
         ///     Sends a followup message for this interaction.
@@ -361,7 +361,7 @@ namespace Discord.Rest
         ///     contains the sent message.
         /// </returns>
         public abstract Task<RestFollowupMessage> FollowupAsync(string text = null, Embed[] embeds = null, bool isTTS = false, bool ephemeral = false,
-             AllowedMentions allowedMentions = null, MessageComponent components = null, Embed embed = null, RequestOptions options = null, PollProperties poll = null);
+             AllowedMentions allowedMentions = null, MessageComponent components = null, Embed embed = null, RequestOptions options = null, PollProperties poll = null, MessageFlags flags = MessageFlags.None);
 
         /// <summary>
         ///     Sends a followup message for this interaction.
@@ -382,7 +382,7 @@ namespace Discord.Rest
         ///     contains the sent message.
         /// </returns>
         public abstract Task<RestFollowupMessage> FollowupWithFileAsync(Stream fileStream, string fileName, string text = null, Embed[] embeds = null, bool isTTS = false, bool ephemeral = false,
-            AllowedMentions allowedMentions = null, MessageComponent components = null, Embed embed = null, RequestOptions options = null, PollProperties poll = null);
+            AllowedMentions allowedMentions = null, MessageComponent components = null, Embed embed = null, RequestOptions options = null, PollProperties poll = null, MessageFlags flags = MessageFlags.None);
 
         /// <summary>
         ///     Sends a followup message for this interaction.
@@ -403,7 +403,7 @@ namespace Discord.Rest
         ///     contains the sent message.
         /// </returns>
         public abstract Task<RestFollowupMessage> FollowupWithFileAsync(string filePath, string fileName = null, string text = null, Embed[] embeds = null, bool isTTS = false, bool ephemeral = false,
-            AllowedMentions allowedMentions = null, MessageComponent components = null, Embed embed = null, RequestOptions options = null, PollProperties poll = null);
+            AllowedMentions allowedMentions = null, MessageComponent components = null, Embed embed = null, RequestOptions options = null, PollProperties poll = null, MessageFlags flags = MessageFlags.None);
 
         /// <summary>
         ///     Sends a followup message for this interaction.
@@ -423,7 +423,7 @@ namespace Discord.Rest
         ///     contains the sent message.
         /// </returns>
         public abstract Task<RestFollowupMessage> FollowupWithFileAsync(FileAttachment attachment, string text = null, Embed[] embeds = null, bool isTTS = false, bool ephemeral = false,
-            AllowedMentions allowedMentions = null, MessageComponent components = null, Embed embed = null, RequestOptions options = null, PollProperties poll = null);
+            AllowedMentions allowedMentions = null, MessageComponent components = null, Embed embed = null, RequestOptions options = null, PollProperties poll = null, MessageFlags flags = MessageFlags.None);
 
         /// <summary>
         ///     Sends a followup message for this interaction.
@@ -443,7 +443,7 @@ namespace Discord.Rest
         ///     contains the sent message.
         /// </returns>
         public abstract Task<RestFollowupMessage> FollowupWithFilesAsync(IEnumerable<FileAttachment> attachments, string text = null, Embed[] embeds = null, bool isTTS = false, bool ephemeral = false,
-            AllowedMentions allowedMentions = null, MessageComponent components = null, Embed embed = null, RequestOptions options = null, PollProperties poll = null);
+            AllowedMentions allowedMentions = null, MessageComponent components = null, Embed embed = null, RequestOptions options = null, PollProperties poll = null, MessageFlags flags = MessageFlags.None);
 
         /// <inheritdoc/>
         public Task DeleteOriginalResponseAsync(RequestOptions options = null)
@@ -462,7 +462,7 @@ namespace Discord.Rest
 
         /// <inheritdoc/>
         Task IDiscordInteraction.RespondAsync(string text, Embed[] embeds, bool isTTS, bool ephemeral, AllowedMentions allowedMentions,
-            MessageComponent components, Embed embed, RequestOptions options, PollProperties poll)
+            MessageComponent components, Embed embed, RequestOptions options, PollProperties poll, MessageFlags flags)
             => Task.FromResult(Respond(text, embeds, isTTS, ephemeral, allowedMentions, components, embed, options, poll));
         /// <inheritdoc/>
         Task IDiscordInteraction.DeferAsync(bool ephemeral, RequestOptions options)
@@ -470,45 +470,48 @@ namespace Discord.Rest
         /// <inheritdoc/>
         Task IDiscordInteraction.RespondWithModalAsync(Modal modal, RequestOptions options)
             => Task.FromResult(RespondWithModal(modal, options));
+
         /// <inheritdoc/>
         async Task<IUserMessage> IDiscordInteraction.FollowupAsync(string text, Embed[] embeds, bool isTTS, bool ephemeral, AllowedMentions allowedMentions,
-            MessageComponent components, Embed embed, RequestOptions options, PollProperties poll)
-            => await FollowupAsync(text, embeds, isTTS, ephemeral, allowedMentions, components, embed, options, poll).ConfigureAwait(false);
+            MessageComponent components, Embed embed, RequestOptions options, PollProperties poll, MessageFlags flags)
+            => await FollowupAsync(text, embeds, isTTS, ephemeral, allowedMentions, components, embed, options, poll, flags).ConfigureAwait(false);
         /// <inheritdoc/>
         async Task<IUserMessage> IDiscordInteraction.GetOriginalResponseAsync(RequestOptions options)
             => await GetOriginalResponseAsync(options).ConfigureAwait(false);
         /// <inheritdoc/>
         async Task<IUserMessage> IDiscordInteraction.ModifyOriginalResponseAsync(Action<MessageProperties> func, RequestOptions options)
             => await ModifyOriginalResponseAsync(func, options).ConfigureAwait(false);
+
         /// <inheritdoc/>
         async Task<IUserMessage> IDiscordInteraction.FollowupWithFileAsync(Stream fileStream, string fileName, string text, Embed[] embeds, bool isTTS, bool ephemeral,
-            AllowedMentions allowedMentions, MessageComponent components, Embed embed, RequestOptions options, PollProperties poll)
-            => await FollowupWithFileAsync(fileStream, fileName, text, embeds, isTTS, ephemeral, allowedMentions, components, embed, options, poll).ConfigureAwait(false);
+            AllowedMentions allowedMentions, MessageComponent components, Embed embed, RequestOptions options, PollProperties poll, MessageFlags flags)
+            => await FollowupWithFileAsync(fileStream, fileName, text, embeds, isTTS, ephemeral, allowedMentions, components, embed, options, poll, flags).ConfigureAwait(false);
         /// <inheritdoc/>
         async Task<IUserMessage> IDiscordInteraction.FollowupWithFileAsync(string filePath, string fileName, string text, Embed[] embeds, bool isTTS, bool ephemeral,
-            AllowedMentions allowedMentions, MessageComponent components, Embed embed, RequestOptions options, PollProperties poll)
-            => await FollowupWithFileAsync(filePath, text, fileName, embeds, isTTS, ephemeral, allowedMentions, components, embed, options, poll).ConfigureAwait(false);
+            AllowedMentions allowedMentions, MessageComponent components, Embed embed, RequestOptions options, PollProperties poll, MessageFlags flags)
+            => await FollowupWithFileAsync(filePath, text, fileName, embeds, isTTS, ephemeral, allowedMentions, components, embed, options, poll, flags).ConfigureAwait(false);
         /// <inheritdoc/>
         async Task<IUserMessage> IDiscordInteraction.FollowupWithFileAsync(FileAttachment attachment, string text, Embed[] embeds, bool isTTS,
-            bool ephemeral, AllowedMentions allowedMentions, MessageComponent components, Embed embed, RequestOptions options, PollProperties poll)
-            => await FollowupWithFileAsync(attachment, text, embeds, isTTS, ephemeral, allowedMentions, components, embed, options, poll).ConfigureAwait(false);
+            bool ephemeral, AllowedMentions allowedMentions, MessageComponent components, Embed embed, RequestOptions options, PollProperties poll, MessageFlags flags)
+            => await FollowupWithFileAsync(attachment, text, embeds, isTTS, ephemeral, allowedMentions, components, embed, options, poll, flags).ConfigureAwait(false);
         /// <inheritdoc/>
         async Task<IUserMessage> IDiscordInteraction.FollowupWithFilesAsync(IEnumerable<FileAttachment> attachments, string text, Embed[] embeds, bool isTTS,
-            bool ephemeral, AllowedMentions allowedMentions, MessageComponent components, Embed embed, RequestOptions options, PollProperties poll)
-            => await FollowupWithFilesAsync(attachments, text, embeds, isTTS, ephemeral, allowedMentions, components, embed, options, poll).ConfigureAwait(false);
+            bool ephemeral, AllowedMentions allowedMentions, MessageComponent components, Embed embed, RequestOptions options, PollProperties poll, MessageFlags flags)
+            => await FollowupWithFilesAsync(attachments, text, embeds, isTTS, ephemeral, allowedMentions, components, embed, options, poll, flags).ConfigureAwait(false);
+
         /// <inheritdoc/>
         Task IDiscordInteraction.RespondWithFilesAsync(IEnumerable<FileAttachment> attachments, string text, Embed[] embeds, bool isTTS, bool ephemeral,
-            AllowedMentions allowedMentions, MessageComponent components, Embed embed, RequestOptions options, PollProperties poll) => throw new NotSupportedException("REST-Based interactions don't support files.");
+            AllowedMentions allowedMentions, MessageComponent components, Embed embed, RequestOptions options, PollProperties poll, MessageFlags flags) => throw new NotSupportedException("REST-Based interactions don't support files.");
 #if NETCOREAPP3_0_OR_GREATER != true
         /// <inheritdoc/>
         Task IDiscordInteraction.RespondWithFileAsync(Stream fileStream, string fileName, string text, Embed[] embeds, bool isTTS, bool ephemeral,
-            AllowedMentions allowedMentions, MessageComponent components, Embed embed, RequestOptions options, PollProperties poll) => throw new NotSupportedException("REST-Based interactions don't support files.");
+            AllowedMentions allowedMentions, MessageComponent components, Embed embed, RequestOptions options, PollProperties poll, MessageFlags flags) => throw new NotSupportedException("REST-Based interactions don't support files.");
         /// <inheritdoc/>
         Task IDiscordInteraction.RespondWithFileAsync(string filePath, string fileName, string text, Embed[] embeds, bool isTTS,
-            bool ephemeral, AllowedMentions allowedMentions, MessageComponent components, Embed embed, RequestOptions options, PollProperties poll) => throw new NotSupportedException("REST-Based interactions don't support files.");
+            bool ephemeral, AllowedMentions allowedMentions, MessageComponent components, Embed embed, RequestOptions options, PollProperties poll, MessageFlags flags) => throw new NotSupportedException("REST-Based interactions don't support files.");
         /// <inheritdoc/>
         Task IDiscordInteraction.RespondWithFileAsync(FileAttachment attachment, string text, Embed[] embeds, bool isTTS, bool ephemeral,
-            AllowedMentions allowedMentions, MessageComponent components, Embed embed, RequestOptions options, PollProperties poll) => throw new NotSupportedException("REST-Based interactions don't support files.");
+            AllowedMentions allowedMentions, MessageComponent components, Embed embed, RequestOptions options, PollProperties poll, MessageFlags flags) => throw new NotSupportedException("REST-Based interactions don't support files.");
 #endif
         #endregion
     }

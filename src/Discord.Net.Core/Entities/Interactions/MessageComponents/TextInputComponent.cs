@@ -3,13 +3,16 @@ namespace Discord
     /// <summary>
     ///     Represents a <see cref="IMessageComponent"/> text input.
     /// </summary>
-    public class TextInputComponent : IMessageComponent
+    public class TextInputComponent : IInteractableComponent
     {
         /// <inheritdoc/>
         public ComponentType Type => ComponentType.TextInput;
 
         /// <inheritdoc/>
         public string CustomId { get; }
+
+        /// <inheritdoc/>
+        public int? Id { get; }
 
         /// <summary>
         ///     Gets the label of the component; this is the text shown above it.
@@ -47,7 +50,7 @@ namespace Discord
         public string Value { get; }
 
         internal TextInputComponent(string customId, string label, string placeholder, int? minLength, int? maxLength,
-            TextInputStyle style, bool? required, string value)
+            TextInputStyle style, bool? required, string value, int? id)
         {
             CustomId = customId;
             Label = label;
@@ -57,6 +60,7 @@ namespace Discord
             Style = style;
             Required = required;
             Value = value;
+            Id = id;
         }
     }
 }

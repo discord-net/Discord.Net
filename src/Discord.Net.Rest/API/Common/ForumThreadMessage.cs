@@ -17,7 +17,7 @@ internal class ForumThreadMessage
     public Optional<AllowedMentions> AllowedMentions { get; set; }
 
     [JsonProperty("components")]
-    public Optional<API.ActionRowComponent[]> Components { get; set; }
+    public Optional<IMessageComponent[]> Components { get; set; }
 
     [JsonProperty("sticker_ids")]
     public Optional<ulong[]> Stickers { get; set; }

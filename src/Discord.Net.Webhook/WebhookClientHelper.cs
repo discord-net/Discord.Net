@@ -29,6 +29,11 @@ namespace Discord.Webhook
             MessageFlags flags, ulong? threadId = null, string threadName = null, ulong[] appliedTags = null,
             PollProperties poll = null)
         {
+            if (components?.Components.Any(x => x.Type is not ComponentType.ActionRow) ?? false)
+                flags |= MessageFlags.ComponentsV2;
+
+            Preconditions.ValidateMessageFlags(flags);
+
             var args = new CreateWebhookMessageParams
             {
                 Content = text,
@@ -48,7 +53,7 @@ namespace Discord.Webhook
             if (allowedMentions != null)
                 args.AllowedMentions = allowedMentions.ToModel();
             if (components != null)
-                args.Components = components?.Components.Select(x => new API.ActionRowComponent(x)).ToArray();
+                args.Components = components?.Components.Select(x => x.ToModel()).ToArray();
             if (threadName is not null)
                 args.ThreadName = threadName;
             if (appliedTags != null)
@@ -56,8 +61,6 @@ namespace Discord.Webhook
             if (poll != null)
                 args.Poll = poll.ToModel();
 
-            if (flags is not MessageFlags.None and not MessageFlags.SuppressEmbeds and not MessageFlags.SuppressNotification)
-                throw new ArgumentException("The only valid MessageFlags are SuppressEmbeds, SuppressNotification and none.", nameof(flags));
 
             var model = await client.ApiClient.CreateWebhookMessageAsync(client.Webhook.Id, args, options: options, threadId: threadId).ConfigureAwait(false);
             return model.Id;
@@ -108,14 +111,14 @@ namespace Discord.Webhook
                     AllowedMentions = args.AllowedMentions.IsSpecified
                         ? args.AllowedMentions.Value.ToModel()
                         : Optional.Create<API.AllowedMentions>(),
-                    Components = args.Components.IsSpecified ? args.Components.Value?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() : Optional<API.ActionRowComponent[]>.Unspecified,
+                    Components = args.Components.IsSpecified ? args.Components.Value?.Components.Select(x => x.ToModel()).ToArray() : Optional<IMessageComponent[]>.Unspecified,
                 };
 
                 return client.ApiClient.ModifyWebhookMessageAsync(client.Webhook.Id, messageId, apiArgs, options, threadId);
             }
             else
             {
-                var attachments = args.Attachments.Value?.ToArray() ?? Array.Empty<FileAttachment>();
+                var attachments = args.Attachments.Value?.ToArray() ?? [];
 
                 var apiArgs = new UploadWebhookFileParams(attachments)
                 {
@@ -127,7 +130,7 @@ namespace Discord.Webhook
                     AllowedMentions = args.AllowedMentions.IsSpecified
                         ? args.AllowedMentions.Value.ToModel()
                         : Optional.Create<API.AllowedMentions>(),
-                    MessageComponents = args.Components.IsSpecified ? args.Components.Value?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() : Optional<API.ActionRowComponent[]>.Unspecified,
+                    MessageComponents = args.Components.IsSpecified ? args.Components.Value?.Components.Select(x => x.ToModel()).ToArray() : Optional<IMessageComponent[]>.Unspecified,
                 };
 
                 return client.ApiClient.ModifyWebhookMessageAsync(client.Webhook.Id, messageId, apiArgs, options, threadId);
@@ -193,8 +196,10 @@ namespace Discord.Webhook
                 }
             }
 
-            if (flags is not MessageFlags.None and not MessageFlags.SuppressEmbeds and not MessageFlags.SuppressNotification)
-                throw new ArgumentException("The only valid MessageFlags are SuppressEmbeds, SuppressNotification and none.", nameof(flags));
+            if (components?.Components.Any(x => x.Type is not ComponentType.ActionRow) ?? false)
+                flags |= MessageFlags.ComponentsV2;
+
+            Preconditions.ValidateMessageFlags(flags);
 
             var args = new UploadWebhookFileParams(attachments.ToArray())
             {
@@ -204,7 +209,7 @@ namespace Discord.Webhook
                 IsTTS = isTTS,
                 Embeds = embeds.Any() ? embeds.Select(x => x.ToModel()).ToArray() : Optional<API.Embed[]>.Unspecified,
                 AllowedMentions = allowedMentions?.ToModel() ?? Optional<API.AllowedMentions>.Unspecified,
-                MessageComponents = components?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Optional<API.ActionRowComponent[]>.Unspecified,
+                MessageComponents = components?.Components.Select(x => x.ToModel()).ToArray() ?? Optional<IMessageComponent[]>.Unspecified,
                 Flags = flags,
                 ThreadName = threadName,
                 AppliedTags = appliedTags,

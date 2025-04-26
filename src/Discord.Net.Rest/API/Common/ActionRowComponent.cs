@@ -8,6 +8,9 @@ namespace Discord.API
         [JsonProperty("type")]
         public ComponentType Type { get; set; }
 
+        [JsonProperty("id")]
+        public Optional<int> Id { get; set; }
+
         [JsonProperty("components")]
         public IMessageComponent[] Components { get; set; }
 
@@ -29,9 +32,10 @@ namespace Discord.API
                     _ => null
                 };
             }).ToArray();
+            Id = c.Id ?? Optional<int>.Unspecified;
         }
 
         [JsonIgnore]
-        string IMessageComponent.CustomId => null;
+        int? IMessageComponent.Id => Id.ToNullable();
     }
 }

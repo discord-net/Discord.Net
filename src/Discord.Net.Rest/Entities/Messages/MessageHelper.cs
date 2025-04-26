@@ -55,16 +55,16 @@ namespace Discord.Rest
                 Preconditions.AtMost(allowedMentions?.UserIds?.Count ?? 0, 100, nameof(allowedMentions.UserIds), "A max of 100 user Ids are allowed.");
 
                 // check that user flag and user Id list are exclusive, same with role flag and role Id list
-                if (allowedMentions != null && allowedMentions.AllowedTypes.HasValue)
+                if (allowedMentions is { AllowedTypes: not null })
                 {
                     if (allowedMentions.AllowedTypes.Value.HasFlag(AllowedMentionTypes.Users) &&
-                        allowedMentions.UserIds != null && allowedMentions.UserIds.Count > 0)
+                        allowedMentions.UserIds is { Count: > 0 })
                     {
                         throw new ArgumentException("The Users flag is mutually exclusive with the list of User Ids.", nameof(allowedMentions));
                     }
 
                     if (allowedMentions.AllowedTypes.Value.HasFlag(AllowedMentionTypes.Roles) &&
-                        allowedMentions.RoleIds != null && allowedMentions.RoleIds.Count > 0)
+                        allowedMentions.RoleIds is { Count: > 0 })
                     {
                         throw new ArgumentException("The Roles flag is mutually exclusive with the list of Role Ids.", nameof(allowedMentions));
                     }
@@ -93,13 +93,13 @@ namespace Discord.Rest
                     Embeds = apiEmbeds?.ToArray() ?? Optional<API.Embed[]>.Unspecified,
                     Flags = args.Flags.IsSpecified ? args.Flags.Value : Optional.Create<MessageFlags?>(),
                     AllowedMentions = args.AllowedMentions.IsSpecified ? args.AllowedMentions.Value.ToModel() : Optional.Create<API.AllowedMentions>(),
-                    Components = args.Components.IsSpecified ? args.Components.Value?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Array.Empty<API.ActionRowComponent>() : Optional<API.ActionRowComponent[]>.Unspecified,
+                    Components = args.Components.IsSpecified ? args.Components.Value?.Components.Select(x => x.ToModel()).ToArray() ?? [] : Optional<IMessageComponent[]>.Unspecified,
                 };
                 return client.ApiClient.ModifyMessageAsync(channelId, msgId, apiArgs, options);
             }
             else
             {
-                var attachments = args.Attachments.Value?.ToArray() ?? Array.Empty<FileAttachment>();
+                var attachments = args.Attachments.Value?.ToArray() ?? [];
 
                 var apiArgs = new UploadFileParams(attachments)
                 {
@@ -107,7 +107,7 @@ namespace Discord.Rest
                     Embeds = apiEmbeds?.ToArray() ?? Optional<API.Embed[]>.Unspecified,
                     Flags = args.Flags.IsSpecified ? args.Flags.Value : Optional.Create<MessageFlags?>(),
                     AllowedMentions = args.AllowedMentions.IsSpecified ? args.AllowedMentions.Value.ToModel() : Optional.Create<API.AllowedMentions>(),
-                    MessageComponent = args.Components.IsSpecified ? args.Components.Value?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Array.Empty<API.ActionRowComponent>() : Optional<API.ActionRowComponent[]>.Unspecified
+                    MessageComponent = args.Components.IsSpecified ? args.Components.Value?.Components.Select(x => x.ToModel()).ToArray() ?? [] : Optional<IMessageComponent[]>.Unspecified
                 };
 
                 return client.ApiClient.ModifyMessageAsync(channelId, msgId, apiArgs, options);

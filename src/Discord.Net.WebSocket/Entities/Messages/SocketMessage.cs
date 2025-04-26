@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
+
 using Model = Discord.API.Message;
 
 namespace Discord.WebSocket
@@ -64,8 +65,8 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public MessageReference Reference { get; private set; }
 
-        /// <inheritdoc/>
-        public IReadOnlyCollection<ActionRowComponent> Components { get; private set; }
+        /// <inheritdoc cref="IMessage.Components"/>
+        public IReadOnlyCollection<IMessageComponent> Components { get; private set; }
 
         /// <summary>
         ///     Gets the interaction this message is a response to.
@@ -213,62 +214,9 @@ namespace Discord.WebSocket
                 };
             }
 
-            if (model.Components.IsSpecified)
-            {
-                Components = model.Components.Value.Where(x => x.Type is ComponentType.ActionRow)
-                    .Select(x => new ActionRowComponent(((API.ActionRowComponent)x).Components.Select<IMessageComponent, IMessageComponent>(y =>
-                {
-                    switch (y.Type)
-                    {
-                        case ComponentType.Button:
-                            {
-                                var parsed = (API.ButtonComponent)y;
-                                return new Discord.ButtonComponent(
-                                    parsed.Style,
-                                    parsed.Label.GetValueOrDefault(),
-                                    parsed.Emote.IsSpecified
-                                        ? parsed.Emote.Value.Id.HasValue
-                                            ? new Emote(parsed.Emote.Value.Id.Value, parsed.Emote.Value.Name, parsed.Emote.Value.Animated.GetValueOrDefault())
-                                            : new Emoji(parsed.Emote.Value.Name)
-                                        : null,
-                                    parsed.CustomId.GetValueOrDefault(),
-                                    parsed.Url.GetValueOrDefault(),
-                                    parsed.Disabled.GetValueOrDefault(),
-                                    parsed.SkuId.ToNullable());
-                            }
-                        case ComponentType.SelectMenu:
-                            {
-                                var parsed = (API.SelectMenuComponent)y;
-                                return new SelectMenuComponent(
-                                    parsed.CustomId,
-                                    parsed.Options.Select(z => new SelectMenuOption(
-                                        z.Label,
-                                        z.Value,
-                                        z.Description.GetValueOrDefault(),
-                                        z.Emoji.IsSpecified
-                                        ? z.Emoji.Value.Id.HasValue
-                                            ? new Emote(z.Emoji.Value.Id.Value, z.Emoji.Value.Name, z.Emoji.Value.Animated.GetValueOrDefault())
-                                            : new Emoji(z.Emoji.Value.Name)
-                                        : null,
-                                        z.Default.ToNullable())).ToList(),
-                                    parsed.Placeholder.GetValueOrDefault(),
-                                    parsed.MinValues,
-                                    parsed.MaxValues,
-                                    parsed.Disabled,
-                                    parsed.Type,
-                                    parsed.ChannelTypes.GetValueOrDefault(),
-                                    parsed.DefaultValues.IsSpecified
-                                        ? parsed.DefaultValues.Value.Select(x => new SelectMenuDefaultValue(x.Id, x.Type))
-                                        : Array.Empty<SelectMenuDefaultValue>()
-                                    );
-                            }
-                        default:
-                            return null;
-                    }
-                }).ToList())).ToImmutableArray();
-            }
-            else
-                Components = new List<ActionRowComponent>();
+            Components = model.Components.IsSpecified
+                ? model.Components.Value.Select(x => x.ToEntity()).ToImmutableArray()
+                : [];
 
             if (model.UserMentions.IsSpecified)
             {
@@ -333,7 +281,7 @@ namespace Discord.WebSocket
                         ? new GuildProductPurchase(model.PurchaseNotification.Value.ProductPurchase.Value.ListingId, model.PurchaseNotification.Value.ProductPurchase.Value.ProductName)
                         : null);
             }
-            
+
             if (model.Call.IsSpecified)
                 CallData = new MessageCallData(model.Call.Value.Participants, model.Call.Value.EndedTimestamp.ToNullable());
         }

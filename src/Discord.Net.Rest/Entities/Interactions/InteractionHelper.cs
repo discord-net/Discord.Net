@@ -430,8 +430,8 @@ namespace Discord.Rest
                 Embeds = apiEmbeds?.ToArray() ?? Optional<API.Embed[]>.Unspecified,
                 AllowedMentions = args.AllowedMentions.IsSpecified ? args.AllowedMentions.Value.ToModel() : Optional<API.AllowedMentions>.Unspecified,
                 Components = args.Components.IsSpecified
-                        ? args.Components.Value?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Array.Empty<API.ActionRowComponent>()
-                        : Optional<API.ActionRowComponent[]>.Unspecified,
+                        ? args.Components.Value?.Components.Select(x => x.ToModel()).ToArray() ?? []
+                        : Optional<IMessageComponent[]>.Unspecified,
             };
 
             return client.ApiClient.ModifyInteractionFollowupMessageAsync(apiArgs, message.Id, message.Token, options);
@@ -478,8 +478,7 @@ namespace Discord.Rest
                     Embeds = apiEmbeds?.ToArray() ?? Optional<API.Embed[]>.Unspecified,
                     AllowedMentions = args.AllowedMentions.IsSpecified ? args.AllowedMentions.Value?.ToModel() : Optional<API.AllowedMentions>.Unspecified,
                     Components = args.Components.IsSpecified
-                        ? args.Components.Value?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Array.Empty<API.ActionRowComponent>()
-                        : Optional<API.ActionRowComponent[]>.Unspecified,
+                        ? args.Components.Value?.Components.Select(x => x.ToModel()).ToArray() ?? [] : Optional<IMessageComponent[]>.Unspecified,
                     Flags = args.Flags
                 };
 
@@ -495,8 +494,7 @@ namespace Discord.Rest
                     Embeds = apiEmbeds?.ToArray() ?? Optional<API.Embed[]>.Unspecified,
                     AllowedMentions = args.AllowedMentions.IsSpecified ? args.AllowedMentions.Value?.ToModel() : Optional<API.AllowedMentions>.Unspecified,
                     MessageComponents = args.Components.IsSpecified
-                        ? args.Components.Value?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Array.Empty<API.ActionRowComponent>()
-                        : Optional<API.ActionRowComponent[]>.Unspecified
+                        ? args.Components.Value?.Components.Select(x => x.ToModel()).ToArray() ?? [] : Optional<IMessageComponent[]>.Unspecified
                 };
 
                 return client.ApiClient.ModifyInteractionResponseAsync(apiArgs, token, options);

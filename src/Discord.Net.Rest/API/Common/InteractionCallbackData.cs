@@ -21,7 +21,7 @@ namespace Discord.API
         public Optional<MessageFlags> Flags { get; set; }
 
         [JsonProperty("components")]
-        public Optional<ActionRowComponent[]> Components { get; set; }
+        public Optional<IMessageComponent[]> Components { get; set; }
 
         [JsonProperty("choices")]
         public Optional<ApplicationCommandOptionChoice[]> Choices { get; set; }

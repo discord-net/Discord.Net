@@ -93,7 +93,7 @@ namespace Discord.Rest
             }
         }
 
-        internal RestMessageComponentData(IMessageComponent component, BaseDiscordClient discord, IGuild guild)
+        internal RestMessageComponentData(IInteractableComponent component, BaseDiscordClient discord, IGuild guild)
         {
             CustomId = component.CustomId;
             Type = component.Type;
