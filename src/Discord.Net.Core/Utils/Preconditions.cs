@@ -404,7 +404,11 @@ namespace Discord
 
         public static void ValidateMessageFlags(MessageFlags flags)
         {
-            if (flags is not MessageFlags.None and not MessageFlags.SuppressEmbeds and not MessageFlags.SuppressNotification and not MessageFlags.ComponentsV2 and not MessageFlags.Ephemeral)
+            if (!flags.HasFlag(MessageFlags.None) &&
+                !flags.HasFlag(MessageFlags.SuppressEmbeds) &&
+                !flags.HasFlag(MessageFlags.SuppressNotification) &&
+                !flags.HasFlag(MessageFlags.ComponentsV2) &&
+                !flags.HasFlag(MessageFlags.Ephemeral))
                 throw new ArgumentException("The only valid MessageFlags are Ephemeral, SuppressEmbeds, SuppressNotification, ComponentsV2 and None.", nameof(flags));
         }
     }
