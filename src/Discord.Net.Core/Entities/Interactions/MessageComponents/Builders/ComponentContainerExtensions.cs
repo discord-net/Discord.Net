@@ -6,6 +6,15 @@ namespace Discord;
 public static class ComponentContainerExtensions
 {
     /// <summary>
+    ///     Gets the total number of components in this and all child <see cref="IComponentContainer"/>s combined.
+    /// </summary>
+    public static int ComponentCount(this IComponentContainer container)
+        => (container.Components?.Count ?? 0)
+        + container.Components?
+            .OfType<IComponentContainer>()
+            .Sum(x => x.ComponentCount()) ?? 0;
+
+    /// <summary>
     ///     Adds a <see cref="TextDisplayBuilder"/> to the container.
     /// </summary>
     /// <returns>

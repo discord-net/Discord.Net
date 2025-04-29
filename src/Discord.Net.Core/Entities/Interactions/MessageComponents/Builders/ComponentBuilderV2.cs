@@ -7,9 +7,9 @@ namespace Discord;
 public class ComponentBuilderV2 : IStaticComponentContainer
 {
     /// <summary>
-    ///    Gets the maximum number of components that can be added to this container.
+    ///    Gets the maximum number of components that can be added to a message.
     /// </summary>
-    public const int MaxComponents = 10;
+    public const int MaxComponents = 40;
 
     private List<IMessageComponentBuilder> _components = new();
 
@@ -53,8 +53,8 @@ public class ComponentBuilderV2 : IStaticComponentContainer
     /// <inheritdoc cref="IMessageComponentBuilder.Build" />
     public MessageComponent Build()
     {
-        if (_components.Count is 0 or >MaxComponents)
-            throw new InvalidOperationException($"The number of components must be between 1 and {MaxComponents}.");
+        Preconditions.AtLeast(Components?.Count ?? 0, 1, nameof(Components.Count), "At least 1 component must be added to this container.");
+        Preconditions.AtMost(this.ComponentCount(), MaxComponents, nameof(Components.Count), $"A message must contain {MaxComponents} components or less.");
 
         if (_components.Any(x => 
                 x is not ActionRowBuilder

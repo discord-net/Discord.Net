@@ -7,11 +7,6 @@ namespace Discord;
 
 public class ContainerBuilder : IMessageComponentBuilder, IStaticComponentContainer
 {
-    /// <summary>
-    ///     The maximum number of components allowed in a container.
-    /// </summary>
-    public const int MaxComponents = 10;
-
     /// <inheritdoc />
     public ComponentType Type => ComponentType.Container;
 
@@ -86,9 +81,6 @@ public class ContainerBuilder : IMessageComponentBuilder, IStaticComponentContai
     /// <inheritdoc cref="IMessageComponentBuilder.Build"/>
     public ContainerComponent Build()
     {
-        if (_components.Count is 0 or > MaxComponents)
-            throw new InvalidOperationException($"A container must have between 1 and {MaxComponents} components.");
-
         if (_components.Any(x => x
                 is not ActionRowBuilder
                 and not TextDisplayBuilder
