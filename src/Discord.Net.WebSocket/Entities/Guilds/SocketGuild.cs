@@ -1748,6 +1748,8 @@ namespace Discord.WebSocket
         }
         internal async Task<IAudioClient> ConnectAudioAsync(ulong channelId, bool selfDeaf, bool selfMute, bool external, bool disconnect = true)
         {
+            Discord.EnsureGatewayIntent(GatewayIntents.GuildVoiceStates);
+
             TaskCompletionSource<AudioClient> promise;
 
             await _audioLock.WaitAsync().ConfigureAwait(false);
