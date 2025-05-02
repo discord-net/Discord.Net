@@ -4,6 +4,7 @@ using Discord.Logging;
 using Discord.Net;
 using Discord.Net.Converters;
 using Discord.WebSocket;
+using Discord.WebSocket.Diagnostics;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -58,6 +59,7 @@ namespace Discord.Audio
         private StopReason _stopReason;
         private bool _resuming;
 
+        public int ClientId { get; }
         public SocketGuild Guild { get; }
         public DiscordVoiceAPIClient ApiClient { get; private set; }
         public int Latency { get; private set; }
@@ -73,13 +75,19 @@ namespace Discord.Audio
         internal AudioClient(SocketGuild guild, int clientId, ulong channelId)
         {
             Guild = guild;
+            ClientId = clientId;
             ChannelId = channelId;
             _audioLogger = Discord.LogManager.CreateLogger($"Audio #{clientId}");
 
             ApiClient = new DiscordVoiceAPIClient(guild.Id, Discord.WebSocketProvider, Discord.UdpSocketProvider);
             ApiClient.SentGatewayMessage += async opCode => await _audioLogger.DebugAsync($"Sent {opCode}").ConfigureAwait(false);
             ApiClient.SentDiscovery += async () => await _audioLogger.DebugAsync("Sent Discovery").ConfigureAwait(false);
-            //ApiClient.SentData += async bytes => await _audioLogger.DebugAsync($"Sent {bytes} Bytes").ConfigureAwait(false);
+            ApiClient.SentData += bytes =>
+            {
+                //await _audioLogger.DebugAsync($"Sent {bytes} Bytes").ConfigureAwait(false);
+                AudioMeter.RecordBytesSent(bytes, this);
+                return Task.CompletedTask;
+            };
             ApiClient.ReceivedEvent += ProcessMessageAsync;
             ApiClient.ReceivedPacket += ProcessPacketAsync;
 
@@ -101,7 +109,11 @@ namespace Discord.Audio
             };
 
             LatencyUpdated += async (old, val) => await _audioLogger.DebugAsync($"Latency = {val} ms").ConfigureAwait(false);
-            UdpLatencyUpdated += async (old, val) => await _audioLogger.DebugAsync($"UDP Latency = {val} ms").ConfigureAwait(false);
+            UdpLatencyUpdated += async (old, val) =>
+            {
+                await _audioLogger.DebugAsync($"UDP Latency = {val} ms").ConfigureAwait(false);
+                AudioMeter.RecordUdpLatency((double)val / 1000, this);
+            };
         }
 
         internal Task StartAsync(string url, ulong userId, string sessionId, string token)
@@ -132,6 +144,7 @@ namespace Discord.Audio
             await _audioLogger.DebugAsync($"Connecting ApiClient. Voice server: wss://{_url}").ConfigureAwait(false);
             await ApiClient.ConnectAsync($"wss://{_url}?v={DiscordConfig.VoiceAPIVersion}").ConfigureAwait(false);
             await _audioLogger.DebugAsync($"Listening on port {ApiClient.UdpPort}").ConfigureAwait(false);
+            AudioMeter.AddAudioConnections(1, this);
 
             if (!_resuming)
             {
@@ -151,6 +164,7 @@ namespace Discord.Audio
         {
             await _audioLogger.DebugAsync("Disconnecting ApiClient").ConfigureAwait(false);
             await ApiClient.DisconnectAsync().ConfigureAwait(false);
+            AudioMeter.AddAudioConnections(-1, this);
 
             if (_stopReason == StopReason.Unknown && ex.InnerException is WebSocketException exception)
             {
@@ -403,6 +417,7 @@ namespace Discord.Audio
         }
         private async Task ProcessPacketAsync(byte[] packet)
         {
+            AudioMeter.RecordBytesReceived(packet.Length, this);
             try
             {
                 if (_connection.State == ConnectionState.Connecting)

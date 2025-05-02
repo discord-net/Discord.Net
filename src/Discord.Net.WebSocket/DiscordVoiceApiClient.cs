@@ -48,6 +48,8 @@ namespace Discord.Audio
         internal IWebSocketClient WebSocketClient { get; }
         public ConnectionState ConnectionState { get; private set; }
 
+        public string UdpRemoteIp { get; private set; }
+        public int UdpRemotePort { get; private set; }
         public ushort UdpPort => _udp.Port;
 
         internal DiscordVoiceAPIClient(ulong guildId, WebSocketProvider webSocketProvider, UdpSocketProvider udpSocketProvider, JsonSerializer serializer = null)
@@ -268,6 +270,8 @@ namespace Discord.Audio
 
         public void SetUdpEndpoint(string ip, int port)
         {
+            UdpRemoteIp = ip;
+            UdpRemotePort = port;
             _udp.SetDestination(ip, port);
         }
         #endregion
