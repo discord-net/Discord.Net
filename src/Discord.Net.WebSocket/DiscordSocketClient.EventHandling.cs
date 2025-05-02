@@ -22,7 +22,6 @@ public partial class DiscordSocketClient
             _lastSeq = seq.Value;
         _lastMessageTime = Environment.TickCount;
 
-        SocketMeter.RecordSocketEvent(opCode, type, BaseConfig);
         try
         {
             switch (opCode)
@@ -89,7 +88,7 @@ public partial class DiscordSocketClient
                 break;
                 case GatewayOpCode.Dispatch:
                     // An extra Stopwatch is required due to `activity.Duration` cannot be used because its only useable when its stopped but then the metrics wont be associated with this trace.
-                    var activity = SocketActivity.StartSocketDispatchActivity(type, BaseConfig);
+                    var activity = SocketActivity.StartSocketDispatchActivity(type, this);
                     var watch =  Stopwatch.StartNew();
 
                     try
@@ -2523,12 +2522,13 @@ public partial class DiscordSocketClient
                     catch (Exception ex)
                     {
                         activity?.AddExceptionToActivity(ex);
+                        SocketMeter.RecordSocketEventException(ex, type, this);
                         throw;
                     }
                     finally
                     {
                         watch.Stop();
-                        SocketMeter.RecordSocketDispatch(watch.Elapsed, type, BaseConfig);
+                        SocketMeter.RecordSocketEvent(watch.Elapsed, type, this);
 
                         activity?.Dispose();
                     }
@@ -2546,7 +2546,6 @@ public partial class DiscordSocketClient
                 ex.Data["payload_data"] = (payload as JToken).ToString();
             }
 
-            SocketMeter.RecordSocketEventException(ex, opCode, type, BaseConfig);
             await _gatewayLogger.ErrorAsync($"Error handling {opCode}{(type != null ? $" ({type})" : "")}", ex).ConfigureAwait(false);
         }
     }

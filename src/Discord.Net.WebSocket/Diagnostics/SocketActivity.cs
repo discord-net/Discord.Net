@@ -10,16 +10,16 @@ namespace Discord.WebSocket.Diagnostics
     internal static class SocketActivity
     {
 #if NET5_0_OR_GREATER
-        private static readonly ActivitySource _source = new(Options.SourceName, Options.Version);
+        private static readonly ActivitySource _source = new("Discord.Net.WebSocket", typeof(DiagnosticTags).Assembly.GetName().Version.ToString());
 
-        internal static Activity StartSocketDispatchActivity(string type, DiscordSocketConfig config)
+        internal static Activity StartSocketDispatchActivity(string type, DiscordSocketClient client)
         {
             Activity.Current = null;     // This activity doesn't have a parent so it have to be explicitly set
             return _source.StartActivity(
                 "dispatch socket event",
                 ActivityKind.Consumer,
                 null,
-                tags: Options.CreateTags(GatewayOpCode.Dispatch, type, config));
+                tags: DiagnosticTags.Create(type, client));
         }
 
         internal static void AddExceptionToActivity(this Activity activity, Exception ex)
@@ -40,7 +40,7 @@ namespace Discord.WebSocket.Diagnostics
         }
 
 #else
-        internal static IDisposable StartSocketDispatchActivity(string type, DiscordSocketConfig config) => null;
+        internal static IDisposable StartSocketDispatchActivity(string type, DiscordSocketClient client) => null;
 
         internal static void AddExceptionToActivity(this IDisposable activity, Exception ex) { }
 #endif

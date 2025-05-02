@@ -12,7 +12,7 @@ namespace Discord.WebSocket.Diagnostics
     internal static class SocketMeter
     {
 #if NET6_0_OR_GREATER
-        private readonly static Meter _meter = new(Options.SourceName, Options.Version);
+        private readonly static Meter _meter = new("Discord.Net.WebSocket", typeof(DiagnosticTags).Assembly.GetName().Version.ToString());
 
 #if NET7_0_OR_GREATER
         private readonly static BufferedUpDownCounter _clientShards;     // Buffering is especially here required because Add gets called so early where the instrument isn't enabled yet.
@@ -22,10 +22,8 @@ namespace Discord.WebSocket.Diagnostics
         private readonly static Histogram<double> _socketConnectionsLatency;
 
         private readonly static Counter<long> _socketEvents;
-        private readonly static Counter<int> _socketEventExceptions;
-        private readonly static Counter<long> _socketDispatches;
-        private readonly static Counter<int> _socketDispatchesExceptions;
-        private readonly static Histogram<double> _socketDispatchesDuration;
+        private readonly static Histogram<double> _socketEventsDuration;
+        private readonly static Counter<int> _socketEventsExceptions;
 
 #if NET9_0_OR_GREATER
         /* 
@@ -61,85 +59,68 @@ namespace Discord.WebSocket.Diagnostics
             _socketEvents = _meter.CreateCounter<long>(
                 name: "socket.events_count",
                 unit: "Events",
-                description: "The total amount of events sent by the gateway since the application is running.");
-            _socketEventExceptions = _meter.CreateCounter<int>(
-                name: "socket.events.exceptions_count",
-                unit: "Exceptions",
-                description: "The amount of exceptions occurred while event procession.");
-            _socketDispatches = _meter.CreateCounter<long>(
-                name: "socket.dispatches_count",
-                unit: "Dispatches",
-                description: "The total amount of dispatches (like 'READY' or 'INTERACTION_CREATE') sent by the gateway since the application is running.");
-            _socketDispatchesExceptions = _meter.CreateCounter<int>(
-                name: "socket.dispatches.exceptions_count",
-                unit: "Exceptions",
-                description: "The amount of exceptions occurred while handling dispatches (like 'READY' or 'INTERACTION_CREATE').");
-            _socketDispatchesDuration = _meter.CreateHistogram<double>(
-                name: "socket.dispatches.duration",
+                description: "The total amount of events sent by the gateway since the application has startet.");
+            _socketEventsDuration = _meter.CreateHistogram<double>(
+                name: "socket.events.duration",
                 unit: "Seconds",
-                description: "The handling duration of dispatches (like 'READY' or 'INTERACTION_CREATE') received from the gateway."
+                description: "The duration to dispatch events received from the gateway."
 #if NET9_0_OR_GREATER
                 , advice: new() { HistogramBucketBoundaries = _histogramBoundaries }
 #endif
                 );
+            _socketEventsExceptions = _meter.CreateCounter<int>(
+                name: "socket.events.exceptions_count",
+                unit: "Exceptions",
+                description: "The amount of exceptions occurred while dispatching dispatches sent by the gateway.");
         }
 
-        internal static void AddClientShards(int shards, DiscordSocketConfig config)
+        internal static void AddClientShards(int shards, DiscordSocketClient client)
         {
 #if NET7_0_OR_GREATER
-            _clientShards.Add(shards, [.. Options.CreateTags(config)]);
+            _clientShards.Add(shards, [.. DiagnosticTags.Create(client)]);
 #endif
         }
 
-        internal static void AddSocketConnections(int connections, DiscordSocketConfig config)
+        internal static void AddSocketConnections(int connections, DiscordSocketClient client)
         {
 #if NET7_0_OR_GREATER
-            _socketConnections.Add(connections, [.. Options.CreateTags(config)]);
+            _socketConnections.Add(connections, [.. DiagnosticTags.Create(client)]);
 #endif
         }
 
-        internal static void RecordSocketLatency(double seconds, DiscordSocketConfig config)
+        internal static void RecordConnectionLatency(double seconds, DiscordSocketClient client)
         {
-            _socketConnectionsLatency.Record(seconds, [.. Options.CreateTags(config)]);
+            _socketConnectionsLatency.Record(seconds, [.. DiagnosticTags.Create(client)]);
         }
 
-        internal static void RecordSocketEvent(GatewayOpCode opCode, string type, DiscordSocketConfig config)
-        {
-            _socketEvents.Add(1, [..Options.CreateTags(opCode, type, config)]);
-        }
-
-        internal static void RecordSocketEventException(Exception ex, GatewayOpCode opCode, string type, DiscordSocketConfig config)
+        internal static void RecordSocketEventException(Exception ex, string type, DiscordSocketClient client)
         {
             TagList tags = [
-                .. Options.CreateTags(opCode, type, config),
+                .. DiagnosticTags.Create(type, client),
                 KeyValuePair.Create<string, object>("exception.type", ex.GetType().ToString()),
                 KeyValuePair.Create<string, object>("exception.message", ex.Message),
                 KeyValuePair.Create<string, object>("exception.stacktrace", ex.ToString()),
             ];
-
-            _socketEventExceptions.Add(1, tags);
-            if (opCode == GatewayOpCode.Dispatch)
-                _socketDispatchesExceptions.Add(1, tags);
+            _socketEventsExceptions.Add(1, tags);
         }
 
-        internal static void RecordSocketDispatch(TimeSpan duration, string type, DiscordSocketConfig config)
+        internal static void RecordSocketEvent(TimeSpan duration, string type, DiscordSocketClient client)
         {
-            TagList tags = [..Options.CreateTags(GatewayOpCode.Dispatch, type, config)];
-            _socketDispatches.Add(1, tags);
-            _socketDispatchesDuration.Record(duration.TotalSeconds, tags);
+            TagList tags = [..DiagnosticTags.Create(type, client)];
+
+            _socketEvents.Add(1, tags);
+            _socketEventsDuration.Record(duration.TotalSeconds, tags);
         }
 #else
-        internal static void AddClientShards(int shards, DiscordSocketConfig config) { }
+        internal static void AddClientShards(int shards, DiscordSocketClient client) { }
 
-        internal static void AddSocketConnections(int connections, DiscordSocketConfig config) { }
+        internal static void AddSocketConnections(int connections, DiscordSocketClient client) { }
 
-        internal static void RecordSocketLatency(double seconds, DiscordSocketConfig config) { }
+        internal static void RecordConnectionLatency(double seconds, DiscordSocketClient client) { }
 
-        internal static void RecordSocketEvent(GatewayOpCode opCode, string type, DiscordSocketConfig config) { }
+        internal static void RecordSocketEventException(Exception ex, string type, DiscordSocketClient client) { }
 
-        internal static void RecordSocketEventException(Exception ex, GatewayOpCode opCode, string type, DiscordSocketConfig config) { }
-
-        internal static void RecordSocketDispatch(TimeSpan duration, string type, DiscordSocketConfig config) { }
+        internal static void RecordSocketEvent(TimeSpan duration, string type, DiscordSocketClient client) { }
 #endif
     }
 }

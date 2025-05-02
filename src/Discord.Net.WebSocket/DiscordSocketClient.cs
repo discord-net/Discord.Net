@@ -195,18 +195,18 @@ namespace Discord.WebSocket
 
             Connected += () =>
             {
-                SocketMeter.AddSocketConnections(1, BaseConfig);
+                SocketMeter.AddSocketConnections(1, this);
                 return Task.CompletedTask;
             };
             Disconnected += _ =>
             {
-                SocketMeter.AddSocketConnections(-1, BaseConfig);
+                SocketMeter.AddSocketConnections(-1, this);
                 return Task.CompletedTask;
 
             };
             LatencyUpdated += async (old, val) =>
             {
-                SocketMeter.RecordSocketLatency((double)val / 1000, BaseConfig);
+                SocketMeter.RecordConnectionLatency((double)val / 1000, this);
                 await _gatewayLogger.DebugAsync($"Latency = {val} ms").ConfigureAwait(false);
             };
 
@@ -222,7 +222,7 @@ namespace Discord.WebSocket
             _largeGuilds = new ConcurrentQueue<ulong>();
             AuditLogCacheSize = config.AuditLogCacheSize;
 
-            SocketMeter.AddClientShards(1, BaseConfig);
+            SocketMeter.AddClientShards(1, this);
         }
         private static API.DiscordSocketApiClient CreateApiClient(DiscordSocketConfig config)
             => new DiscordSocketApiClient(config.RestClientProvider, config.WebSocketProvider, DiscordRestConfig.UserAgent, config.GatewayHost,
@@ -239,7 +239,7 @@ namespace Discord.WebSocket
                     _stateLock?.Dispose();
                 }
 
-                SocketMeter.AddClientShards(-1, BaseConfig);
+                SocketMeter.AddClientShards(-1, this);
                 _isDisposed = true;
             }
 
