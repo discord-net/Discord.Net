@@ -27,7 +27,7 @@ jobs:
         dotnet-version: 9.0.x
 
     - name: Setup DocFX
-      run: dotnet tool install -g docfx --version 2.78.2
+      run: dotnet tool install -g docfx --version 2.78.3
 
     - name: Build DNet docs
       run: docfx docs/docfx.json
