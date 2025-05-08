@@ -333,11 +333,11 @@ public static class ComponentContainerExtensions
         => container.FindComponentById<IMessageComponentBuilder>(id);
 
     /// <summary>
-    ///     Finds the first <see cref="ComponentT"/> in the <see cref="IComponentContainer"/>
+    ///     Finds the first <c>ComponentT</c> in the <see cref="IComponentContainer"/>
     ///     or any of its child <see cref="IComponentContainer"/>s with matching id.
     /// </summary>
     /// <returns>
-    ///     The <see cref="ComponentT"/> with matching id, <see langword="null"/> otherwise.
+    ///     The <c>ComponentT</c> with matching id, <see langword="null"/> otherwise.
     /// </returns>
     public static ComponentT FindComponentById<ComponentT>(this IComponentContainer container, int id)
         where ComponentT : class, IMessageComponentBuilder
