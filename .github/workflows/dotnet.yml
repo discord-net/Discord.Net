@@ -118,11 +118,11 @@ jobs:
             nuget setApiKey ${{ secrets.GITHUB_TOKEN }} -Source ${{ env.REPOSITORY_URL }}
 
         - name: Push Nightly
-          if: vars.PUSH_NIGHTLY == 'true'
+          if: vars.PUSH_NIGHTLY_CUSTOM == 'true'
           run: nuget push "${{ env.ArtifactStagingDirectory }}/*.nupkg" -Source ${{ vars.NIGHTLY_FEED }}
 
         - name: Push Nightly to GitHub Pacakges
-          if: vars.PUSH_NIGHTLY == 'true'            
+          if: vars.PUSH_NIGHTLY_GITHUB == 'true'            
           run: nuget push "${{ env.ArtifactStagingDirectory }}/*.nupkg" -Source ${{ env.REPOSITORY_URL }}
 
         - name: Push Release
