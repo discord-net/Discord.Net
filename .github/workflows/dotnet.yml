@@ -35,7 +35,7 @@ jobs:
             run: echo "IsTagBuild=true" >> $GITHUB_ENV
             
           - name: Generate Beta Suffix
-            if: startsWith(github.ref, 'refs/tags/') && contains(github.ref_name, '/')
+            if: env.IsTagBuild == 'true' && contains(github.ref_name, '/')
             env: 
               REF_NAME: ${{ github.ref_name }}
             run: echo "Suffix=${REF_NAME##*/}" >> $GITHUB_ENV
@@ -94,12 +94,13 @@ jobs:
           run: echo "IsTagBuild=true" >> $GITHUB_ENV
           
         - name: Generate Beta Suffix
-          if: startsWith(github.ref, 'refs/tags/') && contains(github.ref_name, '/')
+          if: env.IsTagBuild == 'true' && contains(github.ref_name, '/')
           env: 
             REF_NAME: ${{ github.ref_name }}
-          run: echo "Suffix=${REF_NAME##*/}" >> $GITHUB_ENV
+          run: echo "Suffix=-${REF_NAME##*/}" >> $GITHUB_ENV
 
         - name: Generate Suffix
+          if: env.IsTagBuild == 'true'
           run: echo "Suffix=nightly.$(date +'%Y%m%d').${{ github.run_number }}" >> $GITHUB_ENV
           
         - name: setup NuGet
@@ -114,12 +115,7 @@ jobs:
             path: ${{ env.ArtifactStagingDirectory }}
         
         - name: Pack Metapackage
-          if: env.IsTagBuild != 'true'
           run: nuget pack "src/Discord.Net/Discord.Net.nuspec" -OutputDirectory ${{ env.ArtifactStagingDirectory }} -NonInteractive -p "suffix=-${{ env.Suffix }}"
-
-        - name: Pack Metapackage
-          if: env.IsTagBuild == 'true'
-          run: nuget pack "src/Discord.Net/Discord.Net.nuspec" -OutputDirectory ${{ env.ArtifactStagingDirectory }}
 
         - name: Set API Keys
           run: |
