@@ -321,4 +321,43 @@ public static class ComponentContainerExtensions
         => container.WithActionRow(new ActionRowBuilder()
             .WithComponents(components)
             .WithId(id));
+
+    /// <summary>
+    ///     Finds the first <see cref="IMessageComponentBuilder"/> in the <see cref="IComponentContainer"/>
+    ///     or any of its child <see cref="IComponentContainer"/>s with matching id.
+    /// </summary>
+    /// <returns>
+    ///     The <see cref="IMessageComponentBuilder"/> with matching id, <see langword="null"/> otherwise.
+    /// </returns>
+    public static IMessageComponentBuilder FindComponentById(this IComponentContainer container, int id)
+        => container.FindComponentById<IMessageComponentBuilder>(id);
+
+    /// <summary>
+    ///     Finds the first <see cref="ComponentT"/> in the <see cref="IComponentContainer"/>
+    ///     or any of its child <see cref="IComponentContainer"/>s with matching id.
+    /// </summary>
+    /// <returns>
+    ///     The <see cref="ComponentT"/> with matching id, <see langword="null"/> otherwise.
+    /// </returns>
+    public static ComponentT FindComponentById<ComponentT>(this IComponentContainer container, int id)
+        where ComponentT : class, IMessageComponentBuilder
+        => container.Components
+               .OfType<ComponentT>()
+               .FirstOrDefault(x => x.Id == id)
+           ?? container.Components
+               .OfType<IComponentContainer>()
+               .Select(x => x.FindComponentById<ComponentT>(id))
+               .FirstOrDefault(x => x is not null);
+
+    /// <summary>
+    ///     Gets a <see cref="IEnumerable{T}">IEnumerable</see> containing ids of <see cref="IMessageComponentBuilder"/>
+    ///     in this <see cref="IComponentContainer"/> and all child <see cref="IComponentContainer"/>s.
+    /// </summary>
+    public static IEnumerable<int> GetComponentIds(this IComponentContainer container)
+        => container.Components
+            .Where(x => x.Id is not null)
+            .Select(x => x.Id.Value)
+            .Concat(container.Components
+                .OfType<IComponentContainer>()
+                .SelectMany(x => x.GetComponentIds()));
 }

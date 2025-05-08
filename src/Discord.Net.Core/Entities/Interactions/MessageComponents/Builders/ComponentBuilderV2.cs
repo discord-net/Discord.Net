@@ -53,8 +53,13 @@ public class ComponentBuilderV2 : IStaticComponentContainer
     /// <inheritdoc cref="IMessageComponentBuilder.Build" />
     public MessageComponent Build()
     {
-        Preconditions.AtLeast(Components?.Count ?? 0, 1, nameof(Components.Count), "At least 1 component must be added to this container.");
+        Preconditions.NotNull(Components, nameof(Components));
+        Preconditions.AtLeast(Components.Count, 1, nameof(Components.Count), "At least 1 component must be added to this container.");
         Preconditions.AtMost(this.ComponentCount(), MaxComponents, nameof(Components.Count), $"A message must contain {MaxComponents} components or less.");
+
+        var ids = this.GetComponentIds().ToList();
+        if (ids.Count != ids.Distinct().Count())
+            throw new InvalidOperationException("Components must have unique ids.");
 
         if (_components.Any(x => 
                 x is not ActionRowBuilder
