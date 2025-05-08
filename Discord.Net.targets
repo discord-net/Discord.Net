@@ -12,7 +12,8 @@
         <PackageReadmeFile>NUGET_README.md</PackageReadmeFile>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(IsTagBuild)' == 'true' ">
-        <VersionSuffix></VersionSuffix>
+        <VersionSuffix Condition=" '$(BuildNumber)' == '' "></VersionSuffix>
+        <VersionSuffix Condition=" '$(BuildNumber)' != '' ">$(BuildNumber)</VersionSuffix>
         <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(BuildNumber)' == '' And $(IsTagBuild) != 'true' ">
