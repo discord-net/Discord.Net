@@ -1,5 +1,19 @@
 # Changelog
 
+## [3.18.0-beta.1] - 2025-05-08
+
+### Added
+- #3065 Components V2 (ba78e0c)
+- #3110 CV2 Find component by id (cc81669)
+
+### Fixed
+- #3106 Providing multiple message flags fails to pass validations (05a0acc)
+- #3114 Fix NRE responding with a modal info class with null required fields (2b6a912)
+
+### Misc
+- #3107 update component limits + add `ComponentCount()` extension (348928a)
+
+
 ## [3.17.4] - 2025-04-26
 
 ### Fixed
