@@ -70,7 +70,7 @@ namespace Discord.Interactions
                         {
                             var boxedValue = textComponent.Getter(modal);
                             var value = textComponent.TypeOverridesToString
-                                ? boxedValue.ToString()
+                                ? boxedValue?.ToString()
                                 : boxedValue as string;
 
                             builder.AddTextInput(textComponent.Label, textComponent.CustomId, textComponent.Style, textComponent.Placeholder, textComponent.IsRequired ? textComponent.MinLength : null,
