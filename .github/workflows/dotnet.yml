@@ -38,7 +38,7 @@ jobs:
           
           - name: Generate Suffix
             if: env.IsTagBuild != 'true'
-            run: echo "Suffix=$(date +'%Y%m%d')-${{ github.run_number }}" >> $GITHUB_ENV
+            run: echo "Suffix=nightly.$(date +'%Y%m%d').${{ github.run_number }}" >> $GITHUB_ENV
 
           - name: Restore
             run: dotnet restore ./Discord.Net.sln -v minimal --locked-mode
