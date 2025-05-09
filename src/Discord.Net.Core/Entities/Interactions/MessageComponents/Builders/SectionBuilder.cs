@@ -41,6 +41,11 @@ public class SectionBuilder : IMessageComponentBuilder, IStaticComponentContaine
     /// <summary>
     ///     Initializes a new <see cref="SectionBuilder"/>.
     /// </summary>
+    public SectionBuilder() { }
+
+    /// <summary>
+    ///     Initializes a new <see cref="SectionBuilder"/>.
+    /// </summary>
     public SectionBuilder(IMessageComponentBuilder accessory = null, params IEnumerable<IMessageComponentBuilder> components)
     {
         Accessory = accessory;

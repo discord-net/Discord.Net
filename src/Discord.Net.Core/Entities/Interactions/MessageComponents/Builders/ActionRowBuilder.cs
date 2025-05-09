@@ -38,6 +38,11 @@ public class ActionRowBuilder : IMessageComponentBuilder, IInteractableComponent
     /// <summary>
     ///     Initializes a new <see cref="ActionRowBuilder"/>.
     /// </summary>
+    public ActionRowBuilder() { }
+
+    /// <summary>
+    ///     Initializes a new <see cref="ActionRowBuilder"/>.
+    /// </summary>
     public ActionRowBuilder(params IMessageComponentBuilder[] components)
     {
         Components = components?.ToList() ?? [];

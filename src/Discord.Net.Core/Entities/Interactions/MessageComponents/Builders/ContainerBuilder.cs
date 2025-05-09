@@ -35,6 +35,11 @@ public class ContainerBuilder : IMessageComponentBuilder, IStaticComponentContai
     /// <summary>
     ///     Initializes a new <see cref="ContainerBuilder"/>.
     /// </summary>
+    public ContainerBuilder() { }
+
+    /// <summary>
+    ///     Initializes a new <see cref="ContainerBuilder"/>.
+    /// </summary>
     public ContainerBuilder(params IEnumerable<IMessageComponentBuilder> components)
     {
         Components = components?.ToList();

@@ -26,6 +26,11 @@ public class ComponentBuilderV2 : IStaticComponentContainer
     /// <summary>
     ///     Initializes a new instance of <see cref="ComponentBuilderV2"/>.
     /// </summary>
+    public ComponentBuilderV2() { }
+
+    /// <summary>
+    ///     Initializes a new instance of <see cref="ComponentBuilderV2"/>.
+    /// </summary>
     public ComponentBuilderV2(params IEnumerable<IMessageComponentBuilder> components)
     {
         Components = components?.ToList();
