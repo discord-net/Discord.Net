@@ -21,10 +21,19 @@ public class SeparatorComponent : IMessageComponent
     /// </summary>
     public SeparatorSpacingSize? Spacing { get; }
 
+    /// <summary>
+    ///     Converts a <see cref="SeparatorComponent"/> to a <see cref="SeparatorBuilder"/>.
+    /// </summary>
+    public SeparatorBuilder ToBuilder()
+        => new(this);
+
     internal SeparatorComponent(bool? isDivider, SeparatorSpacingSize? spacing, int? id = null)
     {
         IsDivider = isDivider;
         Spacing = spacing;
         Id = id;
     }
+
+    /// <inheritdoc />
+    IMessageComponentBuilder IMessageComponent.ToBuilder() => ToBuilder();
 }

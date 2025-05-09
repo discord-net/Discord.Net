@@ -32,4 +32,5 @@ internal class ThumbnailComponent : IMessageComponent
     }
 
     int? IMessageComponent.Id => Id.ToNullable();
+    IMessageComponentBuilder IMessageComponent.ToBuilder() => null;
 }

@@ -10,5 +10,13 @@ public interface IMessageComponent
     /// </summary>
     ComponentType Type { get; }
 
+    /// <summary>
+    ///     
+    /// </summary>
     int? Id { get; }
+
+    /// <summary>
+    ///     Converts a <see cref="IMessageComponent"/> to a <see cref="IMessageComponentBuilder"/>.
+    /// </summary>
+    public IMessageComponentBuilder ToBuilder();
 }

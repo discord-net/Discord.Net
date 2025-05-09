@@ -27,4 +27,5 @@ internal class SeparatorComponent : IMessageComponent
     }
 
     int? IMessageComponent.Id => Id.ToNullable();
+    IMessageComponentBuilder IMessageComponent.ToBuilder() => null;
 }

@@ -28,6 +28,12 @@ public class ContainerComponent : IMessageComponent
     /// </summary>
     public bool? IsSpoiler { get; }
 
+    /// <summary>
+    ///     Converts a <see cref="ContainerComponent"/> to a <see cref="ContainerBuilder"/>.
+    /// </summary>
+    public ContainerBuilder ToBuilder()
+        => new(this);
+
     internal ContainerComponent(IReadOnlyCollection<IMessageComponent> components, Color? accentColor, bool? isSpoiler, int? id = null)
     {
         Components = components;
@@ -35,4 +41,7 @@ public class ContainerComponent : IMessageComponent
         IsSpoiler = isSpoiler;
         Id = id;
     }
+
+    /// <inheritdoc />
+    IMessageComponentBuilder IMessageComponent.ToBuilder() => ToBuilder();
 }

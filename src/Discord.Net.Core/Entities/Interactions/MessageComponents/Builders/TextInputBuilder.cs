@@ -170,6 +170,22 @@ public class TextInputBuilder : IInteractableComponentBuilder
     }
 
     /// <summary>
+    ///     Creates a new instance of a <see cref="TextInputBuilder"/> from existing component.
+    /// </summary>
+    public TextInputBuilder(TextInputComponent textInput)
+    {
+        Label = textInput.Label;
+        Style = textInput.Style;
+        CustomId = textInput.CustomId;
+        Placeholder = textInput.Placeholder;
+        MinLength = textInput.MinLength;
+        MaxLength = textInput.MaxLength;
+        Required = textInput.Required;
+        Value = textInput.Value;
+        Id = textInput.Id;
+    }
+
+    /// <summary>
     ///     Sets the label of the current builder.
     /// </summary>
     /// <param name="label">The value to set.</param>

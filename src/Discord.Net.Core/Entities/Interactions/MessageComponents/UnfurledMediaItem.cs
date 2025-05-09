@@ -10,6 +10,12 @@ public class UnfurledMediaItem
     /// </summary>
     public string Url { get; }
 
+    /// <summary>
+    ///     Converts a <see cref="UnfurledMediaItem"/> to a <see cref="UnfurledMediaItemProperties"/>.
+    /// </summary>
+    public UnfurledMediaItemProperties ToProperties()
+        => new(Url);
+
     internal UnfurledMediaItem(string url)
     {
         Url = url;

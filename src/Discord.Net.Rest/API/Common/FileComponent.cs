@@ -27,4 +27,5 @@ internal class FileComponent : IMessageComponent
     }
 
     int? IMessageComponent.Id => Id.ToNullable();
+    IMessageComponentBuilder IMessageComponent.ToBuilder() => null;
 }

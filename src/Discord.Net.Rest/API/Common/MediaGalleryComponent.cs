@@ -30,4 +30,5 @@ internal class MediaGalleryComponent : IMessageComponent
     }
 
     int? IMessageComponent.Id => Id.ToNullable();
+    IMessageComponentBuilder IMessageComponent.ToBuilder() => null;
 }

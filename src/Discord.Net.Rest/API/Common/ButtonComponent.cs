@@ -70,5 +70,7 @@ namespace Discord.API
 
         [JsonIgnore]
         int? IMessageComponent.Id => Id.ToNullable();
+
+        IMessageComponentBuilder IMessageComponent.ToBuilder() => null;
     }
 }

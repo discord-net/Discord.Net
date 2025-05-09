@@ -16,9 +16,18 @@ public class TextDisplayComponent : IMessageComponent
     /// </summary>
     public string Content { get; }
 
+    /// <summary>
+    ///     Converts a <see cref="TextDisplayComponent"/> to a <see cref="TextDisplayBuilder"/>.
+    /// </summary>
+    public TextDisplayBuilder ToBuilder()
+        => new(this);
+
     internal TextDisplayComponent(string content, int? id = null)
     {
         Id = id;
         Content = content;
     }
+
+    /// <inheritdoc />
+    IMessageComponentBuilder IMessageComponent.ToBuilder() => ToBuilder();
 }

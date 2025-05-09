@@ -21,10 +21,19 @@ public class FileComponent : IMessageComponent
     /// </summary>
     public bool? IsSpoiler { get; }
 
+    /// <summary>
+    ///     Converts a <see cref="FileComponent"/> to a <see cref="FileComponentBuilder"/>.
+    /// </summary>
+    public FileComponentBuilder ToBuilder()
+        => new(this);
+
     internal FileComponent(UnfurledMediaItem file, bool? isSpoiler, int? id = null)
     {
         File = file;
         IsSpoiler = isSpoiler;
         Id = id;
     }
+
+    /// <inheritdoc />
+    IMessageComponentBuilder IMessageComponent.ToBuilder() => ToBuilder();
 }

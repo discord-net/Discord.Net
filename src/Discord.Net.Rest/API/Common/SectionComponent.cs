@@ -29,4 +29,5 @@ internal class SectionComponent : IMessageComponent
     }
 
     int? IMessageComponent.Id => Id.ToNullable();
+    IMessageComponentBuilder IMessageComponent.ToBuilder() => null;
 }

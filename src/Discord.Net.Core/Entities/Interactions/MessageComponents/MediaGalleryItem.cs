@@ -20,6 +20,12 @@ public readonly struct MediaGalleryItem
     /// </summary>
     public bool IsSpoiler { get; }
 
+    /// <summary>
+    ///     Converts a <see cref="MediaGalleryItem"/> to a <see cref="MediaGalleryItemProperties"/>.
+    /// </summary>
+    public MediaGalleryItemProperties ToProperties()
+        => new(Media.ToProperties(), Description, IsSpoiler);
+
     internal MediaGalleryItem(UnfurledMediaItem media, string description, bool? isSpoiler)
     {
         Media = media;

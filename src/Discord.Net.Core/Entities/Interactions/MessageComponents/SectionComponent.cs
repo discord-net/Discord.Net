@@ -23,10 +23,19 @@ public class SectionComponent : IMessageComponent
     /// </summary>
     public IMessageComponent Accessory { get; }
 
+    /// <summary>
+    ///     Converts a <see cref="SectionComponent"/> to a <see cref="SectionBuilder"/>.
+    /// </summary>
+    public SectionBuilder ToBuilder()
+        => new(this);
+
     internal SectionComponent(int? id, IReadOnlyCollection<IMessageComponent> components, IMessageComponent accessory)
     {
         Id = id;
         Components = components;
         Accessory = accessory;
     }
+
+    /// <inheritdoc />
+    IMessageComponentBuilder IMessageComponent.ToBuilder() => ToBuilder();
 }

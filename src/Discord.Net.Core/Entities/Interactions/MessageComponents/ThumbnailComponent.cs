@@ -26,6 +26,12 @@ public class ThumbnailComponent : IMessageComponent
     /// </summary>
     public bool IsSpoiler { get; }
 
+    /// <summary>
+    ///     Converts a <see cref="ThumbnailComponent"/> to a <see cref="ThumbnailBuilder"/>.
+    /// </summary>
+    public ThumbnailBuilder ToBuilder()
+        => new(this);
+
     internal ThumbnailComponent(int? id, UnfurledMediaItem media, string description, bool? isSpoiler)
     {
         Id = id;
@@ -33,4 +39,7 @@ public class ThumbnailComponent : IMessageComponent
         Description = description;
         IsSpoiler = isSpoiler ?? false;
     }
+
+    /// <inheritdoc />
+    IMessageComponentBuilder IMessageComponent.ToBuilder() => ToBuilder();
 }

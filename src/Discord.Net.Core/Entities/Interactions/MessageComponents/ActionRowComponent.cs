@@ -18,10 +18,19 @@ public class ActionRowComponent : IMessageComponent
     /// </summary>
     public IReadOnlyCollection<IMessageComponent> Components { get; internal set; }
 
+    /// <summary>
+    ///     Converts a <see cref="ActionRowComponent"/> to a <see cref="ActionRowBuilder"/>.
+    /// </summary>
+    public ActionRowBuilder ToBuilder()
+        => new(this);
+
     internal ActionRowComponent() { }
 
     internal ActionRowComponent(IReadOnlyCollection<IMessageComponent> components)
     {
         Components = components;
     }
+
+    /// <inheritdoc />
+    IMessageComponentBuilder IMessageComponent.ToBuilder() => ToBuilder();
 }

@@ -51,13 +51,10 @@ public class ButtonComponent : IInteractableComponent
     public ulong? SkuId { get; }
 
     /// <summary>
-    ///     Turns this button into a button builder.
+    ///     Converts a <see cref="ButtonComponent"/> to a <see cref="ButtonBuilder"/>.
     /// </summary>
-    /// <returns>
-    ///     A newly created button builder with the same properties as this button.
-    /// </returns>
     public ButtonBuilder ToBuilder()
-        => new (Label, CustomId, Style, Url, Emote, IsDisabled);
+        => new(this);
 
     internal ButtonComponent(ButtonStyle style, string label, IEmote emote, string customId, string url, bool isDisabled, ulong? skuId, int? id)
     {
@@ -70,4 +67,7 @@ public class ButtonComponent : IInteractableComponent
         IsDisabled = isDisabled;
         SkuId = skuId;
     }
+
+    /// <inheritdoc />
+    IMessageComponentBuilder IMessageComponent.ToBuilder() => ToBuilder();
 }
