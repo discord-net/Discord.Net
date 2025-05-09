@@ -27,7 +27,7 @@ internal class ContainerComponent : IMessageComponent
     {
         Type = component.Type;
         Id = component.Id ?? Optional<int>.Unspecified;
-        AccentColor = component.AccentColor ?? Optional<uint?>.Unspecified;
+        AccentColor = component.AccentColor?.RawValue ?? Optional<uint?>.Unspecified;
         IsSpoiler = component.IsSpoiler ?? Optional<bool>.Unspecified;
         Components = component.Components.Select(x => x.ToModel()).ToArray();
     }

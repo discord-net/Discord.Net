@@ -25,7 +25,7 @@ public class ContainerBuilder : IMessageComponentBuilder, IStaticComponentContai
     /// <summary>
     ///     Gets or sets the accent color of this container.
     /// </summary>
-    public uint? AccentColor { get; set; }
+    public Color? AccentColor { get; set; }
 
     /// <summary>
     ///     Gets or sets whether this container is a spoiler.
@@ -59,7 +59,7 @@ public class ContainerBuilder : IMessageComponentBuilder, IStaticComponentContai
     /// </returns>
     public ContainerBuilder WithAccentColor(Color? color)
     {
-        AccentColor = color?.RawValue;
+        AccentColor = color;
         return this;
     }
 

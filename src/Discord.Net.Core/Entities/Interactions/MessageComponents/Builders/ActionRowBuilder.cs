@@ -31,15 +31,7 @@ public class ActionRowBuilder : IMessageComponentBuilder, IInteractableComponent
         get => _components;
         set
         {
-            if (value == null)
-                throw new ArgumentNullException(nameof(value), $"{nameof(Components)} cannot be null.");
-
-            _components = value.Count switch
-            {
-                0 => throw new ArgumentOutOfRangeException(nameof(value), "There must be at least 1 component in a row."),
-                > MaxChildCount => throw new ArgumentOutOfRangeException(nameof(value), $"Action row can only contain {MaxChildCount} child components!"),
-                _ => value
-            };
+            _components = value ?? throw new ArgumentNullException(nameof(value), $"{nameof(Components)} cannot be null.");
         }
     }
 
@@ -48,7 +40,7 @@ public class ActionRowBuilder : IMessageComponentBuilder, IInteractableComponent
     /// </summary>
     public ActionRowBuilder(params IMessageComponentBuilder[] components)
     {
-        Components = components?.ToList();
+        Components = components?.ToList() ?? [];
     }
 
     /// <summary>
@@ -205,6 +197,9 @@ public class ActionRowBuilder : IMessageComponentBuilder, IInteractableComponent
     /// <returns>A <see cref="ActionRowComponent"/> that can be used within a <see cref="ComponentBuilder"/></returns>
     public ActionRowComponent Build()
     {
+        Preconditions.AtLeast(Components.Count, 1, nameof(Components), "There must be at least 1 component in a row.");
+        Preconditions.AtMost(Components.Count, MaxChildCount, nameof(Components), $"Action row can only contain {MaxChildCount} child components!");
+        
         return new ActionRowComponent(_components.Select(x => x.Build()).ToList());
     }
     IMessageComponent IMessageComponentBuilder.Build() => Build();
@@ -231,10 +226,12 @@ public class ActionRowBuilder : IMessageComponentBuilder, IInteractableComponent
         }
     }
 
-
+    /// <inheritdoc />
     IComponentContainer IComponentContainer.AddComponent(IMessageComponentBuilder component) => AddComponent(component);
 
+    /// <inheritdoc />
     IComponentContainer IComponentContainer.AddComponents(params IMessageComponentBuilder[] components) => AddComponents(components);
 
+    /// <inheritdoc />
     IComponentContainer IComponentContainer.WithComponents(IEnumerable<IMessageComponentBuilder> components) => WithComponents(components);
 }

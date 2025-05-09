@@ -21,14 +21,14 @@ public class ContainerComponent : IMessageComponent
     /// <summary>
     ///     Gets the accent color of this container.
     /// </summary>
-    public uint? AccentColor { get; }
+    public Color? AccentColor { get; }
 
     /// <summary>
     ///     Gets whether this container is a spoiler.
     /// </summary>
     public bool? IsSpoiler { get; }
 
-    internal ContainerComponent(IReadOnlyCollection<IMessageComponent> components, uint? accentColor, bool? isSpoiler, int? id = null)
+    internal ContainerComponent(IReadOnlyCollection<IMessageComponent> components, Color? accentColor, bool? isSpoiler, int? id = null)
     {
         Components = components;
         AccentColor = accentColor;
