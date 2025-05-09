@@ -33,6 +33,25 @@ public class ContainerBuilder : IMessageComponentBuilder, IStaticComponentContai
     public bool? IsSpoiler { get; set; }
 
     /// <summary>
+    ///     Initializes a new <see cref="ContainerBuilder"/>.
+    /// </summary>
+    public ContainerBuilder(params IEnumerable<IMessageComponentBuilder> components)
+    {
+        Components = components?.ToList();
+    }
+
+    /// <summary>
+    ///     Initializes a new <see cref="ContainerBuilder"/> from existing component.
+    /// </summary>
+    public ContainerBuilder(ContainerComponent container)
+    {
+        Components = container.Components.Select(x => x.ToBuilder()).ToList();
+        AccentColor = container.AccentColor;
+        IsSpoiler = container.IsSpoiler;
+        Id = container.Id;
+    }
+
+    /// <summary>
     ///     Sets the accent color of this container.
     /// </summary>
     /// <returns>
@@ -50,7 +69,7 @@ public class ContainerBuilder : IMessageComponentBuilder, IStaticComponentContai
     /// <returns>
     ///     The current builder.
     /// </returns>
-    public ContainerBuilder WithSpoiler(bool isSpoiler)
+    public ContainerBuilder WithSpoiler(bool? isSpoiler)
     {
         IsSpoiler = isSpoiler;
         return this;

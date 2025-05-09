@@ -19,6 +19,25 @@ public class SeparatorBuilder : IMessageComponentBuilder
     public int? Id { get; set; }
 
     /// <summary>
+    ///     Initializes a new <see cref="SeparatorBuilder"/>.
+    /// </summary>
+    public SeparatorBuilder(bool isDivider = true, SeparatorSpacingSize spacing = SeparatorSpacingSize.Small)
+    {
+        IsDivider = isDivider;
+        Spacing = spacing;
+    }
+
+    /// <summary>
+    ///     Initializes a new <see cref="SeparatorBuilder"/> from existing component.
+    /// </summary>
+    public SeparatorBuilder(SeparatorComponent separator)
+    {
+        IsDivider = separator.IsDivider;
+        Spacing = separator.Spacing;
+        Id = separator.Id;
+    }
+
+    /// <summary>
     ///     Sets whether the component is a divider.
     /// </summary>
     /// <returns>

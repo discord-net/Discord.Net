@@ -10,8 +10,10 @@ namespace Discord;
 /// </summary>
 public class ActionRowBuilder : IMessageComponentBuilder, IInteractableComponentContainer
 {
+    /// <inheritdoc />
     public ComponentType Type => ComponentType.ActionRow;
 
+    /// <inheritdoc />
     public int? Id { get; set; }
 
     /// <summary>
@@ -41,7 +43,24 @@ public class ActionRowBuilder : IMessageComponentBuilder, IInteractableComponent
         }
     }
 
+    /// <summary>
+    ///     Initializes a new <see cref="ActionRowBuilder"/>.
+    /// </summary>
+    public ActionRowBuilder(params IMessageComponentBuilder[] components)
+    {
+        Components = components?.ToList();
+    }
 
+    /// <summary>
+    ///     Initializes a new <see cref="ActionRowBuilder"/> from existing component.
+    /// </summary>
+    public ActionRowBuilder(ActionRowComponent actionRow)
+    {
+        Components = actionRow.Components.Select(x => x.ToBuilder()).ToList();
+        Id = actionRow.Id;
+    }
+
+    /// <inheritdoc cref="IComponentContainer.AddComponents"/>
     public ActionRowBuilder AddComponents(params IMessageComponentBuilder[] components)
     {
         foreach (var component in components)
@@ -49,6 +68,7 @@ public class ActionRowBuilder : IMessageComponentBuilder, IInteractableComponent
         return this;
     }
 
+    /// <inheritdoc cref="IComponentContainer.WithComponents"/>
     public ActionRowBuilder WithComponents(IEnumerable<IMessageComponentBuilder> components)
     {
         Components = components.ToList();

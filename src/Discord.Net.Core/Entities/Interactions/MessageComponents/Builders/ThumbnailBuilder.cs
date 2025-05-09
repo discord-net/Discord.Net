@@ -46,6 +46,17 @@ public class ThumbnailBuilder : IMessageComponentBuilder
     }
 
     /// <summary>
+    ///     Initializes a new <see cref="ThumbnailBuilder"/> from existing component.
+    /// </summary>
+    public ThumbnailBuilder(ThumbnailComponent component)
+    {
+        Media = component.Media.ToProperties();
+        Description = component.Description;
+        IsSpoiler = component.IsSpoiler;
+        Id = component.Id;
+    }
+
+    /// <summary>
     ///     Sets the media of the thumbnail.
     /// </summary>
     /// <returns>

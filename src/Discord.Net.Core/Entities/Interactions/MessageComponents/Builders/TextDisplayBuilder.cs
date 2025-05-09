@@ -35,6 +35,15 @@ public class TextDisplayBuilder : IMessageComponentBuilder
     }
 
     /// <summary>
+    ///     Initializes a new <see cref="TextDisplayBuilder"/> from existing component.
+    /// </summary>
+    public TextDisplayBuilder(TextDisplayComponent textDisplay)
+    {
+        Content = textDisplay.Content;
+        Id = textDisplay.Id;
+    }
+
+    /// <summary>
     ///     Sets the content of the text display.
     /// </summary>
     /// <returns>

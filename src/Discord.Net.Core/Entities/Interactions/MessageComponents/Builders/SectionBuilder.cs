@@ -38,6 +38,25 @@ public class SectionBuilder : IMessageComponentBuilder, IStaticComponentContaine
         set => _components = value ?? throw new ArgumentNullException(nameof(value), $"{nameof(Components)} cannot be null.");
     }
 
+    /// <summary>
+    ///     Initializes a new <see cref="SectionBuilder"/>.
+    /// </summary>
+    public SectionBuilder(IMessageComponentBuilder accessory = null, params IEnumerable<IMessageComponentBuilder> components)
+    {
+        Accessory = accessory;
+        Components = components?.ToList();
+    }
+
+    /// <summary>
+    ///     Initializes a new <see cref="SectionBuilder"/> from existing component.
+    /// </summary>
+    public SectionBuilder(SectionComponent section)
+    {
+        Components = section.Components.Select(x => x.ToBuilder()).ToList();
+        Accessory = section.Accessory.ToBuilder();
+        Id = section.Id;
+    }
+
     /// <inheritdoc cref="IComponentContainer.AddComponent"/>
     /// <remarks>
     ///     Only <see cref="TextDisplayBuilder"/> is supported.

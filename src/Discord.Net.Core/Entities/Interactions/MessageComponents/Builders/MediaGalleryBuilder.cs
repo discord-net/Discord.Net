@@ -28,10 +28,18 @@ public class MediaGalleryBuilder : IMessageComponentBuilder
     /// <summary>
     ///    Initializes a new instance of the <see cref="MediaGalleryBuilder"/>.
     /// </summary>
-    public MediaGalleryBuilder(IEnumerable<MediaGalleryItemProperties> items, int? id = null)
+    public MediaGalleryBuilder(params IEnumerable<MediaGalleryItemProperties> items)
     {
-        Items = items.ToList();
-        Id = id;
+        Items = items?.ToList();
+    }
+
+    /// <summary>
+    ///     Initializes a new <see cref="MediaGalleryBuilder"/> from existing component.
+    /// </summary>
+    public MediaGalleryBuilder(MediaGalleryComponent mediaGallery)
+    {
+        Items = mediaGallery.Items.Select(x => x.ToProperties()).ToList();
+        Id = mediaGallery.Id;
     }
 
     /// <summary>

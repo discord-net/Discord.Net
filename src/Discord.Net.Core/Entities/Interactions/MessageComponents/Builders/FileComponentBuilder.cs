@@ -26,7 +26,7 @@ public class FileComponentBuilder : IMessageComponentBuilder
     /// <summary>
     ///     Initializes a new instance of the <see cref="FileComponentBuilder"/>.
     /// </summary>
-    public FileComponentBuilder() {}
+    public FileComponentBuilder() { }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="FileComponentBuilder"/>.
@@ -36,6 +36,16 @@ public class FileComponentBuilder : IMessageComponentBuilder
         File = media;
         Id = id;
         IsSpoiler = isSpoiler;
+    }
+
+    /// <summary>
+    ///     Initializes a new <see cref="FileComponentBuilder"/> from existing component.
+    /// </summary>
+    public FileComponentBuilder(FileComponent file)
+    {
+        File = file.File.ToProperties();
+        IsSpoiler = file.IsSpoiler;
+        Id = file.Id;
     }
 
     /// <summary>
