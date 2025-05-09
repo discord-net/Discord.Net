@@ -200,7 +200,7 @@ public class ActionRowBuilder : IMessageComponentBuilder, IInteractableComponent
         Preconditions.AtLeast(Components.Count, 1, nameof(Components), "There must be at least 1 component in a row.");
         Preconditions.AtMost(Components.Count, MaxChildCount, nameof(Components), $"Action row can only contain {MaxChildCount} child components!");
         
-        return new ActionRowComponent(_components.Select(x => x.Build()).ToList());
+        return new ActionRowComponent(_components.Select(x => x.Build()).ToList(), Id);
     }
     IMessageComponent IMessageComponentBuilder.Build() => Build();
 

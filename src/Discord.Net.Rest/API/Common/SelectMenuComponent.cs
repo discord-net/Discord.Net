@@ -54,6 +54,7 @@ namespace Discord.API
             Disabled = component.IsDisabled;
             ChannelTypes = component.ChannelTypes.ToArray();
             DefaultValues = component.DefaultValues.Select(x => new SelectMenuDefaultValue {Id = x.Id, Type = x.Type}).ToArray();
+            Id = component.Id ?? Optional<int>.Unspecified;
         }
 
         [JsonIgnore]
