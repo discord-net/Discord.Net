@@ -341,13 +341,30 @@ public static class ComponentContainerExtensions
     /// </returns>
     public static ComponentT FindComponentById<ComponentT>(this IComponentContainer container, int id)
         where ComponentT : class, IMessageComponentBuilder
-        => container.Components
-               .OfType<ComponentT>()
-               .FirstOrDefault(x => x.Id == id)
-           ?? container.Components
-               .OfType<IComponentContainer>()
-               .Select(x => x.FindComponentById<ComponentT>(id))
-               .FirstOrDefault(x => x is not null);
+    {
+        if (container is ComponentT cmp && cmp.Id == id)
+            return cmp;
+
+        foreach (var component in container.Components)
+        {
+            if (component.Id == id && component is ComponentT target)
+                return target;
+
+            if (component is SectionBuilder section
+                && section.Accessory.Id == id
+                && section.Accessory is ComponentT targetAccessory)
+                return targetAccessory;
+
+            if (component is IComponentContainer childContainer)
+            {
+                var childSearchResult = childContainer.FindComponentById<ComponentT>(id);
+                if (childSearchResult is not null)
+                    return childSearchResult;
+            }
+        }
+
+        return null;
+    }
 
     /// <summary>
     ///     Gets a <see cref="IEnumerable{T}">IEnumerable</see> containing ids of <see cref="IMessageComponentBuilder"/>
@@ -360,4 +377,71 @@ public static class ComponentContainerExtensions
             .Concat(container.Components
                 .OfType<IComponentContainer>()
                 .SelectMany(x => x.GetComponentIds()));
+
+    /// <summary>
+    ///     Finds the first <see cref="IMessageComponent"/> in the <see cref="INestedComponent"/>
+    ///     or any of its child <see cref="INestedComponent"/>s with matching id.
+    /// </summary>
+    /// <returns>
+    ///     The <see cref="IMessageComponent"/> with matching id, <see langword="null"/> otherwise.
+    /// </returns>
+    public static IMessageComponent FindComponentById(this INestedComponent container, int id)
+        => container.FindComponentById<IMessageComponent>(id);
+
+    /// <summary>
+    ///     Finds the first <c>ComponentT</c> in the <see cref="INestedComponent"/>
+    ///     or any of its child <see cref="INestedComponent"/>s with matching id.
+    /// </summary>
+    /// <returns>
+    ///     The <c>ComponentT</c> with matching id, <see langword="null"/> otherwise.
+    /// </returns>
+    public static ComponentT FindComponentById<ComponentT>(this INestedComponent container, int id)
+        where ComponentT : class, IMessageComponent
+    {
+        if (container is ComponentT cmp && cmp.Id == id)
+            return cmp;
+
+        return container.Components.FindComponentById<ComponentT>(id);
+    }
+
+    /// <summary>
+    ///     Finds the first <c>ComponentT</c> in the <see cref="IEnumerable{IMessageComponent}"/>
+    ///     or any of its child <see cref="INestedComponent"/>s with matching id.
+    /// </summary>
+    /// <returns>
+    ///     The <c>ComponentT</c> with matching id, <see langword="null"/> otherwise.
+    /// </returns>
+    public static ComponentT FindComponentById<ComponentT>(this IEnumerable<IMessageComponent> components, int id)
+        where ComponentT : class, IMessageComponent
+    {
+        foreach (var component in components)
+        {
+            if (component.Id == id && component is ComponentT target)
+                return target;
+
+            if (component is SectionComponent section
+                && section.Accessory.Id == id
+                && section.Accessory is ComponentT targetAccessory)
+                return targetAccessory;
+
+            if (component is INestedComponent childContainer)
+            {
+                var childSearchResult = childContainer.FindComponentById<ComponentT>(id);
+                if (childSearchResult is not null)
+                    return childSearchResult;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    ///     Finds the first <see cref="IMessageComponent"/> in the <see cref="IEnumerable{IMessageComponent}"/>
+    ///     or any of its child <see cref="INestedComponent"/>s with matching id.
+    /// </summary>
+    /// <returns>
+    ///     The <see cref="IMessageComponent"/> with matching id, <see langword="null"/> otherwise.
+    /// </returns>
+    public static IMessageComponent FindComponentById(this IEnumerable<IMessageComponent> components, int id)
+        => components.FindComponentById<IMessageComponent>(id);
 }

@@ -5,7 +5,7 @@ namespace Discord;
 /// <summary>
 ///     Represents a component object used to send components with messages.
 /// </summary>
-public class MessageComponent
+public class MessageComponent : INestedComponent
 {
     /// <summary>
     ///     Gets the components to be used in a message.

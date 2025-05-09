@@ -5,7 +5,7 @@ namespace Discord;
 /// <summary>
 ///     Represents a container component.
 /// </summary>
-public class ContainerComponent : IMessageComponent
+public class ContainerComponent : INestedComponent, IMessageComponent
 {
     /// <inheritdoc/>
     public ComponentType Type => ComponentType.Container;

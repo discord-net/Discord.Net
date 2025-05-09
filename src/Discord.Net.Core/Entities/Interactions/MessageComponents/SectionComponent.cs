@@ -5,7 +5,7 @@ namespace Discord;
 /// <summary>
 ///     Represents a section component.
 /// </summary>
-public class SectionComponent : IMessageComponent
+public class SectionComponent : INestedComponent, IMessageComponent
 {
     /// <inheritdoc/>
     public ComponentType Type => ComponentType.Section;

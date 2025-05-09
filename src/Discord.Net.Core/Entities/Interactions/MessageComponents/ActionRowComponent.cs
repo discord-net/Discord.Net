@@ -5,7 +5,7 @@ namespace Discord;
 /// <summary>
 ///     Represents a <see cref="IMessageComponent"/> Row for child components to live in.
 /// </summary>
-public class ActionRowComponent : IMessageComponent
+public class ActionRowComponent : INestedComponent, IMessageComponent
 {
     /// <inheritdoc/>
     public ComponentType Type => ComponentType.ActionRow;
