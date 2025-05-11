@@ -18,7 +18,7 @@ public class PollProperties
     public List<PollMediaProperties> Answers { get; set; }
 
     /// <summary>
-    ///     Gets or sets the duration for the poll in hours. Max duration is 168 hours (7 days).
+    ///     Gets or sets the duration for the poll in hours. Max duration is 768 hours (32 days).
     /// </summary>
     public uint Duration { get; set; }
 
