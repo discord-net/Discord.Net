@@ -9,10 +9,21 @@ public static class ComponentContainerExtensions
     ///     Gets the total number of components in this and all child <see cref="IComponentContainer"/>s combined.
     /// </summary>
     public static int ComponentCount(this IComponentContainer container)
-        => (container.Components?.Count ?? 0)
-        + container.Components?
-            .OfType<IComponentContainer>()
-            .Sum(x => x.ComponentCount()) ?? 0;
+    {
+        var sum = 0;
+        foreach (var component in container.Components)
+        {
+            sum++;
+
+            if (component is SectionBuilder { Accessory: not null })
+                sum++;
+
+            if (component is IComponentContainer childContainer)
+                sum += childContainer.ComponentCount();
+        }
+
+        return sum;
+    }
 
     /// <summary>
     ///     Adds a <see cref="TextDisplayBuilder"/> to the container.
