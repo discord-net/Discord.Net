@@ -1,4 +1,5 @@
 #if NET5_0_OR_GREATER
+using Discord.API.Voice;
 using Discord.Audio;
 using System.Collections.Generic;
 
@@ -18,6 +19,11 @@ namespace Discord.WebSocket.Diagnostics
 
         internal static IEnumerable<KeyValuePair<string, object>> Create(AudioClient client) => [
             KeyValuePair.Create<string, object>("client.id", client.ClientId)
+        ];
+
+        internal static IEnumerable<KeyValuePair<string, object>> Create(VoiceOpCode opCode, AudioClient client) => [
+            ..Create(client),
+            KeyValuePair.Create<string, object>("event.op_code", opCode)
         ];
 
         internal static IEnumerable<KeyValuePair<string, object>> CreateUdpTags(AudioClient client) => [
