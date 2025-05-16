@@ -1472,10 +1472,15 @@ namespace Discord.API
 
         public Task CreateInteractionResponseAsync(UploadInteractionFileParams response, ulong interactionId, string interactionToken, RequestOptions options = null)
         {
-            if ((!response.Embeds.IsSpecified || response.Embeds.Value == null || response.Embeds.Value.Length == 0) && !response.Files.Any())
-                Preconditions.NotNullOrEmpty(response.Content, nameof(response.Content));
+            if ((!response.Embeds.IsSpecified || response.Embeds.Value == null || response.Embeds.Value.Length == 0)
+                && (!response.Content.IsSpecified || response.Content.Value is null || string.IsNullOrWhiteSpace(response.Content.Value))
+                && (!response.MessageComponents.IsSpecified || response.MessageComponents.Value is null || response.MessageComponents.Value.Length == 0)
+                && (response.Files is null || response.Files.Length == 0))
+            {
+                throw new ArgumentException("At least one of 'Content', 'Embeds', 'Files' or 'MessageComponents' must be specified.", nameof(response));
+            }
 
-            if (response.Content.IsSpecified && response.Content.Value.Length > DiscordConfig.MaxMessageSize)
+            if (response.Content.IsSpecified && response.Content.Value?.Length > DiscordConfig.MaxMessageSize)
                 throw new ArgumentException(message: $"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", paramName: nameof(response.Content));
 
             options = RequestOptions.CreateOrClone(options);
