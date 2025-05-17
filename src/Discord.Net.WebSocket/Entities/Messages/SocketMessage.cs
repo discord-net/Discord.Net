@@ -161,7 +161,8 @@ namespace Discord.WebSocket
                 model.Type == MessageType.Reply ||
                 model.Type == MessageType.ApplicationCommand ||
                 model.Type == MessageType.ThreadStarterMessage ||
-                model.Type == MessageType.ContextMenuCommand)
+                model.Type == MessageType.ContextMenuCommand ||
+                model.Type == MessageType.PollResult)
                 return SocketUserMessage.Create(discord, state, author, channel, model);
             else
                 return SocketSystemMessage.Create(discord, state, author, channel, model);
