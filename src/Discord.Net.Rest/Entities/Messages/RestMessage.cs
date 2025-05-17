@@ -119,8 +119,7 @@ namespace Discord.Rest
                 model.Type == MessageType.Reply ||
                 model.Type == MessageType.ApplicationCommand ||
                 model.Type == MessageType.ContextMenuCommand ||
-                model.Type == MessageType.ThreadStarterMessage ||
-                model.Type == MessageType.PollResult)
+                model.Type == MessageType.ThreadStarterMessage)
                 return RestUserMessage.Create(discord, channel, author, model);
             else
                 return RestSystemMessage.Create(discord, channel, author, model);
