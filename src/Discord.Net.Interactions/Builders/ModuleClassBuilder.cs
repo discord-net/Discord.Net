@@ -127,7 +127,7 @@ namespace Discord.Interactions.Builders
             var validContextCommands = methods.Where(IsValidContextCommandDefinition);
             var validInteractions = methods.Where(IsValidComponentCommandDefinition);
             var validAutocompleteCommands = methods.Where(IsValidAutocompleteCommandDefinition);
-            var validModalCommands = methods.Where(IsValidModalCommanDefinition);
+            var validModalCommands = methods.Where(IsValidModalCommandDefinition);
 
             Func<IServiceProvider, IInteractionModuleBase> createInstance = commandService._useCompiledLambda ?
                 ReflectionUtils<IInteractionModuleBase>.CreateLambdaBuilder(typeInfo, commandService) : ReflectionUtils<IInteractionModuleBase>.CreateBuilder(typeInfo, commandService);
@@ -693,7 +693,7 @@ namespace Discord.Interactions.Builders
                 methodInfo.GetParameters().Length == 0;
         }
 
-        private static bool IsValidModalCommanDefinition(MethodInfo methodInfo)
+        private static bool IsValidModalCommandDefinition(MethodInfo methodInfo)
         {
             return methodInfo.IsDefined(typeof(ModalInteractionAttribute)) &&
                 (methodInfo.ReturnType == typeof(Task) || methodInfo.ReturnType == typeof(Task<RuntimeResult>)) &&
