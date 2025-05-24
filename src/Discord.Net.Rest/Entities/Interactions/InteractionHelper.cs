@@ -478,7 +478,13 @@ namespace Discord.Rest
                     Embeds = apiEmbeds?.ToArray() ?? Optional<API.Embed[]>.Unspecified,
                     AllowedMentions = args.AllowedMentions.IsSpecified ? args.AllowedMentions.Value?.ToModel() : Optional<API.AllowedMentions>.Unspecified,
                     Components = args.Components.IsSpecified
-                        ? args.Components.Value?.Components.Select(x => x.ToModel()).ToArray() ?? [] : Optional<IMessageComponent[]>.Unspecified,
+                     ? args.Components.Value?.Components
+                         .Select(b => b.ToModel())
+                         .SelectMany(c => c is API.ContainerComponent container
+                             ? new IMessageComponent[] { new API.ActionRowComponent { Components = container.Components, Id = container.Id } }
+                             : new IMessageComponent[] { c })
+                         .ToArray()
+                     : Optional<IMessageComponent[]>.Unspecified,
                     Flags = args.Flags
                 };
 
