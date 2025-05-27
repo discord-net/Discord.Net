@@ -1,12 +1,9 @@
 using Discord.API.Rest;
-using Discord.Net.Rest;
 using Discord.Rest;
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 
 using DataModel = Discord.API.ModalInteractionData;
@@ -439,7 +436,7 @@ namespace Discord.WebSocket
         }
 
         /// <inheritdoc/>
-        /// <remarks>     
+        /// <remarks>
         ///     Acknowledges this interaction with the <see cref="InteractionResponseType.DeferredUpdateMessage"/> if the modal was created
         ///     in a response to a message component interaction, <see cref="InteractionResponseType.DeferredChannelMessageWithSource"/> otherwise.
         /// </remarks>

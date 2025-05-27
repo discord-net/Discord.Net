@@ -1,4 +1,3 @@
-using System;
 using System.Diagnostics;
 
 namespace Discord
@@ -25,7 +24,7 @@ namespace Discord
         ///     Gets the height of this image.
         /// </summary>
         /// <returns>
-        ///     A <see cref="int"/> representing the height of this image if it can be retrieved; otherwise 
+        ///     A <see cref="int"/> representing the height of this image if it can be retrieved; otherwise
         ///     <see langword="null" />.
         /// </returns>
         public int? Height { get; }
@@ -33,7 +32,7 @@ namespace Discord
         ///     Gets the width of this image.
         /// </summary>
         /// <returns>
-        ///     A <see cref="int"/> representing the width of this image if it can be retrieved; otherwise 
+        ///     A <see cref="int"/> representing the width of this image if it can be retrieved; otherwise
         ///     <see langword="null" />.
         /// </returns>
         public int? Width { get; }

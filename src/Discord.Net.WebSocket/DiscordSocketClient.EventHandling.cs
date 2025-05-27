@@ -9,8 +9,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using System;
 
-using GameModel = Discord.API.Game;
-
 namespace Discord.WebSocket;
 
 public partial class DiscordSocketClient

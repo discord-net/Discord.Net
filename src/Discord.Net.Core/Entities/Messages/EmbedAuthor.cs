@@ -1,4 +1,3 @@
-using System;
 using System.Diagnostics;
 
 namespace Discord
@@ -39,7 +38,7 @@ namespace Discord
         ///     Gets the name of the author field.
         /// </summary>
         /// <returns>
-        ///     
+        ///
         /// </returns>
         public override string ToString() => Name;
 

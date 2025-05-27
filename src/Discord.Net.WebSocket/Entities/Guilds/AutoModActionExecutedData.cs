@@ -1,5 +1,3 @@
-using Discord.Rest;
-
 namespace Discord.WebSocket;
 
 public class AutoModActionExecutedData

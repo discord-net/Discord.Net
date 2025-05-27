@@ -1,12 +1,8 @@
 using Discord.Net.Rest;
-using Discord.Rest;
-
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 
 using DataModel = Discord.API.ModalInteractionData;
@@ -138,7 +134,7 @@ namespace Discord.Rest
             MessageComponent component = null,
             Embed embed = null,
             RequestOptions options = null,
-            PollProperties poll = null, 
+            PollProperties poll = null,
             MessageFlags flags = MessageFlags.None)
         {
             if (!IsValidToken)

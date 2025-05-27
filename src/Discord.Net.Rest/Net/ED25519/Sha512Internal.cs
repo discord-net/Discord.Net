@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-
 namespace Discord.Net.ED25519
 {
     internal static class Sha512Internal

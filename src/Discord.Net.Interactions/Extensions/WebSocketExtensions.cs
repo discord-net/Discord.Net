@@ -1,4 +1,3 @@
-using Discord.Rest;
 using System.Collections.Generic;
 using System.Linq;
 

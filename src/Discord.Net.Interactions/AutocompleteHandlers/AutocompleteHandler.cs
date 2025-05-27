@@ -1,5 +1,3 @@
-using Discord.Rest;
-using Discord.WebSocket;
 using System;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
@@ -45,7 +43,7 @@ namespace Discord.Interactions
                 default:
                     throw new InvalidOperationException($"RunMode {InteractionService._runMode} is not supported.");
             }
-            
+
             return Task.FromResult((IResult)ExecuteResult.FromSuccess());
         }
 

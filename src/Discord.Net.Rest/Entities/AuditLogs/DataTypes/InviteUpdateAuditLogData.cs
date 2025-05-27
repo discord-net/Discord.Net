@@ -1,6 +1,4 @@
 using Discord.API.AuditLogs;
-
-using System.Linq;
 using EntryModel = Discord.API.AuditLogEntry;
 using Model = Discord.API.AuditLog;
 

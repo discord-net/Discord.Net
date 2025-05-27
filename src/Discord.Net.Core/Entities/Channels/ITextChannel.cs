@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Threading.Tasks;
 
 namespace Discord
@@ -125,7 +124,7 @@ namespace Discord
         ///     The duration on which this thread archives after.
         ///     <para>
         ///         <b>Note: </b> Options <see cref="ThreadArchiveDuration.OneWeek"/> and <see cref="ThreadArchiveDuration.ThreeDays"/>
-        ///         are only available for guilds that are boosted. You can check in the <see cref="IGuild.Features"/> to see if the 
+        ///         are only available for guilds that are boosted. You can check in the <see cref="IGuild.Features"/> to see if the
         ///         guild has the <b>THREE_DAY_THREAD_ARCHIVE</b> and <b>SEVEN_DAY_THREAD_ARCHIVE</b>.
         ///     </para>
         /// </param>

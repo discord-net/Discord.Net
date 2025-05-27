@@ -2,7 +2,6 @@ using Discord.Audio;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Discord

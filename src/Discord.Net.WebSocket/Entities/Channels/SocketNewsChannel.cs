@@ -1,6 +1,5 @@
 using Discord.Rest;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Model = Discord.API.Channel;

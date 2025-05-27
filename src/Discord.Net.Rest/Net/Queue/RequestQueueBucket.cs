@@ -1,4 +1,3 @@
-using Discord.API;
 using Discord.Net.Rest;
 using Newtonsoft.Json;
 using System;

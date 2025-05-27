@@ -1,4 +1,3 @@
-using Discord.API;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -56,7 +55,7 @@ public class CommandPermissionUpdateAuditLogData : IAuditLogData
     ///     Gets the application command which permissions were updated.
     /// </summary>
     public IApplicationCommand ApplicationCommand { get; }
-    
+
     /// <summary>
     ///     Gets values of the permissions before the change if available.
     /// </summary>

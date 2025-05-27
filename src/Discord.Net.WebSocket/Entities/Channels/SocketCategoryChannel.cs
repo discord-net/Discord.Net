@@ -1,5 +1,4 @@
 using Discord.Rest;
-using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;

@@ -1,7 +1,5 @@
 using System;
-using System.Collections.Immutable;
 using System.Diagnostics;
-using System.Linq;
 using System.Threading.Tasks;
 using Model = Discord.API.Invite;
 
@@ -143,7 +141,7 @@ namespace Discord.Rest
 
         /// <inheritdoc />
         IApplication IInvite.Application => Application;
-        
+
         #endregion
     }
 }

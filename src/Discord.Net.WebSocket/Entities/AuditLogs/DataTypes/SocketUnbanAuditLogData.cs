@@ -1,5 +1,4 @@
 using Discord.Rest;
-using System.Linq;
 using EntryModel = Discord.API.AuditLogEntry;
 
 namespace Discord.WebSocket;

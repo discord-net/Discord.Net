@@ -2,7 +2,6 @@ using Discord.API.Rest;
 using Discord.Rest;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using DataModel = Discord.API.ApplicationCommandInteractionData;

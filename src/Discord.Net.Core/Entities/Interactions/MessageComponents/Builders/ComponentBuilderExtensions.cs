@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Discord;
 
@@ -18,7 +16,7 @@ public static class ComponentBuilderExtensions
         builder.Id = id;
         return builder;
     }
-    
+
     /// <summary>
     ///     Converts a collection of <see cref="IMessageComponent"/> to a <see cref="ComponentBuilderV2"/>.
     /// </summary>

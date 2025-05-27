@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 
 namespace Discord
 {
@@ -33,7 +32,7 @@ namespace Discord
         ///     Setting this value to anything above zero will require each user to wait X seconds before
         ///     sending another message; setting this value to <c>0</c> will disable slow-mode for this channel.
         ///     <note>
-        ///         Users with <see cref="Discord.ChannelPermission.ManageMessages"/> or 
+        ///         Users with <see cref="Discord.ChannelPermission.ManageMessages"/> or
         ///         <see cref="ChannelPermission.ManageChannels"/> will be exempt from slow-mode.
         ///     </note>
         /// </remarks>
@@ -52,7 +51,7 @@ namespace Discord
         ///     Setting this value to anything above zero will require each user to wait X seconds before
         ///     sending another message; setting this value to <c>0</c> will disable slow-mode for child threads.
         ///     <note>
-        ///         Users with <see cref="Discord.ChannelPermission.ManageMessages"/> or 
+        ///         Users with <see cref="Discord.ChannelPermission.ManageMessages"/> or
         ///         <see cref="ChannelPermission.ManageChannels"/> will be exempt from slow-mode.
         ///     </note>
         /// </remarks>

@@ -3,7 +3,6 @@ using Discord.Logging;
 using Discord.Rest;
 using Discord.WebSocket;
 using System;
-using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;

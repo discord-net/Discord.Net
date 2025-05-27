@@ -1,9 +1,7 @@
 using Discord.API.Rest;
-using Discord.Net.Rest;
 using Discord.Rest;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using DataModel = Discord.API.MessageComponentInteractionData;
@@ -20,7 +18,7 @@ namespace Discord.WebSocket
         ///     Gets the data received with this interaction, contains the button that was clicked.
         /// </summary>
         public new SocketMessageComponentData Data { get; }
-        
+
         /// <inheritdoc cref="IComponentInteraction.Message"/>
         public SocketUserMessage Message { get; private set; }
 
@@ -358,7 +356,7 @@ namespace Discord.WebSocket
                 flags |= MessageFlags.Ephemeral;
 
             Preconditions.ValidateMessageFlags(flags);
-                
+
 
             var args = new API.Rest.CreateWebhookMessageParams
             {

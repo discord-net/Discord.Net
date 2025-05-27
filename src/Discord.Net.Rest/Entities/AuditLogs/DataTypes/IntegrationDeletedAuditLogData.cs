@@ -1,5 +1,4 @@
 using Discord.API.AuditLogs;
-using System.Linq;
 using EntryModel = Discord.API.AuditLogEntry;
 using Model = Discord.API.AuditLog;
 
@@ -20,7 +19,7 @@ public class IntegrationDeletedAuditLogData : IAuditLogData
         var changes = entry.Changes;
 
         var (data, _) = AuditLogHelper.CreateAuditLogEntityInfo<IntegrationInfoAuditLogModel>(changes, discord);
-        
+
         return new(new IntegrationInfo(data));
     }
 

@@ -1,5 +1,3 @@
-using Discord.Rest;
-
 namespace Discord.Rest;
 
 /// <summary>

@@ -1,9 +1,5 @@
 using Discord.Net.ED25519.Ed25519Ref10;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Discord.Net.ED25519
 {

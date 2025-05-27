@@ -1,5 +1,3 @@
-using System.Linq;
-
 using EntryModel = Discord.API.AuditLogEntry;
 using InfoModel = Discord.API.AuditLogs.GuildInfoAuditLogModel;
 

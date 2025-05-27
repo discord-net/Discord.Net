@@ -1,5 +1,3 @@
-using System;
-
 namespace Discord
 {
     /// <summary>
@@ -57,7 +55,7 @@ namespace Discord
         /// </summary>
         /// <remarks>
         ///     This value cannot be set at the same time as Emoji, as they are both exclusive.
-        ///     
+        ///
         ///     Setting an Icon will override a currently existing Emoji if present.
         /// </remarks>
         public Optional<Image?> Icon { get; set; }

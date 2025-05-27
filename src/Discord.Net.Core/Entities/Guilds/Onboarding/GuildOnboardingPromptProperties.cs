@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace Discord;
 
 /// <summary>
@@ -34,7 +32,7 @@ public class GuildOnboardingPromptProperties
     public bool IsRequired { get; set; }
 
     /// <summary>
-    ///     Gets or sets whether the prompt is present in the onboarding flow. 
+    ///     Gets or sets whether the prompt is present in the onboarding flow.
     /// </summary>
     public bool IsInOnboarding { get; set; }
 

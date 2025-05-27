@@ -1,8 +1,4 @@
-using Discord.Rest;
 using System;
-using System.Linq;
-
-using Model = Discord.API.AuditLog;
 using EntryModel = Discord.API.Gateway.AuditLogCreatedEvent;
 
 namespace Discord.WebSocket;

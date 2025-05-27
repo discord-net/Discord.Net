@@ -1,7 +1,6 @@
 using Discord.API.Voice;
 using Discord.Audio.Streams;
 using Discord.Logging;
-using Discord.Net;
 using Discord.Net.Converters;
 using Discord.WebSocket;
 using Newtonsoft.Json;

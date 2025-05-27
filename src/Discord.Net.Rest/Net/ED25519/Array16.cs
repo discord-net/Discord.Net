@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-
 namespace Discord.Net.ED25519
 {
     // Array16<UInt32> Salsa20 state

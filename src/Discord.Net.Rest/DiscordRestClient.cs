@@ -1,5 +1,5 @@
 //using Discord.Rest.Entities.Interactions;
-using Discord.Net;
+
 using Discord.Net.Converters;
 using Discord.Net.ED25519;
 using Newtonsoft.Json;

@@ -1,5 +1,3 @@
-using System;
-
 namespace Discord.Net.ED25519.Ed25519Ref10
 {
     internal static partial class FieldOperations

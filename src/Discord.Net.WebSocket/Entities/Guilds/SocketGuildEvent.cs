@@ -1,9 +1,6 @@
 using Discord.Rest;
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Model = Discord.API.GuildScheduledEvent;
 
@@ -165,7 +162,7 @@ namespace Discord.WebSocket
         /// </summary>
         /// <remarks>
         ///     <note type="important">
-        ///         The returned collection is an asynchronous enumerable object; one must call 
+        ///         The returned collection is an asynchronous enumerable object; one must call
         ///         <see cref="AsyncEnumerableExtensions.FlattenAsync{T}"/> to access the individual messages as a
         ///         collection.
         ///     </note>
@@ -187,7 +184,7 @@ namespace Discord.WebSocket
         /// </summary>
         /// <remarks>
         ///     <note type="important">
-        ///         The returned collection is an asynchronous enumerable object; one must call 
+        ///         The returned collection is an asynchronous enumerable object; one must call
         ///         <see cref="AsyncEnumerableExtensions.FlattenAsync{T}"/> to access the individual users as a
         ///         collection.
         ///     </note>
@@ -197,7 +194,7 @@ namespace Discord.WebSocket
         ///     </note>
         ///     This method will attempt to fetch the number of users specified under <paramref name="limit"/> around
         ///     the user <paramref name="fromUserId"/> depending on the <paramref name="dir"/>. The library will
-        ///     attempt to split up the requests according to your <paramref name="limit"/> and 
+        ///     attempt to split up the requests according to your <paramref name="limit"/> and
         ///     <see cref="DiscordConfig.MaxGuildEventUsersPerBatch"/>. In other words, should the user request 500 users,
         ///     and the <see cref="Discord.DiscordConfig.MaxGuildEventUsersPerBatch"/> constant is <c>100</c>, the request will
         ///     be split into 5 individual requests; thus returning 5 individual asynchronous responses, hence the need

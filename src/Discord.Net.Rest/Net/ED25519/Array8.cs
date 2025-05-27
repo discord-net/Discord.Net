@@ -1,5 +1,3 @@
-using System;
-
 namespace Discord.Net.ED25519
 {
     // Array8<UInt32> Poly1305 key

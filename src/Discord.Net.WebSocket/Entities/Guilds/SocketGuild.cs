@@ -18,7 +18,6 @@ using ChannelModel = Discord.API.Channel;
 using EmojiUpdateModel = Discord.API.Gateway.GuildEmojiUpdateEvent;
 using EventModel = Discord.API.GuildScheduledEvent;
 using ExtendedModel = Discord.API.Gateway.ExtendedGuild;
-using GuildSyncModel = Discord.API.Gateway.GuildSyncEvent;
 using MemberModel = Discord.API.GuildMember;
 using Model = Discord.API.Guild;
 using PresenceModel = Discord.API.Presence;

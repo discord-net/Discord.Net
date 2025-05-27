@@ -7,12 +7,9 @@ using Discord.Net.Rest;
 using Newtonsoft.Json;
 
 using System;
-using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.ComponentModel.Design;
 using System.Diagnostics;
-using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -2056,7 +2053,7 @@ namespace Discord.API
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             options = RequestOptions.CreateOrClone(options);
-            
+
             var ids = new BucketIds(guildId: guildId);
             var response = await SendJsonAsync<GuildMemberSearchResponse>("POST", () => $"guilds/{guildId}/members-search", args, ids, options: options);
 

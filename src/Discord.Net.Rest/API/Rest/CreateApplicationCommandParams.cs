@@ -1,7 +1,5 @@
 using Newtonsoft.Json;
-using System.Collections;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 
 namespace Discord.API.Rest

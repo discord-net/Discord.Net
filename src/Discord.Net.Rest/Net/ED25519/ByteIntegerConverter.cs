@@ -1,5 +1,3 @@
-using System;
-
 namespace Discord.Net.ED25519
 {
     // Loops? Arrays? Never heard of that stuff

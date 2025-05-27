@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Linq;
 using Model = Discord.API.GuildOnboardingPromptOption;
 
 namespace Discord.Rest;
@@ -17,7 +16,7 @@ public class RestGuildOnboardingPromptOption : RestEntity<ulong>, IGuildOnboardi
 
     /// <inheritdoc />
     public IReadOnlyCollection<ulong> RoleIds { get; private set; }
-    
+
     /// <inheritdoc />
     public IEmote Emoji { get; private set; }
 
@@ -33,7 +32,7 @@ public class RestGuildOnboardingPromptOption : RestEntity<ulong>, IGuildOnboardi
         RoleIds = model.RoleIds.ToImmutableArray();
         Title = model.Title;
         Description = model.Description;
-        
+
         if (model.Emoji.Id.HasValue)
         {
             Emoji = new Emote(model.Emoji.Id.Value, model.Emoji.Name, model.Emoji.Animated.GetValueOrDefault(false));

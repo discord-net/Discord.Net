@@ -1,5 +1,4 @@
 using Discord.API.AuditLogs;
-using System;
 using System.Collections.Generic;
 
 namespace Discord.Rest;

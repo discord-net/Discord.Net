@@ -1,5 +1,3 @@
-using System;
-
 namespace Discord
 {
     /// <summary> Specifies the type of token to use with the client. </summary>
