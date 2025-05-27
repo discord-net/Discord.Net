@@ -19,7 +19,7 @@ namespace Discord.Rest
             return new RestGuildWidget(model.Enabled, model.ChannelId);
         }
 
-        public override string ToString() => ChannelId?.ToString() ?? "Unknown";
-        private string DebuggerDisplay => $"{ChannelId} ({(IsEnabled ? "Enabled" : "Disabled")})";
+        public override readonly string ToString() => ChannelId?.ToString() ?? "Unknown";
+        private readonly string DebuggerDisplay => $"{ChannelId} ({(IsEnabled ? "Enabled" : "Disabled")})";
     }
 }

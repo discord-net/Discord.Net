@@ -9,7 +9,7 @@ namespace Discord
     ///     Represents a container for a series of overwrite permissions.
     /// </summary>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    public struct OverwritePermissions
+    public readonly struct OverwritePermissions
     {
         /// <summary>
         ///     Gets a blank <see cref="OverwritePermissions" /> that inherits all permissions.

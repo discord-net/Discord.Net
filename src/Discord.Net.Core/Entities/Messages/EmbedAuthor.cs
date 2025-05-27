@@ -7,7 +7,7 @@ namespace Discord
     ///     A author field of an <see cref="Embed"/>.
     /// </summary>
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
-    public struct EmbedAuthor
+    public record struct EmbedAuthor
     {
         /// <summary>
         ///     Gets the name of the author field.
@@ -34,43 +34,17 @@ namespace Discord
             ProxyIconUrl = proxyIconUrl;
         }
 
-        private string DebuggerDisplay => $"{Name} ({Url})";
+        private readonly string DebuggerDisplay => $"{Name} ({Url})";
         /// <summary>
         ///     Gets the name of the author field.
         /// </summary>
         /// <returns>
-        ///     
+        ///
         /// </returns>
-        public override string ToString() => Name;
-
-        public static bool operator ==(EmbedAuthor? left, EmbedAuthor? right)
-            => left is null ? right is null
-                : left.Equals(right);
-
-        public static bool operator !=(EmbedAuthor? left, EmbedAuthor? right)
-            => !(left == right);
-
-        /// <summary>
-        /// Determines whether the specified object is equal to the current <see cref="EmbedAuthor"/>.
-        /// </summary>
-        /// <remarks>
-        /// If the object passes is an <see cref="EmbedAuthor"/>, <see cref="Equals(EmbedAuthor?)"/> will be called to compare the 2 instances
-        /// </remarks>
-        /// <param name="obj">The object to compare with the current <see cref="EmbedAuthor"/></param>
-        /// <returns></returns>
-        public override bool Equals(object obj)
-            => obj is EmbedAuthor embedAuthor && Equals(embedAuthor);
-
-        /// <summary>
-        /// Determines whether the specified <see cref="EmbedAuthor"/> is equal to the current <see cref="EmbedAuthor"/>
-        /// </summary>
-        /// <param name="embedAuthor">The <see cref="EmbedAuthor"/> to compare with the current <see cref="EmbedAuthor"/></param>
-        /// <returns></returns>
-        public bool Equals(EmbedAuthor? embedAuthor)
-            => GetHashCode() == embedAuthor?.GetHashCode();
+        public override readonly string ToString() => Name;
 
         /// <inheritdoc />
-        public override int GetHashCode()
+        public override readonly int GetHashCode()
             => (Name, Url, IconUrl).GetHashCode();
     }
 }

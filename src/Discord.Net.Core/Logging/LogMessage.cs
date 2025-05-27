@@ -6,7 +6,7 @@ namespace Discord
     /// <summary>
     ///     Provides a message object used for logging purposes.
     /// </summary>
-    public struct LogMessage
+    public readonly struct LogMessage
     {
         /// <summary>
         ///     Gets the severity of the log entry.

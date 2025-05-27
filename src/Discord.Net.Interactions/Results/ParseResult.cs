@@ -2,7 +2,7 @@ using System;
 
 namespace Discord.Interactions
 {
-    public struct ParseResult : IResult
+    public readonly struct ParseResult : IResult
     {
         public object[] Args { get; }
 

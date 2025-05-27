@@ -7,7 +7,7 @@ using System.Linq;
 namespace Discord.Commands
 {
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    public struct TypeReaderValue
+    public readonly struct TypeReaderValue
     {
         public object Value { get; }
         public float Score { get; }
@@ -23,7 +23,7 @@ namespace Discord.Commands
     }
 
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    public struct TypeReaderResult : IResult
+    public readonly struct TypeReaderResult : IResult
     {
         public IReadOnlyCollection<TypeReaderValue> Values { get; }
 

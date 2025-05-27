@@ -8,7 +8,7 @@ namespace Discord
     ///     Represents a color used in Discord.
     /// </summary>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    public struct Color
+    public readonly record struct Color
     {
         /// <summary> Gets the max decimal value of color. </summary>
         public const uint MaxDecimalValue = 0xFFFFFF;
@@ -188,12 +188,6 @@ namespace Discord
                      | (uint)(b * 255.0f);
         }
 
-        public static bool operator ==(Color lhs, Color rhs)
-            => lhs.RawValue == rhs.RawValue;
-
-        public static bool operator !=(Color lhs, Color rhs)
-            => lhs.RawValue != rhs.RawValue;
-
         public static implicit operator Color(uint rawValue)
             => new(rawValue);
 
@@ -228,7 +222,7 @@ namespace Discord
 
             if (string.IsNullOrWhiteSpace(rawValue))
                 return false;
-            
+
             rawValue = rawValue.TrimStart('#');
 
             if (rawValue.StartsWith("0x"))
@@ -256,7 +250,7 @@ namespace Discord
                     fullHex = (r << 16) | (g << 8) | b;
 
                     break;
-                
+
                 case (4, ColorType.CssHexColor):
                     r = (parsedValue & 0xF00) >> 8;
                     g = (parsedValue & 0xF0) >> 4;
@@ -284,14 +278,9 @@ namespace Discord
             }
 
             color = new Color(fullHex);
-            
+
             return true;
         }
-
-        public override bool Equals(object obj)
-            => obj is Color c && RawValue == c.RawValue;
-
-        public override int GetHashCode() => RawValue.GetHashCode();
 
         public static implicit operator StandardColor(Color color)
             => StandardColor.FromArgb((int)color.RawValue);

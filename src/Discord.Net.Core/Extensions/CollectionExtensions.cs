@@ -23,7 +23,7 @@ namespace Discord
     }
 
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    internal struct CollectionWrapper<TValue> : IReadOnlyCollection<TValue>
+    internal readonly struct CollectionWrapper<TValue> : IReadOnlyCollection<TValue>
     {
         private readonly IEnumerable<TValue> _query;
         private readonly Func<int> _countFunc;

@@ -5,7 +5,7 @@ namespace Discord.Interactions
     /// <summary>
     ///     Represents a result type for <see cref="TypeConverter.ReadAsync(IInteractionContext, IApplicationCommandInteractionDataOption, IServiceProvider)"/>.
     /// </summary>
-    public struct TypeConverterResult : IResult
+    public readonly struct TypeConverterResult : IResult
     {
         /// <summary>
         ///     Gets the result of the conversion if the operation was successful.

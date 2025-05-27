@@ -35,14 +35,14 @@ namespace Discord
         /// <summary>
         ///     Gets or sets bytearray representing a sampled waveform. <see langword="null"/> if the attachment is not a voice message.
         /// </summary>
-        public byte[] Waveform { get; set; } 
+        public byte[] Waveform { get; set; }
 
 #pragma warning disable IDISP008
         /// <summary>
         ///     Gets the stream containing the file content.
         /// </summary>
         public Stream Stream { get; }
-#pragma warning restore IDISP008 
+#pragma warning restore IDISP008
 
         private bool _isDisposed;
 
@@ -130,7 +130,7 @@ namespace Discord
         /// <returns>
         ///     The formatted url.
         /// </returns>
-        public string GetAttachmentUrl()
+        public readonly string GetAttachmentUrl()
         {
             return $"attachment://{FileName}";
         }

@@ -40,19 +40,19 @@ namespace Discord.WebSocket
         public DateTimeOffset? RequestToSpeakTimestamp { get; private set; }
 
         /// <inheritdoc />
-        public bool IsMuted => (_voiceStates & Flags.Muted) != 0;
+        public readonly bool IsMuted => (_voiceStates & Flags.Muted) != 0;
         /// <inheritdoc />
-        public bool IsDeafened => (_voiceStates & Flags.Deafened) != 0;
+        public readonly bool IsDeafened => (_voiceStates & Flags.Deafened) != 0;
         /// <inheritdoc />
-        public bool IsSuppressed => (_voiceStates & Flags.Suppressed) != 0;
+        public readonly bool IsSuppressed => (_voiceStates & Flags.Suppressed) != 0;
         /// <inheritdoc />
-        public bool IsSelfMuted => (_voiceStates & Flags.SelfMuted) != 0;
+        public readonly bool IsSelfMuted => (_voiceStates & Flags.SelfMuted) != 0;
         /// <inheritdoc />
-        public bool IsSelfDeafened => (_voiceStates & Flags.SelfDeafened) != 0;
+        public readonly bool IsSelfDeafened => (_voiceStates & Flags.SelfDeafened) != 0;
         /// <inheritdoc />
-        public bool IsStreaming => (_voiceStates & Flags.SelfStream) != 0;
+        public readonly bool IsStreaming => (_voiceStates & Flags.SelfStream) != 0;
         /// <inheritdoc />
-        public bool IsVideoing => (_voiceStates & Flags.SelfVideo) != 0;
+        public readonly bool IsVideoing => (_voiceStates & Flags.SelfVideo) != 0;
 
 
         internal SocketVoiceState(SocketVoiceChannel voiceChannel, DateTimeOffset? requestToSpeak, string sessionId, bool isSelfMuted, bool isSelfDeafened, bool isMuted, bool isDeafened, bool isSuppressed, bool isStream, bool isVideo)
@@ -89,11 +89,11 @@ namespace Discord.WebSocket
         /// <returns>
         ///     A string that resolves to name of this voice channel; otherwise "Unknown".
         /// </returns>
-        public override string ToString() => VoiceChannel?.Name ?? "Unknown";
-        private string DebuggerDisplay => $"{VoiceChannel?.Name ?? "Unknown"} ({_voiceStates})";
-        internal SocketVoiceState Clone() => this;
+        public override readonly string ToString() => VoiceChannel?.Name ?? "Unknown";
+        private readonly string DebuggerDisplay => $"{VoiceChannel?.Name ?? "Unknown"} ({_voiceStates})";
+        internal readonly SocketVoiceState Clone() => this;
 
         /// <inheritdoc />
-        IVoiceChannel IVoiceState.VoiceChannel => VoiceChannel;
+        readonly IVoiceChannel IVoiceState.VoiceChannel => VoiceChannel;
     }
 }

@@ -7,7 +7,7 @@ namespace Discord.Commands
     ///     Contains information of the command's overall execution result.
     /// </summary>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    public struct ExecuteResult : IResult
+    public readonly struct ExecuteResult : IResult
     {
         /// <summary>
         ///     Gets the exception that may have occurred during the command execution.
@@ -76,7 +76,7 @@ namespace Discord.Commands
         ///     Gets a string that indicates the execution result.
         /// </summary>
         /// <returns>
-        ///     <c>Success</c> if <see cref="IsSuccess"/> is <see langword="true" />; otherwise "<see cref="Error"/>: 
+        ///     <c>Success</c> if <see cref="IsSuccess"/> is <see langword="true" />; otherwise "<see cref="Error"/>:
         ///     <see cref="ErrorReason"/>".
         /// </returns>
         public override string ToString() => IsSuccess ? "Success" : $"{Error}: {ErrorReason}";

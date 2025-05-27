@@ -5,7 +5,7 @@ using System.Diagnostics;
 namespace Discord
 {
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
-    public struct ChannelPermissions
+    public readonly struct ChannelPermissions
     {
         /// <summary>
         ///     Gets a blank <see cref="ChannelPermissions"/> that grants no permissions.

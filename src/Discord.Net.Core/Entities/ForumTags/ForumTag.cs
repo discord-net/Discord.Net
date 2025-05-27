@@ -6,7 +6,7 @@ namespace Discord;
 /// <summary>
 ///     A struct representing a forum channel tag.
 /// </summary>
-public readonly struct ForumTag : ISnowflakeEntity, IForumTag
+public readonly record struct ForumTag : ISnowflakeEntity, IForumTag
 {
     /// <inheritdoc/>
     public ulong Id { get; }
@@ -39,9 +39,6 @@ public readonly struct ForumTag : ISnowflakeEntity, IForumTag
 
     public override int GetHashCode() => (Id, Name, Emoji, IsModerated).GetHashCode();
 
-    public override bool Equals(object? obj)
-        => obj is ForumTag tag && Equals(tag);
-
     /// <summary>
     /// Gets whether supplied tag is equals to the current one.
     /// </summary>
@@ -52,11 +49,6 @@ public readonly struct ForumTag : ISnowflakeEntity, IForumTag
             Emoji is Emote emote && tag.Emoji is Emote otherEmote && emote.Equals(otherEmote)) &&
            IsModerated == tag.IsModerated;
 
-    public static bool operator ==(ForumTag? left, ForumTag? right)
-        => left?.Equals(right) ?? right is null;
-
-    public static bool operator !=(ForumTag? left, ForumTag? right) => !(left == right);
-
     /// <inheritdoc/>
-    readonly ulong? IForumTag.Id => Id;
+    ulong? IForumTag.Id => Id;
 }

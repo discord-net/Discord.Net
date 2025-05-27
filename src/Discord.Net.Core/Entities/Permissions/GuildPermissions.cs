@@ -6,7 +6,7 @@ using System.Linq;
 namespace Discord
 {
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    public struct GuildPermissions
+    public readonly struct GuildPermissions
     {
         /// <summary> Gets a blank <see cref="GuildPermissions"/> that grants no permissions. </summary>
         public static readonly GuildPermissions None = new GuildPermissions();

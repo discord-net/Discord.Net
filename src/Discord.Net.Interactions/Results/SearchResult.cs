@@ -6,7 +6,7 @@ namespace Discord.Interactions
     ///     Contains information of a command search.
     /// </summary>
     /// <typeparam name="T">Type of the target command type.</typeparam>
-    public struct SearchResult<T> : IResult where T : class, ICommandInfo
+    public readonly struct SearchResult<T> : IResult where T : class, ICommandInfo
     {
         /// <summary>
         ///     Gets the input text of the command search.

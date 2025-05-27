@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Discord.Commands
 {
-    public struct CommandMatch
+    public readonly record struct CommandMatch
     {
         /// <summary> The command that matches the search result. </summary>
         public CommandInfo Command { get; }

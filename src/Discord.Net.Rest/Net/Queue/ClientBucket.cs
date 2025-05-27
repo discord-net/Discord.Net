@@ -7,7 +7,7 @@ namespace Discord.Net.Queue
         Unbucketed = 0,
         SendEdit = 1
     }
-    internal struct ClientBucket
+    internal record struct ClientBucket
     {
         private static readonly ImmutableDictionary<ClientBucketType, ClientBucket> DefsByType;
         private static readonly ImmutableDictionary<BucketId, ClientBucket> DefsById;

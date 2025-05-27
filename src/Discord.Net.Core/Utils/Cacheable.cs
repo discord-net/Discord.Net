@@ -8,7 +8,7 @@ namespace Discord
     /// </summary>
     /// <typeparam name="TEntity">The type of entity that is cached.</typeparam>
     /// <typeparam name="TId">The type of this entity's ID.</typeparam>
-    public struct Cacheable<TEntity, TId>
+    public readonly struct Cacheable<TEntity, TId>
         where TEntity : IEntity<TId>
         where TId : IEquatable<TId>
     {
@@ -61,7 +61,7 @@ namespace Discord
         /// </returns>
         public async Task<TEntity> GetOrDownloadAsync() => HasValue ? Value : await DownloadAsync().ConfigureAwait(false);
     }
-    public struct Cacheable<TCachedEntity, TDownloadableEntity, TRelationship, TId>
+    public readonly struct Cacheable<TCachedEntity, TDownloadableEntity, TRelationship, TId>
         where TCachedEntity : IEntity<TId>, TRelationship
         where TDownloadableEntity : IEntity<TId>, TRelationship
         where TId : IEquatable<TId>

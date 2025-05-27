@@ -1,11 +1,12 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace Discord
 {
     //Based on https://github.com/dotnet/coreclr/blob/master/src/mscorlib/src/System/Nullable.cs
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    public struct Optional<T>
+    public readonly struct Optional<T> : IEquatable<Optional<T>>
     {
         public static Optional<T> Unspecified => default;
         private readonly T _value;
@@ -21,6 +22,7 @@ namespace Discord
                 return _value;
             }
         }
+
         /// <summary> Returns true if this value has been specified. </summary>
         public bool IsSpecified { get; }
 
@@ -42,6 +44,10 @@ namespace Discord
                 return false;
             return _value.Equals(other);
         }
+
+        /// <inheritdoc />
+        public bool Equals(Optional<T> other) => EqualityComparer<T>.Default.Equals(_value, other._value) && IsSpecified == other.IsSpecified;
+
         public override int GetHashCode() => IsSpecified ? _value.GetHashCode() : 0;
 
         public override string ToString() => IsSpecified ? _value?.ToString() : null;
@@ -49,7 +55,11 @@ namespace Discord
 
         public static implicit operator Optional<T>(T value) => new(value);
         public static explicit operator T(Optional<T> value) => value.Value;
+
+        public static bool operator ==(Optional<T> left, Optional<T> right) => left.Equals(right);
+        public static bool operator !=(Optional<T> left, Optional<T> right) => !(left == right);
     }
+
     public static class Optional
     {
         public static Optional<T> Create<T>() => Optional<T>.Unspecified;

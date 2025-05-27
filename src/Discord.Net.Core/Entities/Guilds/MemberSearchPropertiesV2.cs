@@ -211,10 +211,10 @@ public struct MemberSearchStringQuery : IMemberSearchQuery
     public IEnumerable<string> OrQuery { get; set; }
 
     /// <inheritdoc />
-    IEnumerable<object> IMemberSearchQuery.AndQuery => AndQuery;
+    readonly IEnumerable<object> IMemberSearchQuery.AndQuery => AndQuery;
 
     /// <inheritdoc />
-    IEnumerable<object> IMemberSearchQuery.OrQuery => OrQuery;
+    readonly IEnumerable<object> IMemberSearchQuery.OrQuery => OrQuery;
 }
 
 
@@ -230,10 +230,10 @@ public struct MemberSearchIntQuery : IMemberSearchQuery
     public IEnumerable<int> OrQuery { get; set; }
 
     /// <inheritdoc />
-    IEnumerable<object> IMemberSearchQuery.AndQuery => AndQuery?.Select(x => (object)x);
+    readonly IEnumerable<object> IMemberSearchQuery.AndQuery => AndQuery?.Select(x => (object)x);
 
     /// <inheritdoc />
-    IEnumerable<object> IMemberSearchQuery.OrQuery => OrQuery?.Select(x => (object)x);
+    readonly IEnumerable<object> IMemberSearchQuery.OrQuery => OrQuery?.Select(x => (object)x);
 }
 
 
@@ -249,8 +249,8 @@ public struct MemberSearchSnowflakeQuery : IMemberSearchQuery
     public IEnumerable<ulong> OrQuery { get; set; }
 
     /// <inheritdoc />
-    IEnumerable<object> IMemberSearchQuery.AndQuery => AndQuery?.Select(x => (object)x);
+    readonly IEnumerable<object> IMemberSearchQuery.AndQuery => AndQuery?.Select(x => (object)x);
 
     /// <inheritdoc />
-    IEnumerable<object> IMemberSearchQuery.OrQuery => OrQuery?.Select(x => (object)x);
+    readonly IEnumerable<object> IMemberSearchQuery.OrQuery => OrQuery?.Select(x => (object)x);
 }

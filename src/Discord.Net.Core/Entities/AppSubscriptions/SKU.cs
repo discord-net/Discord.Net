@@ -2,7 +2,7 @@ using System;
 
 namespace Discord;
 
-public struct SKU : ISnowflakeEntity
+public readonly struct SKU : ISnowflakeEntity
 {
     /// <inheritdoc />
     public ulong Id { get; }

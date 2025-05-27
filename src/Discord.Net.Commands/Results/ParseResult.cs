@@ -8,7 +8,7 @@ namespace Discord.Commands
     ///     Contains information for the parsing result from the command service's parser.
     /// </summary>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    public struct ParseResult : IResult
+    public readonly struct ParseResult : IResult
     {
         public IReadOnlyList<TypeReaderResult> ArgValues { get; }
         public IReadOnlyList<TypeReaderResult> ParamValues { get; }
@@ -22,7 +22,7 @@ namespace Discord.Commands
         ///     Provides information about the parameter that caused the parsing error.
         /// </summary>
         /// <returns>
-        ///     A <see cref="ParameterInfo" /> indicating the parameter info of the error that may have occurred during parsing; 
+        ///     A <see cref="ParameterInfo" /> indicating the parameter info of the error that may have occurred during parsing;
         ///     <see langword="null" /> if the parsing was successful or the parsing error is not specific to a single parameter.
         /// </returns>
         public ParameterInfo ErrorParameter { get; }
