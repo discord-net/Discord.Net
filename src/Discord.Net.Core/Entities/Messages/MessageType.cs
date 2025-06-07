@@ -166,6 +166,11 @@ namespace Discord
         /// <summary>
         ///     The message is a purchase notification.
         /// </summary>
-        PurchaseNotification = 44
+        PurchaseNotification = 44,
+
+        /// <summary>
+        ///     The message indicating the result of a poll.
+        /// </summary>
+        PollResult = 46,
     }
 }

@@ -7,10 +7,10 @@ public class TextDisplayBuilder : IMessageComponentBuilder
     /// <summary>
     ///     The maximum length of the content.
     /// </summary>
-    public const int MaxContentLength = 4096;
+    public const int MaxContentLength = 4000;
 
     /// <inheritdoc/>
-    public ComponentType Type => ComponentType.ActionRow;
+    public ComponentType Type => ComponentType.TextDisplay;
 
     /// <inheritdoc/>
     public int? Id { get; set; }

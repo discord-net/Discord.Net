@@ -18,8 +18,8 @@ public class MessageComponent : INestedComponent
     }
 
     /// <summary>
-    ///     Returns a empty <see cref="MessageComponent"/>.
+    ///     Returns an empty <see cref="MessageComponent"/>.
     /// </summary>
-    internal static MessageComponent Empty
+    public static MessageComponent Empty
         => new([]);
 }

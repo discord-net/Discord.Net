@@ -1,5 +1,19 @@
 # Changelog
 
+## [3.18.0-beta.3] - 2025-05-26
+
+### Fixed
+- #3130 correct typo (523212a)
+- #3125 Add empty constructors for containers (56d6980)
+- #3126 Include section accessories in `ComponentCount()` (5f2d173)
+- #3127 Change comment to reflect longer polls (9f9b093)
+- #3129 Fix error when only sending components in response to interactions (b1c2fcb)
+- #3135 Fix some CV2 oversights (35b493c)
+
+### Misc
+- #3133 refactor(TimestampTagStyles): replace ASCII integer values with character literals (e68fa50)
+
+
 ## [3.18.0-beta.2] - 2025-05-09
 
 ### Added

@@ -432,6 +432,7 @@ namespace Discord.Rest
                 Components = args.Components.IsSpecified
                         ? args.Components.Value?.Components.Select(x => x.ToModel()).ToArray() ?? []
                         : Optional<IMessageComponent[]>.Unspecified,
+                Flags = args.Flags
             };
 
             return client.ApiClient.ModifyInteractionFollowupMessageAsync(apiArgs, message.Id, message.Token, options);
@@ -494,7 +495,10 @@ namespace Discord.Rest
                     Embeds = apiEmbeds?.ToArray() ?? Optional<API.Embed[]>.Unspecified,
                     AllowedMentions = args.AllowedMentions.IsSpecified ? args.AllowedMentions.Value?.ToModel() : Optional<API.AllowedMentions>.Unspecified,
                     MessageComponents = args.Components.IsSpecified
-                        ? args.Components.Value?.Components.Select(x => x.ToModel()).ToArray() ?? [] : Optional<IMessageComponent[]>.Unspecified
+                        ? args.Components.Value?.Components.Select(x => x.ToModel()).ToArray() ?? [] : Optional<IMessageComponent[]>.Unspecified,
+                    Flags = args.Flags.IsSpecified
+                        ? (args.Flags.Value ?? Optional<MessageFlags>.Unspecified)
+                        : Optional<MessageFlags>.Unspecified
                 };
 
                 return client.ApiClient.ModifyInteractionResponseAsync(apiArgs, token, options);
