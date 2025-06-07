@@ -466,6 +466,10 @@ namespace Discord.Interactions.Builders
             builder.IsRequired = !paramInfo.IsOptional;
             builder.DefaultValue = paramInfo.DefaultValue;
 
+            var supportedNumericalRange = paramInfo.GetSupportedNumericalRange();
+            builder.MinValue = supportedNumericalRange.Min;
+            builder.MaxValue = supportedNumericalRange.Max;
+
             foreach (var attribute in attributes)
             {
                 switch (attribute)
@@ -497,9 +501,15 @@ namespace Discord.Interactions.Builders
                             builder.WithAutocompleteHandler(autocomplete.AutocompleteHandlerType, services);
                         break;
                     case MaxValueAttribute maxValue:
+                        if (maxValue.Value > supportedNumericalRange.Max)
+                            throw new ArgumentOutOfRangeException($"{nameof(maxValue)} cannot be greater than {supportedNumericalRange.Max}.");
+
                         builder.MaxValue = maxValue.Value;
                         break;
                     case MinValueAttribute minValue:
+                        if (minValue.Value < supportedNumericalRange.Min)
+                            throw new ArgumentOutOfRangeException($"{nameof(minValue)} cannot be less than {supportedNumericalRange.Min}.");
+
                         builder.MinValue = minValue.Value;
                         break;
                     case MinLengthAttribute minLength:
