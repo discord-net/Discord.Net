@@ -20,6 +20,7 @@ namespace Discord
                 TypeCode.UInt16 => (ushort.MinValue, ushort.MaxValue),
                 TypeCode.Int32 => (int.MinValue, int.MaxValue),
                 TypeCode.UInt32 => (uint.MinValue, uint.MaxValue),
+                TypeCode.UInt64 => (ulong.MinValue, Int53Max),
                 _ => (Int53Min, Int53Max)
             };
 
