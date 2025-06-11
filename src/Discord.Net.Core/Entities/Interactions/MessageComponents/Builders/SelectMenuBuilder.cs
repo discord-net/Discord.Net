@@ -169,6 +169,7 @@ public class SelectMenuBuilder : IInteractableComponentBuilder
         MaxValues = selectMenu.MaxValues;
         MinValues = selectMenu.MinValues;
         IsDisabled = selectMenu.IsDisabled;
+        Type = selectMenu.Type;
         Options = selectMenu.Options?
            .Select(x => new SelectMenuOptionBuilder(x.Label, x.Value, x.Description, x.Emote, x.IsDefault))
            .ToList();
