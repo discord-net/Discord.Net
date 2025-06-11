@@ -59,6 +59,9 @@ public class RestApplication : RestEntity<ulong>, IApplication
     public int? ApproximateUserInstallCount { get; private set; }
 
     /// <inheritdoc />
+    public int? ApproximateUserAuthorizationCount { get; private set; }
+
+    /// <inheritdoc />
     public IReadOnlyCollection<string> RedirectUris { get; private set; }
 
     /// <inheritdoc />
@@ -122,7 +125,7 @@ public class RestApplication : RestEntity<ulong>, IApplication
     internal void Update(Model model)
     {
         Description = model.Description;
-        RPCOrigins = model.RPCOrigins.IsSpecified ? model.RPCOrigins.Value.ToImmutableArray() : ImmutableArray<string>.Empty;
+        RPCOrigins = model.RPCOrigins.IsSpecified ? [..model.RPCOrigins.Value] : ImmutableArray<string>.Empty;
         Name = model.Name;
         _iconId = model.Icon;
         IsBotPublic = model.IsBotPublic.IsSpecified ? model.IsBotPublic.Value : null;
@@ -132,7 +135,7 @@ public class RestApplication : RestEntity<ulong>, IApplication
         TermsOfService = model.TermsOfService;
 
         InstallParams = model.InstallParams.IsSpecified
-            ? new ApplicationInstallParams(model.InstallParams.Value.Scopes, (GuildPermission)model.InstallParams.Value.Permission)
+            ? new ApplicationInstallParams(model.InstallParams.Value.Scopes, model.InstallParams.Value.Permission)
             : null;
 
         if (model.Flags.IsSpecified)
@@ -154,15 +157,16 @@ public class RestApplication : RestEntity<ulong>, IApplication
         if (model.RedirectUris.IsSpecified)
             RedirectUris = model.RedirectUris.Value.ToImmutableArray();
 
-        ApproximateGuildCount = model.ApproximateGuildCount.IsSpecified ? model.ApproximateGuildCount.Value : null;
-        ApproximateUserInstallCount = model.ApproximateUserInstallCount.IsSpecified ? model.ApproximateUserInstallCount.Value : null;
+        ApproximateGuildCount = model.ApproximateGuildCount.ToNullable();
+        ApproximateUserInstallCount = model.ApproximateUserInstallCount.ToNullable();
+        ApproximateUserAuthorizationCount = model.ApproximateUserAuthorizationCount.ToNullable();
 
         DiscoverabilityState = model.DiscoverabilityState.GetValueOrDefault(ApplicationDiscoverabilityState.None);
         DiscoveryEligibilityFlags = model.DiscoveryEligibilityFlags.GetValueOrDefault(DiscoveryEligibilityFlags.None);
         ExplicitContentFilterLevel = model.ExplicitContentFilter.GetValueOrDefault(ApplicationExplicitContentFilterLevel.Disabled);
         IsHook = model.IsHook;
 
-        InteractionEventTypes = model.InteractionsEventTypes.GetValueOrDefault(Array.Empty<string>()).ToImmutableArray();
+        InteractionEventTypes = model.InteractionsEventTypes.GetValueOrDefault([]).ToImmutableArray();
         InteractionsVersion = model.InteractionsVersion.GetValueOrDefault(ApplicationInteractionsVersion.Version1);
 
         IsMonetized = model.IsMonetized;
@@ -178,7 +182,7 @@ public class RestApplication : RestEntity<ulong>, IApplication
         {
             foreach (var p in model.IntegrationTypesConfig.Value)
             {
-                dict.Add(p.Key, new ApplicationInstallParams(p.Value.Scopes ?? Array.Empty<string>(), p.Value.Permission));
+                dict.Add(p.Key, new ApplicationInstallParams(p.Value.Scopes ?? [], p.Value.Permission));
             }
         }
         IntegrationTypesConfig = dict.ToImmutableDictionary();

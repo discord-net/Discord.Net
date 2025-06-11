@@ -101,6 +101,11 @@ namespace Discord
         int? ApproximateUserInstallCount { get; }
 
         /// <summary>
+        ///     Gets the approximate count of the users who have authorized the application. <see langword="null" /> if not returned.
+        /// </summary>
+        int? ApproximateUserAuthorizationCount { get; }
+
+        /// <summary>
         ///     Gets the application's discoverability state.
         /// </summary>
         ApplicationDiscoverabilityState DiscoverabilityState { get; }
