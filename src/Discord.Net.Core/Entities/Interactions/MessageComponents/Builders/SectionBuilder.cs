@@ -1,10 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Linq;
 
 namespace Discord;
 
+
+[DebuggerDisplay(@"{DebuggerDisplay,nq}")]
 public class SectionBuilder : IMessageComponentBuilder, IStaticComponentContainer
 {
     /// <summary>
@@ -128,4 +131,6 @@ public class SectionBuilder : IMessageComponentBuilder, IStaticComponentContaine
     IComponentContainer IComponentContainer.AddComponents(params IMessageComponentBuilder[] components) => AddComponents(components);
     /// <inheritdoc/>
     IComponentContainer IComponentContainer.WithComponents(IEnumerable<IMessageComponentBuilder> components) => WithComponents(components.ToList());
+
+    private string DebuggerDisplay => $"{nameof(SectionBuilder)}: {this.ComponentCount()} child components.";
 }

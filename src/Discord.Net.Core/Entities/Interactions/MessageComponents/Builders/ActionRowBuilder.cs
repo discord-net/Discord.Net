@@ -1,13 +1,16 @@
 using Discord.Utils;
-using System.Collections.Generic;
-using System.Linq;
+
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 
 namespace Discord;
 
 /// <summary>
 ///     Represents a class used to build Action rows.
 /// </summary>
+[DebuggerDisplay(@"{DebuggerDisplay,nq}")]
 public class ActionRowBuilder : IMessageComponentBuilder, IInteractableComponentContainer
 {
     /// <inheritdoc />
@@ -239,4 +242,6 @@ public class ActionRowBuilder : IMessageComponentBuilder, IInteractableComponent
 
     /// <inheritdoc />
     IComponentContainer IComponentContainer.WithComponents(IEnumerable<IMessageComponentBuilder> components) => WithComponents(components);
+
+    private string DebuggerDisplay => $"{nameof(ActionRowBuilder)}: {this.ComponentCount()} child components.";
 }
