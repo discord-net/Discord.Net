@@ -102,6 +102,14 @@
       topicUid: Guides.MessageComponents.TextInputs
     - name: Advanced Concepts
       topicUid: Guides.MessageComponents.Advanced
+- name: Components V2
+  items:
+    - name: Introduction
+      topicUid: Guides.ComponentsV2.Intro
+    - name: Structure
+      topicUid: Guides.ComponentsV2.Structure
+    - name: Interacting with Components
+      topicUid: Guides.ComponentsV2.Interaction
 - name: Modal Basics
   items:
     - name: Introduction
