@@ -15,7 +15,6 @@ namespace Discord.WebSocket;
 
 public partial class DiscordSocketClient
 {
-
     private async Task ProcessMessageAsync(GatewayOpCode opCode, int? seq, string type, object payload)
     {
         if (seq != null)
@@ -87,8 +86,8 @@ public partial class DiscordSocketClient
                 }
                 break;
                 case GatewayOpCode.Dispatch:
-                    // An extra Stopwatch is required due to `activity.Duration` cannot be used because its only useable when its stopped but then the metrics wont be associated with this trace.
-                    var activity = SocketActivity.StartSocketDispatchActivity(type, this);
+                    // An extra Stopwatch is required due to `activity.Duration` cannot be used because its only usable when its stopped but then the metrics won't be associated with this trace.
+                    var activity = SocketActivity.StartSocketDispatchActivity(seq, type, this);
                     var watch =  Stopwatch.StartNew();
 
                     try
@@ -2522,13 +2521,13 @@ public partial class DiscordSocketClient
                     catch (Exception ex)
                     {
                         activity?.AddExceptionToActivity(ex);
-                        SocketMeter.RecordSocketEventException(ex, type, this);
+                        SocketMeter.RecordSocketEventException(ex, seq, type, this);
                         throw;
                     }
                     finally
                     {
                         watch.Stop();
-                        SocketMeter.RecordSocketEvent(watch.Elapsed, type, this);
+                        SocketMeter.RecordSocketEvent(watch.Elapsed, seq, type, this);
 
                         activity?.Dispose();
                     }

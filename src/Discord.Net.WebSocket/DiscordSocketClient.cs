@@ -172,7 +172,12 @@ namespace Discord.WebSocket
             _connection = new ConnectionManager(_stateLock, _gatewayLogger, config.ConnectionTimeout,
                 OnConnectingAsync, OnDisconnectingAsync, x => ApiClient.Disconnected += x);
             _connection.Connected += () => TimedInvokeAsync(_connectedEvent, nameof(Connected));
-            _connection.Disconnected += (ex, recon) => TimedInvokeAsync(_disconnectedEvent, nameof(Disconnected), ex);
+            _connection.Disconnected += (ex, recon) =>
+            {
+                if (recon)
+                    SocketMeter.AddSocketReconnect(this);
+                return TimedInvokeAsync(_disconnectedEvent, nameof(Disconnected), ex);
+            };
 
             _nextAudioId = 1;
             _shardedClient = shardedClient;

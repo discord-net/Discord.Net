@@ -1,7 +1,6 @@
 using Discord.API.Voice;
 using Discord.Audio.Streams;
 using Discord.Logging;
-using Discord.Net;
 using Discord.Net.Converters;
 using Discord.WebSocket;
 using Discord.WebSocket.Diagnostics;
@@ -101,7 +100,12 @@ namespace Discord.Audio
             _connection = new ConnectionManager(_stateLock, _audioLogger, ConnectionTimeoutMs,
                 OnConnectingAsync, OnDisconnectingAsync, x => ApiClient.Disconnected += x);
             _connection.Connected += () => _connectedEvent.InvokeAsync();
-            _connection.Disconnected += (exception, _) => _disconnectedEvent.InvokeAsync(exception);
+            _connection.Disconnected += (exception, reconnect) =>
+            {
+                if (reconnect)
+                    AudioMeter.AddAudioReconnect(this);
+                return _disconnectedEvent.InvokeAsync(exception);
+            };
             _heartbeatTimes = new ConcurrentQueue<long>();
             _keepaliveTimes = new ConcurrentQueue<KeyValuePair<ulong, int>>();
             _ssrcMap = new ConcurrentDictionary<uint, ulong>();
@@ -424,12 +428,12 @@ namespace Discord.Audio
             catch (Exception ex)
             {
                 await _audioLogger.ErrorAsync($"Error handling {opCode}", ex).ConfigureAwait(false);
-                AudioMeter.RecordSocketEventException(opCode, ex, this);
+                AudioMeter.RecordSocketEventException(ex, opCode, this);
             }
             finally
             {
                 watch.Stop();
-                AudioMeter.RecordSocketEventReceived(opCode, watch.Elapsed, this);
+                AudioMeter.RecordSocketEventReceived(watch.Elapsed, opCode, this);
             }
         }
         private async Task ProcessPacketAsync(byte[] packet)

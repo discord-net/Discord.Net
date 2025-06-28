@@ -46,6 +46,7 @@ namespace Discord.API
         /// </remarks>
         public string GatewayUrl
         {
+            get => _gatewayUrl;
             set
             {
                 // Makes the sharded client not override the custom value.
