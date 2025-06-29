@@ -7,12 +7,12 @@ using System.Collections.ObjectModel;
 namespace Discord.WebSocket.Diagnostics
 {
     /// <summary>
-    /// A wrapper around <see cref="UpDownCounter{int}"/> which buffers values in cause the instrument isn't enabled yet.
+    /// A wrapper around <see cref="UpDownCounter{T}"/> (T is int) which buffers values in cause the instrument isn't enabled yet.
     /// </summary>
     internal class BufferedUpDownCounter
     {
         private readonly Collection<(int value, TagList tags)> _pendingValues = [];
-        private bool _buffering = false;
+        private bool _buffering;
 
         /// <summary>
         /// The instrument this instance will use.
