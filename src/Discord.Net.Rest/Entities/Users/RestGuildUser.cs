@@ -109,7 +109,7 @@ namespace Discord.Rest
         {
             base.Update(model.User);
             if (model.JoinedAt.IsSpecified)
-                _joinedAtTicks = model.JoinedAt.Value.UtcTicks ??= DateTimeOffset.UtcNow.UtcTicks;
+                _joinedAtTicks = model.JoinedAt.Value.GetValueOrDefault(DateTimeOffset.UtcNow).UtcTicks;
             if (model.Nick.IsSpecified)
                 Nickname = model.Nick.Value;
             if (model.Avatar.IsSpecified)
