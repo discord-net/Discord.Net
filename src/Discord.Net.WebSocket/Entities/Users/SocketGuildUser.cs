@@ -178,7 +178,7 @@ namespace Discord.WebSocket
         {
             base.Update(state, model.User);
             if (model.JoinedAt.IsSpecified)
-                _joinedAtTicks = model.JoinedAt.Value.UtcTicks;
+                _joinedAtTicks = model.JoinedAt.Value.UtcTicks ??= DateTimeOffset.UtcNow.UtcTicks;
             if (model.Nick.IsSpecified)
                 Nickname = model.Nick.Value;
             if (model.Avatar.IsSpecified)
