@@ -10,10 +10,14 @@ namespace Discord;
 [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
 public class SectionBuilder : IMessageComponentBuilder, IStaticComponentContainer
 {
-    /// <summary>
-    ///     Gets the maximum number of components allowed in this container.
-    /// </summary>
-    public const int MaxComponents = 3;
+    /// <inheritdoc />
+    public ImmutableArray<ComponentType> SupportedComponentTypes { get; } =
+    [
+        ComponentType.TextDisplay
+    ];
+
+    /// <inheritdoc cref="IComponentContainer.MaxChildCount"/>
+    public const int MaxChildCount = 3;
 
     /// <inheritdoc/>
     public ComponentType Type => ComponentType.Section;
@@ -45,7 +49,7 @@ public class SectionBuilder : IMessageComponentBuilder, IStaticComponentContaine
     ///     Initializes a new <see cref="SectionBuilder"/>.
     /// </summary>
     public SectionBuilder() { }
-
+    
     /// <summary>
     ///     Initializes a new <see cref="SectionBuilder"/>.
     /// </summary>
@@ -108,17 +112,17 @@ public class SectionBuilder : IMessageComponentBuilder, IStaticComponentContaine
     /// <inheritdoc cref="IMessageComponentBuilder.Build"/>
     public SectionComponent Build()
     {
-        if (_components.Count is 0 or > MaxComponents)
-            throw new InvalidOperationException($"Section component can only contain {MaxComponents} child components!");
+        if (_components.Count is 0 or > MaxChildCount)
+            throw new InvalidOperationException($"Section component can only contain {MaxChildCount} child components.");
 
-        if (_components.Any(x => x is not TextDisplayBuilder))
-            throw new InvalidOperationException($"Section component can only contain {nameof(TextDisplayBuilder)}!");
+        if (Components.Any(x => !SupportedComponentTypes.Contains(x.Type)))
+            throw new InvalidOperationException($"This component container only supports components of types: {string.Join(", ", SupportedComponentTypes)}");
 
         if (Accessory is null)
-            throw new ArgumentNullException(nameof(Accessory), "A section must have an accessory");
+            throw new ArgumentNullException(nameof(Accessory), "A section must have an accessory.");
 
         if (Accessory is not ButtonBuilder and not ThumbnailBuilder)
-            throw new InvalidOperationException($"Accessory component can only be {nameof(ButtonBuilder)} or {nameof(ThumbnailBuilder)}!");
+            throw new InvalidOperationException($"Accessory component can only be {nameof(ButtonBuilder)} or {nameof(ThumbnailBuilder)}.");
 
         return new(Id, Components.Select(x => x.Build()).ToImmutableArray(), Accessory?.Build());
     }
@@ -131,6 +135,7 @@ public class SectionBuilder : IMessageComponentBuilder, IStaticComponentContaine
     IComponentContainer IComponentContainer.AddComponents(params IMessageComponentBuilder[] components) => AddComponents(components);
     /// <inheritdoc/>
     IComponentContainer IComponentContainer.WithComponents(IEnumerable<IMessageComponentBuilder> components) => WithComponents(components.ToList());
-
+    /// <inheritdoc/>
+    int IComponentContainer.MaxChildCount => MaxChildCount;
     private string DebuggerDisplay => $"{nameof(SectionBuilder)}: {this.ComponentCount()} child components.";
 }
