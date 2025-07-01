@@ -1,3 +1,4 @@
+using Discord.API.Gateway;
 using System;
 
 #if NET6_0_OR_GREATER
@@ -105,27 +106,27 @@ namespace Discord.WebSocket.Diagnostics
             _socketConnectionsLatency.Record(seconds, [.. DiagnosticTags.CreateSocketClientTags(client)]);
         }
 
-        internal static void RecordSocketEventException(Exception ex, int? seq, string type, DiscordSocketClient client)
+        internal static void RecordSocketEvent(TimeSpan duration, GatewayOpCode opCode, string type, DiscordSocketClient client)
         {
             TagList tags = [
                 .. DiagnosticTags.CreateSocketClientTags(client),
-                .. DiagnosticTags.CreateEventTags(seq, type),
+                .. DiagnosticTags.CreateEventTags(opCode, type)
+            ];
+
+            _socketEvents.Add(1, tags);
+            _socketEventsDuration.Record(duration.TotalSeconds, tags);
+        }
+
+        internal static void RecordSocketEventException(Exception ex, GatewayOpCode opCode, string type, DiscordSocketClient client)
+        {
+            TagList tags = [
+                .. DiagnosticTags.CreateSocketClientTags(client),
+                .. DiagnosticTags.CreateEventTags(opCode, type),
                 KeyValuePair.Create<string, object>("exception.type", ex.GetType().ToString()),
                 KeyValuePair.Create<string, object>("exception.message", ex.Message),
                 KeyValuePair.Create<string, object>("exception.stacktrace", ex.ToString()),
             ];
             _socketEventsExceptions.Add(1, tags);
-        }
-
-        internal static void RecordSocketEvent(TimeSpan duration, int? seq, string type, DiscordSocketClient client)
-        {
-            TagList tags = [
-                .. DiagnosticTags.CreateSocketClientTags(client),
-                .. DiagnosticTags.CreateEventTags(seq, type)
-            ];
-
-            _socketEvents.Add(1, tags);
-            _socketEventsDuration.Record(duration.TotalSeconds, tags);
         }
 #else
         internal static void AddClientShards(int shards, DiscordSocketClient client) { }
@@ -136,9 +137,9 @@ namespace Discord.WebSocket.Diagnostics
 
         internal static void RecordConnectionLatency(double seconds, DiscordSocketClient client) { }
 
-        internal static void RecordSocketEventException(Exception ex, int? seq, string type, DiscordSocketClient client) { }
+        internal static void RecordSocketEvent(TimeSpan duration, GatewayOpCode opCode, string type, DiscordSocketClient client) { }
 
-        internal static void RecordSocketEvent(TimeSpan duration, int? seq, string type, DiscordSocketClient client) { }
+        internal static void RecordSocketEventException(Exception ex, GatewayOpCode opCode, string type, DiscordSocketClient client) { }
 #endif
     }
 }

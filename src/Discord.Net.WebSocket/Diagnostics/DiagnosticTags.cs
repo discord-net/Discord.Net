@@ -1,7 +1,9 @@
 #if NET5_0_OR_GREATER
+using Discord.API.Gateway;
 using Discord.API.Voice;
 using Discord.Audio;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Discord.WebSocket.Diagnostics
 {
@@ -13,10 +15,15 @@ namespace Discord.WebSocket.Diagnostics
             KeyValuePair.Create<string, object>("discord.client.gateway_url", client.ApiClient.GatewayUrl)
         ];
 
-        internal static IEnumerable<KeyValuePair<string, object>> CreateEventTags(int? seq, string type) => [
-            KeyValuePair.Create<string, object>("discord.event_type", type),
-            KeyValuePair.Create<string, object>("discord.event_sequence", seq)
-        ];
+        internal static IEnumerable<KeyValuePair<string, object>> CreateEventTags(GatewayOpCode opCode, string type)
+        {
+            IEnumerable<KeyValuePair<string, object>> tags = [
+                KeyValuePair.Create<string, object>("discord.event_op_code", opCode)
+            ];
+            if (!string.IsNullOrEmpty(type))
+                tags = tags.Append(new KeyValuePair<string, object>("discord.event_op_type", type));
+            return tags;
+        }
 
         internal static IEnumerable<KeyValuePair<string, object>> CreateAudioClientTags(AudioClient client) => [
             KeyValuePair.Create<string, object>("discord.audio.client_id", client.ClientId),
@@ -25,7 +32,7 @@ namespace Discord.WebSocket.Diagnostics
         ];
 
         internal static IEnumerable<KeyValuePair<string, object>> CreateAudioEventTags(VoiceOpCode opCode) => [
-            KeyValuePair.Create<string, object>("discord.audio.event_opCode", opCode)
+            KeyValuePair.Create<string, object>("discord.audio.event_op_code", opCode)
         ];
 
         internal static IEnumerable<KeyValuePair<string, object>> CreateUdpTags(AudioClient client) => [
