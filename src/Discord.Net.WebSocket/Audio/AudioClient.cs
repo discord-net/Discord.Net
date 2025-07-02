@@ -331,7 +331,9 @@ namespace Discord.Audio
         {
             _lastMessageTime = Environment.TickCount;
 
+            var activity = AudioActivity.StartEventReceivedActivity(opCode, this);
             var watch = Stopwatch.StartNew();
+
             try
             {
                 switch (opCode)
@@ -427,13 +429,17 @@ namespace Discord.Audio
             }
             catch (Exception ex)
             {
-                await _audioLogger.ErrorAsync($"Error handling {opCode}", ex).ConfigureAwait(false);
+                activity?.AddExceptionToActivity(ex);
                 AudioMeter.RecordSocketEventException(ex, opCode, this);
+
+                await _audioLogger.ErrorAsync($"Error handling {opCode}", ex).ConfigureAwait(false);
             }
             finally
             {
                 watch.Stop();
                 AudioMeter.RecordSocketEventReceived(watch.Elapsed, opCode, this);
+
+                activity?.Dispose();
             }
         }
         private async Task ProcessPacketAsync(byte[] packet)
