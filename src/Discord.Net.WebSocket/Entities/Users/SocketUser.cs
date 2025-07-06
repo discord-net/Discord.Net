@@ -54,6 +54,9 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public ulong? AvatarDecorationSkuId { get; private set; }
 
+        /// <inheritdoc />
+        public PrimaryGuild? PrimaryGuild { get; private set; }
+
         /// <summary>
         ///     Gets mutual guilds shared with this user.
         /// </summary>
@@ -111,6 +114,32 @@ namespace Discord.WebSocket
                 AvatarDecorationHash = model.AvatarDecoration.Value?.Asset;
                 AvatarDecorationSkuId = model.AvatarDecoration.Value?.SkuId;
                 hasChanges = true;
+            }
+
+            if (model.PrimaryGuild.IsSpecified)
+            {
+                if (model.PrimaryGuild.Value is null)
+                {
+                    PrimaryGuild = null;
+                    if (PrimaryGuild is not null)
+                        hasChanges = true;
+                }
+                else
+                {
+                    if (PrimaryGuild?.GuildId != model.PrimaryGuild.Value.GuildId ||
+                        PrimaryGuild?.BadgeHash != model.PrimaryGuild.Value.BadgeHash ||
+                        PrimaryGuild?.Tag != model.PrimaryGuild.Value.Tag||
+                        PrimaryGuild?.IdentityEnabled != model.PrimaryGuild.Value.IdentityEnabled)
+                    {
+                        PrimaryGuild = new(
+                            model.PrimaryGuild.Value.GuildId,
+                            model.PrimaryGuild.Value.IdentityEnabled,
+                            model.PrimaryGuild.Value.Tag,
+                            model.PrimaryGuild.Value.BadgeHash);
+
+                        hasChanges = true;
+                    }
+                }
             }
 
             return hasChanges;

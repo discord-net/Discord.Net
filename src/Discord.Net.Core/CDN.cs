@@ -285,5 +285,14 @@ namespace Discord
         /// </returns>
         public static string GetAvatarDecorationUrl(string avatarDecorationHash)
             => $"{DiscordConfig.CDNUrl}avatar-decoration-presets/{avatarDecorationHash}.png";
+
+        /// <summary>
+        ///     Gets a guild tag badge url based off the hash.
+        /// </summary>
+        /// <returns>
+        ///     A URL to the guild tag badge.
+        /// </returns>
+        public static string GetGuildTagBadgeUrl(ulong guildId, string badgeHash)
+            => $"{DiscordConfig.CDNUrl} guild-tag-badges/{guildId}/{badgeHash}.png";
     }
 }

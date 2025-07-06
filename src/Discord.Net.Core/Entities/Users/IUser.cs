@@ -123,6 +123,11 @@ namespace Discord
         ulong? AvatarDecorationSkuId { get; }
 
         /// <summary>
+        ///     Gets the user's primary guild. <see langword="null" /> if one is not set.
+        /// </summary>
+        PrimaryGuild? PrimaryGuild { get; }
+
+        /// <summary>
         ///     Creates the direct message channel of this user.
         /// </summary>
         /// <remarks>

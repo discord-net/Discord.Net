@@ -72,6 +72,8 @@ namespace Discord.Rest
         /// <inheritdoc />
         public ulong? AvatarDecorationSkuId { get; private set; }
 
+        /// <inheritdoc />
+        public PrimaryGuild? PrimaryGuild { get; private set; }
 
         internal RestUser(BaseDiscordClient discord, ulong id)
             : base(discord, id)
@@ -125,6 +127,18 @@ namespace Discord.Rest
             {
                 AvatarDecorationHash = model.AvatarDecoration.Value?.Asset;
                 AvatarDecorationSkuId = model.AvatarDecoration.Value?.SkuId;
+            }
+
+            if (model.PrimaryGuild.IsSpecified)
+            {
+                if (model.PrimaryGuild.Value is null)
+                    PrimaryGuild = null;
+                else
+                    PrimaryGuild = new(
+                        model.PrimaryGuild.Value.GuildId,
+                        model.PrimaryGuild.Value.IdentityEnabled,
+                        model.PrimaryGuild.Value.Tag,
+                        model.PrimaryGuild.Value.BadgeHash);
             }
         }
 

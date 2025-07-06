@@ -27,6 +27,9 @@ namespace Discord.API
         [JsonProperty("avatar_decoration_data")]
         public Optional<AvatarDecorationData> AvatarDecoration { get; set; }
 
+        [JsonProperty("primary_guild")]
+        public Optional<PrimaryGuild> PrimaryGuild { get; set; }
+
         //CurrentUser
         [JsonProperty("verified")]
         public Optional<bool> Verified { get; set; }
