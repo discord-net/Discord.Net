@@ -13,9 +13,9 @@ namespace Discord.Commands
 
         public static async Task<IReadOnlyList<TypeInfo>> SearchAsync(Assembly assembly, CommandService service)
         {
-            bool IsLoadableModule(TypeInfo info)
+            static bool IsLoadableModule(TypeInfo info)
             {
-                return info.DeclaredMethods.Any(x => x.GetCustomAttribute<CommandAttribute>() != null) &&
+                return !info.IsAbstract && info.DeclaredMethods.Any(x => x.GetCustomAttribute<CommandAttribute>() != null) &&
                     info.GetCustomAttribute<DontAutoLoadAttribute>() == null;
             }
 

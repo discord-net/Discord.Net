@@ -2,6 +2,7 @@ using Discord.Utils;
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
 
@@ -13,6 +14,18 @@ namespace Discord;
 [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
 public class ActionRowBuilder : IMessageComponentBuilder, IInteractableComponentContainer
 {
+    /// <inheritdoc />
+    public ImmutableArray<ComponentType> SupportedComponentTypes { get; } =
+    [
+        ComponentType.Button,
+        ComponentType.SelectMenu,
+        ComponentType.UserSelect,
+        ComponentType.RoleSelect,
+        ComponentType.ChannelSelect,
+        ComponentType.MentionableSelect,
+        ComponentType.TextInput
+    ];
+
     /// <inheritdoc />
     public ComponentType Type => ComponentType.ActionRow;
 
@@ -207,7 +220,10 @@ public class ActionRowBuilder : IMessageComponentBuilder, IInteractableComponent
     {
         Preconditions.AtLeast(Components.Count, 1, nameof(Components), "There must be at least 1 component in a row.");
         Preconditions.AtMost(Components.Count, MaxChildCount, nameof(Components), $"Action row can only contain {MaxChildCount} child components!");
-        
+
+        if (Components.Any(x => !SupportedComponentTypes.Contains(x.Type)))
+            throw new InvalidOperationException($"This component container only supports components of types: {string.Join(", ", SupportedComponentTypes)}");
+
         return new ActionRowComponent(_components.Select(x => x.Build()).ToList(), Id);
     }
     IMessageComponent IMessageComponentBuilder.Build() => Build();
@@ -242,6 +258,8 @@ public class ActionRowBuilder : IMessageComponentBuilder, IInteractableComponent
 
     /// <inheritdoc />
     IComponentContainer IComponentContainer.WithComponents(IEnumerable<IMessageComponentBuilder> components) => WithComponents(components);
+    /// <inheritdoc />
+    int IComponentContainer.MaxChildCount => MaxChildCount;
 
     private string DebuggerDisplay => $"{nameof(ActionRowBuilder)}: {this.ComponentCount()} child components.";
 }

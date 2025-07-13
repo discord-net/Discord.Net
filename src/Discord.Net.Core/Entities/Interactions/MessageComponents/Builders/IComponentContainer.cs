@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Collections.Immutable;
 
 namespace Discord;
 
@@ -7,6 +8,16 @@ namespace Discord;
 /// </summary>
 public interface IComponentContainer
 {
+    /// <summary>
+    ///     Gets the types of child components supported by this container.
+    /// </summary>
+    ImmutableArray<ComponentType> SupportedComponentTypes { get; }
+
+    /// <summary>
+    ///     Gets the maximum number of components allowed in the container.
+    /// </summary>
+    int MaxChildCount { get; }
+
     /// <summary>
     ///     Gets the components in the container.
     /// </summary>

@@ -10,7 +10,23 @@ namespace Discord;
 public class ContainerBuilder : IMessageComponentBuilder, IStaticComponentContainer
 {
     /// <inheritdoc />
+    public ImmutableArray<ComponentType> SupportedComponentTypes { get; } =
+    [
+        ComponentType.ActionRow,
+        ComponentType.Section,
+        ComponentType.Button,
+        ComponentType.MediaGallery,
+        ComponentType.Separator,
+        ComponentType.File,
+        ComponentType.SelectMenu,
+        ComponentType.TextDisplay
+    ];
+
+    /// <inheritdoc />
     public ComponentType Type => ComponentType.Container;
+
+    /// <inheritdoc cref="IComponentContainer.MaxChildCount"/>
+    public const int MaxChildCount = 39;
 
     /// <inheritdoc />
     public int? Id { get; set; }
@@ -46,7 +62,7 @@ public class ContainerBuilder : IMessageComponentBuilder, IStaticComponentContai
     {
         Components = components?.ToList();
     }
-
+    
     /// <summary>
     ///     Initializes a new <see cref="ContainerBuilder"/> from existing component.
     /// </summary>
@@ -107,14 +123,11 @@ public class ContainerBuilder : IMessageComponentBuilder, IStaticComponentContai
     /// <inheritdoc cref="IMessageComponentBuilder.Build"/>
     public ContainerComponent Build()
     {
-        if (_components.Any(x => x
-                is not ActionRowBuilder
-                and not TextDisplayBuilder
-                and not SectionBuilder
-                and not MediaGalleryBuilder
-                and not SeparatorBuilder
-                and not FileComponentBuilder))
-            throw new InvalidOperationException($"A container can only contain {nameof(ActionRowBuilder)}, {nameof(TextDisplayBuilder)}, {nameof(SectionBuilder)}, {nameof(MediaGalleryBuilder)}, {nameof(SeparatorBuilder)}, or {nameof(FileComponentBuilder)} components.");
+        Preconditions.NotNull(Components, nameof(Components));
+        Preconditions.AtLeast(Components.Count, 1, nameof(Components.Count), "At least 1 component must be added to this container.");
+
+        if (Components.Any(x => !SupportedComponentTypes.Contains(x.Type)))
+            throw new InvalidOperationException($"This component container only supports components of types: {string.Join(", ", SupportedComponentTypes)}");
 
         return new(Components.ConvertAll(x => x.Build()).ToImmutableArray(), AccentColor, IsSpoiler, Id);
     }
@@ -127,6 +140,8 @@ public class ContainerBuilder : IMessageComponentBuilder, IStaticComponentContai
     IComponentContainer IComponentContainer.AddComponents(params IMessageComponentBuilder[] components) => AddComponents(components);
     /// <inheritdoc />
     IComponentContainer IComponentContainer.WithComponents(IEnumerable<IMessageComponentBuilder> components) => WithComponents(components);
+    /// <inheritdoc/>
+    int IComponentContainer.MaxChildCount => MaxChildCount;
 
     private string DebuggerDisplay => $"{nameof(ContainerBuilder)}: {this.ComponentCount()} child components.";
 }

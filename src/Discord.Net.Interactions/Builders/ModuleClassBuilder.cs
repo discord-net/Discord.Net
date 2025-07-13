@@ -16,10 +16,15 @@ namespace Discord.Interactions.Builders
 
         public static async Task<IEnumerable<TypeInfo>> SearchAsync(Assembly assembly, InteractionService commandService)
         {
-            static bool IsLoadableModule(TypeInfo info)
-            {
-                return info.DeclaredMethods.Any(x => x.GetCustomAttribute<SlashCommandAttribute>() != null);
-            }
+            static bool IsLoadableModule(TypeInfo info) =>
+                !info.IsAbstract &&
+                info.DeclaredMethods
+                    .SelectMany(x => x.GetCustomAttributes())
+                    .Any(x => x is SlashCommandAttribute
+                                or ComponentInteractionAttribute
+                                or ContextCommandAttribute
+                                or AutocompleteCommandAttribute
+                                or ModalInteractionAttribute);
 
             var result = new List<TypeInfo>();
 
@@ -58,7 +63,7 @@ namespace Discord.Interactions.Builders
                 result.Add(type.AsType(), moduleInfo);
             }
 
-            await commandService._cmdLogger.DebugAsync($"Successfully built {built.Count} Slash Command modules.").ConfigureAwait(false);
+            await commandService._cmdLogger.DebugAsync($"Successfully built {built.Count} interaction modules.").ConfigureAwait(false);
 
             return result;
         }
