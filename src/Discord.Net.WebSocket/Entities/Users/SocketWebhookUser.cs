@@ -29,6 +29,15 @@ namespace Discord.WebSocket
         public override string GlobalName { get; internal set; }
 
         /// <inheritdoc />
+        public override string AvatarDecorationHash { get; internal set; }
+
+        /// <inheritdoc />
+        public override ulong? AvatarDecorationSkuId { get; internal set; }
+
+        /// <inheritdoc />
+        public override PrimaryGuild? PrimaryGuild { get; internal set; }
+
+        /// <inheritdoc />
         public override bool IsBot { get; internal set; }
 
         /// <inheritdoc />

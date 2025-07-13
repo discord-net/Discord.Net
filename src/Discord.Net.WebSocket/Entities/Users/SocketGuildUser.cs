@@ -53,6 +53,13 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public override string GlobalName { get { return GlobalUser.GlobalName; } internal set { GlobalUser.GlobalName = value; } }
 
+        /// <inheritdoc />
+        public override string AvatarDecorationHash { get => GlobalUser.AvatarDecorationHash; internal set => GlobalUser.AvatarDecorationHash = value; }
+        /// <inheritdoc />
+        public override ulong? AvatarDecorationSkuId { get => GlobalUser.AvatarDecorationSkuId; internal set => GlobalUser.AvatarDecorationSkuId = value; }
+        /// <inheritdoc />
+        public override PrimaryGuild? PrimaryGuild { get => GlobalUser.PrimaryGuild; internal set => GlobalUser.PrimaryGuild = value; }
+
         /// <inheritdoc/>
         public string GuildBannerHash { get; private set; }
 
