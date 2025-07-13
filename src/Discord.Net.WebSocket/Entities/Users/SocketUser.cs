@@ -57,9 +57,6 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public abstract PrimaryGuild? PrimaryGuild { get; internal set; }
 
-        /// <inheritdoc />
-        public PrimaryGuild? PrimaryGuild { get; private set; }
-
         /// <summary>
         ///     Gets mutual guilds shared with this user.
         /// </summary>
