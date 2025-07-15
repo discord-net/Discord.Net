@@ -25,7 +25,7 @@ interface with the [Discord API](https://discord.com/).
 If this is your first time using Discord.Net, you should refer to the
 [Intro](xref:Guides.Introduction) for tutorials.
 
-If you're coming from Discord.Net V2, you should refer to the [V2 -> V3](xref:Guides.V2V3Guide) guides.
+If you're coming from Discord.Net V2, you should refer to the [V2 -> V3](xref:Guides.Breakings.V2V3Guide) guides.
 
 More experienced users might want to refer to the
 [API Documentation](xref:API.Docs) for a breakdown of the individual

@@ -1,7 +1,11 @@
 - name: Introduction
   topicUid: Guides.Introduction
-- name: V2 to V3 Guide
-  topicUid: Guides.V2V3Guide
+- name: Breakings
+  items:
+    - name: V2 to V3 Guide
+      topicUid: Guides.Breakings.V2V3Guide
+    - name: V3.18
+      topicUid: Guides.Breakings.V3_18
 - name: Getting Started
   items:
     - name: Installation
