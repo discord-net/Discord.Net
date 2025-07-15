@@ -6,7 +6,7 @@ title: Interact with Components V2
 # Interaction with components
 
 ## Lifecycle
-A component should receive an initial response within a 3 second timeframe. After this it can continue receiving responses for up to 30m, this is useful when a component needs to be rebuilt periodically (buttons etc), which is also what we will be leveraging here.
+A component should receive an initial response within a 3 second timeframe. After this it can continue receiving responses for up to 15 minutes, this is useful when a component needs to be rebuilt periodically (buttons etc), which is also what we will be leveraging here.
 
 ## Catching of and responding to a user interaction
 
