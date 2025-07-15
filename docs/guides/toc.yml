@@ -106,8 +106,8 @@
   items:
     - name: Introduction
       topicUid: Guides.ComponentsV2.Intro
-    - name: Structure
-      topicUid: Guides.ComponentsV2.Structure
+    - name: Advanced
+      topicUid: Guides.ComponentsV2.Advanced
     - name: Interacting with Components
       topicUid: Guides.ComponentsV2.Interaction
 - name: Modal Basics

@@ -1,5 +1,5 @@
 ---
-uid: Guides.ComponentsV2.Structure
+uid: Guides.ComponentsV2.Advanced
 title: Create Components V2
 ---
 
