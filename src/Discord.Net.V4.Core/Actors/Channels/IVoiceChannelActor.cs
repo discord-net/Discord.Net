@@ -14,7 +14,6 @@ namespace Discord;
     )
 ]
 public partial interface IVoiceChannelActor :
-    IGuildChannelActor,
     IMessageChannelTrait,
     IInvitableTrait<IGuildChannelInviteActor, IGuildChannelInvite>,
     IIntegrationChannelTrait.WithIncoming,

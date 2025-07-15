@@ -14,7 +14,9 @@ public record TraitAncestor(
 
 public sealed class TraitsTask : GenerationTask
 {
-    public IncrementalKeyValueProvider<string, ITraitInfo> Traits { get; }
+    public IncrementalKeyValueProvider<string, TraitSymbols> Traits { get; }
+    
+    public IncrementalKeyValueProvider<string, ITraitInfo> TraitInfos { get; }
     public IncrementalKeyValueProvider<ITraitInfo, ImmutableEquatableArray<TraitAncestor>> TraitAncestors { get; }
 
     public record TraitSymbols(
@@ -54,7 +56,9 @@ public sealed class TraitsTask : GenerationTask
             .WhereNotNull()
             .KeyedBy(x => x.Symbols.Trait.ToDisplayString());
 
-        Traits = traitsProvider
+        Traits = traitsProvider.MapValues((_, x) => x.Symbols);
+
+        TraitInfos = traitsProvider
             .MapValues((_, x) => x.Symbols.ToInfo());
 
         TraitAncestors = traitsProvider
@@ -74,10 +78,10 @@ public sealed class TraitsTask : GenerationTask
                     )
                     .ToImmutableEquatableArray()
             )
-            .TransformKeyVia(Traits)
+            .TransformKeyVia(TraitInfos)
             .MapValues((_, ancestors) => ancestors
-                .Where(x => Traits.ContainsKey(x.Ancestor))
-                .Select(x => new TraitAncestor(Traits.GetValue(x.Ancestor), x.IsEntityAssignable))
+                .Where(x => TraitInfos.ContainsKey(x.Ancestor))
+                .Select(x => new TraitAncestor(TraitInfos.GetValue(x.Ancestor), x.IsEntityAssignable))
                 .ToImmutableEquatableArray()
             );
     }

@@ -2,16 +2,17 @@ using Discord.Models;
 using Discord.Models.Json;
 using Discord.Rest;
 using System.Diagnostics.CodeAnalysis;
+using Discord.Rest.Pipeline;
 
 namespace Discord;
 
 [
     RelationshipName("Thread"),
-    Loadable(nameof(Routes.GetChannel), typeof(ThreadChannelBase)),
-    Modifiable<ModifyThreadChannelProperties>(nameof(Routes.ModifyChannel)),
-    PagedFetchableOfMany<PagePublicArchivedThreadsParams>(nameof(Routes.ListPublicArchivedThreads)),
-    PagedFetchableOfMany<PagePrivateArchivedThreadsParams>(nameof(Routes.ListPrivateArchivedThreads)),
-    PagedFetchableOfMany<PageJoinedPrivateArchivedThreadsParams>(nameof(Routes.ListJoinedPrivateArchivedThreads))
+    Loadable<Routes.GetChannel>,
+    Modifiable<Routes.UpdateChannel, ModifyThreadChannelProperties>,
+    PagedFetchableOfMany<Routes.ListPublicArchivedThreads, PagePublicArchivedThreadsParams>,
+    PagedFetchableOfMany<Routes.ListPrivateArchivedThreads, PagePrivateArchivedThreadsParams>,
+    PagedFetchableOfMany<Routes.ListMyPrivateArchivedThreads, PageJoinedPrivateArchivedThreadsParams>
 ]
 public partial interface IThreadChannelActor :
     IMessageChannelTrait,
@@ -25,11 +26,17 @@ public partial interface IThreadChannelActor :
         .BackLink<IThreadChannelActor>
         Members { get; }
 
-    Task JoinAsync(RequestOptions? options = null, CancellationToken token = default)
-        => Client.RestApiClient.ExecuteAsync(Routes.JoinThread(Id), options, token);
+    async Task JoinAsync(RequestOptions? options = null, CancellationToken token = default)
+        => await Routes.JoinThread
+            .Create(this)
+            .AsPipeline(options)
+            .RunAsync(Client, token);
 
-    Task LeaveAsync(RequestOptions? options = null, CancellationToken token = default)
-        => Client.RestApiClient.ExecuteAsync(Routes.LeaveThread(Id), options, token);
+    async Task LeaveAsync(RequestOptions? options = null, CancellationToken token = default)
+        => await Routes.LeaveThread
+            .Create(this)
+            .AsPipeline(options)
+            .RunAsync(Client, token);
 
     [LinkExtension]
     private interface WithActiveExtension

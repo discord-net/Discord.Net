@@ -195,6 +195,23 @@ public record TypeSpec(
         );
     }
 
+    public string ToReferenceName()
+    {
+        if (Generics.Count == 0)
+            return Name;
+        
+        var sb = new StringBuilder(Name);
+
+        sb.Append('<');
+        foreach (var generic in Generics)
+            sb.Append(generic.Name).Append(", ");
+
+        sb.Length -= 2;
+        sb.Append('>');
+
+        return sb.ToString();
+    }
+
     public override string ToString()
     {
         var builder = new StringBuilder();

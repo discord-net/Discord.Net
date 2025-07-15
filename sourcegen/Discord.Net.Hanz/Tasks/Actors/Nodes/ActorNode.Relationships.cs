@@ -193,18 +193,33 @@ public sealed partial class ActorNode
                 .KeyedBy(x => x.State.ActorInfo)
                 .JoinByKey(Relationships)
                 .JoinByKey(
-                    GetTask<ActorsTask>(context).ActorAncestors,
+                    GetTask<ActorsTask>(context).ActorAncestors!,
                     (info, state, ancestors) => (
                         State: state.Value,
                         Relationships: state.Other,
                         Hierarchy: ancestors.ToImmutableEquatableArray()
                     )
                 )
-                .Select(CreateRelationshipsTypes),
-            (sourceContext, sourceSpec) => sourceContext.AddSource(
-                sourceSpec.Path,
-                sourceSpec.ToString()
-            )
+                .Select(CreateRelationshipsTypes)
+                .Collect(),
+            (sourceContext, sourceSpec) =>
+            {
+                var gen = new HashSet<string>();
+
+                foreach (var spec in sourceSpec)
+                {
+                    if (!gen.Add(spec.Path))
+                    {
+                        Logger.Warn($"Tried to add {spec.Path} again, source:\n{spec}");
+                        continue;
+                    }
+                    
+                    sourceContext.AddSource(
+                        spec.Path,
+                        spec.ToString()
+                    );
+                }
+            }
         );
     }
 

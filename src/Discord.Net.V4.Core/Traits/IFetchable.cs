@@ -26,7 +26,10 @@ internal sealed class PagedFetchableOfManyAttribute<TRoute, TPageParams, TPagedE
 
 #pragma warning restore CS9113 // Parameter is unread.
 
-public interface IFetchable<TRoute, TModel> : IPathable
+public interface IFetchable<TRoute> : IPathable
+    where TRoute : IRouteOperation<TRoute>;
+
+public interface IFetchable<TRoute, TModel> : IFetchable<TRoute>
     where TRoute : IRouteOperation<TRoute>
 {
     internal IRestPipeline<TModel?> CreatePipeline(RequestOptions? options)

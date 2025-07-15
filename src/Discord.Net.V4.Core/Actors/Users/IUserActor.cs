@@ -1,24 +1,26 @@
 using Discord.Models;
 using Discord.Models.Json;
 using Discord.Rest;
+using Discord.Rest.Pipeline;
 
 namespace Discord;
 
 [
-    Loadable(nameof(Routes.GetUser)), 
+    Loadable<Routes.GetUser>, 
     BackLinkable, 
-    Refreshable(nameof(Routes.GetUser))
+    Refreshable
 ]
 public partial interface IUserActor :
     IActor<ulong, IUser>
 {
     async Task<IDMChannel> CreateDMAsync(RequestOptions? options = null, CancellationToken token = default)
     {
-        var model = await Client.RestApiClient.ExecuteRequiredAsync(
-            Routes.CreateDm(new CreateDMChannelParams {RecipientId = Id}),
-            options ?? Client.DefaultRequestOptions,
-            token
-        );
+        
+        // var model = await Client.RestApiClient.ExecuteRequiredAsync(
+        //     Routes.CreateDm(new CreateDMChannelParams {RecipientId = Id}),
+        //     options ?? Client.DefaultRequestOptions,
+        //     token
+        // );
 
         return await Client.Channels.DM.CreateEntityAsync(model, token);
     }

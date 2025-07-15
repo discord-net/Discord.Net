@@ -5,8 +5,8 @@ namespace Discord;
 
 [
     Trait,
-    Loadable(nameof(Routes.GetChannel), typeof(ThreadableChannelBase)),
-    Modifiable<ModifyThreadableChannelProperties>(nameof(Routes.ModifyChannel)),
+    Loadable<Routes.GetChannel>,
+    Modifiable<Routes.UpdateChannel, ModifyThreadableChannelProperties>,
 ]
 public partial interface IThreadableChannelTrait :
     IGuildChannelActor,

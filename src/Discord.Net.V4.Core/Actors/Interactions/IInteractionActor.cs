@@ -1,18 +1,26 @@
+﻿using Discord.Models;
+
 namespace Discord;
 
-// only handles https://discord.com/developers/docs/interactions/receiving-and-responding#create-interaction-response
-public partial interface IInteractionActor :
-    IActor<ulong, IInteraction>,
-    ICurrentApplicationsInteractionActor
-{   
-    
-    // [SourceOfTruth]
-    new IInteractionMessageActor.Indexable.WithOriginal.BackLink<IInteractionActor> Responses { get; }
-}
 
-public partial interface ICurrentApplicationsInteractionActor :
-    ITokenPathProvider,
-    ICurrentApplicationActor.CanonicalRelationship
+// for '/interactions/{interaction.id}'
+public partial interface IInteractionActor :
+    IApplicationInteractionActor,
+    IEntityProvider<IInteractionCallbackResponse, IInteractionCallbackResponseModel>
 {
-    IInteractionMessageActor.Indexable.WithOriginal Responses { get; }
+    new WithToken this[string token] { get; }
+
+    public new partial interface WithToken :
+        IInteractionActor,
+        IApplicationInteractionActor.WithToken
+    {
+        new IInteractionMessageActor.BackLink<WithToken> Response { get; }
+        
+        new IInteractionMessageActor.Indexable.BackLink<WithToken> FollowUps { get; }
+
+        IInteractionMessageActor IInteractionTokenActor.Response => Response;
+        IInteractionMessageActor.Indexable IInteractionTokenActor.FollowUps => FollowUps;
+    }
+    
+    IApplicationInteractionActor.WithToken IApplicationInteractionActor.this[string token] => this[token];
 }

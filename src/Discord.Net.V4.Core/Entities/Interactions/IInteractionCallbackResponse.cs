@@ -4,7 +4,7 @@ namespace Discord;
 
 public partial interface IInteractionCallbackResponse : 
     ISnowflakeEntity<IInteractionCallbackResponseModel>,
-    IInteractionCallbackResponseActor
+    IInteractionMessageActor
 {
     InteractionType Type { get; }
     InteractionResponseType ResponseType { get; }

@@ -9,8 +9,7 @@ public sealed class FileLogger :
     IDisposable
 {
     public LogContext Context { get; }
-    private readonly StreamWriter _stream;
-    private readonly string _path;
+    public readonly string Path;
     private readonly LogLevel _level;
 
     public static bool TryCreate(string path, LogLevel level, LogContext context, out FileLogger logger)
@@ -29,20 +28,23 @@ public sealed class FileLogger :
 
     public FileLogger(string path, LogLevel level, LogContext context)
     {
-        var dir = Path.GetDirectoryName(path);
+        var dir = System.IO.Path.GetDirectoryName(path);
 
         if (dir is not null && !Directory.Exists(dir))
             Directory.CreateDirectory(dir);
 
         Context = context;
-        _path = path;
+        Path = path;
         _level = level;
-        _stream = new StreamWriter(
-            File.Open(path, FileMode.OpenOrCreate, FileAccess.Write, FileShare.ReadWrite | FileShare.Delete),
-            Encoding.UTF8,
-            1024,
-            leaveOpen: false
-        );
+
+        Clean();
+
+        // _stream = new StreamWriter(
+        //     File.Open(path, FileMode.OpenOrCreate, FileAccess.Write, FileShare.ReadWrite | FileShare.Delete),
+        //     Encoding.UTF8,
+        //     1024,
+        //     leaveOpen: false
+        // );
     }
 
     private string GetPrefix(LogLevel logLevel)
@@ -53,20 +55,36 @@ public sealed class FileLogger :
 
     public void Log(LogLevel logLevel, string message)
     {
-        _stream.WriteLine($"{GetPrefix(logLevel)}: {message}");
-        _stream.Flush();
+        File.AppendAllLines(Path, [$"{GetPrefix(logLevel)}: {message}"]);
+        
+        // _stream.WriteLine($"{GetPrefix(logLevel)}: {message}");
+        // _stream.Flush();
     }
 
     public void Clean()
     {
-        // _stream.BaseStream.SetLength(0);
-        // _stream.Flush();
+        if (File.Exists(Path))
+        {
+            try
+            {
+                File.Delete(Path);
+            }
+            catch
+            {
+                // ignored
+            }
+        }
     }
 
-    public void Flush() => _stream.Flush();
+    public void Flush()
+    {
+        
+    }
 
     public void Dispose()
-        => _stream.Dispose();
+    { 
+        
+    }
 
     // public const int MAX_UNFLUSHED_LOGS = 2500;
     //

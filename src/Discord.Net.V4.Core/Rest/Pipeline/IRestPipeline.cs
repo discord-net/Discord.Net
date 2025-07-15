@@ -8,6 +8,26 @@ public interface IRestPipeline<TOut>
     ValueTask<TOut> RunAsync(IDiscordClient client, CancellationToken token);
 }
 
+internal sealed record PipelineContext(
+    IDiscordClient Client
+)
+{
+    
+}
+
+file abstract record RestPipelineElement<T> : IRestPipeline<Optional<T>>
+{
+    protected abstract ValueTask<Optional<T>> RunAsync(
+        PipelineContext context,
+        CancellationToken token
+    );
+
+    public ValueTask<Optional<T>> RunAsync(IDiscordClient client, CancellationToken token)
+    {
+        throw new NotImplementedException();
+    }
+}
+
 file sealed record PreconditionPipeline<T>(
     IRestPipeline<T> Pipeline,
     Predicate<T> Precondition
@@ -16,7 +36,7 @@ file sealed record PreconditionPipeline<T>(
     public async ValueTask<Optional<T>> RunAsync(IDiscordClient client, CancellationToken token)
     {
         var previous = await Pipeline.RunAsync(client, token);
-        return previous.OptionalIf(Precondition);
+        return previous.SomeWhen(Precondition);
     }
 }
 

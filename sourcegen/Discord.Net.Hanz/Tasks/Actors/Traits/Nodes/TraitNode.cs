@@ -91,7 +91,7 @@ public abstract class TraitNode : Node
             .Select(TraitImplementationTarget (info, _) => new ActorTraitImplementationTarget(info))
             .Concat(
                 GetTask<TraitsTask>()
-                    .Traits
+                    .TraitInfos
                     .ValuesProvider
                     .MaybeSelect(info =>
                         info is ActorTraitInfo actorTraitInfo

@@ -1,5 +1,7 @@
 using Discord.Models;
+using Discord.Models.Json;
 using Discord.Rest;
+using Discord.Rest.Pipeline;
 
 namespace Discord;
 
@@ -13,10 +15,17 @@ public partial interface IInteractionMessageActor :
     IApplicationActor.CanonicalRelationship,
     ITokenPathProvider
 {
-
-    [LinkExtension]
-    private interface WithOriginalExtension
-    {
-        IInteractionCallbackResponseActor Original { get; }
-    }
+    [BackLink<IInteractionActor.WithToken>]
+    private static async Task<IInteractionCallbackResponse> CreateAsync(
+        IInteractionActor.WithToken actor,
+        CreateInteractionResponseProperties properties,
+        RequestOptions? options = null,
+        CancellationToken token = default
+    ) => await Routes.CreateInteractionResponse
+        .Create(actor)
+        .AsPipeline(properties.ToApiModel(), options)
+        .Deserialize<IInteractionCallbackResponseModel>()
+        .Required()
+        .Transform(actor.CreateEntityAsync)
+        .RunAsync(actor.Client, token);
 }

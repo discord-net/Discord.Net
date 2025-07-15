@@ -45,7 +45,7 @@ public class LinksTask : GenerationTask
             .Select(ActorOrTraitInfo (x, _) => x)
             .Concat(
                 traitsTask
-                    .Traits
+                    .TraitInfos
                     .ValuesProvider
                     .MaybeSelect(info =>
                         info is ActorTraitInfo actorTrait ? actorTrait.Some<ActorOrTraitInfo>() : default

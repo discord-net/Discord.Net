@@ -83,7 +83,7 @@ public sealed class TraitComponentNode : TraitNode
             )
             .ValuesProvider
             .GroupBy(x => x.Trait)
-            .TransformKeysVia(GetTask<TraitsTask>().Traits)
+            .TransformKeysVia(GetTask<TraitsTask>().TraitInfos)
             .ToKeyed((trait, components) =>
                 new State(
                     trait,

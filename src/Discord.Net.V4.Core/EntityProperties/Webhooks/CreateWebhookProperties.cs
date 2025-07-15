@@ -12,7 +12,7 @@ public sealed class CreateWebhookProperties : IEntityProperties<CreateWebhookPar
         return new CreateWebhookParams()
         {
             Name = Name,
-            Avatar = Avatar.Map<string?>(v => v.ToImageData())
+            Avatar = Avatar.Map(v => v.ToImageData())!
         };
     }
 }

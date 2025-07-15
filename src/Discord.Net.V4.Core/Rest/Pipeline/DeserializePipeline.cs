@@ -24,6 +24,6 @@ public record DeserializePipeline<T>(
         if (Required && !response.HasContent)
             throw new DiscordHttpException(response.Route, response.Options, "Missing content");
 
-        return await response.DeserializeAsync<T>(token);
+        return await response.DeserializeAsync<T?>(token);
     }
 }

@@ -12,6 +12,19 @@ internal sealed class LoadableAttribute<TRoute> : Attribute
 
 #pragma warning restore CS9113 // Parameter is unread.
 
+public static class LoadableExt
+{
+    public static void FetchAsyncTest<TRoute>(
+        this IFetchable<TRoute> loadable
+    )
+        where TRoute : class, IRouteOperation<TRoute>
+    {
+        IGuildChannelActor x = null!;
+
+        x.FetchAsyncTest();
+    }
+}
+
 public interface ILoadable<TRoute, TEntity, TModel> :
     IFetchable<TRoute, TModel>,
     IEntityProvider<TEntity, TModel>

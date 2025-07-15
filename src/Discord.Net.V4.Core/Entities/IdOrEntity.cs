@@ -2,12 +2,18 @@ using Discord.Rest;
 
 namespace Discord;
 
+public interface IIdLike<out TId>
+{
+    TId Id { get; }
+}
+
 /// <summary>
 ///     Represents a container that contains an ID of an entity, either from the id itself or from the entity.
 /// </summary>
 /// <typeparam name="TId">The ID type of the entity.</typeparam>
 /// <typeparam name="TEntity">The entity type represented by the ID.</typeparam>
 public readonly struct IdOrEntity<TId, TEntity> : 
+    IIdLike<TId>,
     IEquatable<IdOrEntity<TId, TEntity>> 
     where TId : IEquatable<TId>
     where TEntity : IIdentifiable<TId>
@@ -15,7 +21,7 @@ public readonly struct IdOrEntity<TId, TEntity> :
     /// <summary>
     ///     The ID of the entity.
     /// </summary>
-    public readonly TId Id;
+    public TId Id { get; }
 
     /// <summary>
     ///     Constructs a new <see cref="IdOrEntity{TId,TEntity}" />.

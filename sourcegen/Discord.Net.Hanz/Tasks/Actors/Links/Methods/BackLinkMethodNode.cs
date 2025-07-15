@@ -199,12 +199,13 @@ public sealed class BackLinkMethodNode : Node
                 .Remove(0, 1)
                 .Remove(template.Length - 2, 1);
 
-            var split = template.Split([Environment.NewLine], StringSplitOptions.None);
+            var split = template.Split([Environment.NewLine], StringSplitOptions.None)
+                .Where(x => !string.IsNullOrWhiteSpace(x))
+                .ToArray();
 
             if (split.Length > 0)
             {
-                var max = split.Where(x => !string.IsNullOrWhiteSpace(x))
-                    .Min(x => x.TakeWhile(char.IsWhiteSpace).Count());
+                var max = split.Min(x => x.TakeWhile(char.IsWhiteSpace).Count());
                 template = string.Join(Environment.NewLine, split.Select(x => x.Length >= max ? x.Remove(0, max) : x));
             }
         }

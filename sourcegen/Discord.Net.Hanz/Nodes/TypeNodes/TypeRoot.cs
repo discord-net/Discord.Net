@@ -53,6 +53,9 @@ public class NestedTypeRoot<TSource> : ProviderNesting<TSource>
 
     private static void LogGraph(IntrospectionGraph<TSource> graph, ILogger logger)
     {
+        if(graph.Trees.Length > 0)
+            logger.Clean();
+        
         try
         {
             logger.Log($"{graph.Trees.Length} trees:");

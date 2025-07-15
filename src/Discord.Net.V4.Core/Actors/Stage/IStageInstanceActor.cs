@@ -11,7 +11,7 @@ namespace Discord;
     (
         WhenBackLinkingFrom = [typeof(IStageChannelActor)]
     ),
-    Refreshable(nameof(Routes.GetStageInstance))
+    Refreshable
 ]
 public partial interface IStageInstanceActor :
     IStageChannelActor.Relationship,

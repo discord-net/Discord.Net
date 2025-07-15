@@ -140,13 +140,24 @@ public sealed class SourceOfTruth : GenerationTask
     private Target? Map(GeneratorAttributeSyntaxContext context, CancellationToken token)
     {
         if (context.TargetNode is not MemberDeclarationSyntax syntax)
+        {
+            Logger.Warn($"{context.TargetSymbol}: Not a member declaration");
             return null;
+        }
 
         if (syntax.Parent is not TypeDeclarationSyntax typeDeclaration)
+        {
+            Logger.Warn($"{context.TargetSymbol}: parent is not a type declaration");
             return null;
+        }
 
         if (typeDeclaration.Modifiers.IndexOf(SyntaxKind.PartialKeyword) == -1)
+        {
+            Logger.Warn($"{context.TargetSymbol}: parent is not partial");
             return null;
+        }
+        
+        Logger.Log($"Mapping {context.TargetSymbol}...");
         
         return context.TargetSymbol switch
         {
@@ -158,7 +169,7 @@ public sealed class SourceOfTruth : GenerationTask
         };
     }
 
-    private static PropertyTarget? MapProperty(
+    private PropertyTarget? MapProperty(
         IPropertySymbol symbol, 
         SemanticModel model,
         MemberDeclarationSyntax syntax,
@@ -166,10 +177,16 @@ public sealed class SourceOfTruth : GenerationTask
         ILogger logger)
     {
         if (symbol.ContainingType is not { } containingType)
+        {
+            Logger.Warn($"{symbol}: containing type is null");
             return null;
+        }
 
         if (containingType.AllInterfaces.Length == 0)
+        {
+            Logger.Warn($"{symbol}: no interfaces");
             return null;
+        }
 
         var overrideSpecs = new List<TargetOverride<PropertySpec>>();
 
@@ -199,6 +216,15 @@ public sealed class SourceOfTruth : GenerationTask
             );
         }
 
+        if (overrideSpecs.Count == 0)
+        {
+            Logger.Warn($"{symbol}: no override targets");
+        }
+        else
+        {
+            Logger.Log($"{symbol}: {overrideSpecs.Count} override targets");
+        }
+        
         return overrideSpecs.Count > 0
             ? new PropertyTarget(
                 new TypeRef(symbol.ContainingType),

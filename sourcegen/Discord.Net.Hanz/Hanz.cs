@@ -133,6 +133,8 @@ public sealed class Hanz : IIncrementalGenerator
     private void SetupLogger(
         IncrementalGeneratorInitializationContext context)
     {
+        Logging.Reset();
+        
         context.RegisterSourceOutput(
             context
                 .AnalyzerConfigOptionsProvider
@@ -147,13 +149,24 @@ public sealed class Hanz : IIncrementalGenerator
 
                     if (!options.GlobalOptions.TryGetValue("build_property.ProjectDir", out var dir))
                         dir = null;
+                    
+                    if (!options.GlobalOptions.TryGetValue("build_property.SolutionDir", out var sdir))
+                        sdir = null;
 
-                    return (logLevel, dir);
+                    return (logLevel, dir, sdir, options.GlobalOptions.Keys);
                 }),
             (_, opt) =>
             {
-                if (opt.dir is not null)
-                    Logging.InitializeFileLogging(Path.Combine(opt.dir, ".hanz"), opt.logLevel);
+                if (Logging.IsInitialized) return;
+
+                var dir = Path.GetDirectoryName(opt.dir);
+                for (var i = 0; i < 2 && dir is not null; i++)
+                    dir = Path.GetDirectoryName(dir);
+                
+                if(dir is null || !dir.EndsWith("Discord.Net")) return;
+                
+                Logging.InitializeFileLogging(Path.Combine(dir, ".hanz"), opt.logLevel);
+                Logging.GetLogger<Hanz>().Log($"INIT: {dir} | {opt.dir}");
             }
         );
     }

@@ -3,7 +3,7 @@ using Discord.Rest;
 
 namespace Discord;
 
-[PagedFetchableOfMany<PageGuildScheduledEventUsersParams>(nameof(Routes.GetGuildScheduledEventUsers))]
+[PagedFetchableOfMany<Routes.ListGuildScheduledEventUsers, PageGuildScheduledEventUsersParams>]
 public partial interface IGuildScheduledEventUserActor :
     IGuildScheduledEventActor.CanonicalRelationship,
     IMemberActor.Relationship,

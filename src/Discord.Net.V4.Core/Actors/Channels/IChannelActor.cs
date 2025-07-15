@@ -4,11 +4,11 @@ using Discord.Rest;
 namespace Discord;
 
 [
-    PathIdentity(PathParameterType.ChannelId),
-    //Loadable(nameof(Routes.GetChannel)),
-    LinkHierarchicalRoot(Types = [typeof(IDMChannelActor), typeof(IGroupChannelActor)]),
+    Loadable<Routes.GetChannel>,
+    Refreshable,
     RelationshipName("Channel"), 
-    //Refreshable(nameof(Routes.GetChannel))
+    LinkHierarchicalRoot(Types = [typeof(IDMChannelActor), typeof(IGroupChannelActor)]),
+    PathIdentity(PathParameterType.ChannelId),
 ]
 public partial interface IChannelActor :
     IActor<ulong, IChannel>;

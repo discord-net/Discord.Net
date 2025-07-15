@@ -9,15 +9,15 @@ public partial interface IPollActor :
     IMessageActor.CanonicalRelationship
 {
     IPollAnswerActor.Indexable Answers { get; }
-    
+
     ValueTask<IMessage> EndAsync(RequestOptions? options = null, CancellationToken cancellationToken = default)
         => Routes
             .PollExpire
             .Create(this)
             .AsPipeline(options)
             .Deserialize<IMessageModel>()
-            .Transform(Message.CreateEntityAsync)
-    
+            .Transform(Message);
+
     // async Task<IMessage> EndAsync(RequestOptions? options = null, CancellationToken token = default)
     // {
     //     var model = await Client.RestApiClient.ExecuteRequiredAsync(

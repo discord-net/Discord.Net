@@ -14,5 +14,7 @@ public interface ISnowflakeEntity : IEntity<ulong>
     DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
 }
 
-public interface ISnowflakeEntity<out TModel> : ISnowflakeEntity, IEntity<ulong, TModel>
+public interface ISnowflakeEntity<out TModel> : 
+    ISnowflakeEntity,
+    IEntity<ulong, TModel>
     where TModel : IEntityModel<ulong>;

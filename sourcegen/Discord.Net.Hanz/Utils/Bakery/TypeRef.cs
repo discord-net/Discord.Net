@@ -51,7 +51,12 @@ public sealed class TypeRef(ITypeSymbol type) : IEquatable<TypeRef>
 
     public override string ToString() => DisplayString;
 
-    public bool Equals(TypeRef? other) => other != null && DisplayString == other.DisplayString;
+    public bool Equals(TypeRef? other)
+        => other != null &&
+           ReferenceName == other.ReferenceName &&
+           MetadataName == other.MetadataName &&
+           DisplayString == other.DisplayString;
+
     public override bool Equals(object? obj) => Equals(obj as TypeRef);
-    public override int GetHashCode() => HashCode.Of(DisplayString).And(Accessibility);
+    public override int GetHashCode() => System.HashCode.Combine(ReferenceName, MetadataName, Accessibility, DisplayString);
 }

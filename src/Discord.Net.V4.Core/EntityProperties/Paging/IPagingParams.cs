@@ -7,7 +7,11 @@ public interface IPagingParams<TRoute, in TApiModel> : IPagingParams
     where TRoute : IRouteOperation<TRoute>
     where TApiModel : class
 {
-    TRoute? GetNext(TRoute route, TApiModel? previousApiResult);
+    TRoute? GetNext(
+        IPathable path,
+        TRoute route, 
+        TApiModel? previousApiResult
+        );
 }
 
 public interface IPagingParams

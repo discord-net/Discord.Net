@@ -77,11 +77,11 @@ public static class Optional
         => value.Map(x => (T)x);
 
     public static Optional<T> Some<T>(this T value) => new(value);
-    public static Optional<T> SomeWhen<T>(this T value, Func<T, bool> predicate)
+    public static Optional<T> SomeWhen<T>(this T value, Predicate<T> predicate)
         => predicate(value) ? Some(value) : default;
     
     public static Optional<T> None<T>(this T value) => default;
-    public static Optional<T> NoneWhen<T>(this T value, Func<T, bool> predicate)
+    public static Optional<T> NoneWhen<T>(this T value, Predicate<T> predicate)
         => !predicate(value) ? Some(value) : default;
 
     public static bool IsSome<T>(this Optional<T> optional, [MaybeNullWhen(false)] out T value)
@@ -99,6 +99,7 @@ public static class Optional
     public static Optional<T> ToOptional<T>(this T? value)
         where T : struct
         => value is not null ? Some(value.Value) : default;
+    
     public static Optional<T> ToOptional<T>(this T? value)
         where T : class
         => value is not null ? Some(value) : default;

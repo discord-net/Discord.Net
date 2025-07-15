@@ -7,102 +7,134 @@ public record LogContext(
 
 file sealed class LoggerProxy : ILogger
 {
-    private readonly LogContext _context;
-    private ILogger _logger;
-    private readonly Action<LoggerProxy> _onDispose;
+    public LogContext Context { get; }
 
-    public LoggerProxy(LogContext context, ILogger logger, Action<LoggerProxy> onDispose)
+    public LoggerProxy(LogContext context)
     {
-        _context = context;
-        _logger = logger;
-        _onDispose = onDispose;
+        Context = context;
     }
 
-    public void Update()
-        => _logger = Logging.GetLogger(_context);
+    public void Dispose() {}
 
-    public void Dispose()
-    {
-        _onDispose(this);
-        _logger.Dispose();
-    }
-
-    public LogContext Context => _logger.Context;
-
-    public bool IsEnabled(LogLevel logLevel)
-    {
-        return _logger.IsEnabled(logLevel);
-    }
+    public bool IsEnabled(LogLevel logLevel) => false;
 
     public void Log(LogLevel logLevel, string message)
     {
-        _logger.Log(logLevel, message);
     }
 
     public void Clean()
     {
-        _logger.Clean();
     }
 
     public void Flush()
     {
-        _logger.Flush();
     }
 }
 
 public static class Logging
 {
+    public static bool IsInitialized => _loggerFactory is not null;
+    
     private static Func<LogContext, ILogger>? _loggerFactory = null;
 
-    
-    private static readonly HashSet<ILogger> _proxies = [];
-    
+    private static readonly HashSet<ILogger> _loggers = [];
+
+    private static readonly object _lock = new();
+
+    public static void Reset()
+    {
+        // lock (_lock)
+        // {
+        //     foreach (var logger in _loggers)
+        //     {
+        //         logger.Dispose();
+        //     }
+        //
+        //     _loggers.Clear();
+        // }
+    }
+
     public static void InitializeFileLogging(
         string path,
         LogLevel level
     )
     {
-        _loggerFactory = (ctx) =>
+        lock (_lock)
         {
-            var detailsPath = ctx.Details.Select(x => x.ToString());
+            if (_loggerFactory is not null)
+            {
+                foreach (var logger in _loggers)
+                {
+                    logger.Dispose();
+                }
 
-            var filePath = Path.Combine([path, ..detailsPath, $"{ctx.Owner.Name}.log"]);
+                _loggers.Clear();
+                
+                return;
+            }
+
+            var fileLogger = new FileLogger(
+                Path.Combine(path, "FileLogging.log"),
+                LogLevel.Trace,
+                new(typeof(Logging))
+            );
             
-            return FileLogger.TryCreate(filePath, level, ctx, out var logger)
-                    ? logger
-                    : NullLogger.Instance;
-        };
+            _loggerFactory = (ctx) =>
+            {
+                var detailsPath = ctx.Details.Select(x => x.ToString());
 
-        UpdateProxies();
+                var filePath = Path.Combine([path, ..detailsPath, $"{ctx.Owner.Name}.log"]);
+
+                if (_loggers.OfType<FileLogger>().FirstOrDefault(x => x.Path == filePath) is { } logger)
+                {
+                    fileLogger.Log($"CACHE: {filePath} : {ctx}");
+                    return logger;
+                }
+
+                if (FileLogger.TryCreate(filePath, level, ctx, out logger))
+                {
+                    fileLogger.Log($"CREATE({_loggers.Add(logger)}): {filePath} : {ctx}");
+                    return logger;
+                }
+                
+                fileLogger.Log($"NULL: {filePath} : {ctx}");
+                return NullLogger.Instance;
+            };
+            
+            UpdateProxies();
+        }
+
+        
     }
 
     private static void UpdateProxies()
     {
-        if (_proxies.Count == 0 || _loggerFactory is null) return;
-
-        foreach (var proxy in _proxies.OfType<LoggerProxy>().ToArray())
+        if(_loggerFactory is null) return;
+        
+        foreach (var proxy in _loggers.OfType<LoggerProxy>().ToArray())
         {
-            proxy.Update();
+            _loggers.Remove(proxy);
+            _loggers.Add(_loggerFactory(proxy.Context));
         }
     }
 
     public static ILogger GetLogger<T>()
         => GetLogger(new(typeof(T)));
-    
+
     public static ILogger GetLogger<T>(params object[] details)
         => GetLogger(new(typeof(T), details));
 
     public static ILogger GetLogger(LogContext context)
     {
-        if (_loggerFactory is null)
+        lock (_lock)
         {
-            return new LoggerProxy(
-                context,
-                NullLogger.Instance,
-                proxy => _proxies.Remove(proxy)
-            );
-        }
+            var logger = _loggerFactory is null
+                ? new LoggerProxy(context)
+                : _loggerFactory(context);
+            
+            _loggers.Add(logger);
 
-        return _loggerFactory(context);
+            return logger;
+        }
     }
 }
