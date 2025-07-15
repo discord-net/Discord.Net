@@ -293,6 +293,6 @@ namespace Discord
         ///     A URL to the guild tag badge.
         /// </returns>
         public static string GetGuildTagBadgeUrl(ulong guildId, string badgeHash)
-            => $"{DiscordConfig.CDNUrl} guild-tag-badges/{guildId}/{badgeHash}.png";
+            => $"{DiscordConfig.CDNUrl}guild-tag-badges/{guildId}/{badgeHash}.png";
     }
 }
