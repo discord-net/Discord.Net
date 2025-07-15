@@ -3,38 +3,53 @@ uid: Guides.ComponentsV2.Interaction
 title: Interact with Components V2
 ---
 
-# Terminology
+# Interaction with components
 
-## Preface
+## Lifecycle
+A component should receive an initial response within a 3 second timeframe. After this it can continue receiving responses for up to 30m, this is useful when a component needs to be rebuilt periodically (buttons etc), which is also what we will be leveraging here.
 
-Most terms for objects remain the same between 0.9 and 1.0 and above.
-The major difference is that the `Server` is now called `Guild`
-to stay in line with Discord internally.
+## Catching of and responding to a user interaction
 
-## Implementation Specific Entities
+Before we respond to an interaction triggered by the user we must first "catch" it. You can do this by hooking into the `DiscordSocketClient#InteractionCreated` event. Before proceeding we should make sure that the event was triggered by our component.
 
-Discord.Net is split into a core library and two different
-implementations - `Discord.Net.Core`, `Discord.Net.Rest`, and
-`Discord.Net.WebSocket`.
+Consider this component (the same as used in the intro). The buttons have a customId of "recipes-show-me-button-{recipe.RecipeId}", where the last part is an unique identifier.
 
-You will typically only need to use `Discord.Net.WebSocket`,
-but you should be aware of the differences between them.
+![](images/interaction.png)
 
-> [!TIP]
-> If you are looking to implement Rest based interactions, or handle calls over REST in any other way,
-> `Discord.Net.Rest` is the resource most applicable to you. 
+```cs
+private async Task ClientOnInteractionCreatedAsync(SocketInteraction arg)
+{
+    switch (arg)
+    {
+        case SocketMessageComponent component:
+            switch (component.Data.CustomId)
+            {
+                // Non dynamic cases ...
 
-`Discord.Net.Core` provides a set of interfaces that models Discord's
-API. These interfaces are consistent throughout all implementations of
-Discord.Net, and if you are writing an implementation-agnostic library
-or addon, you can rely on the core interfaces to ensure that your
-addon will run on all platforms.
+                default:
+                    var customId = component.Data.CustomId;
+                    var lastPartStartIndex = customId.LastIndexOf('-');
 
-`Discord.Net.Rest` provides a set of concrete classes to be used
-**strictly** with the REST portion of Discord's API. Entities in this
-implementation are prefixed with `Rest` (e.g., `RestChannel`).
+                    if (lastPartStartIndex == -1)
+                        return;
 
-`Discord.Net.WebSocket` provides a set of concrete classes that are
-used primarily with Discord's WebSocket API or entities that are kept
-in cache. When developing bots, you will be using this implementation.
-All entities are prefixed with `Socket` (e.g., `SocketChannel`).
+                    if (customId[..lastPartStartIndex] == RecipesLookInsideButton) // "recipes-show-me-button"
+                        await component.UpdateAsync(m => m.Components = BuildComponentUnsafe(_recipes.First(r => r.RecipeId == int.Parse(customId[(lastPartStartIndex + 1)..]))).Build()); //_recipes is a list of Recipe objects ; int.Parse({recipe.RecipeId}) (in this case it is 1)
+
+                    break;
+            }
+
+            break;
+        case SocketModal modal:
+            // Interaction came from a modal
+
+            break;
+        default:
+            return;
+    }
+}
+```
+
+ModifyAsync replaces our component array with a new one built based on the button clicked (recipe with the specified ID). More on this more advanced component v2 in the **advanced** page.
+
+![](images/interaction-response.png)
