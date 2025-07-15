@@ -68,6 +68,9 @@ public sealed class Hanz : IIncrementalGenerator
 
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
+        // rip hanz
+        return;
+        
         try
         {
             SetupLogger(context);
