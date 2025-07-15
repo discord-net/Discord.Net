@@ -29,9 +29,5 @@
   <ItemGroup>
     <Compile Remove="$(CompilerGeneratedFilesOutputPath)/**/*.cs" />
   </ItemGroup>
-  
-  <ItemGroup>
-    <AdditionalFiles Include="$(DiscordOpenAPISpecPath)"/>
-  </ItemGroup>
 
 </Project>
