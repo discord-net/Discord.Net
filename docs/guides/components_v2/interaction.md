@@ -34,7 +34,7 @@ private async Task ClientOnInteractionCreatedAsync(SocketInteraction arg)
                         return;
 
                     if (customId[..lastPartStartIndex] == RecipesLookInsideButton) // "recipes-show-me-button"
-                        await component.UpdateAsync(m => m.Components = BuildComponentUnsafe(_recipes.First(r => r.RecipeId == int.Parse(customId[(lastPartStartIndex + 1)..]))).Build()); //_recipes is a list of Recipe objects ; int.Parse({recipe.RecipeId}) (in this case it is 1)
+                        await component.UpdateAsync(m => m.Components = BuildComponentUnsafe(_recipes.First(r => r.RecipeId == int.Parse(customId[(lastPartStartIndex + 1)..]))).Build()); // _recipes is a list of Recipe objects ; int.Parse({recipe.RecipeId}) (in this case it is 1)
 
                     break;
             }
@@ -50,6 +50,6 @@ private async Task ClientOnInteractionCreatedAsync(SocketInteraction arg)
 }
 ```
 
-ModifyAsync replaces our component array with a new one built based on the button clicked (recipe with the specified ID). More on this more advanced component v2 in the **advanced** page.
+UpdateAsync replaces our component array with a new one built based on the button clicked (recipe with the specified ID). More on this more advanced component v2 in the **advanced** page.
 
 ![](images/interaction-response.png)
