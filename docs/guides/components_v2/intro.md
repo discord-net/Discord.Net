@@ -9,7 +9,7 @@ Message components V2 is, not unlike Message components (V1) a framework for add
 
 ## What is a Component
 
-Components are a new parameter you can use when sending messages with your bot (just like normal components). You have a lot more components to choose from though :3. A full list of compatible components can be found [here](https://discord.com/developers/docs/components/reference#component-object-component-types).
+Components are a parameter you can use when sending messages with your bot (just like normal components). With V2 you have a lot more components to choose from though :3. A full list of compatible components can be found [here](https://discord.com/developers/docs/components/reference#component-object-component-types).
 
 ## Creating components
 

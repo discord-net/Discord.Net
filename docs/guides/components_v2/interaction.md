@@ -12,7 +12,7 @@ A component should receive an initial response within a 3 second timeframe. Afte
 
 Before we respond to an interaction triggered by the user we must first "catch" it. You can do this by hooking into the `DiscordSocketClient#InteractionCreated` event. Before proceeding we should make sure that the event was triggered by our component.
 
-The way you get you get/retrieve a specific component from a message is by either their `customId` (this is what is used here) or by using `IEnumerable<IMessageComponent>#FindComponentById`. The latter finds a component by type and optionally an id (when you have multiple of this type in your message). You can see how that works in [Advanced].
+The way you get you get/retrieve a specific component from a message is by either their `customId` (this is what is used here) or by using `IEnumerable<IMessageComponent>#FindComponentById`. The latter finds a component by the integer id, and optionally by the type provided as the generic type parameter. Each component is automatically assigned with an incremental id (unique within a given message), unless overriden by the developer. You can see how that works in [Advanced].
 
 Consider this component (the same as used in [Intro]). The buttons have a customId of "recipes-show-me-button-{recipe.RecipeId}", where the last part is an unique identifier.
 
