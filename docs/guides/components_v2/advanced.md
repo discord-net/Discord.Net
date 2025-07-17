@@ -67,7 +67,7 @@ A parent component, this allows you to put `TextDisplays` (1 - 3) next to eachot
 
 **[Text Display](https://discord.com/developers/docs/components/reference#text-display)**
 
-Just text lol. (With markdown support, just like a regular user)
+Just text lol. (With markdown support, just like a regular user; up to 4000 characters)
 
 **[Thumbnail](https://discord.com/developers/docs/components/reference#thumbnail)**
 
@@ -81,18 +81,19 @@ A component used to display up to `10` images.
 
 **[File](https://discord.com/developers/docs/components/reference#file)**
 
-Used to send a single file.
+Used to send a single file. Only supports the `attachment://` protocol.
 
 **[Separator](https://discord.com/developers/docs/components/reference#separator)**
 
 Just something to put space between components (Y axis).
 - Spacing can be set to either `1` (small space) or `2` (large space)
+- Visibility can be toggled too. (`IsDivider`)
 
 **[Container](https://discord.com/developers/docs/components/reference#container)**
 
 A parent component with a side bar of customisable colour (like embeds).
 
-In Discord.NET, you typically use these components in conjunction with a `ComponentBuilderV2`. The V2 specific components can be added to the builder using the `WithX` fluent/chain methods whereas the other supported components are mostly children of `ActionRows` and can be added as a component array like used below. You need to know what components can be added to which component though to prevent errors (this is why the above sections exist).
+In Discord.NET, you typically use these components in conjunction with a `ComponentBuilderV2`. The V2 specific components can be added to the builder using the `WithX` fluent/chain methods whereas the other supported components are mostly children of `ActionRows` and can be added as a component array like used below. You need to know what components can be added to which component though to prevent errors (this is why the above sections exist). If your component structure is wrong, Discord.NET will throw an exception.
 
 This example offers some more insight on how to use them. Below is a component with `TextDisplay`, `MediaGallery` and `ActionRow` (with `Buttons` or `SelectMenu`).
 
