@@ -1,5 +1,29 @@
 # Changelog
 
+## [3.18.0] - 2025-07-19
+### Added
+- #3145 add `ApproximateUserAuthorizationCount` (6e1f9c1)
+- #3147 [CV2] add children component counts to `IComponentContainer` (f18c836)
+- #3153 [CV2] QoL & fixes (800a234)
+- #3156 User primary guild (79b455e)
+- #3131 support POLL_RESULT (46) in MessageType enum (dc3bd76)
+- #3162 Docs/components v2 :wires: (cf66ab4)
+
+### Fixed
+- #3138 Fix value of `TextDisplayBuilder.MaxContentLength` (b338d30)
+- #3140 Fixed incorrect ComponentType in TextDisplayBuilder. (7a74f78)
+- #3142 Fix overflow exception (0c1536d)
+- #3146 Fixed missing Type in constructor SelectMenuBuilder(SelectMenuComponent) (c07c28d)
+- #3148 fix(IsLoadableModule): return false for abstract classes (978f999)
+- #3152 Guild member `JoinedAt` nullability (c343ce9)
+- #3158 Certain global user properies not getting updated (f9ba642)
+
+### Misc
+- #3139 Fix visibility of `MessageComponent.Empty` (35d94ca)
+- #3144 edge case missed (1e50900)
+- #3161 Fix guild tag badge URL helper (80b4328)
+
+
 ## [3.18.0-beta.3] - 2025-05-26
 
 ### Fixed
