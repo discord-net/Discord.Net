@@ -87,7 +87,7 @@ public class ComponentBuilder
     /// <returns>The current builder.</returns>
     public ComponentBuilder RemoveComponentsOfType(ComponentType t)
     {
-        this.ActionRows.ForEach(ar => ar.Components.RemoveAll(c => c.Type == t));
+        ActionRows.ForEach(ar => ar.Components.RemoveAll(c => c.Type == t));
         return this;
     }
 
@@ -98,7 +98,7 @@ public class ComponentBuilder
     /// <returns>The current builder.</returns>
     public ComponentBuilder RemoveComponent(string customId)
     {
-        this.ActionRows.ForEach(ar => ar.Components.RemoveAll(c => c is IInteractableComponent i && i.CustomId == customId));
+        ActionRows.ForEach(ar => ar.Components.RemoveAll(c => c is IInteractableComponentBuilder i && i.CustomId == customId));
         return this;
     }
 
@@ -109,7 +109,7 @@ public class ComponentBuilder
     /// <returns>The current builder.</returns>
     public ComponentBuilder RemoveButtonByURL(string url)
     {
-        this.ActionRows.ForEach(ar => ar.Components.RemoveAll(c => c is ButtonComponent b && b.Url == url));
+        ActionRows.ForEach(ar => ar.Components.RemoveAll(c => c is ButtonBuilder b && b.Url == url));
         return this;
     }
 
