@@ -319,7 +319,7 @@ public class ComponentBuilder
                     _actionRows.RemoveAt(i);
 
         return _actionRows != null
-            ? new MessageComponent(_actionRows.Select(x => x.Build()).OfType<IMessageComponent>().ToList())
+            ? new MessageComponent(_actionRows.Select(IMessageComponent (x) => x.Build()).ToList())
             : MessageComponent.Empty;
     }
 }
