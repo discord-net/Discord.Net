@@ -15,7 +15,12 @@ namespace Discord.Interactions
         /// </summary>
         public object Value { get; }
 
-        internal ParameterChoice(string name, object value)
+        /// <summary>
+        ///     Initializes a new <see cref="ParameterChoice"/>.
+        /// </summary>
+        /// <param name="name">Name of this choice.</param>
+        /// <param name="value">Value of this choice.</param>
+        public ParameterChoice(string name, object value)
         {
             Name = name;
             Value = value;
