@@ -41,6 +41,9 @@ internal static class MessageComponentExtension
 
             case ContainerComponent container:
                 return new API.ContainerComponent(container);
+
+            case LabelComponent label:
+                return new API.LabelComponent(label);
         }
 
         return null;
@@ -171,6 +174,12 @@ internal static class MessageComponentExtension
                     parsed.AccentColor.GetValueOrDefault(null),
                     parsed.IsSpoiler.ToNullable(),
                     parsed.Id.ToNullable());
+            }
+
+            case ComponentType.Label:
+            {
+                var parsed = (API.LabelComponent)component;
+                return new LabelComponent(parsed.Id.ToNullable(), parsed.Label, parsed.Description, parsed.Component.ToEntity());
             }
 
             default:

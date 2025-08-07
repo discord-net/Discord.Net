@@ -61,6 +61,9 @@ namespace Discord.Net.Converters
                 case ComponentType.Container:
                     messageComponent = new API.ContainerComponent();
                     break;
+                case ComponentType.Label:
+                    messageComponent = new API.LabelComponent();
+                    break;
             }
             serializer.Populate(jsonObject.CreateReader(), messageComponent);
             return messageComponent;
