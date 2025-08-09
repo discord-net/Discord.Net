@@ -9,6 +9,7 @@ namespace Discord;
 /// </summary>
 public class ButtonBuilder : IInteractableComponentBuilder
 {
+    /// <inheritdoc />
     public ComponentType Type => ComponentType.Button;
 
     /// <summary>
