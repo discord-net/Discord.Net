@@ -45,6 +45,6 @@ namespace Discord
         /// <summary>
         ///     Indicates that a user is playing an activity in a voice channel.
         /// </summary>
-        Embedded = 0b10000000
+        Embedded = 0b100000000
     }
 }
