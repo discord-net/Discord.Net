@@ -29,8 +29,8 @@ namespace Discord
         /// </remarks>
         public TEntity Value { get; }
         private Func<Task<TEntity>> DownloadFunc { get; }
-
-        internal Cacheable(TEntity value, TId id, bool hasValue, Func<Task<TEntity>> downloadFunc)
+        
+        public Cacheable(TEntity value, TId id, bool hasValue, Func<Task<TEntity>> downloadFunc)
         {
             Value = value;
             Id = id;
@@ -84,7 +84,7 @@ namespace Discord
         public TCachedEntity Value { get; }
         private Func<Task<TDownloadableEntity>> DownloadFunc { get; }
 
-        internal Cacheable(TCachedEntity value, TId id, bool hasValue, Func<Task<TDownloadableEntity>> downloadFunc)
+        public Cacheable(TCachedEntity value, TId id, bool hasValue, Func<Task<TDownloadableEntity>> downloadFunc)
         {
             Value = value;
             Id = id;
