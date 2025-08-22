@@ -1,0 +1,12 @@
+base: IUserModel
+props:
+  Username: "username"
+  Discriminator: "discriminator"
+  GlobalName: "global_name"
+  Avatar: "avatar"
+  Banner: "banner"
+  Bot: "bot"
+  System: "system"
+  Flags: "flags"
+  PublicFlags: "public_flags"
+  Id: "id"

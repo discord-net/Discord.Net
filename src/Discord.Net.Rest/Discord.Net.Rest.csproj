@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <LangVersion>preview</LangVersion>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <RootNamespace>Discord.Rest</RootNamespace>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Discord.Net.Models.Json\Discord.Net.Models.Json.csproj" />
+      <ProjectReference Include="..\Discord.Net.V4.Core\Discord.Net.V4.Core.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Api\Routes\Generated\" />
+    </ItemGroup>
+
+</Project>

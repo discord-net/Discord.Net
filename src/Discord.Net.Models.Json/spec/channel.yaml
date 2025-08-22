@@ -1,0 +1,5 @@
+base: IChannelModel
+props:
+  Type: "type"
+  Flags: "flags"
+  Id: "id"

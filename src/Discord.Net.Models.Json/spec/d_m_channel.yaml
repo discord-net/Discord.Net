@@ -1,0 +1,6 @@
+base: IDMChannelModel
+props:
+  Recipient: "recipient"
+  Type: "type"
+  Flags: "flags"
+  Id: "id"

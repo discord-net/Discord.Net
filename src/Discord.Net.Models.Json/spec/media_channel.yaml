@@ -1,0 +1,18 @@
+base: IMediaChannelModel
+props:
+  IsNSFW: "is_n_s_f_w"
+  Topic: "topic"
+  RateLimitPerUser: "rate_limit_per_user"
+  DefaultReactionEmoji: "default_reaction_emoji"
+  AvailableTags: "available_tags"
+  DefaultSortOrder: "default_sort_order"
+  DefaultAutoArchiveDuration: "default_auto_archive_duration"
+  Name: "name"
+  GuildId: "guild_id"
+  Position: "position"
+  PermissionOverwrites: "permission_overwrites"
+  Permissions: "permissions"
+  Type: "type"
+  Flags: "flags"
+  Id: "id"
+  ParentId: "parent_id"

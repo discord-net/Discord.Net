@@ -1,0 +1,6 @@
+base: IOverwriteModel
+props:
+  Type: "type"
+  Allow: "allow"
+  Deny: "deny"
+  Id: "id"

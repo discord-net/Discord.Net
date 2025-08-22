@@ -1,0 +1,7 @@
+base: IGroupChannelModel
+props:
+  OwnerId: "owner_id"
+  Recipients: "recipients"
+  Type: "type"
+  Flags: "flags"
+  Id: "id"

@@ -1,0 +1,18 @@
+base: IThreadChannelModel
+props:
+  ParentId: "parent_id"
+  MemberCount: "member_count"
+  MessageCount: "message_count"
+  AppliedTags: "applied_tags"
+  OwnerId: "owner_id"
+  IsNSFW: "is_n_s_f_w"
+  Topic: "topic"
+  RateLimitPerUser: "rate_limit_per_user"
+  Name: "name"
+  GuildId: "guild_id"
+  Position: "position"
+  PermissionOverwrites: "permission_overwrites"
+  Permissions: "permissions"
+  Type: "type"
+  Flags: "flags"
+  Id: "id"

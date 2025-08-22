@@ -1,0 +1,11 @@
+base: IDirectoryChannelModel
+props:
+  Name: "name"
+  GuildId: "guild_id"
+  Position: "position"
+  PermissionOverwrites: "permission_overwrites"
+  Permissions: "permissions"
+  Type: "type"
+  Flags: "flags"
+  Id: "id"
+  ParentId: "parent_id"
