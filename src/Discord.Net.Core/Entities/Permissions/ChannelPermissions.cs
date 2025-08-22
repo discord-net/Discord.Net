@@ -18,17 +18,17 @@ namespace Discord
         /// <summary>
         ///     Gets a <see cref="ChannelPermissions"/> that grants all permissions for text channels.
         /// </summary>
-        public static readonly ChannelPermissions Text = new(0b110_110001_001111_110010_110011_111101_111111_111101_010001);
+        public static readonly ChannelPermissions Text = new(0b1110_110001_001111_110010_110011_111101_111111_111101_010001);
 
         /// <summary>
         ///     Gets a <see cref="ChannelPermissions"/> that grants all permissions for voice channels.
         /// </summary>
-        public static readonly ChannelPermissions Voice = new(0b111_110101_001010_001010_110011_111101_111111_111101_010001);
+        public static readonly ChannelPermissions Voice = new(0b0111_110101_001010_001010_110011_111101_111111_111101_010001);
 
         /// <summary>
         ///     Gets a <see cref="ChannelPermissions"/> that grants all permissions for stage channels.
         /// </summary>
-        public static readonly ChannelPermissions Stage = new(0b110_110100_000010_001110_010001_010101_111111_111001_010001);
+        public static readonly ChannelPermissions Stage = new(0b0110_110100_000010_001110_010001_010101_111111_111001_010001);
 
         /// <summary>
         ///     Gets a <see cref="ChannelPermissions"/> that grants all permissions for category channels.
@@ -48,7 +48,7 @@ namespace Discord
         /// <summary>
         ///     Gets a <see cref="ChannelPermissions"/> that grants all permissions for forum channels.
         /// </summary>
-        public static readonly ChannelPermissions Forum = new(0b000001_001110_010010_110011_111101_111111_111101_010001);
+        public static readonly ChannelPermissions Forum = new(0b1000_000001_001110_010010_110011_111101_111111_111101_010001);
 
         /// <summary>
         ///     Gets a <see cref="ChannelPermissions"/> that grants all permissions for media channels.
@@ -158,6 +158,8 @@ namespace Discord
         public bool UserExternalApps => Permissions.GetValue(RawValue, ChannelPermission.UseExternalApps);
         /// <summary> If <see langword="true"/>, a user-installed application can send public responses.</summary>
         public bool UseExternalSounds => Permissions.GetValue(RawValue, ChannelPermission.UseExternalSounds);
+        /// <summary> If <see langword="true"/>, a user can ping and unpin messages.</summary>
+        public bool PinMessages => Permissions.GetValue(RawValue, ChannelPermission.PinMessages);
 
         /// <summary> Creates a new <see cref="ChannelPermissions"/> with the provided packed value.</summary>
         public ChannelPermissions(ulong rawValue) { RawValue = rawValue; }
@@ -200,7 +202,8 @@ namespace Discord
             bool? setVoiceChannelStatus = null,
             bool? sendPolls = null,
             bool? useExternalApps = null,
-            bool? useExternalSounds = null)
+            bool? useExternalSounds = null,
+            bool? pinMessages = null)
         {
             ulong value = initialValue;
 
@@ -242,6 +245,7 @@ namespace Discord
             Permissions.SetValue(ref value, sendPolls, ChannelPermission.SendPolls);
             Permissions.SetValue(ref value, useExternalApps, ChannelPermission.UseExternalApps);
             Permissions.SetValue(ref value, useExternalSounds, ChannelPermission.UseExternalSounds);
+            Permissions.SetValue(ref value, pinMessages, ChannelPermission.PinMessages);
 
             RawValue = value;
         }
@@ -285,12 +289,14 @@ namespace Discord
             bool setVoiceChannelStatus = false,
             bool sendPolls = false,
             bool useExternalApps = false,
-            bool useExternalSounds = false)
+            bool useExternalSounds = false,
+            bool pinMessages = false)
             : this(0, createInstantInvite, manageChannel, addReactions, viewChannel, sendMessages, sendTTSMessages, manageMessages,
                 embedLinks, attachFiles, readMessageHistory, mentionEveryone, useExternalEmojis, connect,
                 speak, muteMembers, deafenMembers, moveMembers, useVoiceActivation, prioritySpeaker, stream, manageRoles, manageWebhooks,
                 useApplicationCommands, requestToSpeak, manageThreads, createPublicThreads, createPrivateThreads, useExternalStickers, sendMessagesInThreads,
-                startEmbeddedActivities, useSoundboard, createEvents, sendVoiceMessages, useClydeAI, setVoiceChannelStatus, sendPolls, useExternalApps, useExternalSounds)
+                startEmbeddedActivities, useSoundboard, createEvents, sendVoiceMessages, useClydeAI, setVoiceChannelStatus, sendPolls, useExternalApps,
+                useExternalSounds, pinMessages)
         { }
 
         /// <summary> Creates a new <see cref="ChannelPermissions"/> from this one, changing the provided non-null permissions.</summary>
@@ -332,7 +338,8 @@ namespace Discord
             bool? setVoiceChannelStatus = null,
             bool? sendPolls = null,
             bool? useExternalApps = null,
-            bool? useExternalSounds = null)
+            bool? useExternalSounds = null,
+            bool? pinMessages = null)
             => new ChannelPermissions(RawValue,
                 createInstantInvite,
                 manageChannel,
@@ -371,7 +378,8 @@ namespace Discord
                 setVoiceChannelStatus,
                 sendPolls,
                 useExternalApps,
-                useExternalSounds);
+                useExternalSounds,
+                pinMessages);
 
         public bool Has(ChannelPermission permission) => Permissions.GetValue(RawValue, permission);
 
