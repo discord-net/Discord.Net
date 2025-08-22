@@ -124,6 +124,8 @@ namespace Discord
         public bool UserExternalSounds => Permissions.GetValue(RawValue, GuildPermission.UseExternalSounds);
         /// <summary> If <see langword="true"/>, a user can create events.</summary>
         public bool CreateEvents => Permissions.GetValue(RawValue, GuildPermission.CreateEvents);
+        /// <summary> If <see langword="true"/>, a user can ping and unpin messages.</summary>
+        public bool PinMessages => Permissions.GetValue(RawValue, GuildPermission.PinMessages);
 
         /// <summary> Creates a new <see cref="GuildPermissions"/> with the provided packed value. </summary>
         public GuildPermissions(ulong rawValue) { RawValue = rawValue; }
@@ -182,7 +184,8 @@ namespace Discord
             bool? sendPolls = null,
             bool? useExternalApps = null,
             bool? useExternalSounds = null,
-            bool? createEvents = null)
+            bool? createEvents = null,
+            bool? pinMessages = null)
         {
             ulong value = initialValue;
 
@@ -237,6 +240,7 @@ namespace Discord
             Permissions.SetValue(ref value, useExternalApps, GuildPermission.UseExternalApps);
             Permissions.SetValue(ref value, useExternalSounds, GuildPermission.UseExternalSounds);
             Permissions.SetValue(ref value, createEvents, GuildPermission.CreateEvents);
+            Permissions.SetValue(ref value, pinMessages, GuildPermission.PinMessages);
 
             RawValue = value;
         }
@@ -293,7 +297,8 @@ namespace Discord
             bool sendPolls = false,
             bool useExternalApps = false,
             bool useExternalSounds = false,
-            bool createEvents = false)
+            bool createEvents = false,
+            bool pinMessages = false)
             : this(0,
                 createInstantInvite: createInstantInvite,
                 manageRoles: manageRoles,
@@ -345,7 +350,8 @@ namespace Discord
                 sendPolls: sendPolls,
                 useExternalApps: useExternalApps,
                 useExternalSounds: useExternalSounds,
-                createEvents: createEvents)
+                createEvents: createEvents,
+                pinMessages: pinMessages)
         { }
 
         /// <summary> Creates a new <see cref="GuildPermissions"/> from this one, changing the provided non-null permissions. </summary>
@@ -400,14 +406,15 @@ namespace Discord
             bool? sendPolls = null,
             bool? useExternalApps = null,
             bool? useExternalSounds = null,
-            bool? createEvents = null)
+            bool? createEvents = null,
+            bool? pinMessages = null)
             => new GuildPermissions(RawValue, createInstantInvite, kickMembers, banMembers, administrator, manageChannels, manageGuild, addReactions,
                 viewAuditLog, viewGuildInsights, viewChannel, sendMessages, sendTTSMessages, manageMessages, embedLinks, attachFiles,
                 readMessageHistory, mentionEveryone, useExternalEmojis, connect, speak, muteMembers, deafenMembers, moveMembers,
                 useVoiceActivation, prioritySpeaker, stream, changeNickname, manageNicknames, manageRoles, manageWebhooks, manageEmojisAndStickers,
                 useApplicationCommands, requestToSpeak, manageEvents, manageThreads, createPublicThreads, createPrivateThreads, useExternalStickers, sendMessagesInThreads,
                 startEmbeddedActivities, moderateMembers, useSoundboard, viewMonetizationAnalytics, sendVoiceMessages, useClydeAI, createGuildExpressions, setVoiceChannelStatus,
-                sendPolls, useExternalApps, useExternalSounds, createEvents);
+                sendPolls, useExternalApps, useExternalSounds, createEvents, pinMessages);
 
         /// <summary>
         ///     Returns a value that indicates if a specific <see cref="GuildPermission"/> is enabled
