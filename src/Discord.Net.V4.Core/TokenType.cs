@@ -1,4 +1,4 @@
-﻿namespace Discord.Models;
+﻿namespace Discord;
 
 /// <summary>
 ///     Specifies the type of token to use with the client.

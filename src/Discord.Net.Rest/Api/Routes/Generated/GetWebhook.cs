@@ -1,6 +1,3 @@
-using Discord.Models;
-using Discord.Models.Rest.Api;
-
 namespace Discord.Rest.Api;
 
 partial class Routes

@@ -2,8 +2,9 @@
 using System.Text.Json;
 using Discord.Models.Json;
 using Discord.Models.Rest.Targets;
+using Discord.Rest.Targets;
 
-namespace Discord.Models.Rest;
+namespace Discord.Rest;
 
 public class DiscordRestClient : IDiscordClient
 {

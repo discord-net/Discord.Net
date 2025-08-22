@@ -1,4 +1,4 @@
-﻿namespace Discord.Models;
+﻿namespace Discord;
 
 public readonly record struct RequestOptions(
     RequestFlags RequestFlags = RequestFlags.Default,

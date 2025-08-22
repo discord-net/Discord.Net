@@ -1,7 +1,7 @@
 ﻿using System.Globalization;
 using System.Text;
 
-namespace Discord.Models;
+namespace Discord;
 
 /// <summary>
 ///     Provides a series of helper methods for handling Discord login tokens.

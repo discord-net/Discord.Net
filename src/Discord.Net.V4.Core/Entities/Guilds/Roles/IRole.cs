@@ -1,4 +1,4 @@
-﻿namespace Discord.Models;
+﻿namespace Discord;
 
 public interface IRole :
     IEntity<>

@@ -1,4 +1,4 @@
-﻿namespace Discord.Models;
+﻿namespace Discord;
 
 public readonly record struct IdOrEntity<TId, TEntity>(TId Id)
     where TEntity : IIdentifiable<TId>

@@ -1,7 +1,10 @@
-﻿using Discord.Models.Rest.Actors;
+﻿using Discord.Models;
+using Discord.Models.Rest.Actors;
 using Discord.Models.Rest.Api;
+using Discord.Rest.Actors;
+using Discord.Rest.Api;
 
-namespace Discord.Models.Rest;
+namespace Discord.Rest;
 
 public class RestUserActor(Snowflake id, DiscordRestClient client) :
     RestActor<Snowflake, RestUser>(id, client), IUserActor

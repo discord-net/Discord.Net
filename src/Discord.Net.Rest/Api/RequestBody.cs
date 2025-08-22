@@ -1,6 +1,7 @@
-﻿using Discord.Models.Models;
+﻿using Discord.Models;
+using Discord.Models.Models;
 
-namespace Discord.Models.Rest.Api;
+namespace Discord.Rest.Api;
 
 public abstract record RequestBody
 {

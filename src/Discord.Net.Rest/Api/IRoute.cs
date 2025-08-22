@@ -1,4 +1,4 @@
-﻿namespace Discord.Models.Rest.Api;
+﻿namespace Discord.Rest.Api;
 
 public interface IRoute
 {

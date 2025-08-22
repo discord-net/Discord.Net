@@ -2,8 +2,9 @@
 using System.Net.Http.Json;
 using Discord.Models.Json;
 using Discord.Models.Rest.Api;
+using Discord.Rest.Api;
 
-namespace Discord.Models.Rest;
+namespace Discord.Rest;
 
 public sealed class RestApiClient
 {

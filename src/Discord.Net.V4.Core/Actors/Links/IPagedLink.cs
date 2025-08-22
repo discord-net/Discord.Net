@@ -1,6 +1,7 @@
-﻿using Discord.Models.Models;
+﻿using Discord.Models;
+using Discord.Models.Models;
 
-namespace Discord.Models;
+namespace Discord;
 
 public interface IPagedLink<in TParams, out TEntity> :
     IAsyncEnumerable<TEntity>

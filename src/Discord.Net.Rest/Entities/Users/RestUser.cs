@@ -1,6 +1,7 @@
-﻿using Discord.Models.Models;
+﻿using Discord.Models;
+using Discord.Models.Models;
 
-namespace Discord.Models.Rest;
+namespace Discord.Rest;
 
 public class RestUser : 
     RestEntity<Snowflake, IUserModel>, 

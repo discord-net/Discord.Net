@@ -1,4 +1,4 @@
-﻿namespace Discord.Models;
+﻿namespace Discord;
 
 public interface IIdentifiable<out TId>
     where TId : IEquatable<TId>

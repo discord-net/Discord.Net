@@ -1,4 +1,4 @@
-﻿namespace Discord.Models;
+﻿namespace Discord;
 
 /// <summary>
 ///     Represents an authentication token used to authenticate with the

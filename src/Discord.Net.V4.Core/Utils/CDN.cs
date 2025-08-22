@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using Discord.Models;
 
-namespace Discord.Models;
+namespace Discord;
 
 /// <summary>
 ///     Represents a class containing the strings related to various Content Delivery Networks (CDNs).

@@ -1,7 +1,8 @@
 ﻿using System.Globalization;
+using Discord.Models;
 using Discord.Models.Models;
 
-namespace Discord.Models;
+namespace Discord;
 
 public interface ICurrentUser : 
     IUser,

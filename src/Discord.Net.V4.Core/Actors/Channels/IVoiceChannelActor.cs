@@ -1,4 +1,6 @@
-﻿namespace Discord.Models;
+﻿using Discord.Models;
+
+namespace Discord;
 
 public interface IVoiceChannelActor :
     IActor<Snowflake, IVoiceChannel>,

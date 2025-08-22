@@ -1,4 +1,4 @@
-﻿namespace Discord.Models.Rest.Actors;
+﻿namespace Discord.Rest.Actors;
 
 public abstract class RestActor<TId, TEntity> : IActor<TId, TEntity>
     where TId : IEquatable<TId>

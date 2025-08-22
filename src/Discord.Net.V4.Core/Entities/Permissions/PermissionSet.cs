@@ -2,7 +2,7 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-namespace Discord.Models;
+namespace Discord;
 
 [StructLayout(LayoutKind.Sequential)]
 public readonly struct PermissionSet(ulong lower, ulong upper) : IEquatable<PermissionSet>

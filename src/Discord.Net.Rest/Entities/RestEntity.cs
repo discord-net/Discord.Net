@@ -1,4 +1,6 @@
-﻿namespace Discord.Models.Rest;
+﻿using Discord.Models;
+
+namespace Discord.Rest;
 
 public abstract class RestEntity<TId, TModel> :
     RestEntity<TId>,

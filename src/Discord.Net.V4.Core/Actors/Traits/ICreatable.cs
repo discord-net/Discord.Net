@@ -1,4 +1,4 @@
-﻿namespace Discord.Models;
+﻿namespace Discord;
 
 public interface ICreatable<in TProperties, TResult> :
     ICreatable<TProperties>

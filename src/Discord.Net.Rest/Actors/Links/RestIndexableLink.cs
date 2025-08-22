@@ -1,7 +1,8 @@
 ﻿using System.Runtime.CompilerServices;
 using Discord.Models.Rest.Actors;
+using Discord.Rest.Actors;
 
-namespace Discord.Models.Rest;
+namespace Discord.Rest;
 
 public sealed class RestIndexableLink<TId, TActor, TEntity> :
     IIndexableLink<TId, TActor>

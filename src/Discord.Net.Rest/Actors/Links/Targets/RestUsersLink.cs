@@ -1,6 +1,6 @@
-﻿using Discord.Models.Rest;
+﻿using Discord.Models;
 
-namespace Discord.Models.Rest.Targets;
+namespace Discord.Rest.Targets;
 
 public sealed class RestUsersLink : IUsersLink
 {

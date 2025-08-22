@@ -2,7 +2,7 @@
 using System.Runtime;
 using System.Runtime.CompilerServices;
 
-namespace Discord.Models.Rest;
+namespace Discord.Rest;
 
 internal sealed class WeakTable<TKey, TValue>
     where TKey : notnull

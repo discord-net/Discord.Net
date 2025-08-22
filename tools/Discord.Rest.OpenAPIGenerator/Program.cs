@@ -156,6 +156,8 @@ foreach (var (path, item) in document.Paths)
 File.WriteAllText(
     Path.Combine(OUT_DIR, "RouteParameters.cs"),
     $$"""
+      using Discord.Models;
+      
       namespace Discord.Rest.Api;
 
       public abstract record RouteParameter
@@ -175,7 +177,7 @@ File.WriteAllText(
                                     public static implicit operator {{x.Type}}({{name}} self) => self.Value;
                                     public static implicit operator {{name}}({{x.Type}} value) => new(value);
                                 }
-                                """;
+                                """.ReplaceLineEndings($"{Environment.NewLine}    ");
                       })
               )
           }}

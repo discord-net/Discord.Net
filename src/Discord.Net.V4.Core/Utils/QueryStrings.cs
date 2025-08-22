@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace Discord.Models;
+namespace Discord;
 
 public class QueryStrings(IEnumerable<KeyValuePair<string, object>> values) : Dictionary<string, object>(values)
 {

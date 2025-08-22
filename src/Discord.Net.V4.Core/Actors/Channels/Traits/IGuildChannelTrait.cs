@@ -1,6 +1,6 @@
-﻿using Discord.Models.Models;
+﻿using Discord.Models;
 
-namespace Discord.Models;
+namespace Discord;
 
 public interface IGuildChannelTrait :
     IActor<Snowflake, IGuildChannel>,

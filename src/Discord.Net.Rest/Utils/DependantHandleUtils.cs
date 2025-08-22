@@ -1,7 +1,7 @@
 ﻿using System.Runtime;
 using System.Runtime.CompilerServices;
 
-namespace Discord.Models.Rest;
+namespace Discord.Rest;
 
 internal static class DependantHandleUtils
 {

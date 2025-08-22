@@ -1,7 +1,8 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using Discord.Models;
 using Discord.Models.Models;
 
-namespace Discord.Models;
+namespace Discord;
 
 public interface IUser : 
     IEntity<>,

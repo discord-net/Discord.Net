@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 
-namespace Discord.Models;
+namespace Discord;
 
 /// <summary>
 ///     Defines various behaviors of Discord.Net.
