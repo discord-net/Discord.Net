@@ -3,11 +3,17 @@ namespace Discord.Rest.Api;
 partial class Routes
 {
    public sealed record SearchGuildMembers(
-        Snowflake GuildId
+        RouteParameters.GuildId GuildId
     ) : IOperation
     {
         public required int Limit { get; init; }
         public required string Query { get; init; }
+    
+        public static IReadOnlyList<Type> RouteParameterTypes
+            => [typeof(RouteParameters.GuildId)];
+            
+        public IReadOnlyList<RouteParameters> RouteParameters
+            => [GuildId];
     
         public static string Path => @"/guilds/{guild_id}/members/search";
         public static string OperationId => "search_guild_members";

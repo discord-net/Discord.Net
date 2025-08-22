@@ -3,9 +3,15 @@ namespace Discord.Rest.Api;
 partial class Routes
 {
    public sealed record GetGuildVanityUrl(
-        Snowflake GuildId
+        RouteParameters.GuildId GuildId
     ) : IOperation
     {
+        public static IReadOnlyList<Type> RouteParameterTypes
+            => [typeof(RouteParameters.GuildId)];
+            
+        public IReadOnlyList<RouteParameters> RouteParameters
+            => [GuildId];
+    
         public static string Path => @"/guilds/{guild_id}/vanity-url";
         public static string OperationId => "get_guild_vanity_url";
         public static RequestMethod Method => RequestMethod.Get;

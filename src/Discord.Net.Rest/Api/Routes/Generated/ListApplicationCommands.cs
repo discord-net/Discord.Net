@@ -3,10 +3,16 @@ namespace Discord.Rest.Api;
 partial class Routes
 {
    public sealed record ListApplicationCommands(
-        Snowflake ApplicationId
+        RouteParameters.ApplicationId ApplicationId
     ) : IOperation
     {
         public Optional<bool> WithLocalizations { get; init; }
+    
+        public static IReadOnlyList<Type> RouteParameterTypes
+            => [typeof(RouteParameters.ApplicationId)];
+            
+        public IReadOnlyList<RouteParameters> RouteParameters
+            => [ApplicationId];
     
         public static string Path => @"/applications/{application_id}/commands";
         public static string OperationId => "list_application_commands";

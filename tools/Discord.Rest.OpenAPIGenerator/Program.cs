@@ -40,9 +40,9 @@ foreach (var (path, item) in document.Paths)
                 if (i > 0) sb.Append(',');
 
                 var parameter = pathParameters[i];
-                var type = GetDotnetName(parameter.Schema);
+                var type = $"RouteParameters.{ToPascalCase(parameter.Name)}";
 
-                routeParameters.Add((parameter.Name, type));
+                routeParameters.Add((parameter.Name, GetDotnetName(parameter.Schema)));
 
                 sb.AppendLine().Append("    ");
                 sb.Append(type).Append(' ').Append(ToPascalCase(parameter.Name));
@@ -80,6 +80,19 @@ foreach (var (path, item) in document.Paths)
             }
 
             sb.AppendLine();
+        }
+
+        if (pathParameters.Length > 0)
+        {
+            sb.AppendLine(
+                $"""
+                     public static IReadOnlyList<Type> RouteParameterTypes
+                         => [{string.Join(", ", pathParameters.Select(x => $"typeof(RouteParameters.{ToPascalCase(x.Name)})"))}];
+                         
+                     public IReadOnlyList<RouteParameters> RouteParameters
+                         => [{string.Join(", ", pathParameters.Select(x => ToPascalCase(x.Name)))}];
+                 """
+            ).AppendLine();
         }
 
         var formatMethod = new StringBuilder();
@@ -156,11 +169,9 @@ foreach (var (path, item) in document.Paths)
 File.WriteAllText(
     Path.Combine(OUT_DIR, "RouteParameters.cs"),
     $$"""
-      using Discord.Models;
-      
       namespace Discord.Rest.Api;
 
-      public abstract record RouteParameter
+      public abstract record RouteParameters
       {
           {{
               string.Join(
@@ -172,7 +183,7 @@ File.WriteAllText(
 
                           return
                               $$"""
-                                public sealed record {{name}}({{x.Type}} Value) : RouteParameter
+                                public sealed record {{name}}({{x.Type}} Value) : RouteParameters
                                 {
                                     public static implicit operator {{x.Type}}({{name}} self) => self.Value;
                                     public static implicit operator {{name}}({{x.Type}} value) => new(value);

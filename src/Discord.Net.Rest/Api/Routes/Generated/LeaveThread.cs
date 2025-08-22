@@ -3,9 +3,15 @@ namespace Discord.Rest.Api;
 partial class Routes
 {
    public sealed record LeaveThread(
-        Snowflake ChannelId
+        RouteParameters.ChannelId ChannelId
     ) : IOperation
     {
+        public static IReadOnlyList<Type> RouteParameterTypes
+            => [typeof(RouteParameters.ChannelId)];
+            
+        public IReadOnlyList<RouteParameters> RouteParameters
+            => [ChannelId];
+    
         public static string Path => @"/channels/{channel_id}/thread-members/@me";
         public static string OperationId => "leave_thread";
         public static RequestMethod Method => RequestMethod.Delete;

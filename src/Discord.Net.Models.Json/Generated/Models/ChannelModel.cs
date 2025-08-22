@@ -15,7 +15,7 @@ public partial class DiscordJsonContext
 public record ChannelModel(
     Discord.Models.ChannelType Type,
     Discord.Models.ChannelFlags Flags,
-    Discord.Models.Snowflake Id
+    Snowflake Id
 ) : 
     IChannelModel,
     IJsonModel,
@@ -28,7 +28,7 @@ public record ChannelModel(
             ObjectWithParameterizedConstructorCreator = static args => new ChannelModel(
                 Type: (Discord.Models.ChannelType)args[0],
                 Flags: (Discord.Models.ChannelFlags)args[1],
-                Id: (Discord.Models.Snowflake)args[2]
+                Id: (Snowflake)args[2]
             ),
             PropertyMetadataInitializer = _ => CreatePropertyInfos(options),
             ConstructorParameterMetadataInitializer = CreateConstructorParameterInfos
@@ -64,9 +64,9 @@ public record ChannelModel(
                 IgnoreCondition = JsonIgnoreCondition.Never
             }
         ),
-        JsonMetadataServices.CreatePropertyInfo<Discord.Models.Snowflake>(
+        JsonMetadataServices.CreatePropertyInfo<Snowflake>(
             options,
-            new JsonPropertyInfoValues<Discord.Models.Snowflake>
+            new JsonPropertyInfoValues<Snowflake>
             {
                 IsProperty = true,
                 IsPublic = true,
@@ -102,7 +102,7 @@ public record ChannelModel(
         new()
         {
            Name = "Id",
-           ParameterType = typeof(Discord.Models.Snowflake),
+           ParameterType = typeof(Snowflake),
            Position = 2,
            HasDefaultValue = false,
            DefaultValue = null,

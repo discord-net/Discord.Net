@@ -1,7 +1,6 @@
 ﻿using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using Discord.Models.Json;
-using Discord.Models.Rest.Api;
 using Discord.Rest.Api;
 
 namespace Discord.Rest;

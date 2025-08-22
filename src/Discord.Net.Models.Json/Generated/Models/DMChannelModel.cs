@@ -13,10 +13,10 @@ public partial class DiscordJsonContext
 }
 
 public record DMChannelModel(
-    Discord.Models.IdOrModel<Discord.Models.Snowflake,Discord.Models.IUserModel> Recipient,
+    Discord.Models.IdOrModel<Snowflake,Discord.Models.IUserModel> Recipient,
     Discord.Models.ChannelType Type,
     Discord.Models.ChannelFlags Flags,
-    Discord.Models.Snowflake Id
+    Snowflake Id
 ) : 
     IDMChannelModel,
     IJsonModel,
@@ -27,10 +27,10 @@ public record DMChannelModel(
         new JsonObjectInfoValues<DMChannelModel>()
         {
             ObjectWithParameterizedConstructorCreator = static args => new DMChannelModel(
-                Recipient: (Discord.Models.IdOrModel<Discord.Models.Snowflake,Discord.Models.IUserModel>)args[0],
+                Recipient: (Discord.Models.IdOrModel<Snowflake,Discord.Models.IUserModel>)args[0],
                 Type: (Discord.Models.ChannelType)args[1],
                 Flags: (Discord.Models.ChannelFlags)args[2],
-                Id: (Discord.Models.Snowflake)args[3]
+                Id: (Snowflake)args[3]
             ),
             PropertyMetadataInitializer = _ => CreatePropertyInfos(options),
             ConstructorParameterMetadataInitializer = CreateConstructorParameterInfos
@@ -38,9 +38,9 @@ public record DMChannelModel(
     );
 
     public static JsonPropertyInfo[] CreatePropertyInfos(JsonSerializerOptions options) => [
-        JsonMetadataServices.CreatePropertyInfo<Discord.Models.IdOrModel<Discord.Models.Snowflake,Discord.Models.IUserModel>>(
+        JsonMetadataServices.CreatePropertyInfo<Discord.Models.IdOrModel<Snowflake,Discord.Models.IUserModel>>(
             options,
-            new JsonPropertyInfoValues<Discord.Models.IdOrModel<Discord.Models.Snowflake,Discord.Models.IUserModel>>
+            new JsonPropertyInfoValues<Discord.Models.IdOrModel<Snowflake,Discord.Models.IUserModel>>
             {
                 IsProperty = true,
                 IsPublic = true,
@@ -80,9 +80,9 @@ public record DMChannelModel(
                 IgnoreCondition = JsonIgnoreCondition.Never
             }
         ),
-        JsonMetadataServices.CreatePropertyInfo<Discord.Models.Snowflake>(
+        JsonMetadataServices.CreatePropertyInfo<Snowflake>(
             options,
-            new JsonPropertyInfoValues<Discord.Models.Snowflake>
+            new JsonPropertyInfoValues<Snowflake>
             {
                 IsProperty = true,
                 IsPublic = true,
@@ -100,7 +100,7 @@ public record DMChannelModel(
         new()
         {
            Name = "Recipient",
-           ParameterType = typeof(Discord.Models.IdOrModel<Discord.Models.Snowflake,Discord.Models.IUserModel>),
+           ParameterType = typeof(Discord.Models.IdOrModel<Snowflake,Discord.Models.IUserModel>),
            Position = 0,
            HasDefaultValue = false,
            DefaultValue = null,
@@ -127,7 +127,7 @@ public record DMChannelModel(
         new()
         {
            Name = "Id",
-           ParameterType = typeof(Discord.Models.Snowflake),
+           ParameterType = typeof(Snowflake),
            Position = 3,
            HasDefaultValue = false,
            DefaultValue = null,

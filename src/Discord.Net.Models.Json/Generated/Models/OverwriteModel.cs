@@ -16,7 +16,7 @@ public record OverwriteModel(
     Discord.Models.OverwriteType Type,
     Discord.Models.PermissionBitSet Allow,
     Discord.Models.PermissionBitSet Deny,
-    Discord.Models.Snowflake Id
+    Snowflake Id
 ) : 
     IOverwriteModel,
     IJsonModel,
@@ -30,7 +30,7 @@ public record OverwriteModel(
                 Type: (Discord.Models.OverwriteType)args[0],
                 Allow: (Discord.Models.PermissionBitSet)args[1],
                 Deny: (Discord.Models.PermissionBitSet)args[2],
-                Id: (Discord.Models.Snowflake)args[3]
+                Id: (Snowflake)args[3]
             ),
             PropertyMetadataInitializer = _ => CreatePropertyInfos(options),
             ConstructorParameterMetadataInitializer = CreateConstructorParameterInfos
@@ -80,9 +80,9 @@ public record OverwriteModel(
                 IgnoreCondition = JsonIgnoreCondition.Never
             }
         ),
-        JsonMetadataServices.CreatePropertyInfo<Discord.Models.Snowflake>(
+        JsonMetadataServices.CreatePropertyInfo<Snowflake>(
             options,
-            new JsonPropertyInfoValues<Discord.Models.Snowflake>
+            new JsonPropertyInfoValues<Snowflake>
             {
                 IsProperty = true,
                 IsPublic = true,
@@ -127,7 +127,7 @@ public record OverwriteModel(
         new()
         {
            Name = "Id",
-           ParameterType = typeof(Discord.Models.Snowflake),
+           ParameterType = typeof(Snowflake),
            Position = 3,
            HasDefaultValue = false,
            DefaultValue = null,

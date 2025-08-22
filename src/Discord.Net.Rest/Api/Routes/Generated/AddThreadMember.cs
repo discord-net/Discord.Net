@@ -3,10 +3,16 @@ namespace Discord.Rest.Api;
 partial class Routes
 {
    public sealed record AddThreadMember(
-        Snowflake ChannelId,
-        Snowflake UserId
+        RouteParameters.ChannelId ChannelId,
+        RouteParameters.UserId UserId
     ) : IOperation
     {
+        public static IReadOnlyList<Type> RouteParameterTypes
+            => [typeof(RouteParameters.ChannelId), typeof(RouteParameters.UserId)];
+            
+        public IReadOnlyList<RouteParameters> RouteParameters
+            => [ChannelId, UserId];
+    
         public static string Path => @"/channels/{channel_id}/thread-members/{user_id}";
         public static string OperationId => "add_thread_member";
         public static RequestMethod Method => RequestMethod.Put;

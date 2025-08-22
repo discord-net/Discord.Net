@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Numerics;
 using System.Runtime.InteropServices;
 
-namespace Discord.Models;
+namespace Discord;
 
 [StructLayout(LayoutKind.Sequential)]
 public readonly struct Snowflake(ulong value) :

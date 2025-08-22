@@ -3,9 +3,15 @@ namespace Discord.Rest.Api;
 partial class Routes
 {
    public sealed record TriggerTypingIndicator(
-        Snowflake ChannelId
+        RouteParameters.ChannelId ChannelId
     ) : IOperation
     {
+        public static IReadOnlyList<Type> RouteParameterTypes
+            => [typeof(RouteParameters.ChannelId)];
+            
+        public IReadOnlyList<RouteParameters> RouteParameters
+            => [ChannelId];
+    
         public static string Path => @"/channels/{channel_id}/typing";
         public static string OperationId => "trigger_typing_indicator";
         public static RequestMethod Method => RequestMethod.Post;

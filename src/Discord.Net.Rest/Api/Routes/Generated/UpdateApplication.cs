@@ -3,9 +3,15 @@ namespace Discord.Rest.Api;
 partial class Routes
 {
    public sealed record UpdateApplication(
-        Snowflake ApplicationId
+        RouteParameters.ApplicationId ApplicationId
     ) : IOperation
     {
+        public static IReadOnlyList<Type> RouteParameterTypes
+            => [typeof(RouteParameters.ApplicationId)];
+            
+        public IReadOnlyList<RouteParameters> RouteParameters
+            => [ApplicationId];
+    
         public static string Path => @"/applications/{application_id}";
         public static string OperationId => "update_application";
         public static RequestMethod Method => RequestMethod.Patch;

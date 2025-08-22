@@ -3,10 +3,16 @@ namespace Discord.Rest.Api;
 partial class Routes
 {
    public sealed record DeleteGroupDmUser(
-        Snowflake ChannelId,
-        Snowflake UserId
+        RouteParameters.ChannelId ChannelId,
+        RouteParameters.UserId UserId
     ) : IOperation
     {
+        public static IReadOnlyList<Type> RouteParameterTypes
+            => [typeof(RouteParameters.ChannelId), typeof(RouteParameters.UserId)];
+            
+        public IReadOnlyList<RouteParameters> RouteParameters
+            => [ChannelId, UserId];
+    
         public static string Path => @"/channels/{channel_id}/recipients/{user_id}";
         public static string OperationId => "delete_group_dm_user";
         public static RequestMethod Method => RequestMethod.Delete;

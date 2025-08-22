@@ -3,9 +3,15 @@ namespace Discord.Rest.Api;
 partial class Routes
 {
    public sealed record CreateGuildChannel(
-        Snowflake GuildId
+        RouteParameters.GuildId GuildId
     ) : IOperation
     {
+        public static IReadOnlyList<Type> RouteParameterTypes
+            => [typeof(RouteParameters.GuildId)];
+            
+        public IReadOnlyList<RouteParameters> RouteParameters
+            => [GuildId];
+    
         public static string Path => @"/guilds/{guild_id}/channels";
         public static string OperationId => "create_guild_channel";
         public static RequestMethod Method => RequestMethod.Post;

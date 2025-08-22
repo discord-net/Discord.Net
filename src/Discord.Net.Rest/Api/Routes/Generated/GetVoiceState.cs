@@ -3,10 +3,16 @@ namespace Discord.Rest.Api;
 partial class Routes
 {
    public sealed record GetVoiceState(
-        Snowflake GuildId,
-        Snowflake UserId
+        RouteParameters.GuildId GuildId,
+        RouteParameters.UserId UserId
     ) : IOperation
     {
+        public static IReadOnlyList<Type> RouteParameterTypes
+            => [typeof(RouteParameters.GuildId), typeof(RouteParameters.UserId)];
+            
+        public IReadOnlyList<RouteParameters> RouteParameters
+            => [GuildId, UserId];
+    
         public static string Path => @"/guilds/{guild_id}/voice-states/{user_id}";
         public static string OperationId => "get_voice_state";
         public static RequestMethod Method => RequestMethod.Get;

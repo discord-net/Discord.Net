@@ -13,7 +13,7 @@ public partial class DiscordJsonContext
 }
 
 public record TagModel(
-    Discord.Models.Snowflake Id
+    Snowflake Id
 ) : 
     ITagModel,
     IJsonModel,
@@ -24,7 +24,7 @@ public record TagModel(
         new JsonObjectInfoValues<TagModel>()
         {
             ObjectWithParameterizedConstructorCreator = static args => new TagModel(
-                Id: (Discord.Models.Snowflake)args[0]
+                Id: (Snowflake)args[0]
             ),
             PropertyMetadataInitializer = _ => CreatePropertyInfos(options),
             ConstructorParameterMetadataInitializer = CreateConstructorParameterInfos
@@ -32,9 +32,9 @@ public record TagModel(
     );
 
     public static JsonPropertyInfo[] CreatePropertyInfos(JsonSerializerOptions options) => [
-        JsonMetadataServices.CreatePropertyInfo<Discord.Models.Snowflake>(
+        JsonMetadataServices.CreatePropertyInfo<Snowflake>(
             options,
-            new JsonPropertyInfoValues<Discord.Models.Snowflake>
+            new JsonPropertyInfoValues<Snowflake>
             {
                 IsProperty = true,
                 IsPublic = true,
@@ -52,7 +52,7 @@ public record TagModel(
         new()
         {
            Name = "Id",
-           ParameterType = typeof(Discord.Models.Snowflake),
+           ParameterType = typeof(Snowflake),
            Position = 0,
            HasDefaultValue = false,
            DefaultValue = null,

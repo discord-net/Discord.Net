@@ -18,14 +18,14 @@ public record AnnouncementChannelModel(
     Discord.Models.Optional<int> RateLimitPerUser,
     Discord.Models.DefaultAutoArchiveDuration DefaultAutoArchiveDuration,
     string Name,
-    Discord.Models.Snowflake GuildId,
+    Snowflake GuildId,
     int Position,
     System.Collections.Generic.IReadOnlyList<Discord.Models.IOverwriteModel> PermissionOverwrites,
     Discord.Models.Optional<Discord.Models.PermissionBitSet> Permissions,
     Discord.Models.ChannelType Type,
     Discord.Models.ChannelFlags Flags,
-    Discord.Models.Snowflake Id,
-    Discord.Models.Optional<Nullable<Discord.Models.Snowflake>> ParentId
+    Snowflake Id,
+    Discord.Models.Optional<Nullable<Snowflake>> ParentId
 ) : 
     IAnnouncementChannelModel,
     IJsonModel,
@@ -41,14 +41,14 @@ public record AnnouncementChannelModel(
                 RateLimitPerUser: (Discord.Models.Optional<int>)args[2],
                 DefaultAutoArchiveDuration: (Discord.Models.DefaultAutoArchiveDuration)args[3],
                 Name: (string)args[4],
-                GuildId: (Discord.Models.Snowflake)args[5],
+                GuildId: (Snowflake)args[5],
                 Position: (int)args[6],
                 PermissionOverwrites: (System.Collections.Generic.IReadOnlyList<Discord.Models.IOverwriteModel>)args[7],
                 Permissions: (Discord.Models.Optional<Discord.Models.PermissionBitSet>)args[8],
                 Type: (Discord.Models.ChannelType)args[9],
                 Flags: (Discord.Models.ChannelFlags)args[10],
-                Id: (Discord.Models.Snowflake)args[11],
-                ParentId: (Discord.Models.Optional<Nullable<Discord.Models.Snowflake>>)args[12]
+                Id: (Snowflake)args[11],
+                ParentId: (Discord.Models.Optional<Nullable<Snowflake>>)args[12]
             ),
             PropertyMetadataInitializer = _ => CreatePropertyInfos(options),
             ConstructorParameterMetadataInitializer = CreateConstructorParameterInfos
@@ -126,9 +126,9 @@ public record AnnouncementChannelModel(
                 IgnoreCondition = JsonIgnoreCondition.Never
             }
         ),
-        JsonMetadataServices.CreatePropertyInfo<Discord.Models.Snowflake>(
+        JsonMetadataServices.CreatePropertyInfo<Snowflake>(
             options,
-            new JsonPropertyInfoValues<Discord.Models.Snowflake>
+            new JsonPropertyInfoValues<Snowflake>
             {
                 IsProperty = true,
                 IsPublic = true,
@@ -210,9 +210,9 @@ public record AnnouncementChannelModel(
                 IgnoreCondition = JsonIgnoreCondition.Never
             }
         ),
-        JsonMetadataServices.CreatePropertyInfo<Discord.Models.Snowflake>(
+        JsonMetadataServices.CreatePropertyInfo<Snowflake>(
             options,
-            new JsonPropertyInfoValues<Discord.Models.Snowflake>
+            new JsonPropertyInfoValues<Snowflake>
             {
                 IsProperty = true,
                 IsPublic = true,
@@ -224,9 +224,9 @@ public record AnnouncementChannelModel(
                 IgnoreCondition = JsonIgnoreCondition.Never
             }
         ),
-        JsonMetadataServices.CreatePropertyInfo<Discord.Models.Optional<Nullable<Discord.Models.Snowflake>>>(
+        JsonMetadataServices.CreatePropertyInfo<Discord.Models.Optional<Nullable<Snowflake>>>(
             options,
-            new JsonPropertyInfoValues<Discord.Models.Optional<Nullable<Discord.Models.Snowflake>>>
+            new JsonPropertyInfoValues<Discord.Models.Optional<Nullable<Snowflake>>>
             {
                 IsProperty = true,
                 IsPublic = true,
@@ -289,7 +289,7 @@ public record AnnouncementChannelModel(
         new()
         {
            Name = "GuildId",
-           ParameterType = typeof(Discord.Models.Snowflake),
+           ParameterType = typeof(Snowflake),
            Position = 5,
            HasDefaultValue = false,
            DefaultValue = null,
@@ -343,7 +343,7 @@ public record AnnouncementChannelModel(
         new()
         {
            Name = "Id",
-           ParameterType = typeof(Discord.Models.Snowflake),
+           ParameterType = typeof(Snowflake),
            Position = 11,
            HasDefaultValue = false,
            DefaultValue = null,
@@ -352,7 +352,7 @@ public record AnnouncementChannelModel(
         new()
         {
            Name = "ParentId",
-           ParameterType = typeof(Discord.Models.Optional<Nullable<Discord.Models.Snowflake>>),
+           ParameterType = typeof(Discord.Models.Optional<Nullable<Snowflake>>),
            Position = 12,
            HasDefaultValue = false,
            DefaultValue = null,

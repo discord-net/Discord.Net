@@ -3,9 +3,15 @@ namespace Discord.Rest.Api;
 partial class Routes
 {
    public sealed record SetGuildMfaLevel(
-        Snowflake GuildId
+        RouteParameters.GuildId GuildId
     ) : IOperation
     {
+        public static IReadOnlyList<Type> RouteParameterTypes
+            => [typeof(RouteParameters.GuildId)];
+            
+        public IReadOnlyList<RouteParameters> RouteParameters
+            => [GuildId];
+    
         public static string Path => @"/guilds/{guild_id}/mfa";
         public static string OperationId => "set_guild_mfa_level";
         public static RequestMethod Method => RequestMethod.Post;

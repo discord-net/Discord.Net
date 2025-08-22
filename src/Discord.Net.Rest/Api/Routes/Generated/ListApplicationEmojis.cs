@@ -3,9 +3,15 @@ namespace Discord.Rest.Api;
 partial class Routes
 {
    public sealed record ListApplicationEmojis(
-        Snowflake ApplicationId
+        RouteParameters.ApplicationId ApplicationId
     ) : IOperation
     {
+        public static IReadOnlyList<Type> RouteParameterTypes
+            => [typeof(RouteParameters.ApplicationId)];
+            
+        public IReadOnlyList<RouteParameters> RouteParameters
+            => [ApplicationId];
+    
         public static string Path => @"/applications/{application_id}/emojis";
         public static string OperationId => "list_application_emojis";
         public static RequestMethod Method => RequestMethod.Get;

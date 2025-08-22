@@ -3,9 +3,15 @@ namespace Discord.Rest.Api;
 partial class Routes
 {
    public sealed record DeleteWebhook(
-        Snowflake WebhookId
+        RouteParameters.WebhookId WebhookId
     ) : IOperation
     {
+        public static IReadOnlyList<Type> RouteParameterTypes
+            => [typeof(RouteParameters.WebhookId)];
+            
+        public IReadOnlyList<RouteParameters> RouteParameters
+            => [WebhookId];
+    
         public static string Path => @"/webhooks/{webhook_id}";
         public static string OperationId => "delete_webhook";
         public static RequestMethod Method => RequestMethod.Delete;

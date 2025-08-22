@@ -3,11 +3,17 @@ namespace Discord.Rest.Api;
 partial class Routes
 {
    public sealed record InviteResolve(
-        string Code
+        RouteParameters.Code Code
     ) : IOperation
     {
         public Optional<bool> WithCounts { get; init; }
         public Optional<Snowflake> GuildScheduledEventId { get; init; }
+    
+        public static IReadOnlyList<Type> RouteParameterTypes
+            => [typeof(RouteParameters.Code)];
+            
+        public IReadOnlyList<RouteParameters> RouteParameters
+            => [Code];
     
         public static string Path => @"/invites/{code}";
         public static string OperationId => "invite_resolve";

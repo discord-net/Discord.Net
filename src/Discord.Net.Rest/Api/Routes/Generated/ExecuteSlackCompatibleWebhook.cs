@@ -3,12 +3,18 @@ namespace Discord.Rest.Api;
 partial class Routes
 {
    public sealed record ExecuteSlackCompatibleWebhook(
-        Snowflake WebhookId,
-        string WebhookToken
+        RouteParameters.WebhookId WebhookId,
+        RouteParameters.WebhookToken WebhookToken
     ) : IOperation
     {
         public Optional<bool> Wait { get; init; }
         public Optional<Snowflake> ThreadId { get; init; }
+    
+        public static IReadOnlyList<Type> RouteParameterTypes
+            => [typeof(RouteParameters.WebhookId), typeof(RouteParameters.WebhookToken)];
+            
+        public IReadOnlyList<RouteParameters> RouteParameters
+            => [WebhookId, WebhookToken];
     
         public static string Path => @"/webhooks/{webhook_id}/{webhook_token}/slack";
         public static string OperationId => "execute_slack_compatible_webhook";

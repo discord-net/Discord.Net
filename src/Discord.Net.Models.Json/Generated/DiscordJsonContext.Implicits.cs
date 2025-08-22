@@ -44,15 +44,15 @@ public partial class DiscordJsonContext
     );
 
     [field: MaybeNull]
-    public JsonTypeInfo<Discord.Models.Optional<Nullable<Discord.Models.Snowflake>>> OptionalNullableSnowflake => field ??= JsonMetadataServices.CreateValueInfo<Discord.Models.Optional<Nullable<Discord.Models.Snowflake>>>(
+    public JsonTypeInfo<Discord.Models.Optional<Nullable<Snowflake>>> OptionalNullableSnowflake => field ??= JsonMetadataServices.CreateValueInfo<Discord.Models.Optional<Nullable<Snowflake>>>(
         Options, 
-        Converters.OptionalConverter<Nullable<Discord.Models.Snowflake>>.Instance
+        Converters.OptionalConverter<Nullable<Snowflake>>.Instance
     );
 
     [field: MaybeNull]
-    public JsonTypeInfo<Discord.Models.IdOrModel<Discord.Models.Snowflake,Discord.Models.IUserModel>> IdOrModelOfUserModel => field ??= JsonMetadataServices.CreateValueInfo<Discord.Models.IdOrModel<Discord.Models.Snowflake,Discord.Models.IUserModel>>(
+    public JsonTypeInfo<Discord.Models.IdOrModel<Snowflake,Discord.Models.IUserModel>> IdOrModelOfUserModel => field ??= JsonMetadataServices.CreateValueInfo<Discord.Models.IdOrModel<Snowflake,Discord.Models.IUserModel>>(
         Options, 
-        new Converters.IdOrModelConverter<Discord.Models.Snowflake, Discord.Models.IUserModel>(
+        new Converters.IdOrModelConverter<Snowflake, Discord.Models.IUserModel>(
            Snowflake,
            UserModel
         )
@@ -83,15 +83,15 @@ public partial class DiscordJsonContext
     );
 
     [field: MaybeNull]
-    public JsonTypeInfo<System.Collections.Generic.IReadOnlyList<Discord.Models.IdOrModel<Discord.Models.Snowflake,Discord.Models.IUserModel>>> ListOfIdOrModelOfUserModel => field ??= JsonMetadataServices.CreateIEnumerableInfo<System.Collections.Generic.IReadOnlyList<Discord.Models.IdOrModel<Discord.Models.Snowflake,Discord.Models.IUserModel>>, Discord.Models.IdOrModel<Discord.Models.Snowflake,Discord.Models.IUserModel>>(
+    public JsonTypeInfo<System.Collections.Generic.IReadOnlyList<Discord.Models.IdOrModel<Snowflake,Discord.Models.IUserModel>>> ListOfIdOrModelOfUserModel => field ??= JsonMetadataServices.CreateIEnumerableInfo<System.Collections.Generic.IReadOnlyList<Discord.Models.IdOrModel<Snowflake,Discord.Models.IUserModel>>, Discord.Models.IdOrModel<Snowflake,Discord.Models.IUserModel>>(
         Options, 
-        new JsonCollectionInfoValues<System.Collections.Generic.IReadOnlyList<Discord.Models.IdOrModel<Discord.Models.Snowflake,Discord.Models.IUserModel>>>()
+        new JsonCollectionInfoValues<System.Collections.Generic.IReadOnlyList<Discord.Models.IdOrModel<Snowflake,Discord.Models.IUserModel>>>()
     );
 
     [field: MaybeNull]
-    public JsonTypeInfo<Discord.Models.Optional<System.Collections.Generic.IReadOnlyList<Discord.Models.Snowflake>>> OptionalListOfSnowflake => field ??= JsonMetadataServices.CreateValueInfo<Discord.Models.Optional<System.Collections.Generic.IReadOnlyList<Discord.Models.Snowflake>>>(
+    public JsonTypeInfo<Discord.Models.Optional<System.Collections.Generic.IReadOnlyList<Snowflake>>> OptionalListOfSnowflake => field ??= JsonMetadataServices.CreateValueInfo<Discord.Models.Optional<System.Collections.Generic.IReadOnlyList<Snowflake>>>(
         Options, 
-        Converters.OptionalConverter<System.Collections.Generic.IReadOnlyList<Discord.Models.Snowflake>>.Instance
+        Converters.OptionalConverter<System.Collections.Generic.IReadOnlyList<Snowflake>>.Instance
     );
 
     [field: MaybeNull]
@@ -125,9 +125,9 @@ public partial class DiscordJsonContext
     );
 
     [field: MaybeNull]
-    public JsonTypeInfo<Nullable<Discord.Models.Snowflake>> NullableSnowflake => field ??= JsonMetadataServices.CreateValueInfo<Discord.Models.Snowflake?>(
+    public JsonTypeInfo<Nullable<Snowflake>> NullableSnowflake => field ??= JsonMetadataServices.CreateValueInfo<Snowflake?>(
         Options, 
-        JsonMetadataServices.GetNullableConverter<Discord.Models.Snowflake>(Options)
+        JsonMetadataServices.GetNullableConverter<Snowflake>(Options)
     );
 
     [field: MaybeNull]
@@ -143,9 +143,9 @@ public partial class DiscordJsonContext
     );
 
     [field: MaybeNull]
-    public JsonTypeInfo<System.Collections.Generic.IReadOnlyList<Discord.Models.Snowflake>> ListOfSnowflake => field ??= JsonMetadataServices.CreateIEnumerableInfo<System.Collections.Generic.IReadOnlyList<Discord.Models.Snowflake>, Discord.Models.Snowflake>(
+    public JsonTypeInfo<System.Collections.Generic.IReadOnlyList<Snowflake>> ListOfSnowflake => field ??= JsonMetadataServices.CreateIEnumerableInfo<System.Collections.Generic.IReadOnlyList<Snowflake>, Snowflake>(
         Options, 
-        new JsonCollectionInfoValues<System.Collections.Generic.IReadOnlyList<Discord.Models.Snowflake>>()
+        new JsonCollectionInfoValues<System.Collections.Generic.IReadOnlyList<Snowflake>>()
     );
 
     [field: MaybeNull]
@@ -169,23 +169,23 @@ public partial class DiscordJsonContext
         if (type == typeof(Discord.Models.Optional<Discord.Models.PermissionBitSet>)) return (info = OptionalPermissionBitSet) is not null;
         if (type == typeof(Discord.Models.ChannelType)) return (info = ChannelType) is not null;
         if (type == typeof(Discord.Models.ChannelFlags)) return (info = ChannelFlags) is not null;
-        if (type == typeof(Discord.Models.Optional<Nullable<Discord.Models.Snowflake>>)) return (info = OptionalNullableSnowflake) is not null;
-        if (type == typeof(Discord.Models.IdOrModel<Discord.Models.Snowflake,Discord.Models.IUserModel>)) return (info = IdOrModelOfUserModel) is not null;
+        if (type == typeof(Discord.Models.Optional<Nullable<Snowflake>>)) return (info = OptionalNullableSnowflake) is not null;
+        if (type == typeof(Discord.Models.IdOrModel<Snowflake,Discord.Models.IUserModel>)) return (info = IdOrModelOfUserModel) is not null;
         if (type == typeof(Discord.Models.Optional<Nullable<Discord.Models.EmojiId>>)) return (info = OptionalNullableEmojiId) is not null;
         if (type == typeof(System.Collections.Generic.IReadOnlyList<Discord.Models.ITagModel>)) return (info = ListOfTagModel) is not null;
         if (type == typeof(Nullable<Discord.Models.SortOrderType>)) return (info = NullableSortOrderType) is not null;
         if (type == typeof(Discord.Models.ForumLayout)) return (info = ForumLayout) is not null;
-        if (type == typeof(System.Collections.Generic.IReadOnlyList<Discord.Models.IdOrModel<Discord.Models.Snowflake,Discord.Models.IUserModel>>)) return (info = ListOfIdOrModelOfUserModel) is not null;
-        if (type == typeof(Discord.Models.Optional<System.Collections.Generic.IReadOnlyList<Discord.Models.Snowflake>>)) return (info = OptionalListOfSnowflake) is not null;
+        if (type == typeof(System.Collections.Generic.IReadOnlyList<Discord.Models.IdOrModel<Snowflake,Discord.Models.IUserModel>>)) return (info = ListOfIdOrModelOfUserModel) is not null;
+        if (type == typeof(Discord.Models.Optional<System.Collections.Generic.IReadOnlyList<Snowflake>>)) return (info = OptionalListOfSnowflake) is not null;
         if (type == typeof(Discord.Models.OverwriteType)) return (info = OverwriteType) is not null;
         if (type == typeof(Discord.Models.Optional<Discord.Models.PremiumType>)) return (info = OptionalPremiumType) is not null;
         if (type == typeof(Discord.Models.Optional<string>)) return (info = OptionalString) is not null;
         if (type == typeof(Discord.Models.Optional<bool>)) return (info = OptionalBoolean) is not null;
         if (type == typeof(Discord.Models.Optional<Discord.Models.UserFlags>)) return (info = OptionalUserFlags) is not null;
-        if (type == typeof(Nullable<Discord.Models.Snowflake>)) return (info = NullableSnowflake) is not null;
+        if (type == typeof(Nullable<Snowflake>)) return (info = NullableSnowflake) is not null;
         if (type == typeof(Nullable<Discord.Models.EmojiId>)) return (info = NullableEmojiId) is not null;
         if (type == typeof(Discord.Models.SortOrderType)) return (info = SortOrderType) is not null;
-        if (type == typeof(System.Collections.Generic.IReadOnlyList<Discord.Models.Snowflake>)) return (info = ListOfSnowflake) is not null;
+        if (type == typeof(System.Collections.Generic.IReadOnlyList<Snowflake>)) return (info = ListOfSnowflake) is not null;
         if (type == typeof(Discord.Models.PremiumType)) return (info = PremiumType) is not null;
         if (type == typeof(Discord.Models.UserFlags)) return (info = UserFlags) is not null;
         

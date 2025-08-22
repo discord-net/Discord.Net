@@ -3,9 +3,15 @@ namespace Discord.Rest.Api;
 partial class Routes
 {
    public sealed record GetGuildTemplate(
-        string Code
+        RouteParameters.Code Code
     ) : IOperation
     {
+        public static IReadOnlyList<Type> RouteParameterTypes
+            => [typeof(RouteParameters.Code)];
+            
+        public IReadOnlyList<RouteParameters> RouteParameters
+            => [Code];
+    
         public static string Path => @"/guilds/templates/{code}";
         public static string OperationId => "get_guild_template";
         public static RequestMethod Method => RequestMethod.Get;

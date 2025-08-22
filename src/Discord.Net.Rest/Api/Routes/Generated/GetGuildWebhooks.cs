@@ -3,9 +3,15 @@ namespace Discord.Rest.Api;
 partial class Routes
 {
    public sealed record GetGuildWebhooks(
-        Snowflake GuildId
+        RouteParameters.GuildId GuildId
     ) : IOperation
     {
+        public static IReadOnlyList<Type> RouteParameterTypes
+            => [typeof(RouteParameters.GuildId)];
+            
+        public IReadOnlyList<RouteParameters> RouteParameters
+            => [GuildId];
+    
         public static string Path => @"/guilds/{guild_id}/webhooks";
         public static string OperationId => "get_guild_webhooks";
         public static RequestMethod Method => RequestMethod.Get;

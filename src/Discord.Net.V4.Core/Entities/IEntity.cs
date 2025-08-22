@@ -1,4 +1,4 @@
-﻿global using SnowflakeEntity = Discord.Models.IEntity<Discord.Models.Snowflake>;
+﻿global using SnowflakeEntity = Discord.Models.IEntity<Discord.Snowflake>;
 using Discord.Models;
 using Discord.Models.Models;
 

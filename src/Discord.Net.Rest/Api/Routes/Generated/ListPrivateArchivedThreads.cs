@@ -3,11 +3,17 @@ namespace Discord.Rest.Api;
 partial class Routes
 {
    public sealed record ListPrivateArchivedThreads(
-        Snowflake ChannelId
+        RouteParameters.ChannelId ChannelId
     ) : IOperation
     {
         public Optional<string> Before { get; init; }
         public Optional<int> Limit { get; init; }
+    
+        public static IReadOnlyList<Type> RouteParameterTypes
+            => [typeof(RouteParameters.ChannelId)];
+            
+        public IReadOnlyList<RouteParameters> RouteParameters
+            => [ChannelId];
     
         public static string Path => @"/channels/{channel_id}/threads/archived/private";
         public static string OperationId => "list_private_archived_threads";

@@ -13,22 +13,22 @@ public partial class DiscordJsonContext
 }
 
 public record ThreadChannelModel(
-    Discord.Models.Snowflake ParentId,
+    Snowflake ParentId,
     int MemberCount,
     Discord.Models.Optional<int> MessageCount,
-    Discord.Models.Optional<System.Collections.Generic.IReadOnlyList<Discord.Models.Snowflake>> AppliedTags,
-    Discord.Models.Snowflake OwnerId,
+    Discord.Models.Optional<System.Collections.Generic.IReadOnlyList<Snowflake>> AppliedTags,
+    Snowflake OwnerId,
     bool IsNSFW,
     string? Topic,
     Discord.Models.Optional<int> RateLimitPerUser,
     string Name,
-    Discord.Models.Snowflake GuildId,
+    Snowflake GuildId,
     int Position,
     System.Collections.Generic.IReadOnlyList<Discord.Models.IOverwriteModel> PermissionOverwrites,
     Discord.Models.Optional<Discord.Models.PermissionBitSet> Permissions,
     Discord.Models.ChannelType Type,
     Discord.Models.ChannelFlags Flags,
-    Discord.Models.Snowflake Id
+    Snowflake Id
 ) : 
     IThreadChannelModel,
     IJsonModel,
@@ -39,22 +39,22 @@ public record ThreadChannelModel(
         new JsonObjectInfoValues<ThreadChannelModel>()
         {
             ObjectWithParameterizedConstructorCreator = static args => new ThreadChannelModel(
-                ParentId: (Discord.Models.Snowflake)args[0],
+                ParentId: (Snowflake)args[0],
                 MemberCount: (int)args[1],
                 MessageCount: (Discord.Models.Optional<int>)args[2],
-                AppliedTags: (Discord.Models.Optional<System.Collections.Generic.IReadOnlyList<Discord.Models.Snowflake>>)args[3],
-                OwnerId: (Discord.Models.Snowflake)args[4],
+                AppliedTags: (Discord.Models.Optional<System.Collections.Generic.IReadOnlyList<Snowflake>>)args[3],
+                OwnerId: (Snowflake)args[4],
                 IsNSFW: (bool)args[5],
                 Topic: (string?)args[6],
                 RateLimitPerUser: (Discord.Models.Optional<int>)args[7],
                 Name: (string)args[8],
-                GuildId: (Discord.Models.Snowflake)args[9],
+                GuildId: (Snowflake)args[9],
                 Position: (int)args[10],
                 PermissionOverwrites: (System.Collections.Generic.IReadOnlyList<Discord.Models.IOverwriteModel>)args[11],
                 Permissions: (Discord.Models.Optional<Discord.Models.PermissionBitSet>)args[12],
                 Type: (Discord.Models.ChannelType)args[13],
                 Flags: (Discord.Models.ChannelFlags)args[14],
-                Id: (Discord.Models.Snowflake)args[15]
+                Id: (Snowflake)args[15]
             ),
             PropertyMetadataInitializer = _ => CreatePropertyInfos(options),
             ConstructorParameterMetadataInitializer = CreateConstructorParameterInfos
@@ -62,9 +62,9 @@ public record ThreadChannelModel(
     );
 
     public static JsonPropertyInfo[] CreatePropertyInfos(JsonSerializerOptions options) => [
-        JsonMetadataServices.CreatePropertyInfo<Discord.Models.Snowflake>(
+        JsonMetadataServices.CreatePropertyInfo<Snowflake>(
             options,
-            new JsonPropertyInfoValues<Discord.Models.Snowflake>
+            new JsonPropertyInfoValues<Snowflake>
             {
                 IsProperty = true,
                 IsPublic = true,
@@ -104,9 +104,9 @@ public record ThreadChannelModel(
                 IgnoreCondition = JsonIgnoreCondition.WhenWritingDefault
             }
         ),
-        JsonMetadataServices.CreatePropertyInfo<Discord.Models.Optional<System.Collections.Generic.IReadOnlyList<Discord.Models.Snowflake>>>(
+        JsonMetadataServices.CreatePropertyInfo<Discord.Models.Optional<System.Collections.Generic.IReadOnlyList<Snowflake>>>(
             options,
-            new JsonPropertyInfoValues<Discord.Models.Optional<System.Collections.Generic.IReadOnlyList<Discord.Models.Snowflake>>>
+            new JsonPropertyInfoValues<Discord.Models.Optional<System.Collections.Generic.IReadOnlyList<Snowflake>>>
             {
                 IsProperty = true,
                 IsPublic = true,
@@ -118,9 +118,9 @@ public record ThreadChannelModel(
                 IgnoreCondition = JsonIgnoreCondition.WhenWritingDefault
             }
         ),
-        JsonMetadataServices.CreatePropertyInfo<Discord.Models.Snowflake>(
+        JsonMetadataServices.CreatePropertyInfo<Snowflake>(
             options,
-            new JsonPropertyInfoValues<Discord.Models.Snowflake>
+            new JsonPropertyInfoValues<Snowflake>
             {
                 IsProperty = true,
                 IsPublic = true,
@@ -188,9 +188,9 @@ public record ThreadChannelModel(
                 IgnoreCondition = JsonIgnoreCondition.Never
             }
         ),
-        JsonMetadataServices.CreatePropertyInfo<Discord.Models.Snowflake>(
+        JsonMetadataServices.CreatePropertyInfo<Snowflake>(
             options,
-            new JsonPropertyInfoValues<Discord.Models.Snowflake>
+            new JsonPropertyInfoValues<Snowflake>
             {
                 IsProperty = true,
                 IsPublic = true,
@@ -272,9 +272,9 @@ public record ThreadChannelModel(
                 IgnoreCondition = JsonIgnoreCondition.Never
             }
         ),
-        JsonMetadataServices.CreatePropertyInfo<Discord.Models.Snowflake>(
+        JsonMetadataServices.CreatePropertyInfo<Snowflake>(
             options,
-            new JsonPropertyInfoValues<Discord.Models.Snowflake>
+            new JsonPropertyInfoValues<Snowflake>
             {
                 IsProperty = true,
                 IsPublic = true,
@@ -292,7 +292,7 @@ public record ThreadChannelModel(
         new()
         {
            Name = "ParentId",
-           ParameterType = typeof(Discord.Models.Snowflake),
+           ParameterType = typeof(Snowflake),
            Position = 0,
            HasDefaultValue = false,
            DefaultValue = null,
@@ -319,7 +319,7 @@ public record ThreadChannelModel(
         new()
         {
            Name = "AppliedTags",
-           ParameterType = typeof(Discord.Models.Optional<System.Collections.Generic.IReadOnlyList<Discord.Models.Snowflake>>),
+           ParameterType = typeof(Discord.Models.Optional<System.Collections.Generic.IReadOnlyList<Snowflake>>),
            Position = 3,
            HasDefaultValue = false,
            DefaultValue = null,
@@ -328,7 +328,7 @@ public record ThreadChannelModel(
         new()
         {
            Name = "OwnerId",
-           ParameterType = typeof(Discord.Models.Snowflake),
+           ParameterType = typeof(Snowflake),
            Position = 4,
            HasDefaultValue = false,
            DefaultValue = null,
@@ -373,7 +373,7 @@ public record ThreadChannelModel(
         new()
         {
            Name = "GuildId",
-           ParameterType = typeof(Discord.Models.Snowflake),
+           ParameterType = typeof(Snowflake),
            Position = 9,
            HasDefaultValue = false,
            DefaultValue = null,
@@ -427,7 +427,7 @@ public record ThreadChannelModel(
         new()
         {
            Name = "Id",
-           ParameterType = typeof(Discord.Models.Snowflake),
+           ParameterType = typeof(Snowflake),
            Position = 15,
            HasDefaultValue = false,
            DefaultValue = null,

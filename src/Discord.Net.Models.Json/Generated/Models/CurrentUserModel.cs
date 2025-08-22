@@ -27,7 +27,7 @@ public record CurrentUserModel(
     Discord.Models.Optional<bool> System,
     Discord.Models.Optional<Discord.Models.UserFlags> Flags,
     Discord.Models.Optional<Discord.Models.UserFlags> PublicFlags,
-    Discord.Models.Snowflake Id
+    Snowflake Id
 ) : 
     ICurrentUserModel,
     IJsonModel,
@@ -52,7 +52,7 @@ public record CurrentUserModel(
                 System: (Discord.Models.Optional<bool>)args[11],
                 Flags: (Discord.Models.Optional<Discord.Models.UserFlags>)args[12],
                 PublicFlags: (Discord.Models.Optional<Discord.Models.UserFlags>)args[13],
-                Id: (Discord.Models.Snowflake)args[14]
+                Id: (Snowflake)args[14]
             ),
             PropertyMetadataInitializer = _ => CreatePropertyInfos(options),
             ConstructorParameterMetadataInitializer = CreateConstructorParameterInfos
@@ -256,9 +256,9 @@ public record CurrentUserModel(
                 IgnoreCondition = JsonIgnoreCondition.WhenWritingDefault
             }
         ),
-        JsonMetadataServices.CreatePropertyInfo<Discord.Models.Snowflake>(
+        JsonMetadataServices.CreatePropertyInfo<Snowflake>(
             options,
-            new JsonPropertyInfoValues<Discord.Models.Snowflake>
+            new JsonPropertyInfoValues<Snowflake>
             {
                 IsProperty = true,
                 IsPublic = true,
@@ -402,7 +402,7 @@ public record CurrentUserModel(
         new()
         {
            Name = "Id",
-           ParameterType = typeof(Discord.Models.Snowflake),
+           ParameterType = typeof(Snowflake),
            Position = 14,
            HasDefaultValue = false,
            DefaultValue = null,

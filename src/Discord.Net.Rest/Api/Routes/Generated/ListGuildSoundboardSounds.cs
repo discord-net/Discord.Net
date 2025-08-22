@@ -3,9 +3,15 @@ namespace Discord.Rest.Api;
 partial class Routes
 {
    public sealed record ListGuildSoundboardSounds(
-        Snowflake GuildId
+        RouteParameters.GuildId GuildId
     ) : IOperation
     {
+        public static IReadOnlyList<Type> RouteParameterTypes
+            => [typeof(RouteParameters.GuildId)];
+            
+        public IReadOnlyList<RouteParameters> RouteParameters
+            => [GuildId];
+    
         public static string Path => @"/guilds/{guild_id}/soundboard-sounds";
         public static string OperationId => "list_guild_soundboard_sounds";
         public static RequestMethod Method => RequestMethod.Get;

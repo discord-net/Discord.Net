@@ -22,7 +22,7 @@ public record UserModel(
     Discord.Models.Optional<bool> System,
     Discord.Models.Optional<Discord.Models.UserFlags> Flags,
     Discord.Models.Optional<Discord.Models.UserFlags> PublicFlags,
-    Discord.Models.Snowflake Id
+    Snowflake Id
 ) : 
     IUserModel,
     IJsonModel,
@@ -42,7 +42,7 @@ public record UserModel(
                 System: (Discord.Models.Optional<bool>)args[6],
                 Flags: (Discord.Models.Optional<Discord.Models.UserFlags>)args[7],
                 PublicFlags: (Discord.Models.Optional<Discord.Models.UserFlags>)args[8],
-                Id: (Discord.Models.Snowflake)args[9]
+                Id: (Snowflake)args[9]
             ),
             PropertyMetadataInitializer = _ => CreatePropertyInfos(options),
             ConstructorParameterMetadataInitializer = CreateConstructorParameterInfos
@@ -176,9 +176,9 @@ public record UserModel(
                 IgnoreCondition = JsonIgnoreCondition.WhenWritingDefault
             }
         ),
-        JsonMetadataServices.CreatePropertyInfo<Discord.Models.Snowflake>(
+        JsonMetadataServices.CreatePropertyInfo<Snowflake>(
             options,
-            new JsonPropertyInfoValues<Discord.Models.Snowflake>
+            new JsonPropertyInfoValues<Snowflake>
             {
                 IsProperty = true,
                 IsPublic = true,
@@ -277,7 +277,7 @@ public record UserModel(
         new()
         {
            Name = "Id",
-           ParameterType = typeof(Discord.Models.Snowflake),
+           ParameterType = typeof(Snowflake),
            Position = 9,
            HasDefaultValue = false,
            DefaultValue = null,

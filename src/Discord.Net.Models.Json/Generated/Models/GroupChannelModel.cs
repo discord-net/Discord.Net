@@ -13,11 +13,11 @@ public partial class DiscordJsonContext
 }
 
 public record GroupChannelModel(
-    Discord.Models.Snowflake OwnerId,
-    System.Collections.Generic.IReadOnlyList<Discord.Models.IdOrModel<Discord.Models.Snowflake,Discord.Models.IUserModel>> Recipients,
+    Snowflake OwnerId,
+    System.Collections.Generic.IReadOnlyList<Discord.Models.IdOrModel<Snowflake,Discord.Models.IUserModel>> Recipients,
     Discord.Models.ChannelType Type,
     Discord.Models.ChannelFlags Flags,
-    Discord.Models.Snowflake Id
+    Snowflake Id
 ) : 
     IGroupChannelModel,
     IJsonModel,
@@ -28,11 +28,11 @@ public record GroupChannelModel(
         new JsonObjectInfoValues<GroupChannelModel>()
         {
             ObjectWithParameterizedConstructorCreator = static args => new GroupChannelModel(
-                OwnerId: (Discord.Models.Snowflake)args[0],
-                Recipients: (System.Collections.Generic.IReadOnlyList<Discord.Models.IdOrModel<Discord.Models.Snowflake,Discord.Models.IUserModel>>)args[1],
+                OwnerId: (Snowflake)args[0],
+                Recipients: (System.Collections.Generic.IReadOnlyList<Discord.Models.IdOrModel<Snowflake,Discord.Models.IUserModel>>)args[1],
                 Type: (Discord.Models.ChannelType)args[2],
                 Flags: (Discord.Models.ChannelFlags)args[3],
-                Id: (Discord.Models.Snowflake)args[4]
+                Id: (Snowflake)args[4]
             ),
             PropertyMetadataInitializer = _ => CreatePropertyInfos(options),
             ConstructorParameterMetadataInitializer = CreateConstructorParameterInfos
@@ -40,9 +40,9 @@ public record GroupChannelModel(
     );
 
     public static JsonPropertyInfo[] CreatePropertyInfos(JsonSerializerOptions options) => [
-        JsonMetadataServices.CreatePropertyInfo<Discord.Models.Snowflake>(
+        JsonMetadataServices.CreatePropertyInfo<Snowflake>(
             options,
-            new JsonPropertyInfoValues<Discord.Models.Snowflake>
+            new JsonPropertyInfoValues<Snowflake>
             {
                 IsProperty = true,
                 IsPublic = true,
@@ -54,9 +54,9 @@ public record GroupChannelModel(
                 IgnoreCondition = JsonIgnoreCondition.Never
             }
         ),
-        JsonMetadataServices.CreatePropertyInfo<System.Collections.Generic.IReadOnlyList<Discord.Models.IdOrModel<Discord.Models.Snowflake,Discord.Models.IUserModel>>>(
+        JsonMetadataServices.CreatePropertyInfo<System.Collections.Generic.IReadOnlyList<Discord.Models.IdOrModel<Snowflake,Discord.Models.IUserModel>>>(
             options,
-            new JsonPropertyInfoValues<System.Collections.Generic.IReadOnlyList<Discord.Models.IdOrModel<Discord.Models.Snowflake,Discord.Models.IUserModel>>>
+            new JsonPropertyInfoValues<System.Collections.Generic.IReadOnlyList<Discord.Models.IdOrModel<Snowflake,Discord.Models.IUserModel>>>
             {
                 IsProperty = true,
                 IsPublic = true,
@@ -96,9 +96,9 @@ public record GroupChannelModel(
                 IgnoreCondition = JsonIgnoreCondition.Never
             }
         ),
-        JsonMetadataServices.CreatePropertyInfo<Discord.Models.Snowflake>(
+        JsonMetadataServices.CreatePropertyInfo<Snowflake>(
             options,
-            new JsonPropertyInfoValues<Discord.Models.Snowflake>
+            new JsonPropertyInfoValues<Snowflake>
             {
                 IsProperty = true,
                 IsPublic = true,
@@ -116,7 +116,7 @@ public record GroupChannelModel(
         new()
         {
            Name = "OwnerId",
-           ParameterType = typeof(Discord.Models.Snowflake),
+           ParameterType = typeof(Snowflake),
            Position = 0,
            HasDefaultValue = false,
            DefaultValue = null,
@@ -125,7 +125,7 @@ public record GroupChannelModel(
         new()
         {
            Name = "Recipients",
-           ParameterType = typeof(System.Collections.Generic.IReadOnlyList<Discord.Models.IdOrModel<Discord.Models.Snowflake,Discord.Models.IUserModel>>),
+           ParameterType = typeof(System.Collections.Generic.IReadOnlyList<Discord.Models.IdOrModel<Snowflake,Discord.Models.IUserModel>>),
            Position = 1,
            HasDefaultValue = false,
            DefaultValue = null,
@@ -152,7 +152,7 @@ public record GroupChannelModel(
         new()
         {
            Name = "Id",
-           ParameterType = typeof(Discord.Models.Snowflake),
+           ParameterType = typeof(Snowflake),
            Position = 4,
            HasDefaultValue = false,
            DefaultValue = null,

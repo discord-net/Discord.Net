@@ -3,12 +3,18 @@ namespace Discord.Rest.Api;
 partial class Routes
 {
    public sealed record ListThreadMembers(
-        Snowflake ChannelId
+        RouteParameters.ChannelId ChannelId
     ) : IOperation
     {
         public Optional<bool> WithMember { get; init; }
         public Optional<int> Limit { get; init; }
         public Optional<Snowflake> After { get; init; }
+    
+        public static IReadOnlyList<Type> RouteParameterTypes
+            => [typeof(RouteParameters.ChannelId)];
+            
+        public IReadOnlyList<RouteParameters> RouteParameters
+            => [ChannelId];
     
         public static string Path => @"/channels/{channel_id}/thread-members";
         public static string OperationId => "list_thread_members";

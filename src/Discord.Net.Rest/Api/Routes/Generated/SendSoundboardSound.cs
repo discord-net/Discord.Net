@@ -3,9 +3,15 @@ namespace Discord.Rest.Api;
 partial class Routes
 {
    public sealed record SendSoundboardSound(
-        Snowflake ChannelId
+        RouteParameters.ChannelId ChannelId
     ) : IOperation
     {
+        public static IReadOnlyList<Type> RouteParameterTypes
+            => [typeof(RouteParameters.ChannelId)];
+            
+        public IReadOnlyList<RouteParameters> RouteParameters
+            => [ChannelId];
+    
         public static string Path => @"/channels/{channel_id}/send-soundboard-sound";
         public static string OperationId => "send_soundboard_sound";
         public static RequestMethod Method => RequestMethod.Post;

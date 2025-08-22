@@ -3,10 +3,16 @@ namespace Discord.Rest.Api;
 partial class Routes
 {
    public sealed record CrosspostMessage(
-        Snowflake ChannelId,
-        Snowflake MessageId
+        RouteParameters.ChannelId ChannelId,
+        RouteParameters.MessageId MessageId
     ) : IOperation
     {
+        public static IReadOnlyList<Type> RouteParameterTypes
+            => [typeof(RouteParameters.ChannelId), typeof(RouteParameters.MessageId)];
+            
+        public IReadOnlyList<RouteParameters> RouteParameters
+            => [ChannelId, MessageId];
+    
         public static string Path => @"/channels/{channel_id}/messages/{message_id}/crosspost";
         public static string OperationId => "crosspost_message";
         public static RequestMethod Method => RequestMethod.Post;

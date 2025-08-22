@@ -3,7 +3,7 @@ namespace Discord.Rest.Api;
 partial class Routes
 {
    public sealed record ListGuildAuditLogEntries(
-        Snowflake GuildId
+        RouteParameters.GuildId GuildId
     ) : IOperation
     {
         public Optional<Snowflake> UserId { get; init; }
@@ -12,6 +12,12 @@ partial class Routes
         public Optional<Snowflake> Before { get; init; }
         public Optional<Snowflake> After { get; init; }
         public Optional<int> Limit { get; init; }
+    
+        public static IReadOnlyList<Type> RouteParameterTypes
+            => [typeof(RouteParameters.GuildId)];
+            
+        public IReadOnlyList<RouteParameters> RouteParameters
+            => [GuildId];
     
         public static string Path => @"/guilds/{guild_id}/audit-logs";
         public static string OperationId => "list_guild_audit_log_entries";

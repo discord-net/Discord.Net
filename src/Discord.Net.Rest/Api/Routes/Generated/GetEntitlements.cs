@@ -3,7 +3,7 @@ namespace Discord.Rest.Api;
 partial class Routes
 {
    public sealed record GetEntitlements(
-        Snowflake ApplicationId
+        RouteParameters.ApplicationId ApplicationId
     ) : IOperation
     {
         public Optional<Snowflake> UserId { get; init; }
@@ -14,6 +14,12 @@ partial class Routes
         public Optional<int> Limit { get; init; }
         public Optional<bool> ExcludeEnded { get; init; }
         public Optional<bool> OnlyActive { get; init; }
+    
+        public static IReadOnlyList<Type> RouteParameterTypes
+            => [typeof(RouteParameters.ApplicationId)];
+            
+        public IReadOnlyList<RouteParameters> RouteParameters
+            => [ApplicationId];
     
         public static string Path => @"/applications/{application_id}/entitlements";
         public static string OperationId => "get_entitlements";
