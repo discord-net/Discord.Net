@@ -10,7 +10,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Extensions", "Extensions", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{BB59D5B5-E7B0-4BF4-8F82-D14431B2799B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.Net.V4.Core", "src\Discord.Net.V4.Core\Discord.Net.V4.Core.csproj", "{3277421C-AD38-43A7-89EB-D4E1F866004E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.Net.Core", "src\Discord.Net.Core\Discord.Net.V4.Core.csproj", "{3277421C-AD38-43A7-89EB-D4E1F866004E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SourceGenerators", "SourceGenerators", "{C1C763AF-3DC5-4F7D-8551-0A65B6011305}"
 EndProject
@@ -29,7 +29,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SourceGenRunner", "tools\So
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Models", "Models", "{910985D6-4315-41A8-897F-B63C481A6A68}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Discord.Net.Models", "Discord.Net.Models\Discord.Net.Models.csproj", "{FD040884-29EE-4F6C-947F-0F4C203B64E3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Discord.Net.Models", "src\Discord.Net.Models\Discord.Net.Models.csproj", "{FD040884-29EE-4F6C-947F-0F4C203B64E3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Discord.Net.Rest", "src\Discord.Net.Rest\Discord.Net.Rest.csproj", "{9F7950D0-2444-497B-937E-A296989CCFCB}"
 EndProject
