@@ -1,10 +1,12 @@
+using Discord.Models;
+
 namespace Discord.Rest.Api;
 
 partial class Routes
 {
-   public sealed record TriggerTypingIndicator(
+   public sealed partial record TriggerTypingIndicator(
         RouteParameters.ChannelId ChannelId
-    ) : IOperation
+    ) : IOperation, Expand<TriggerTypingIndicator, TriggerTypingIndicator>
     {
         public static IReadOnlyList<Type> RouteParameterTypes
             => [typeof(RouteParameters.ChannelId)];

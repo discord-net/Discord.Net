@@ -12,7 +12,7 @@ public sealed class RateLimiter
         var id = BucketId.FromRoute(route);
 
         if (!_buckets.TryGetValue(id, out var bucket))
-            bucket = _buckets[id] = new();
+            bucket = _buckets[id] = new(id, this);
 
         return bucket;
     }

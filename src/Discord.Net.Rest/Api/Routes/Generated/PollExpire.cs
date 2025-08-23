@@ -1,11 +1,13 @@
+using Discord.Models;
+
 namespace Discord.Rest.Api;
 
 partial class Routes
 {
-   public sealed record PollExpire(
+   public sealed partial record PollExpire(
         RouteParameters.ChannelId ChannelId,
         RouteParameters.MessageId MessageId
-    ) : IOperation
+    ) : IOperation, Expand<PollExpire, PollExpire>
     {
         public static IReadOnlyList<Type> RouteParameterTypes
             => [typeof(RouteParameters.ChannelId), typeof(RouteParameters.MessageId)];

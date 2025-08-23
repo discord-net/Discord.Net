@@ -1,10 +1,12 @@
+using Discord.Models;
+
 namespace Discord.Rest.Api;
 
 partial class Routes
 {
-   public sealed record ListChannelInvites(
+   public sealed partial record ListChannelInvites(
         RouteParameters.ChannelId ChannelId
-    ) : IOperation
+    ) : IOperation, Expand<ListChannelInvites, ListChannelInvites>
     {
         public static IReadOnlyList<Type> RouteParameterTypes
             => [typeof(RouteParameters.ChannelId)];

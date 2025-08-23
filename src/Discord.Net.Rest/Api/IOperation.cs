@@ -13,7 +13,6 @@ public static class OperationExtensions
 {
     extension<T>(T operation) where T : IOperation
     {
-        public void Foo(){}
         public RequestMethod Method => T.Method;
     }
 }

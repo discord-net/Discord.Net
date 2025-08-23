@@ -1,6 +1,6 @@
 ﻿namespace Discord;
 
-public interface IIntegration : IEntity<>
+public interface IIntegration : IEntity<Snowflake>
 {
     
 }

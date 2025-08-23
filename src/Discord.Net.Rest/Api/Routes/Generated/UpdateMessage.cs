@@ -1,11 +1,13 @@
+using Discord.Models;
+
 namespace Discord.Rest.Api;
 
 partial class Routes
 {
-   public sealed record UpdateMessage(
+   public sealed partial record UpdateMessage(
         RouteParameters.ChannelId ChannelId,
         RouteParameters.MessageId MessageId
-    ) : IOperation
+    ) : IOperation, Expand<UpdateMessage, UpdateMessage>
     {
         public static IReadOnlyList<Type> RouteParameterTypes
             => [typeof(RouteParameters.ChannelId), typeof(RouteParameters.MessageId)];

@@ -1,11 +1,13 @@
+using Discord.Models;
+
 namespace Discord.Rest.Api;
 
 partial class Routes
 {
-   public sealed record DeleteApplicationCommand(
+   public sealed partial record DeleteApplicationCommand(
         RouteParameters.ApplicationId ApplicationId,
         RouteParameters.CommandId CommandId
-    ) : IOperation
+    ) : IOperation, Expand<DeleteApplicationCommand, DeleteApplicationCommand>
     {
         public static IReadOnlyList<Type> RouteParameterTypes
             => [typeof(RouteParameters.ApplicationId), typeof(RouteParameters.CommandId)];

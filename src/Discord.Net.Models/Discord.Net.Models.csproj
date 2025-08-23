@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Params\Users\" />
+    <Folder Include="Util\" />
   </ItemGroup>
 
 </Project>

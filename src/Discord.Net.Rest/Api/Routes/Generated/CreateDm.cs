@@ -1,9 +1,18 @@
+using Discord.Models;
+
 namespace Discord.Rest.Api;
 
 partial class Routes
 {
-   public sealed record CreateDm() : IOperation
+   public sealed partial record CreateDm() : IOperation, Expand<CreateDm, CreateDm>
     {
+        public static IReadOnlyList<Type> RouteParameterTypes
+            => [];
+            
+        public IReadOnlyList<RouteParameters> RouteParameters
+            => [];
+    
+        public static readonly CreateDm Instance = new();
         public static string Path => @"/users/@me/channels";
         public static string OperationId => "create_dm";
         public static RequestMethod Method => RequestMethod.Post;

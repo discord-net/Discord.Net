@@ -1,10 +1,12 @@
+using Discord.Models;
+
 namespace Discord.Rest.Api;
 
 partial class Routes
 {
-   public sealed record GetGuildWelcomeScreen(
+   public sealed partial record GetGuildWelcomeScreen(
         RouteParameters.GuildId GuildId
-    ) : IOperation
+    ) : IOperation, Expand<GetGuildWelcomeScreen, GetGuildWelcomeScreen>
     {
         public static IReadOnlyList<Type> RouteParameterTypes
             => [typeof(RouteParameters.GuildId)];

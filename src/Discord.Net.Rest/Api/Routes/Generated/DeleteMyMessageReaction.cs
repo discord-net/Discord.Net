@@ -1,12 +1,14 @@
+using Discord.Models;
+
 namespace Discord.Rest.Api;
 
 partial class Routes
 {
-   public sealed record DeleteMyMessageReaction(
+   public sealed partial record DeleteMyMessageReaction(
         RouteParameters.ChannelId ChannelId,
         RouteParameters.MessageId MessageId,
         RouteParameters.EmojiName EmojiName
-    ) : IOperation
+    ) : IOperation, Expand<DeleteMyMessageReaction, DeleteMyMessageReaction>
     {
         public static IReadOnlyList<Type> RouteParameterTypes
             => [typeof(RouteParameters.ChannelId), typeof(RouteParameters.MessageId), typeof(RouteParameters.EmojiName)];

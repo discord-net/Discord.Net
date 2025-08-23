@@ -1,0 +1,5 @@
+base: IModifyCurrentUserParams
+props:
+  Username: "username"
+  Avatar: "avatar"
+  Banner: "banner"

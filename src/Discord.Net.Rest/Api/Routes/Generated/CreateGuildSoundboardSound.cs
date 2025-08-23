@@ -1,10 +1,12 @@
+using Discord.Models;
+
 namespace Discord.Rest.Api;
 
 partial class Routes
 {
-   public sealed record CreateGuildSoundboardSound(
+   public sealed partial record CreateGuildSoundboardSound(
         RouteParameters.GuildId GuildId
-    ) : IOperation
+    ) : IOperation, Expand<CreateGuildSoundboardSound, CreateGuildSoundboardSound>
     {
         public static IReadOnlyList<Type> RouteParameterTypes
             => [typeof(RouteParameters.GuildId)];

@@ -1,7 +1,7 @@
 ﻿namespace Discord;
 
 public interface IRole :
-    IEntity<>
+    IEntity<Snowflake>
 {
     
 }

@@ -1,9 +1,18 @@
+using Discord.Models;
+
 namespace Discord.Rest.Api;
 
 partial class Routes
 {
-   public sealed record GetMyUser() : IOperation
+   public sealed partial record GetMyUser() : IOperation, Expand<GetMyUser, GetMyUser>
     {
+        public static IReadOnlyList<Type> RouteParameterTypes
+            => [];
+            
+        public IReadOnlyList<RouteParameters> RouteParameters
+            => [];
+    
+        public static readonly GetMyUser Instance = new();
         public static string Path => @"/users/@me";
         public static string OperationId => "get_my_user";
         public static RequestMethod Method => RequestMethod.Get;

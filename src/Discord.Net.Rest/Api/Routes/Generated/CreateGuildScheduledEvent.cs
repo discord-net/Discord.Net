@@ -1,10 +1,12 @@
+using Discord.Models;
+
 namespace Discord.Rest.Api;
 
 partial class Routes
 {
-   public sealed record CreateGuildScheduledEvent(
+   public sealed partial record CreateGuildScheduledEvent(
         RouteParameters.GuildId GuildId
-    ) : IOperation
+    ) : IOperation, Expand<CreateGuildScheduledEvent, CreateGuildScheduledEvent>
     {
         public static IReadOnlyList<Type> RouteParameterTypes
             => [typeof(RouteParameters.GuildId)];

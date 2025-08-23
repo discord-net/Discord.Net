@@ -1,11 +1,13 @@
+using Discord.Models;
+
 namespace Discord.Rest.Api;
 
 partial class Routes
 {
-   public sealed record UpdateApplicationEmoji(
+   public sealed partial record UpdateApplicationEmoji(
         RouteParameters.ApplicationId ApplicationId,
         RouteParameters.EmojiId EmojiId
-    ) : IOperation
+    ) : IOperation, Expand<UpdateApplicationEmoji, UpdateApplicationEmoji>
     {
         public static IReadOnlyList<Type> RouteParameterTypes
             => [typeof(RouteParameters.ApplicationId), typeof(RouteParameters.EmojiId)];

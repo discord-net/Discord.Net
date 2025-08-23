@@ -1,10 +1,12 @@
+using Discord.Models;
+
 namespace Discord.Rest.Api;
 
 partial class Routes
 {
-   public sealed record BulkBanUsersFromGuild(
+   public sealed partial record BulkBanUsersFromGuild(
         RouteParameters.GuildId GuildId
-    ) : IOperation
+    ) : IOperation, Expand<BulkBanUsersFromGuild, BulkBanUsersFromGuild>
     {
         public static IReadOnlyList<Type> RouteParameterTypes
             => [typeof(RouteParameters.GuildId)];

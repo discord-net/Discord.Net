@@ -1,10 +1,12 @@
+using Discord.Models;
+
 namespace Discord.Rest.Api;
 
 partial class Routes
 {
-   public sealed record CreateGuildRole(
+   public sealed partial record CreateGuildRole(
         RouteParameters.GuildId GuildId
-    ) : IOperation
+    ) : IOperation, Expand<CreateGuildRole, CreateGuildRole>
     {
         public static IReadOnlyList<Type> RouteParameterTypes
             => [typeof(RouteParameters.GuildId)];

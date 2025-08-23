@@ -1,11 +1,13 @@
+using Discord.Models;
+
 namespace Discord.Rest.Api;
 
 partial class Routes
 {
-   public sealed record SetChannelPermissionOverwrite(
+   public sealed partial record SetChannelPermissionOverwrite(
         RouteParameters.ChannelId ChannelId,
         RouteParameters.OverwriteId OverwriteId
-    ) : IOperation
+    ) : IOperation, Expand<SetChannelPermissionOverwrite, SetChannelPermissionOverwrite>
     {
         public static IReadOnlyList<Type> RouteParameterTypes
             => [typeof(RouteParameters.ChannelId), typeof(RouteParameters.OverwriteId)];

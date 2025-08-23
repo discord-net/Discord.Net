@@ -1,11 +1,13 @@
+using Discord.Models;
+
 namespace Discord.Rest.Api;
 
 partial class Routes
 {
-   public sealed record AddGroupDmUser(
+   public sealed partial record AddGroupDmUser(
         RouteParameters.ChannelId ChannelId,
         RouteParameters.UserId UserId
-    ) : IOperation
+    ) : IOperation, Expand<AddGroupDmUser, AddGroupDmUser>
     {
         public static IReadOnlyList<Type> RouteParameterTypes
             => [typeof(RouteParameters.ChannelId), typeof(RouteParameters.UserId)];

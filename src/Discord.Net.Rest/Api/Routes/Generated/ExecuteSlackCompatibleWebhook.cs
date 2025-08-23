@@ -1,11 +1,13 @@
+using Discord.Models;
+
 namespace Discord.Rest.Api;
 
 partial class Routes
 {
-   public sealed record ExecuteSlackCompatibleWebhook(
+   public sealed partial record ExecuteSlackCompatibleWebhook(
         RouteParameters.WebhookId WebhookId,
         RouteParameters.WebhookToken WebhookToken
-    ) : IOperation
+    ) : IOperation, Expand<ExecuteSlackCompatibleWebhook, ExecuteSlackCompatibleWebhook>
     {
         public Optional<bool> Wait { get; init; }
         public Optional<Snowflake> ThreadId { get; init; }

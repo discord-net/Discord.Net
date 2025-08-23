@@ -12,9 +12,20 @@ public sealed partial class DiscordJsonContext(JsonSerializerOptions? options) :
     public JsonTypeInfo<Snowflake> Snowflake
         => field ??= JsonMetadataServices.CreateValueInfo<Snowflake>(Options, SnowflakeConverter.Instance);
     
+    [field: MaybeNull]
+    public JsonTypeInfo<ImageData> ImageData
+        => field ??= JsonMetadataServices.CreateValueInfo<ImageData>(Options, ImageDataConverter.Instance);
+
+    [field: MaybeNull]
+    public JsonTypeInfo<IUserModel> BaseUser
+        => field ??= JsonMetadataServices.CreateValueInfo<IUserModel>(Options, new UserConverter(UserModel, CurrentUserModel));
+    
     public override JsonTypeInfo? GetTypeInfo(Type type)
     {
         if (type == typeof(Snowflake)) return Snowflake;
+        if (type == typeof(ImageData)) return ImageData;
+
+        if (type == typeof(IUserModel)) return BaseUser;
         
         if (TryGetJsonModel(type, out var jsonModelType)) 
             type = jsonModelType;

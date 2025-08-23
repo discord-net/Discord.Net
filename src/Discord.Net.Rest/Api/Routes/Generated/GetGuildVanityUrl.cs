@@ -1,10 +1,12 @@
+using Discord.Models;
+
 namespace Discord.Rest.Api;
 
 partial class Routes
 {
-   public sealed record GetGuildVanityUrl(
+   public sealed partial record GetGuildVanityUrl(
         RouteParameters.GuildId GuildId
-    ) : IOperation
+    ) : IOperation, Expand<GetGuildVanityUrl, GetGuildVanityUrl>
     {
         public static IReadOnlyList<Type> RouteParameterTypes
             => [typeof(RouteParameters.GuildId)];

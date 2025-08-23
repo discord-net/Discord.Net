@@ -1,12 +1,14 @@
+using Discord.Models;
+
 namespace Discord.Rest.Api;
 
 partial class Routes
 {
-   public sealed record ListMessageReactionsByEmoji(
+   public sealed partial record ListMessageReactionsByEmoji(
         RouteParameters.ChannelId ChannelId,
         RouteParameters.MessageId MessageId,
         RouteParameters.EmojiName EmojiName
-    ) : IOperation
+    ) : IOperation, Expand<ListMessageReactionsByEmoji, ListMessageReactionsByEmoji>
     {
         public Optional<Snowflake> After { get; init; }
         public Optional<int> Limit { get; init; }

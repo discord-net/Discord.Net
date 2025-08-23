@@ -22,6 +22,7 @@ partial class DiscordJsonContext
         if (type == typeof(Discord.Models.Json.TagModel)) return this.TagModel;
         if (type == typeof(Discord.Models.Json.CurrentUserModel)) return this.CurrentUserModel;
         if (type == typeof(Discord.Models.Json.UserModel)) return this.UserModel;
+        if (type == typeof(Discord.Models.Json.ModifyCurrentUserParams)) return this.ModifyCurrentUserParams;
         
         return null;
     }

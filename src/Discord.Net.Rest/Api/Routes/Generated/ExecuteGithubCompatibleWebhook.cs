@@ -1,11 +1,13 @@
+using Discord.Models;
+
 namespace Discord.Rest.Api;
 
 partial class Routes
 {
-   public sealed record ExecuteGithubCompatibleWebhook(
+   public sealed partial record ExecuteGithubCompatibleWebhook(
         RouteParameters.WebhookId WebhookId,
         RouteParameters.WebhookToken WebhookToken
-    ) : IOperation
+    ) : IOperation, Expand<ExecuteGithubCompatibleWebhook, ExecuteGithubCompatibleWebhook>
     {
         public Optional<bool> Wait { get; init; }
         public Optional<Snowflake> ThreadId { get; init; }

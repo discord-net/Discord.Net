@@ -1,13 +1,21 @@
+using Discord.Models;
+
 namespace Discord.Rest.Api;
 
 partial class Routes
 {
-   public sealed record ListMyGuilds() : IOperation
+   public sealed partial record ListMyGuilds() : IOperation, Expand<ListMyGuilds, ListMyGuilds>
     {
         public Optional<Snowflake> Before { get; init; }
         public Optional<Snowflake> After { get; init; }
         public Optional<int> Limit { get; init; }
         public Optional<bool> WithCounts { get; init; }
+    
+        public static IReadOnlyList<Type> RouteParameterTypes
+            => [];
+            
+        public IReadOnlyList<RouteParameters> RouteParameters
+            => [];
     
         public static string Path => @"/users/@me/guilds";
         public static string OperationId => "list_my_guilds";

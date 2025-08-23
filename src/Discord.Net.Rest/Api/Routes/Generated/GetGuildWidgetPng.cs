@@ -1,10 +1,12 @@
+using Discord.Models;
+
 namespace Discord.Rest.Api;
 
 partial class Routes
 {
-   public sealed record GetGuildWidgetPng(
+   public sealed partial record GetGuildWidgetPng(
         RouteParameters.GuildId GuildId
-    ) : IOperation
+    ) : IOperation, Expand<GetGuildWidgetPng, GetGuildWidgetPng>
     {
         public Optional<string> Style { get; init; }
     

@@ -1,11 +1,13 @@
+using Discord.Models;
+
 namespace Discord.Rest.Api;
 
 partial class Routes
 {
-   public sealed record DeleteGuildIntegration(
+   public sealed partial record DeleteGuildIntegration(
         RouteParameters.GuildId GuildId,
         RouteParameters.IntegrationId IntegrationId
-    ) : IOperation
+    ) : IOperation, Expand<DeleteGuildIntegration, DeleteGuildIntegration>
     {
         public static IReadOnlyList<Type> RouteParameterTypes
             => [typeof(RouteParameters.GuildId), typeof(RouteParameters.IntegrationId)];

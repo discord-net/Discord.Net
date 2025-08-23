@@ -23,11 +23,12 @@ public record CurrentUserModel(
     string? GlobalName,
     string? Avatar,
     Discord.Models.Optional<string?> Banner,
+    Discord.Models.Optional<Nullable<int>> AccentColor,
     Discord.Models.Optional<bool> Bot,
     Discord.Models.Optional<bool> System,
     Discord.Models.Optional<Discord.Models.UserFlags> Flags,
     Discord.Models.Optional<Discord.Models.UserFlags> PublicFlags,
-    Snowflake Id
+    Discord.Snowflake Id
 ) : 
     ICurrentUserModel,
     IJsonModel,
@@ -52,7 +53,8 @@ public record CurrentUserModel(
                 System: (Discord.Models.Optional<bool>)args[11],
                 Flags: (Discord.Models.Optional<Discord.Models.UserFlags>)args[12],
                 PublicFlags: (Discord.Models.Optional<Discord.Models.UserFlags>)args[13],
-                Id: (Snowflake)args[14]
+                Id: (Discord.Snowflake)args[14],
+                AccentColor: (Discord.Models.Optional<Nullable<int>>)args[15]
             ),
             PropertyMetadataInitializer = _ => CreatePropertyInfos(options),
             ConstructorParameterMetadataInitializer = CreateConstructorParameterInfos
@@ -256,9 +258,9 @@ public record CurrentUserModel(
                 IgnoreCondition = JsonIgnoreCondition.WhenWritingDefault
             }
         ),
-        JsonMetadataServices.CreatePropertyInfo<Snowflake>(
+        JsonMetadataServices.CreatePropertyInfo<Discord.Snowflake>(
             options,
-            new JsonPropertyInfoValues<Snowflake>
+            new JsonPropertyInfoValues<Discord.Snowflake>
             {
                 IsProperty = true,
                 IsPublic = true,
@@ -268,6 +270,20 @@ public record CurrentUserModel(
                 PropertyName = "Id",
                 JsonPropertyName = "id",
                 IgnoreCondition = JsonIgnoreCondition.Never
+            }
+        ),
+        JsonMetadataServices.CreatePropertyInfo<Discord.Models.Optional<Nullable<int>>>(
+            options,
+            new JsonPropertyInfoValues<Discord.Models.Optional<Nullable<int>>>
+            {
+                IsProperty = true,
+                IsPublic = true,
+                DeclaringType = typeof(Discord.Models.Json.CurrentUserModel),
+                Getter = static instance => ((Discord.Models.Json.CurrentUserModel)instance).AccentColor,
+                Setter = null,
+                PropertyName = "AccentColor",
+                JsonPropertyName = "accent_color",
+                IgnoreCondition = JsonIgnoreCondition.WhenWritingDefault
             }
         )
     ];
@@ -402,8 +418,17 @@ public record CurrentUserModel(
         new()
         {
            Name = "Id",
-           ParameterType = typeof(Snowflake),
+           ParameterType = typeof(Discord.Snowflake),
            Position = 14,
+           HasDefaultValue = false,
+           DefaultValue = null,
+           IsNullable = false
+        },
+        new()
+        {
+           Name = "AccentColor",
+           ParameterType = typeof(Discord.Models.Optional<Nullable<int>>),
+           Position = 15,
            HasDefaultValue = false,
            DefaultValue = null,
            IsNullable = false
@@ -425,7 +450,8 @@ public record CurrentUserModel(
         System: model.System,
         Flags: model.Flags,
         PublicFlags: model.PublicFlags,
-        Id: model.Id
+        Id: model.Id,
+        AccentColor: model.AccentColor
     );
 
     static CurrentUserModel IApiModel<ICurrentUserModel, CurrentUserModel>.From(ICurrentUserModel model) => From(model);

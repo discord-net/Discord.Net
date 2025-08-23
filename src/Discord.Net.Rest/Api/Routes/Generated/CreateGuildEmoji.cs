@@ -1,10 +1,12 @@
+using Discord.Models;
+
 namespace Discord.Rest.Api;
 
 partial class Routes
 {
-   public sealed record CreateGuildEmoji(
+   public sealed partial record CreateGuildEmoji(
         RouteParameters.GuildId GuildId
-    ) : IOperation
+    ) : IOperation, Expand<CreateGuildEmoji, CreateGuildEmoji>
     {
         public static IReadOnlyList<Type> RouteParameterTypes
             => [typeof(RouteParameters.GuildId)];

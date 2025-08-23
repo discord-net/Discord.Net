@@ -1,38 +1,30 @@
 ﻿using Discord.Models;
-using Discord.Models.Models;
+using Discord.Rest.Api;
 
 namespace Discord.Rest;
 
-public class RestUser : 
-    RestEntity<Snowflake, IUserModel>, 
-    IUser
+public class RestUser :
+    RestEntity<Snowflake, IUserModel>,
+    IRestEntity<RestUser, Snowflake, IUserModel>,
+    IUser,
+    IRestPipelineEntity<RestUser>
 {
-    private readonly RestUserActor _actor;
-    
-    public RestUser(IUserModel model, DiscordRestClient client) : base(model, client)
+    protected virtual RestUserActor Actor { get; }
+
+    protected RestUser(DiscordRestClient client, IUserModel model, RestUserActor? actor = null) : base(client, model)
     {
-        _actor = client.Users[model.Id];
+        Actor = actor ?? client.Users[model.Id];
     }
 
-    public ValueTask<IUser> GetAsync(RequestOptions options = default) => _actor.GetAsync(options);
+    public static RestUser Create(DiscordRestClient client, IUserModel model)
+        => model switch
+        {
+            ICurrentUserModel currentUserModel => throw new NotImplementedException(),
+            _ => new RestUser(client, model)
+        };
 
-    public string Username => throw new NotImplementedException();
+    ValueTask<IUser> ILoadable<IUser>.GetAsync(RequestOptions options) => ValueTask.FromResult<IUser>(this);
 
-    public short? Discriminator => throw new NotImplementedException();
-
-    public string? GlobalName => throw new NotImplementedException();
-
-    public string? AvatarId => throw new NotImplementedException();
-
-    public string? BannerId => throw new NotImplementedException();
-
-    public bool IsBot => throw new NotImplementedException();
-
-    public bool IsSystem => throw new NotImplementedException();
-
-    public Color? AccentColor => throw new NotImplementedException();
-
-    public UserFlags Flags => throw new NotImplementedException();
-
-    public UserFlags PublicFlags => throw new NotImplementedException();
+    public static IRestApiPipeline<RestUser> FromPipeline(IRestApiPipeline<HttpResponseMessage> pipeline)
+        => pipeline.Deserialize<IUserModel>().Map((model, client, options) => new RestUser(client, model));
 }

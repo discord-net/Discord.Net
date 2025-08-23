@@ -1,12 +1,14 @@
+using Discord.Models;
+
 namespace Discord.Rest.Api;
 
 partial class Routes
 {
-   public sealed record DeleteWebhookMessage(
+   public sealed partial record DeleteWebhookMessage(
         RouteParameters.WebhookId WebhookId,
         RouteParameters.WebhookToken WebhookToken,
         RouteParameters.MessageId MessageId
-    ) : IOperation
+    ) : IOperation, Expand<DeleteWebhookMessage, DeleteWebhookMessage>
     {
         public Optional<Snowflake> ThreadId { get; init; }
     

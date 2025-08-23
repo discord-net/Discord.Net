@@ -1,11 +1,13 @@
+using Discord.Models;
+
 namespace Discord.Rest.Api;
 
 partial class Routes
 {
-   public sealed record CreateInteractionResponse(
+   public sealed partial record CreateInteractionResponse(
         RouteParameters.InteractionId InteractionId,
         RouteParameters.InteractionToken InteractionToken
-    ) : IOperation
+    ) : IOperation, Expand<CreateInteractionResponse, CreateInteractionResponse>
     {
         public Optional<bool> WithResponse { get; init; }
     

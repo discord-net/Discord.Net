@@ -1,10 +1,12 @@
+using Discord.Models;
+
 namespace Discord.Rest.Api;
 
 partial class Routes
 {
-   public sealed record InviteResolve(
+   public sealed partial record InviteResolve(
         RouteParameters.Code Code
-    ) : IOperation
+    ) : IOperation, Expand<InviteResolve, InviteResolve>
     {
         public Optional<bool> WithCounts { get; init; }
         public Optional<Snowflake> GuildScheduledEventId { get; init; }

@@ -174,9 +174,11 @@ public class DiscordConfig
     ///     Returns the base Discord API URL.
     /// </summary>
     /// <returns>
-    ///     The Discord API URL using <see cref="APIVersion" />.
+    ///     The Discord API URL.
     /// </returns>
-    public string APIUrl { get; set; } = $"https://discord.com/api/v{APIVersion}/";
+    public string APIUrl { get; set; } = $"https://discord.com/";
+
+    public string APIRootUri { get; set; } = $"api/v{APIVersion}";
 
     /// <summary>
     ///     Returns the base Discord CDN URL.

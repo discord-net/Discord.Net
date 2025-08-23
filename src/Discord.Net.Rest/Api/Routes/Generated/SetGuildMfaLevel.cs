@@ -1,10 +1,12 @@
+using Discord.Models;
+
 namespace Discord.Rest.Api;
 
 partial class Routes
 {
-   public sealed record SetGuildMfaLevel(
+   public sealed partial record SetGuildMfaLevel(
         RouteParameters.GuildId GuildId
-    ) : IOperation
+    ) : IOperation, Expand<SetGuildMfaLevel, SetGuildMfaLevel>
     {
         public static IReadOnlyList<Type> RouteParameterTypes
             => [typeof(RouteParameters.GuildId)];

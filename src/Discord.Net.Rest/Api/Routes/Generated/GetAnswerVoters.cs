@@ -1,12 +1,14 @@
+using Discord.Models;
+
 namespace Discord.Rest.Api;
 
 partial class Routes
 {
-   public sealed record GetAnswerVoters(
+   public sealed partial record GetAnswerVoters(
         RouteParameters.ChannelId ChannelId,
         RouteParameters.MessageId MessageId,
         RouteParameters.AnswerId AnswerId
-    ) : IOperation
+    ) : IOperation, Expand<GetAnswerVoters, GetAnswerVoters>
     {
         public Optional<Snowflake> After { get; init; }
         public Optional<int> Limit { get; init; }

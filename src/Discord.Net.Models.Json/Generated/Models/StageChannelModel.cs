@@ -19,14 +19,14 @@ public record StageChannelModel(
     int Bitrate,
     Discord.Models.Optional<int> UserLimit,
     string Name,
-    Snowflake GuildId,
+    Discord.Snowflake GuildId,
     int Position,
     System.Collections.Generic.IReadOnlyList<Discord.Models.IOverwriteModel> PermissionOverwrites,
     Discord.Models.Optional<Discord.Models.PermissionBitSet> Permissions,
     Discord.Models.ChannelType Type,
     Discord.Models.ChannelFlags Flags,
-    Snowflake Id,
-    Discord.Models.Optional<Nullable<Snowflake>> ParentId
+    Discord.Snowflake Id,
+    Discord.Models.Optional<Nullable<Discord.Snowflake>> ParentId
 ) : 
     IStageChannelModel,
     IJsonModel,
@@ -43,14 +43,14 @@ public record StageChannelModel(
                 Bitrate: (int)args[3],
                 UserLimit: (Discord.Models.Optional<int>)args[4],
                 Name: (string)args[5],
-                GuildId: (Snowflake)args[6],
+                GuildId: (Discord.Snowflake)args[6],
                 Position: (int)args[7],
                 PermissionOverwrites: (System.Collections.Generic.IReadOnlyList<Discord.Models.IOverwriteModel>)args[8],
                 Permissions: (Discord.Models.Optional<Discord.Models.PermissionBitSet>)args[9],
                 Type: (Discord.Models.ChannelType)args[10],
                 Flags: (Discord.Models.ChannelFlags)args[11],
-                Id: (Snowflake)args[12],
-                ParentId: (Discord.Models.Optional<Nullable<Snowflake>>)args[13]
+                Id: (Discord.Snowflake)args[12],
+                ParentId: (Discord.Models.Optional<Nullable<Discord.Snowflake>>)args[13]
             ),
             PropertyMetadataInitializer = _ => CreatePropertyInfos(options),
             ConstructorParameterMetadataInitializer = CreateConstructorParameterInfos
@@ -142,9 +142,9 @@ public record StageChannelModel(
                 IgnoreCondition = JsonIgnoreCondition.Never
             }
         ),
-        JsonMetadataServices.CreatePropertyInfo<Snowflake>(
+        JsonMetadataServices.CreatePropertyInfo<Discord.Snowflake>(
             options,
-            new JsonPropertyInfoValues<Snowflake>
+            new JsonPropertyInfoValues<Discord.Snowflake>
             {
                 IsProperty = true,
                 IsPublic = true,
@@ -226,9 +226,9 @@ public record StageChannelModel(
                 IgnoreCondition = JsonIgnoreCondition.Never
             }
         ),
-        JsonMetadataServices.CreatePropertyInfo<Snowflake>(
+        JsonMetadataServices.CreatePropertyInfo<Discord.Snowflake>(
             options,
-            new JsonPropertyInfoValues<Snowflake>
+            new JsonPropertyInfoValues<Discord.Snowflake>
             {
                 IsProperty = true,
                 IsPublic = true,
@@ -240,9 +240,9 @@ public record StageChannelModel(
                 IgnoreCondition = JsonIgnoreCondition.Never
             }
         ),
-        JsonMetadataServices.CreatePropertyInfo<Discord.Models.Optional<Nullable<Snowflake>>>(
+        JsonMetadataServices.CreatePropertyInfo<Discord.Models.Optional<Nullable<Discord.Snowflake>>>(
             options,
-            new JsonPropertyInfoValues<Discord.Models.Optional<Nullable<Snowflake>>>
+            new JsonPropertyInfoValues<Discord.Models.Optional<Nullable<Discord.Snowflake>>>
             {
                 IsProperty = true,
                 IsPublic = true,
@@ -314,7 +314,7 @@ public record StageChannelModel(
         new()
         {
            Name = "GuildId",
-           ParameterType = typeof(Snowflake),
+           ParameterType = typeof(Discord.Snowflake),
            Position = 6,
            HasDefaultValue = false,
            DefaultValue = null,
@@ -368,7 +368,7 @@ public record StageChannelModel(
         new()
         {
            Name = "Id",
-           ParameterType = typeof(Snowflake),
+           ParameterType = typeof(Discord.Snowflake),
            Position = 12,
            HasDefaultValue = false,
            DefaultValue = null,
@@ -377,7 +377,7 @@ public record StageChannelModel(
         new()
         {
            Name = "ParentId",
-           ParameterType = typeof(Discord.Models.Optional<Nullable<Snowflake>>),
+           ParameterType = typeof(Discord.Models.Optional<Nullable<Discord.Snowflake>>),
            Position = 13,
            HasDefaultValue = false,
            DefaultValue = null,

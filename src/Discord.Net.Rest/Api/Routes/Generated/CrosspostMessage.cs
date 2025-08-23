@@ -1,11 +1,13 @@
+using Discord.Models;
+
 namespace Discord.Rest.Api;
 
 partial class Routes
 {
-   public sealed record CrosspostMessage(
+   public sealed partial record CrosspostMessage(
         RouteParameters.ChannelId ChannelId,
         RouteParameters.MessageId MessageId
-    ) : IOperation
+    ) : IOperation, Expand<CrosspostMessage, CrosspostMessage>
     {
         public static IReadOnlyList<Type> RouteParameterTypes
             => [typeof(RouteParameters.ChannelId), typeof(RouteParameters.MessageId)];

@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using Discord.Models.Json;
-using Discord.Models.Rest.Targets;
 using Discord.Rest.Targets;
 
 namespace Discord.Rest;
@@ -22,7 +21,7 @@ public class DiscordRestClient : IDiscordClient
     {
         Config = config;
         Api = new(this);
-        JsonContext = new();
+        JsonContext = new(null);
     }
     
     IUsersLink IDiscordClient.Users => Users;

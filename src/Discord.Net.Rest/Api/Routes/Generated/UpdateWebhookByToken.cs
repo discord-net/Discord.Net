@@ -1,11 +1,13 @@
+using Discord.Models;
+
 namespace Discord.Rest.Api;
 
 partial class Routes
 {
-   public sealed record UpdateWebhookByToken(
+   public sealed partial record UpdateWebhookByToken(
         RouteParameters.WebhookId WebhookId,
         RouteParameters.WebhookToken WebhookToken
-    ) : IOperation
+    ) : IOperation, Expand<UpdateWebhookByToken, UpdateWebhookByToken>
     {
         public static IReadOnlyList<Type> RouteParameterTypes
             => [typeof(RouteParameters.WebhookId), typeof(RouteParameters.WebhookToken)];

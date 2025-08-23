@@ -1,10 +1,12 @@
+using Discord.Models;
+
 namespace Discord.Rest.Api;
 
 partial class Routes
 {
-   public sealed record GetApplicationRoleConnectionsMetadata(
+   public sealed partial record GetApplicationRoleConnectionsMetadata(
         RouteParameters.ApplicationId ApplicationId
-    ) : IOperation
+    ) : IOperation, Expand<GetApplicationRoleConnectionsMetadata, GetApplicationRoleConnectionsMetadata>
     {
         public static IReadOnlyList<Type> RouteParameterTypes
             => [typeof(RouteParameters.ApplicationId)];

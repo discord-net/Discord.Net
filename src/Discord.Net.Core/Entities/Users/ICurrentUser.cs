@@ -1,6 +1,5 @@
 ﻿using System.Globalization;
 using Discord.Models;
-using Discord.Models.Models;
 
 namespace Discord;
 
@@ -9,18 +8,24 @@ public interface ICurrentUser :
     ICurrentUserActor,
     IModeledBy<ICurrentUserModel>
 {
-    string? Email { get; }
-    
-    bool IsVerified { get; }
-    
-    bool IsMFAEnabled { get; }
-    
-    CultureInfo? Locale { get; }
-    
-    PremiumType PremiumType { get; }
-    
     new ICurrentUserModel Model { get; }
 
     ICurrentUserModel IModeledBy<ICurrentUserModel>.Model => Model;
     IUserModel IModeledBy<IUserModel>.Model => Model;
+}
+
+public static class CurrentUserExtensions
+{
+    extension(ICurrentUser user)
+    {
+        public string? Email => user.Model.Email.ToNullable();
+
+        public bool IsVerified => user.Model.IsVerified | false;
+
+        public bool IsMFAEnabled => user.Model.MFAEnabled | false;
+
+        public CultureInfo? Locale => user.Model.Locale.Map(CultureInfo.GetCultureInfo).ToNullable();
+
+        public PremiumType PremiumType => user.Model.PremiumType | PremiumType.None;
+    }
 }

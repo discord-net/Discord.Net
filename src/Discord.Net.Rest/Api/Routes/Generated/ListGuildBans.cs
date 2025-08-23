@@ -1,10 +1,12 @@
+using Discord.Models;
+
 namespace Discord.Rest.Api;
 
 partial class Routes
 {
-   public sealed record ListGuildBans(
+   public sealed partial record ListGuildBans(
         RouteParameters.GuildId GuildId
-    ) : IOperation
+    ) : IOperation, Expand<ListGuildBans, ListGuildBans>
     {
         public Optional<int> Limit { get; init; }
         public Optional<Snowflake> Before { get; init; }

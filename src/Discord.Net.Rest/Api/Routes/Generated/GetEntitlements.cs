@@ -1,10 +1,12 @@
+using Discord.Models;
+
 namespace Discord.Rest.Api;
 
 partial class Routes
 {
-   public sealed record GetEntitlements(
+   public sealed partial record GetEntitlements(
         RouteParameters.ApplicationId ApplicationId
-    ) : IOperation
+    ) : IOperation, Expand<GetEntitlements, GetEntitlements>
     {
         public Optional<Snowflake> UserId { get; init; }
         public required OneOf<string, OneOf<object?, Snowflake>[]> SkuIds { get; init; }

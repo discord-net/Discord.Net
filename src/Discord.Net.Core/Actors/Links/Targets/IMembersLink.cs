@@ -1,5 +1,4 @@
 ﻿using Discord.Models;
-using Discord.Models.Models;
 
 namespace Discord;
 
@@ -9,5 +8,5 @@ public interface IMembersLink :
 {
     ICurrentMemberActor Current { get; }
     
-    Task<IMember> AddAsync(IdOrEntity<ulong, IUser> user, RequestOptions options = default);
+    Task<IMember> AddAsync(IdOrEntity<Snowflake, IUser> user, RequestOptions options = default);
 }

@@ -1,11 +1,13 @@
+using Discord.Models;
+
 namespace Discord.Rest.Api;
 
 partial class Routes
 {
-   public sealed record UpdateGuildSoundboardSound(
+   public sealed partial record UpdateGuildSoundboardSound(
         RouteParameters.GuildId GuildId,
         RouteParameters.SoundId SoundId
-    ) : IOperation
+    ) : IOperation, Expand<UpdateGuildSoundboardSound, UpdateGuildSoundboardSound>
     {
         public static IReadOnlyList<Type> RouteParameterTypes
             => [typeof(RouteParameters.GuildId), typeof(RouteParameters.SoundId)];

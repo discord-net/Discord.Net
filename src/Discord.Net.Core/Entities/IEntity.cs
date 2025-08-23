@@ -1,12 +1,13 @@
-﻿global using SnowflakeEntity = Discord.Models.IEntity<Discord.Snowflake>;
+﻿global using SnowflakeEntity = Discord.IEntity<Discord.Snowflake>;
 using Discord.Models;
-using Discord.Models.Models;
 
 namespace Discord;
 
-public interface IEntity<out TId> :
-    IIdentifiable<TId>,
-    IClientProvider
+public interface IEntity : IClientProvider;
+
+public interface IEntity<out TId> : 
+    IEntity,
+    IIdentifiable<TId>
     where TId : IEquatable<TId>;
 
 public interface IEntity<out TId, out TModel> :

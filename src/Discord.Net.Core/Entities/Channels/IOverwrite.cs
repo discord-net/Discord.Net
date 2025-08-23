@@ -1,6 +1,6 @@
 ﻿namespace Discord;
 
-public interface IOverwrite : IEntity<>
+public interface IOverwrite : IEntity<Snowflake>
 {
     
 }

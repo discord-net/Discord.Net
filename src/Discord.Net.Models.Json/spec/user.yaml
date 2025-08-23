@@ -10,3 +10,4 @@ props:
   Flags: "flags"
   PublicFlags: "public_flags"
   Id: "id"
+  AccentColor: "accent_color"

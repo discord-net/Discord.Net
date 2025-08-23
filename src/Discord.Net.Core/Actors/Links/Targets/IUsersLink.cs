@@ -2,4 +2,7 @@
 
 namespace Discord;
 
-public interface IUsersLink : IIndexableLink<Snowflake, IUserActor>;
+public interface IUsersLink : IIndexableLink<Snowflake, IUserActor>
+{
+    ICurrentUserActor Current { get; }
+}

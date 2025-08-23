@@ -1,18 +1,21 @@
 ﻿using Discord.Models;
-using Discord.Models.Rest.Actors;
-using Discord.Models.Rest.Api;
 using Discord.Rest.Actors;
 using Discord.Rest.Api;
 
 namespace Discord.Rest;
 
-public class RestUserActor(Snowflake id, DiscordRestClient client) :
-    RestActor<Snowflake, RestUser>(id, client), IUserActor
+public class RestUserActor(DiscordRestClient client, Snowflake id) :
+    RestActor<Snowflake, RestUser>(client, id),
+    IUserActor
 {
-    public ValueTask<RestUser> GetAsync(RequestOptions options = default)
-    {
-        Routes.GetUser
-    }
+    protected virtual IRestApiPipeline<RestUser> GetUserPipeline
+        => new Routes.GetUser(Id)
+            .AsPipeline()
+            .Map(RestUser.Create);
 
-    async ValueTask<IUser> ILoadable<IUser>.GetAsync(RequestOptions options) => await GetAsync(options);
+    public async ValueTask<RestUser> GetAsync(RequestOptions options = default)
+        => await GetUserPipeline.RunAsync(Client, options);
+
+    async ValueTask<IUser> ILoadable<IUser>.GetAsync(RequestOptions options)
+        => await GetAsync(options);
 }

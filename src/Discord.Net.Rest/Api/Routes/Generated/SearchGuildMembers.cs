@@ -1,10 +1,12 @@
+using Discord.Models;
+
 namespace Discord.Rest.Api;
 
 partial class Routes
 {
-   public sealed record SearchGuildMembers(
+   public sealed partial record SearchGuildMembers(
         RouteParameters.GuildId GuildId
-    ) : IOperation
+    ) : IOperation, Expand<SearchGuildMembers, SearchGuildMembers>
     {
         public required int Limit { get; init; }
         public required string Query { get; init; }

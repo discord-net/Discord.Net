@@ -1,7 +1,6 @@
 ﻿namespace Discord;
 
-public interface IGuildChannel :
-    IEntity<>
+public interface IGuildChannel : IChannel
 {
     
 }

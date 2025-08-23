@@ -1,10 +1,12 @@
+using Discord.Models;
+
 namespace Discord.Rest.Api;
 
 partial class Routes
 {
-   public sealed record ListApplicationCommands(
+   public sealed partial record ListApplicationCommands(
         RouteParameters.ApplicationId ApplicationId
-    ) : IOperation
+    ) : IOperation, Expand<ListApplicationCommands, ListApplicationCommands>
     {
         public Optional<bool> WithLocalizations { get; init; }
     

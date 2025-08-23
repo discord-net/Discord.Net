@@ -81,10 +81,10 @@ public class TypeVisitor
         if (type == typeof(Snowflake)) return;
         if (type == typeof(PermissionBitSet)) return;
         if (type == typeof(EmojiId)) return;
+        if (type == typeof(ImageData)) return;
         
         // pass for built-ins
         if (Generator.BuiltIns.Contains(type)) return;
-
 
         if (type is {Name: "Nullable`1", GenericTypeArguments: [{ } inner]})
         {

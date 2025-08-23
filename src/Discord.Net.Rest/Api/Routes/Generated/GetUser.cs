@@ -1,10 +1,12 @@
+using Discord.Models;
+
 namespace Discord.Rest.Api;
 
 partial class Routes
 {
-   public sealed record GetUser(
+   public sealed partial record GetUser(
         RouteParameters.UserId UserId
-    ) : IOperation
+    ) : IOperation, Expand<GetUser, GetUser>
     {
         public static IReadOnlyList<Type> RouteParameterTypes
             => [typeof(RouteParameters.UserId)];

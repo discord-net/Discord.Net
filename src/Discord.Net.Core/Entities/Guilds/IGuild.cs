@@ -1,7 +1,7 @@
 ﻿namespace Discord;
 
 public interface IGuild : 
-    IEntity<>,
+    IEntity<Snowflake>,
     IGuildActor
 {
     

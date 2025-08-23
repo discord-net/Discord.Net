@@ -23,7 +23,7 @@ foreach (var (path, item) in document.Paths)
     {
         var operationName = ToPascalCase(operation.OperationId);
 
-        var sb = new StringBuilder($"public sealed record {operationName}(");
+        var sb = new StringBuilder($"public sealed partial record {operationName}(");
 
         var pathParameters = item.Parameters
             .Where(x => x.In is ParameterLocation.Path)
@@ -55,7 +55,7 @@ foreach (var (path, item) in document.Paths)
             sb.Append(')');
         }
 
-        sb.AppendLine(" : IOperation")
+        sb.AppendLine($" : IOperation, Expand<{operationName}, {operationName}>")
             .AppendLine("{");
 
         if (queryParameters.Length > 0)
@@ -82,18 +82,15 @@ foreach (var (path, item) in document.Paths)
             sb.AppendLine();
         }
 
-        if (pathParameters.Length > 0)
-        {
-            sb.AppendLine(
-                $"""
-                     public static IReadOnlyList<Type> RouteParameterTypes
-                         => [{string.Join(", ", pathParameters.Select(x => $"typeof(RouteParameters.{ToPascalCase(x.Name)})"))}];
-                         
-                     public IReadOnlyList<RouteParameters> RouteParameters
-                         => [{string.Join(", ", pathParameters.Select(x => ToPascalCase(x.Name)))}];
-                 """
-            ).AppendLine();
-        }
+        sb.AppendLine(
+            $"""
+                 public static IReadOnlyList<Type> RouteParameterTypes
+                     => [{string.Join(", ", pathParameters.Select(x => $"typeof(RouteParameters.{ToPascalCase(x.Name)})"))}];
+                     
+                 public IReadOnlyList<RouteParameters> RouteParameters
+                     => [{string.Join(", ", pathParameters.Select(x => ToPascalCase(x.Name)))}];
+             """
+        ).AppendLine();
 
         var formatMethod = new StringBuilder();
 
@@ -122,6 +119,9 @@ foreach (var (path, item) in document.Paths)
 
         formatMethod.Append("\"");
 
+        if (queryParameters.Length is 0 && routeParameters.Count is 0)
+            sb.AppendLine($"    public static readonly {operationName} Instance = new();");
+        
         sb.Append(
             $$"""
                   public static string Path => @"{{path}}";
@@ -154,6 +154,8 @@ foreach (var (path, item) in document.Paths)
         File.WriteAllText(
             Path.Combine(OUT_DIR, $"{operationName}.cs"),
             $$"""
+              using Discord.Models;
+              
               namespace Discord.Rest.Api;
 
               partial class Routes
@@ -187,6 +189,9 @@ File.WriteAllText(
                                 {
                                     public static implicit operator {{x.Type}}({{name}} self) => self.Value;
                                     public static implicit operator {{name}}({{x.Type}} value) => new(value);
+                                    
+                                    public override string ToString() => Value.ToString();
+                                    public override int GetHashCode() => Value.GetHashCode();
                                 }
                                 """.ReplaceLineEndings($"{Environment.NewLine}    ");
                       })

@@ -1,10 +1,12 @@
+using Discord.Models;
+
 namespace Discord.Rest.Api;
 
 partial class Routes
 {
-   public sealed record PreviewPruneGuild(
+   public sealed partial record PreviewPruneGuild(
         RouteParameters.GuildId GuildId
-    ) : IOperation
+    ) : IOperation, Expand<PreviewPruneGuild, PreviewPruneGuild>
     {
         public Optional<int> Days { get; init; }
         public Optional<OneOf<string, OneOf<object?, Snowflake>[]>> IncludeRoles { get; init; }

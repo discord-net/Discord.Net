@@ -10,7 +10,8 @@ public interface IUserModel : IEntityModel<Snowflake>
     string? GlobalName { get; }
     string? Avatar { get; }
     Optional<string?> Banner { get; }
-    
+    Optional<int?> AccentColor { get; }
+
     Optional<bool> Bot { get; }
     Optional<bool> System { get; }
     Optional<UserFlags> Flags { get; }

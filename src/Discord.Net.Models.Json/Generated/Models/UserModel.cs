@@ -18,11 +18,12 @@ public record UserModel(
     string? GlobalName,
     string? Avatar,
     Discord.Models.Optional<string?> Banner,
+    Discord.Models.Optional<Nullable<int>> AccentColor,
     Discord.Models.Optional<bool> Bot,
     Discord.Models.Optional<bool> System,
     Discord.Models.Optional<Discord.Models.UserFlags> Flags,
     Discord.Models.Optional<Discord.Models.UserFlags> PublicFlags,
-    Snowflake Id
+    Discord.Snowflake Id
 ) : 
     IUserModel,
     IJsonModel,
@@ -42,7 +43,8 @@ public record UserModel(
                 System: (Discord.Models.Optional<bool>)args[6],
                 Flags: (Discord.Models.Optional<Discord.Models.UserFlags>)args[7],
                 PublicFlags: (Discord.Models.Optional<Discord.Models.UserFlags>)args[8],
-                Id: (Snowflake)args[9]
+                Id: (Discord.Snowflake)args[9],
+                AccentColor: (Discord.Models.Optional<Nullable<int>>)args[10]
             ),
             PropertyMetadataInitializer = _ => CreatePropertyInfos(options),
             ConstructorParameterMetadataInitializer = CreateConstructorParameterInfos
@@ -176,9 +178,9 @@ public record UserModel(
                 IgnoreCondition = JsonIgnoreCondition.WhenWritingDefault
             }
         ),
-        JsonMetadataServices.CreatePropertyInfo<Snowflake>(
+        JsonMetadataServices.CreatePropertyInfo<Discord.Snowflake>(
             options,
-            new JsonPropertyInfoValues<Snowflake>
+            new JsonPropertyInfoValues<Discord.Snowflake>
             {
                 IsProperty = true,
                 IsPublic = true,
@@ -188,6 +190,20 @@ public record UserModel(
                 PropertyName = "Id",
                 JsonPropertyName = "id",
                 IgnoreCondition = JsonIgnoreCondition.Never
+            }
+        ),
+        JsonMetadataServices.CreatePropertyInfo<Discord.Models.Optional<Nullable<int>>>(
+            options,
+            new JsonPropertyInfoValues<Discord.Models.Optional<Nullable<int>>>
+            {
+                IsProperty = true,
+                IsPublic = true,
+                DeclaringType = typeof(Discord.Models.Json.UserModel),
+                Getter = static instance => ((Discord.Models.Json.UserModel)instance).AccentColor,
+                Setter = null,
+                PropertyName = "AccentColor",
+                JsonPropertyName = "accent_color",
+                IgnoreCondition = JsonIgnoreCondition.WhenWritingDefault
             }
         )
     ];
@@ -277,8 +293,17 @@ public record UserModel(
         new()
         {
            Name = "Id",
-           ParameterType = typeof(Snowflake),
+           ParameterType = typeof(Discord.Snowflake),
            Position = 9,
+           HasDefaultValue = false,
+           DefaultValue = null,
+           IsNullable = false
+        },
+        new()
+        {
+           Name = "AccentColor",
+           ParameterType = typeof(Discord.Models.Optional<Nullable<int>>),
+           Position = 10,
            HasDefaultValue = false,
            DefaultValue = null,
            IsNullable = false
@@ -295,7 +320,8 @@ public record UserModel(
         System: model.System,
         Flags: model.Flags,
         PublicFlags: model.PublicFlags,
-        Id: model.Id
+        Id: model.Id,
+        AccentColor: model.AccentColor
     );
 
     static UserModel IApiModel<IUserModel, UserModel>.From(IUserModel model) => From(model);

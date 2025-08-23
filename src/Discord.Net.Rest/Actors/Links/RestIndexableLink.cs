@@ -1,5 +1,4 @@
 ﻿using System.Runtime.CompilerServices;
-using Discord.Models.Rest.Actors;
 using Discord.Rest.Actors;
 
 namespace Discord.Rest;

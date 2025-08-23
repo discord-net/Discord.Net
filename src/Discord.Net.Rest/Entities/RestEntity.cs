@@ -8,16 +8,16 @@ public abstract class RestEntity<TId, TModel> :
     where TId : IEquatable<TId>
     where TModel : IEntityModel<TId>
 {
-    public TModel Model { get; protected set; }
+    public virtual TModel Model { get; }
     
-    protected RestEntity(TModel model, DiscordRestClient client) : base(model.Id, client)
+    protected RestEntity(DiscordRestClient client, TModel model) : base(model.Id, client)
     {
         Model = model;
     }
 }
 
 public abstract class RestEntity<TId> :
-    IEntity<TId>
+    IRestEntity<TId>
     where TId : IEquatable<TId>
 {
     public TId Id { get; }

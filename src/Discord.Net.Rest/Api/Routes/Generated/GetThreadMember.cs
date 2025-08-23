@@ -1,11 +1,13 @@
+using Discord.Models;
+
 namespace Discord.Rest.Api;
 
 partial class Routes
 {
-   public sealed record GetThreadMember(
+   public sealed partial record GetThreadMember(
         RouteParameters.ChannelId ChannelId,
         RouteParameters.UserId UserId
-    ) : IOperation
+    ) : IOperation, Expand<GetThreadMember, GetThreadMember>
     {
         public Optional<bool> WithMember { get; init; }
     

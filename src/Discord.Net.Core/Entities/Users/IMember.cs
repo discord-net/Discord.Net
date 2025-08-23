@@ -1,7 +1,7 @@
 ﻿namespace Discord;
 
 public interface IMember : 
-    IEntity<>
+    IEntity<Snowflake>
 {
     
 }

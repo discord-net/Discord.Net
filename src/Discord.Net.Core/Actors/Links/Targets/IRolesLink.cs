@@ -1,5 +1,4 @@
 ﻿using Discord.Models;
-using Discord.Models.Models;
 
 namespace Discord;
 

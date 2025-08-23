@@ -1,10 +1,12 @@
+using Discord.Models;
+
 namespace Discord.Rest.Api;
 
 partial class Routes
 {
-   public sealed record ListGuildScheduledEvents(
+   public sealed partial record ListGuildScheduledEvents(
         RouteParameters.GuildId GuildId
-    ) : IOperation
+    ) : IOperation, Expand<ListGuildScheduledEvents, ListGuildScheduledEvents>
     {
         public Optional<bool> WithUserCount { get; init; }
     

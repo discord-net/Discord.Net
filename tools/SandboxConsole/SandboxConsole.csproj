@@ -9,7 +9,13 @@
     </PropertyGroup>
 
     <ItemGroup>
+<!--      <ProjectReference Include="..\..\src\Discord.Net.Core\Discord.Net.Core.csproj" />-->
+<!--      <ProjectReference Include="..\..\src\Discord.Net.Models.Json\Discord.Net.Models.Json.csproj" />-->
+      <ProjectReference Include="..\..\src\Discord.Net.Core\Discord.Net.Core.csproj" />
       <ProjectReference Include="..\..\src\Discord.Net.Models.Json\Discord.Net.Models.Json.csproj" />
+      <ProjectReference Include="..\..\src\Discord.Net.Models\Discord.Net.Models.csproj" />
+      <ProjectReference Include="..\..\src\Discord.Net.Rest\Discord.Net.Rest.csproj" />
+<!--      <ProjectReference Include="..\..\src\Discord.Net.Rest\Discord.Net.Rest.csproj" />-->
     </ItemGroup>
 
 </Project>

@@ -1,36 +1,37 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using Discord.Models;
-using Discord.Models.Models;
 
 namespace Discord;
 
 public interface IUser : 
-    IEntity<>,
+    IEntity<Snowflake>,
     IModeledBy<IUserModel>,
     IUserActor
 {
-    string Username { get; }
     
-    short? Discriminator { get; }
-    
-    string? GlobalName { get; }
-    
-    string? AvatarId { get; }
-    string? BannerId { get; }
-    
-    bool IsBot { get; }
-    bool IsSystem { get; }
-    
-    Color? AccentColor { get; }
-    
-    UserFlags Flags { get; }
-    UserFlags PublicFlags { get; }
 }
 
 public static class UserExtensions
 {
     extension(IUser user)
     {
+        public string Username => user.Model.Username;
+    
+        public short Discriminator => short.Parse(user.Model.Discriminator);
+
+        public string? GlobalName => user.Model.GlobalName;
+    
+        public string? AvatarId  => user.Model.Avatar;
+        public string? BannerId=> user.Model.Banner.ToNullable();
+
+        public bool IsBot => user.Model.Bot | false;
+        public bool IsSystem => user.Model.System | false;
+
+        public Color? AccentColor => user.Model.AccentColor.Unwrap().Map(Color.FromHex).ToNullable();
+
+        public UserFlags Flags => user.Model.Flags | UserFlags.None;
+        public UserFlags PublicFlags => user.Model.PublicFlags | UserFlags.None;
+        
         public string? AvatarUrl => CDN.GetUserAvatarUrl(
             user.Client.Config,
             user.Id,

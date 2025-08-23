@@ -1,10 +1,12 @@
+using Discord.Models;
+
 namespace Discord.Rest.Api;
 
 partial class Routes
 {
-   public sealed record ListMessages(
+   public sealed partial record ListMessages(
         RouteParameters.ChannelId ChannelId
-    ) : IOperation
+    ) : IOperation, Expand<ListMessages, ListMessages>
     {
         public Optional<Snowflake> Around { get; init; }
         public Optional<Snowflake> Before { get; init; }

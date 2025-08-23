@@ -1,6 +1,6 @@
 ﻿namespace Discord;
 
-public interface IBannedUser : IEntity<>, IUser
+public interface IBannedUser : IEntity<Snowflake>, IUser
 {
     
 }

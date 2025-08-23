@@ -10,8 +10,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Extensions", "Extensions", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{BB59D5B5-E7B0-4BF4-8F82-D14431B2799B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.Net.Core", "src\Discord.Net.Core\Discord.Net.V4.Core.csproj", "{3277421C-AD38-43A7-89EB-D4E1F866004E}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SourceGenerators", "SourceGenerators", "{C1C763AF-3DC5-4F7D-8551-0A65B6011305}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Discord.Net.Hanz", "sourcegen\Discord.Net.Hanz\Discord.Net.Hanz.csproj", "{595DFC73-902A-4A2B-BE33-16B627134451}"
@@ -41,6 +39,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SandboxConsole", "tools\San
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Discord.Rest.OpenAPIGenerator", "tools\Discord.Rest.OpenAPIGenerator\Discord.Rest.OpenAPIGenerator.csproj", "{994CF384-8104-45AB-8B5D-F103A3F2F7BB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Discord.Net.Core", "src\Discord.Net.Core\Discord.Net.Core.csproj", "{890D7DDD-A27C-4997-8644-5BD78796BB54}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,18 +51,6 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{3277421C-AD38-43A7-89EB-D4E1F866004E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3277421C-AD38-43A7-89EB-D4E1F866004E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3277421C-AD38-43A7-89EB-D4E1F866004E}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{3277421C-AD38-43A7-89EB-D4E1F866004E}.Debug|x64.Build.0 = Debug|Any CPU
-		{3277421C-AD38-43A7-89EB-D4E1F866004E}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{3277421C-AD38-43A7-89EB-D4E1F866004E}.Debug|x86.Build.0 = Debug|Any CPU
-		{3277421C-AD38-43A7-89EB-D4E1F866004E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3277421C-AD38-43A7-89EB-D4E1F866004E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3277421C-AD38-43A7-89EB-D4E1F866004E}.Release|x64.ActiveCfg = Release|Any CPU
-		{3277421C-AD38-43A7-89EB-D4E1F866004E}.Release|x64.Build.0 = Release|Any CPU
-		{3277421C-AD38-43A7-89EB-D4E1F866004E}.Release|x86.ActiveCfg = Release|Any CPU
-		{3277421C-AD38-43A7-89EB-D4E1F866004E}.Release|x86.Build.0 = Release|Any CPU
 		{595DFC73-902A-4A2B-BE33-16B627134451}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{595DFC73-902A-4A2B-BE33-16B627134451}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{595DFC73-902A-4A2B-BE33-16B627134451}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -171,6 +159,18 @@ Global
 		{994CF384-8104-45AB-8B5D-F103A3F2F7BB}.Release|x64.Build.0 = Release|Any CPU
 		{994CF384-8104-45AB-8B5D-F103A3F2F7BB}.Release|x86.ActiveCfg = Release|Any CPU
 		{994CF384-8104-45AB-8B5D-F103A3F2F7BB}.Release|x86.Build.0 = Release|Any CPU
+		{890D7DDD-A27C-4997-8644-5BD78796BB54}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{890D7DDD-A27C-4997-8644-5BD78796BB54}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{890D7DDD-A27C-4997-8644-5BD78796BB54}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{890D7DDD-A27C-4997-8644-5BD78796BB54}.Debug|x64.Build.0 = Debug|Any CPU
+		{890D7DDD-A27C-4997-8644-5BD78796BB54}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{890D7DDD-A27C-4997-8644-5BD78796BB54}.Debug|x86.Build.0 = Debug|Any CPU
+		{890D7DDD-A27C-4997-8644-5BD78796BB54}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{890D7DDD-A27C-4997-8644-5BD78796BB54}.Release|Any CPU.Build.0 = Release|Any CPU
+		{890D7DDD-A27C-4997-8644-5BD78796BB54}.Release|x64.ActiveCfg = Release|Any CPU
+		{890D7DDD-A27C-4997-8644-5BD78796BB54}.Release|x64.Build.0 = Release|Any CPU
+		{890D7DDD-A27C-4997-8644-5BD78796BB54}.Release|x86.ActiveCfg = Release|Any CPU
+		{890D7DDD-A27C-4997-8644-5BD78796BB54}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

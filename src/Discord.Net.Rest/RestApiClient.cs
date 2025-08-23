@@ -7,18 +7,22 @@ namespace Discord.Rest;
 
 public sealed class RestApiClient
 {
-    private readonly DiscordRestClient _discordClient;
+    public DiscordRestClient DiscordClient { get; }
     private readonly HttpClient _httpClient;
 
     public RestApiClient(
         DiscordRestClient client
     )
     {
-        _discordClient = client;
-        _httpClient = new();
+        DiscordClient = client;
+        _httpClient = new()
+        {
+            BaseAddress = new(client.Config.APIUrl)
+        };
     }
 
-    private async Task<HttpResponseMessage> ExecuteRequestAsync<T>(
+
+    internal async Task<HttpResponseMessage> ExecuteRequestAsync<T>(
         T operation,
         RequestBody? body,
         RequestOptions options
@@ -26,14 +30,17 @@ public sealed class RestApiClient
     {
         var request = new HttpRequestMessage(
             ToHttpMethod(T.Method),
-            operation.Format()
+            new Uri(
+                _httpClient.BaseAddress!,
+                $"{DiscordClient.Config.APIRootUri}{operation.Format()}"
+            )
         )
         {
             Content = EncodeBody(body)
         };
 
         AddAuthorizationHeaders(T.AuthenticationScheme, request);
-        
+
         if (options.AuditLogReason is not null)
             request.Headers.Add("X-Audit-Log-Reason", Uri.EscapeDataString(options.AuditLogReason));
 
@@ -42,20 +49,20 @@ public sealed class RestApiClient
         var response = await _httpClient.SendAsync(request);
 
         // TODO: ratelimits
-        
+
         return response;
     }
 
     private void AddAuthorizationHeaders(AuthenticationScheme scheme, HttpRequestMessage request)
     {
-        switch (_discordClient.Config.Token.Type)
+        switch (DiscordClient.Config.Token.Type)
         {
             case TokenType.Bot when scheme.HasFlag(AuthenticationScheme.BotToken):
-                request.Headers.Authorization = new AuthenticationHeaderValue("Bot", _discordClient.Config.Token.Value);
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bot", DiscordClient.Config.Token.Value);
                 break;
             case TokenType.Bearer when scheme.HasFlag(AuthenticationScheme.BearerToken):
                 request.Headers.Authorization =
-                    new AuthenticationHeaderValue("Bearer", _discordClient.Config.Token.Value);
+                    new AuthenticationHeaderValue("Bearer", DiscordClient.Config.Token.Value);
                 break;
             default:
                 if (scheme is not AuthenticationScheme.None)
@@ -74,7 +81,7 @@ public sealed class RestApiClient
                 var jsonModel = DiscordJsonContext.AsJsonModel(model);
 
                 // TODO: this may be prone to failing if sub types of the model interfaces are supplied.
-                if (_discordClient.JsonContext.GetTypeInfo(model.GetType()) is not { } typeInfo)
+                if (DiscordClient.JsonContext.GetTypeInfo(model.GetType()) is not { } typeInfo)
                     throw new InvalidOperationException($"Missing type info for '{model.GetType()}'");
 
                 return JsonContent.Create(jsonModel, typeInfo);

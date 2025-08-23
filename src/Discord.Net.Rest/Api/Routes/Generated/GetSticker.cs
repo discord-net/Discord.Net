@@ -1,10 +1,12 @@
+using Discord.Models;
+
 namespace Discord.Rest.Api;
 
 partial class Routes
 {
-   public sealed record GetSticker(
+   public sealed partial record GetSticker(
         RouteParameters.StickerId StickerId
-    ) : IOperation
+    ) : IOperation, Expand<GetSticker, GetSticker>
     {
         public static IReadOnlyList<Type> RouteParameterTypes
             => [typeof(RouteParameters.StickerId)];

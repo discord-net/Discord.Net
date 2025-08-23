@@ -14,13 +14,13 @@ public partial class DiscordJsonContext
 
 public record CategoryChannelModel(
     string Name,
-    Snowflake GuildId,
+    Discord.Snowflake GuildId,
     int Position,
     System.Collections.Generic.IReadOnlyList<Discord.Models.IOverwriteModel> PermissionOverwrites,
     Discord.Models.Optional<Discord.Models.PermissionBitSet> Permissions,
     Discord.Models.ChannelType Type,
     Discord.Models.ChannelFlags Flags,
-    Snowflake Id
+    Discord.Snowflake Id
 ) : 
     ICategoryChannelModel,
     IJsonModel,
@@ -32,13 +32,13 @@ public record CategoryChannelModel(
         {
             ObjectWithParameterizedConstructorCreator = static args => new CategoryChannelModel(
                 Name: (string)args[0],
-                GuildId: (Snowflake)args[1],
+                GuildId: (Discord.Snowflake)args[1],
                 Position: (int)args[2],
                 PermissionOverwrites: (System.Collections.Generic.IReadOnlyList<Discord.Models.IOverwriteModel>)args[3],
                 Permissions: (Discord.Models.Optional<Discord.Models.PermissionBitSet>)args[4],
                 Type: (Discord.Models.ChannelType)args[5],
                 Flags: (Discord.Models.ChannelFlags)args[6],
-                Id: (Snowflake)args[7]
+                Id: (Discord.Snowflake)args[7]
             ),
             PropertyMetadataInitializer = _ => CreatePropertyInfos(options),
             ConstructorParameterMetadataInitializer = CreateConstructorParameterInfos
@@ -60,9 +60,9 @@ public record CategoryChannelModel(
                 IgnoreCondition = JsonIgnoreCondition.Never
             }
         ),
-        JsonMetadataServices.CreatePropertyInfo<Snowflake>(
+        JsonMetadataServices.CreatePropertyInfo<Discord.Snowflake>(
             options,
-            new JsonPropertyInfoValues<Snowflake>
+            new JsonPropertyInfoValues<Discord.Snowflake>
             {
                 IsProperty = true,
                 IsPublic = true,
@@ -144,9 +144,9 @@ public record CategoryChannelModel(
                 IgnoreCondition = JsonIgnoreCondition.Never
             }
         ),
-        JsonMetadataServices.CreatePropertyInfo<Snowflake>(
+        JsonMetadataServices.CreatePropertyInfo<Discord.Snowflake>(
             options,
-            new JsonPropertyInfoValues<Snowflake>
+            new JsonPropertyInfoValues<Discord.Snowflake>
             {
                 IsProperty = true,
                 IsPublic = true,
@@ -173,7 +173,7 @@ public record CategoryChannelModel(
         new()
         {
            Name = "GuildId",
-           ParameterType = typeof(Snowflake),
+           ParameterType = typeof(Discord.Snowflake),
            Position = 1,
            HasDefaultValue = false,
            DefaultValue = null,
@@ -227,7 +227,7 @@ public record CategoryChannelModel(
         new()
         {
            Name = "Id",
-           ParameterType = typeof(Snowflake),
+           ParameterType = typeof(Discord.Snowflake),
            Position = 7,
            HasDefaultValue = false,
            DefaultValue = null,

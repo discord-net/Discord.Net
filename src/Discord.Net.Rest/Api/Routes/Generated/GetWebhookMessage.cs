@@ -1,12 +1,14 @@
+using Discord.Models;
+
 namespace Discord.Rest.Api;
 
 partial class Routes
 {
-   public sealed record GetWebhookMessage(
+   public sealed partial record GetWebhookMessage(
         RouteParameters.WebhookId WebhookId,
         RouteParameters.WebhookToken WebhookToken,
         RouteParameters.MessageId MessageId
-    ) : IOperation
+    ) : IOperation, Expand<GetWebhookMessage, GetWebhookMessage>
     {
         public Optional<Snowflake> ThreadId { get; init; }
     

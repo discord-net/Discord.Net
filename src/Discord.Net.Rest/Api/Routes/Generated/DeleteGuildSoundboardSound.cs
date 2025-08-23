@@ -1,11 +1,13 @@
+using Discord.Models;
+
 namespace Discord.Rest.Api;
 
 partial class Routes
 {
-   public sealed record DeleteGuildSoundboardSound(
+   public sealed partial record DeleteGuildSoundboardSound(
         RouteParameters.GuildId GuildId,
         RouteParameters.SoundId SoundId
-    ) : IOperation
+    ) : IOperation, Expand<DeleteGuildSoundboardSound, DeleteGuildSoundboardSound>
     {
         public static IReadOnlyList<Type> RouteParameterTypes
             => [typeof(RouteParameters.GuildId), typeof(RouteParameters.SoundId)];

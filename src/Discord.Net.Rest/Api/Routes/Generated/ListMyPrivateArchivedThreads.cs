@@ -1,10 +1,12 @@
+using Discord.Models;
+
 namespace Discord.Rest.Api;
 
 partial class Routes
 {
-   public sealed record ListMyPrivateArchivedThreads(
+   public sealed partial record ListMyPrivateArchivedThreads(
         RouteParameters.ChannelId ChannelId
-    ) : IOperation
+    ) : IOperation, Expand<ListMyPrivateArchivedThreads, ListMyPrivateArchivedThreads>
     {
         public Optional<Snowflake> Before { get; init; }
         public Optional<int> Limit { get; init; }

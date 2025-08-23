@@ -1,10 +1,12 @@
+using Discord.Models;
+
 namespace Discord.Rest.Api;
 
 partial class Routes
 {
-   public sealed record ListGuildAuditLogEntries(
+   public sealed partial record ListGuildAuditLogEntries(
         RouteParameters.GuildId GuildId
-    ) : IOperation
+    ) : IOperation, Expand<ListGuildAuditLogEntries, ListGuildAuditLogEntries>
     {
         public Optional<Snowflake> UserId { get; init; }
         public Optional<Snowflake> TargetId { get; init; }

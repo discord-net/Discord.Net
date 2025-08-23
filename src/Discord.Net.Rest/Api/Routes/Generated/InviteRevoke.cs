@@ -1,10 +1,12 @@
+using Discord.Models;
+
 namespace Discord.Rest.Api;
 
 partial class Routes
 {
-   public sealed record InviteRevoke(
+   public sealed partial record InviteRevoke(
         RouteParameters.Code Code
-    ) : IOperation
+    ) : IOperation, Expand<InviteRevoke, InviteRevoke>
     {
         public static IReadOnlyList<Type> RouteParameterTypes
             => [typeof(RouteParameters.Code)];

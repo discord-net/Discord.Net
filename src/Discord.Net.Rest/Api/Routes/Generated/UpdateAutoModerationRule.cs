@@ -1,11 +1,13 @@
+using Discord.Models;
+
 namespace Discord.Rest.Api;
 
 partial class Routes
 {
-   public sealed record UpdateAutoModerationRule(
+   public sealed partial record UpdateAutoModerationRule(
         RouteParameters.GuildId GuildId,
         RouteParameters.RuleId RuleId
-    ) : IOperation
+    ) : IOperation, Expand<UpdateAutoModerationRule, UpdateAutoModerationRule>
     {
         public static IReadOnlyList<Type> RouteParameterTypes
             => [typeof(RouteParameters.GuildId), typeof(RouteParameters.RuleId)];

@@ -22,6 +22,7 @@ partial class DiscordJsonContext
             Discord.Models.IOverwriteModel narrowed => Discord.Models.Json.OverwriteModel.From(narrowed),
             Discord.Models.ITagModel narrowed => Discord.Models.Json.TagModel.From(narrowed),
             Discord.Models.ICurrentUserModel narrowed => Discord.Models.Json.CurrentUserModel.From(narrowed),
+            Discord.Models.IModifyCurrentUserParams narrowed => Discord.Models.Json.ModifyCurrentUserParams.From(narrowed),
             Discord.Models.ITextChannelModel narrowed => Discord.Models.Json.TextChannelModel.From(narrowed),
             Discord.Models.IVoiceChannelModel narrowed => Discord.Models.Json.VoiceChannelModel.From(narrowed),
             Discord.Models.IUserModel narrowed => Discord.Models.Json.UserModel.From(narrowed),
@@ -50,6 +51,7 @@ partial class DiscordJsonContext
         { typeof(Discord.Models.IOverwriteModel), typeof(Discord.Models.Json.OverwriteModel) },
         { typeof(Discord.Models.ITagModel), typeof(Discord.Models.Json.TagModel) },
         { typeof(Discord.Models.ICurrentUserModel), typeof(Discord.Models.Json.CurrentUserModel) },
-        { typeof(Discord.Models.IUserModel), typeof(Discord.Models.Json.UserModel) }
+        { typeof(Discord.Models.IUserModel), typeof(Discord.Models.Json.UserModel) },
+        { typeof(Discord.Models.IModifyCurrentUserParams), typeof(Discord.Models.Json.ModifyCurrentUserParams) }
     };
 }
