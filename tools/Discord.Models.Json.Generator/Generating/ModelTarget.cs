@@ -5,6 +5,7 @@ namespace Discord.Models.Json.Generator;
 
 public sealed class ModelTarget
 {
+    public string? CoreConverter { get; set; }
     public Type Type { get; }
     public TypeSpec TypeSpec { get; }
     

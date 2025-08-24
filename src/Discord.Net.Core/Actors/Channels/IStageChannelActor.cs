@@ -5,7 +5,8 @@ namespace Discord;
 public interface IStageChannelActor :
     IActor<Snowflake, IStageChannel>,
     IGuildChannelTrait,
-    IInvitableGuildChannelTrait
+    IInvitableGuildChannelTrait,
+    IGuildMessageChannelTrait
 {
     
 }

@@ -1,0 +1,16 @@
+base: IMemberModel
+props:
+  User: "user"
+  Nick: "nick"
+  Avatar: "avatar"
+  Banner: "banner"
+  Roles: "roles"
+  JoinedAt: "joined_at"
+  PremiumSince: "premium_since"
+  Deaf: "deaf"
+  Mute: "mute"
+  Flags: "flags"
+  Pending: "pending"
+  Permissions: "permissions"
+  CommunicationsDisabledUntil: "communications_disabled_until"
+  AvatarDecorationData: "avatar_decoration_data"

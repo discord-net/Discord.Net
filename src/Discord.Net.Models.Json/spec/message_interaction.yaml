@@ -1,0 +1,7 @@
+base: IMessageInteractionModel
+props:
+  Type: "type"
+  Name: "name"
+  User: "user"
+  Member: "member"
+  Id: "id"

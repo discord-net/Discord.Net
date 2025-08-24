@@ -1,0 +1,14 @@
+base: IContainerAtom
+props:
+  Type: "type"
+  Id: "id"
+hierarchy:
+  ancestors:
+  - IMessageComponentModel
+  descendants:
+  - IActionRowComponentModel
+  - IFileComponentModel
+  - IMediaGalleryComponentModel
+  - ISectionComponentModel
+  - ISeparatorComponentItem
+  - ITextDisplayComponentModel

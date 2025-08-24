@@ -6,8 +6,7 @@ namespace Discord.Rest;
 public class RestUser :
     RestEntity<Snowflake, IUserModel>,
     IRestEntity<RestUser, Snowflake, IUserModel>,
-    IUser,
-    IRestPipelineEntity<RestUser>
+    IUser
 {
     protected virtual RestUserActor Actor { get; }
 
@@ -19,12 +18,9 @@ public class RestUser :
     public static RestUser Create(DiscordRestClient client, IUserModel model)
         => model switch
         {
-            ICurrentUserModel currentUserModel => throw new NotImplementedException(),
+            ICurrentUserModel currentUserModel => RestCurrentUser.Create(client, model),
             _ => new RestUser(client, model)
         };
 
     ValueTask<IUser> ILoadable<IUser>.GetAsync(RequestOptions options) => ValueTask.FromResult<IUser>(this);
-
-    public static IRestApiPipeline<RestUser> FromPipeline(IRestApiPipeline<HttpResponseMessage> pipeline)
-        => pipeline.Deserialize<IUserModel>().Map((model, client, options) => new RestUser(client, model));
 }

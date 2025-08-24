@@ -1,0 +1,5 @@
+base: IMediaGalleryItemModel
+props:
+  Media: "media"
+  Description: "description"
+  Spoiler: "spoiler"

@@ -23,6 +23,7 @@
 
   <ItemGroup>
     <Folder Include="Constants\" />
+    <Folder Include="DataTypes\" />
   </ItemGroup>
 
 </Project>

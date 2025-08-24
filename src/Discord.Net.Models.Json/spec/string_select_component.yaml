@@ -1,0 +1,18 @@
+base: IStringSelectComponentModel
+props:
+  Options: "options"
+  Placeholder: "placeholder"
+  MinValues: "min_values"
+  MaxValues: "max_values"
+  Disabled: "disabled"
+  Type: "type"
+  Id: "id"
+  CustomId: "custom_id"
+hierarchy:
+  ancestors:
+  - IMessageComponentModel
+  descendants: []
+variant:
+  property_name: Type
+  values:
+  - StringSelect

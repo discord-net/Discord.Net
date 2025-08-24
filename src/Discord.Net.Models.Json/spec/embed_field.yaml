@@ -1,0 +1,5 @@
+base: IEmbedFieldModel
+props:
+  Name: "name"
+  Value: "value"
+  Inline: "inline"

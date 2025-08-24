@@ -1,0 +1,25 @@
+base: IMessageComponentModel
+props:
+  Type: "type"
+  Id: "id"
+hierarchy:
+  ancestors: []
+  descendants:
+  - IActionRowComponentModel
+  - IButtonComponentModel
+  - IChannelSelectComponentModel
+  - IContainerComponentModel
+  - IContainerAtom
+  - IFileComponentModel
+  - IMediaGalleryComponentModel
+  - IMentionableSelectComponentModel
+  - IRoleSelectComponentModel
+  - ISectionComponentModel
+  - ISectionComponentAtom
+  - ISectionComponentAccessory
+  - ISeparatorComponentItem
+  - IStringSelectComponentModel
+  - ITextDisplayComponentModel
+  - ITextInputComponentModel
+  - IThumbnailComponentModel
+  - IUserSelectComponentModel

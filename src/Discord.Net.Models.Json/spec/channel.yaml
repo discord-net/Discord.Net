@@ -3,3 +3,18 @@ props:
   Type: "type"
   Flags: "flags"
   Id: "id"
+hierarchy:
+  ancestors: []
+  descendants:
+  - IAnnouncementChannelModel
+  - ICategoryChannelModel
+  - IDirectoryChannelModel
+  - IDMChannelModel
+  - IForumChannelModel
+  - IGroupChannelModel
+  - IGuildChannelModel
+  - IMediaChannelModel
+  - IStageChannelModel
+  - ITextChannelModel
+  - IThreadChannelModel
+  - IVoiceChannelModel

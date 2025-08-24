@@ -1,0 +1,9 @@
+base: ISectionComponentAtom
+props:
+  Type: "type"
+  Id: "id"
+hierarchy:
+  ancestors:
+  - IMessageComponentModel
+  descendants:
+  - ITextDisplayComponentModel

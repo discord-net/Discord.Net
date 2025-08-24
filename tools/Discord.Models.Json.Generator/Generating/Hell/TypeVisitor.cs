@@ -82,6 +82,7 @@ public class TypeVisitor
         if (type == typeof(PermissionBitSet)) return;
         if (type == typeof(EmojiId)) return;
         if (type == typeof(ImageData)) return;
+        if (type == typeof(Color)) return;
         
         // pass for built-ins
         if (Generator.BuiltIns.Contains(type)) return;
@@ -101,6 +102,12 @@ public class TypeVisitor
         if (type is {Name: "IReadOnlyList`1", GenericTypeArguments: [{ } element]})
         {
             VisitList(type, element);
+            return;
+        }
+
+        if (type is {Name: "IReadOnlyDictionary`2", GenericTypeArguments: [{ } key, { } value]})
+        {
+            VisitDictionary(type, key, value);
             return;
         }
 
@@ -129,10 +136,37 @@ public class TypeVisitor
             {Name: "Nullable`1"} => $"Nullable{GetPropertyName(type.GenericTypeArguments[0])}",
             {Name: "IReadOnlyList`1"} => $"ListOf{GetPropertyName(type.GenericTypeArguments[0])}",
             {Name: "IdOrModel`2"} => $"IdOrModelOf{GetPropertyName(type.GenericTypeArguments[1])}",
+            {Name: "IReadOnlyDictionary`2"} => $"MapOf{GetPropertyName(type.GenericTypeArguments[0])}To{GetPropertyName(type.GenericTypeArguments[1])}",
             _ when Generator.IsAPIModel(type) => type.Name[1..],
             _ => type.Name
         };
 
+    private void VisitDictionary(Type type, Type keyType, Type valueType)
+    {
+        _cache.Add(keyType);
+        _cache.Add(valueType);
+        
+        var propName = GetPropertyName(type);
+
+        _infoProperties.Add((type, propName));
+        
+        _spec.Properties.Add(
+            new PropertySpec(
+                $"JsonTypeInfo<{type.ToCodeString()}>",
+                propName,
+                Accessibility.Public,
+                Attributes: [new AttributeSpec("MaybeNull") {Target = "field"}],
+                Expression:
+                $"""
+                 field ??= JsonMetadataServices.CreateIReadOnlyDictionaryInfo<{type.ToCodeString()}, {keyType.ToCodeString()}, {valueType.ToCodeString()}>(
+                     Options, 
+                     new JsonCollectionInfoValues<{type.ToCodeString()}>()
+                 )
+                 """
+            )
+        );
+    }
+    
     private void VisitIdOrModel(Type type, Type idType, Type modelType)
     {
         _cache.Add(idType);

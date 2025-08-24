@@ -3,7 +3,7 @@
 namespace Discord;
 
 public interface IGuildChannelsLink<TChannel> :
-    IIndexableLink<Snowflake, IGuildChannelTrait> 
+    IIndexableLink<Snowflake, TChannel> 
     where TChannel : IGuildChannelTrait;
 
 public interface IGuildChannelsLink :
@@ -13,7 +13,7 @@ public interface IGuildChannelsLink :
     IGuildChannelsLink<ICategoryChannelActor> Category { get; }
     IGuildChannelsLink<IForumChannelActor> Forum { get; }
     IGuildChannelsLink<IMediaChannelActor> Media { get; }
-    IGuildChannelsLink<INewsChannelActor> News { get; }
+    IGuildChannelsLink<IAnnouncementChannelActor> News { get; }
     IGuildChannelsLink<IStageChannelActor> Stage { get; }
     IGuildChannelsLink<ITextChannelActor> Text { get; }
     IGuildChannelsLink<IVoiceChannelActor> Voice { get; }

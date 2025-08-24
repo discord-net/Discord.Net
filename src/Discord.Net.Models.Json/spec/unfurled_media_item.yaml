@@ -1,0 +1,8 @@
+base: IUnfurledMediaItemModel
+props:
+  Url: "url"
+  ProxyUrl: "proxy_url"
+  Height: "height"
+  Width: "width"
+  ContentType: "content_type"
+  AttachmentId: "attachment_id"

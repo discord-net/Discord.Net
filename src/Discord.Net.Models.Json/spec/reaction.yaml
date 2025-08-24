@@ -1,0 +1,8 @@
+base: IReactionModel
+props:
+  Count: "count"
+  CountDetails: "count_details"
+  Me: "me"
+  MeBurst: "me_burst"
+  Emoji: "emoji"
+  BurstColors: "burst_colors"

@@ -1,0 +1,6 @@
+base: IRoleSubscriptionDataModel
+props:
+  RoleSubscriptionListingId: "role_subscription_listing_id"
+  TierName: "tier_name"
+  TotalMonthsSubscribed: "total_months_subscribed"
+  IsRenewal: "is_renewal"

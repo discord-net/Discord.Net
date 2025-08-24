@@ -1,0 +1,15 @@
+base: IEmbedModel
+props:
+  Title: "title"
+  Type: "type"
+  Description: "description"
+  Url: "url"
+  Timestamp: "timestamp"
+  Color: "color"
+  Footer: "footer"
+  Image: "image"
+  Thumbnail: "thumbnail"
+  Video: "video"
+  Provider: "provider"
+  Author: "author"
+  Fields: "fields"

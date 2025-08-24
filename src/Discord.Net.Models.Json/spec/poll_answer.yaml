@@ -1,0 +1,4 @@
+base: IPollAnswerModel
+props:
+  AnswerId: "answer_id"
+  PollMedia: "poll_media"

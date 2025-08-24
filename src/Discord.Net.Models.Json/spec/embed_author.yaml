@@ -1,0 +1,6 @@
+base: IEmbedAuthorModel
+props:
+  Name: "name"
+  Url: "url"
+  IconUrl: "icon_url"
+  ProxyIconUrl: "proxy_icon_url"

@@ -1,0 +1,20 @@
+base: IButtonComponentModel
+props:
+  Style: "style"
+  Label: "label"
+  Emoji: "emoji"
+  SkuId: "sku_id"
+  Url: "url"
+  Disabled: "disabled"
+  CustomId: "custom_id"
+  Type: "type"
+  Id: "id"
+hierarchy:
+  ancestors:
+  - IMessageComponentModel
+  - ISectionComponentAccessory
+  descendants: []
+variant:
+  property_name: Type
+  values:
+  - Button

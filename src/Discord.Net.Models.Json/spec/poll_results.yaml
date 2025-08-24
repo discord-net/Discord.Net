@@ -1,0 +1,4 @@
+base: IPollResultsModel
+props:
+  IsFinalized: "is_finalized"
+  AnswerCounts: "answer_counts"

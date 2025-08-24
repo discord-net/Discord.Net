@@ -1,0 +1,19 @@
+base: IChannelSelectComponentModel
+props:
+  ChannelTypes: "channel_types"
+  Placeholder: "placeholder"
+  DefaultValues: "default_values"
+  MinValues: "min_values"
+  MaxValues: "max_values"
+  Disabled: "disabled"
+  CustomId: "custom_id"
+  Type: "type"
+  Id: "id"
+hierarchy:
+  ancestors:
+  - IMessageComponentModel
+  descendants: []
+variant:
+  property_name: Type
+  values:
+  - ChannelSelect

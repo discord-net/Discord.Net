@@ -1,0 +1,15 @@
+base: ISectionComponentModel
+props:
+  Components: "components"
+  Accessory: "accessory"
+  Type: "type"
+  Id: "id"
+hierarchy:
+  ancestors:
+  - IContainerAtom
+  - IMessageComponentModel
+  descendants: []
+variant:
+  property_name: Type
+  values:
+  - Section

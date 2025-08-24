@@ -1,0 +1,9 @@
+base: IMessageInteractionMetadataModel
+props:
+  Type: "type"
+  User: "user"
+  AuthorizingIntegrationOwners: "authorizing_integration_owners"
+  OriginalResponseMessageId: "original_response_message_id"
+  TargetUser: "target_user"
+  TargetMessageId: "target_message_id"
+  Id: "id"

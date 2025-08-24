@@ -9,4 +9,5 @@ public readonly record struct IdOrEntity<TId, TEntity>(TId Id)
     }
 
     public static implicit operator IdOrEntity<TId, TEntity>(TId id) => new(id);
+    public static implicit operator IdOrEntity<TId, TEntity>(TEntity entity) => new(entity.Id);
 }

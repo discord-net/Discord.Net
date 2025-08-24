@@ -11,6 +11,7 @@ public readonly record struct IdOrModel<TId, TModel>(TId Id)
         Model = model;
     }
 
+    public static implicit operator TId(IdOrModel<TId, TModel> self) => self.Id;
     public static implicit operator IdOrModel<TId, TModel>(TId id) => new(id);
     public static implicit operator IdOrModel<TId, TModel>(TModel model) => new(model);
 }

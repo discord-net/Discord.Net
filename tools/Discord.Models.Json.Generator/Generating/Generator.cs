@@ -13,6 +13,7 @@ public static partial class Generator
     public const string SPEC_PATH = "../../../../../src/Discord.Net.Models.Json/spec";
     public const string CONTEXT_OUT_DIR = "../../../../../src/Discord.Net.Models.Json/Generated";
     public const string MODELS_OUT_DIR = "../../../../../src/Discord.Net.Models.Json/Generated/Models";
+    public const string CONVERTERS_OUT_DIR = "../../../../../src/Discord.Net.Models.Json/Generated/Converters";
 
     private static IDeserializer _deserializer = new DeserializerBuilder()
         .WithNodeDeserializer(SpecProperty.Serializer.Instance)
@@ -22,22 +23,31 @@ public static partial class Generator
     private static ISerializer _serializer = new SerializerBuilder()
         .WithTypeConverter(SpecProperty.Serializer.Instance)
         .WithNamingConvention(UnderscoredNamingConvention.Instance)
+        .ConfigureDefaultValuesHandling(DefaultValuesHandling.OmitDefaults)
         .Build();
+
+    private static HashSet<Type> _modelTypes;
 
     public static void Run()
     {
         if (!Directory.Exists(MODELS_OUT_DIR)) Directory.CreateDirectory(MODELS_OUT_DIR);
         if (!Directory.Exists(CONTEXT_OUT_DIR)) Directory.CreateDirectory(CONTEXT_OUT_DIR);
+        if (!Directory.Exists(CONVERTERS_OUT_DIR)) Directory.CreateDirectory(CONVERTERS_OUT_DIR);
 
         // find all models to generate
 
-        var targets = typeof(IModel)
+        _modelTypes = typeof(IModel)
             .Assembly
             .GetTypes()
             .Where(IsAPIModel)
-            .Select(ProcessType)
-            .ToList();
+            .ToHashSet();
 
+        var targets =
+            _modelTypes
+                .Select(ProcessType)
+                .ToList();
+
+        GenerateVariants(targets);
         GenerateContexts(targets);
 
         TypeVisitor.Run(targets.SelectMany(x => x
@@ -61,11 +71,43 @@ public static partial class Generator
 
         SpecModel mappingSpec;
 
+        var hierarchy = _modelTypes
+            .Where(x =>
+                x != model &&
+                (
+                    x.IsAssignableFrom(model)
+                    ||
+                    x.IsAssignableTo(model)
+                )
+            )
+            .ToArray();
+
+        var specHierarchy = hierarchy.Length is 0
+            ? null
+            : new SpecHierarchy()
+            {
+                Ancestors = [..hierarchy.Where(model.IsAssignableTo).Select(x => x.Name)],
+                Descendants = [..hierarchy.Where(model.IsAssignableFrom).Select(x => x.Name)],
+            };
+
+        SpecVariant? variant = null;
+        if (model.GetCustomAttribute<VariantAttribute>() is { } variantAttribute)
+        {
+            variant = new()
+            {
+                PropertyName = variantAttribute.PropertyName,
+                Values = variantAttribute.Values
+            };
+        }
+        
         if (Path.Exists(specFilePath))
         {
             mappingSpec = _deserializer.Deserialize<SpecModel>(
                 File.ReadAllText(specFilePath)
             );
+
+            mappingSpec.Hierarchy = specHierarchy;
+            mappingSpec.Variant = variant;
 
             // add missing properties
             foreach (var modelProp in GetAllProperties(model))
@@ -88,7 +130,9 @@ public static partial class Generator
                     .ToDictionary(x => x.Name, x => new SpecProperty()
                     {
                         Json = UnderscoredNamingConvention.Instance.Apply(x.Name)
-                    })
+                    }),
+                Hierarchy = specHierarchy,
+                Variant = variant
             };
         }
 
@@ -120,10 +164,8 @@ public static partial class Generator
         File.WriteAllText(specFilePath, _serializer.Serialize(mappingSpec));
 
         return target;
-
-        
     }
-    
+
     public static string GetSpecName(Type type)
         => type
             .Name[1..]
@@ -192,7 +234,7 @@ public static partial class Generator
 
             foreach (var propertyInfo in current.GetProperties())
             {
-                if(seenNames.Add(propertyInfo.Name))
+                if (seenNames.Add(propertyInfo.Name))
                     yield return propertyInfo;
             }
 

@@ -1,0 +1,17 @@
+base: IFileComponentModel
+props:
+  File: "file"
+  Spoiler: "spoiler"
+  Name: "name"
+  Size: "size"
+  Type: "type"
+  Id: "id"
+hierarchy:
+  ancestors:
+  - IContainerAtom
+  - IMessageComponentModel
+  descendants: []
+variant:
+  property_name: Type
+  values:
+  - File

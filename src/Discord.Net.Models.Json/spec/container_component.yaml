@@ -1,0 +1,15 @@
+base: IContainerComponentModel
+props:
+  Components: "components"
+  AccentColor: "accent_color"
+  Spoiler: "spoiler"
+  Type: "type"
+  Id: "id"
+hierarchy:
+  ancestors:
+  - IMessageComponentModel
+  descendants: []
+variant:
+  property_name: Type
+  values:
+  - Container

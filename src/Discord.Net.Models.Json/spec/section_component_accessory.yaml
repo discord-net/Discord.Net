@@ -1,0 +1,10 @@
+base: ISectionComponentAccessory
+props:
+  Type: "type"
+  Id: "id"
+hierarchy:
+  ancestors:
+  - IMessageComponentModel
+  descendants:
+  - IButtonComponentModel
+  - IThumbnailComponentModel

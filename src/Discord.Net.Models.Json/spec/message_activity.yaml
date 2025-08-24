@@ -1,0 +1,4 @@
+base: IMessageActivityModel
+props:
+  Type: "type"
+  PartyId: "party_id"

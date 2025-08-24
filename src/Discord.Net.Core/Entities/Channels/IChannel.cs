@@ -4,7 +4,8 @@ namespace Discord;
 
 public interface IChannel :
     IEntity<Snowflake>,
-    IModeledBy<IChannelModel>
+    IModeledBy<IChannelModel>,
+    IChannelActor
 {
     
 }

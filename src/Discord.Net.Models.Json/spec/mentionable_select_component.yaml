@@ -1,0 +1,18 @@
+base: IMentionableSelectComponentModel
+props:
+  Placeholder: "placeholder"
+  DefaultValues: "default_values"
+  MinValues: "min_values"
+  MaxValues: "max_values"
+  Disabled: "disabled"
+  Type: "type"
+  Id: "id"
+  CustomId: "custom_id"
+hierarchy:
+  ancestors:
+  - IMessageComponentModel
+  descendants: []
+variant:
+  property_name: Type
+  values:
+  - MentionableSelect

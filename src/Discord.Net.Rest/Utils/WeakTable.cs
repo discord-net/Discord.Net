@@ -84,7 +84,7 @@ internal sealed class WeakTable<TKey, TValue>
         }
     }
 
-    public TValue GetOrAdd<T>(TKey key, Func<TKey, T, TValue> factory, T state)
+    public TValue GetOrAdd<T>(TKey key, Func<T, TKey, TValue> factory, T state)
     {
         lock (_syncRoot)
         {
@@ -94,7 +94,7 @@ internal sealed class WeakTable<TKey, TValue>
                 holder.TryGetValue(out var value)
             ) return value;
 
-            value = factory(key, state);
+            value = factory(state, key);
 
             _dictionary[key] = new(
                 new(this, key, value)

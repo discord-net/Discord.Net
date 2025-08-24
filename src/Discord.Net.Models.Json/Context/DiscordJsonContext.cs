@@ -6,7 +6,7 @@ using Discord.Models.Json.Converters;
 
 namespace Discord.Models.Json;
 
-public sealed partial class DiscordJsonContext(JsonSerializerOptions? options) : JsonSerializerContext(options)
+public sealed partial class DiscordJsonContext(JsonSerializerOptions? options = null) : JsonSerializerContext(options)
 {
     [field: MaybeNull]
     public JsonTypeInfo<Snowflake> Snowflake
@@ -25,10 +25,8 @@ public sealed partial class DiscordJsonContext(JsonSerializerOptions? options) :
         if (type == typeof(Snowflake)) return Snowflake;
         if (type == typeof(ImageData)) return ImageData;
 
-        if (type == typeof(IUserModel)) return BaseUser;
-        
-        if (TryGetJsonModel(type, out var jsonModelType)) 
-            type = jsonModelType;
+        if (type.IsInterface && TryGetCoreJsonTypeInfo(type, out var info))
+            return info;
 
         if (TryGetBuiltIn(type, out var builtIn)) return builtIn;
         if (TryGetImplicitTypeInfo(type, out var implicitInfo)) return implicitInfo;

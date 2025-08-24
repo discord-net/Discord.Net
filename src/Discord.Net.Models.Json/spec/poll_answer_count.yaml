@@ -1,0 +1,5 @@
+base: IPollAnswerCountModel
+props:
+  Id: "id"
+  Count: "count"
+  MeVoted: "me_voted"

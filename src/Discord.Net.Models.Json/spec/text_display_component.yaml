@@ -1,0 +1,15 @@
+base: ITextDisplayComponentModel
+props:
+  Content: "content"
+  Type: "type"
+  Id: "id"
+hierarchy:
+  ancestors:
+  - IContainerAtom
+  - IMessageComponentModel
+  - ISectionComponentAtom
+  descendants: []
+variant:
+  property_name: Type
+  values:
+  - TextDisplay

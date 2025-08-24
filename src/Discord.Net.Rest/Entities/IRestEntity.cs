@@ -10,7 +10,7 @@ public interface IRestEntity :
 
 public interface IRestEntity<out TId> : IRestEntity, IEntity<TId> where TId : IEquatable<TId>;
 
-public interface IRestEntity<out TId, TModel> :
+public interface IRestEntity<out TId, out TModel> :
     IRestEntity<TId>,
     IEntity<TId, TModel>
     where TId : IEquatable<TId>
@@ -23,10 +23,4 @@ public interface IRestEntity<out TSelf, out TId, TModel> :
     where TSelf : IRestEntity<TSelf, TId, TModel>
 {
     static abstract TSelf Create(DiscordRestClient client, TModel model);
-}
-
-public interface IRestPipelineEntity<TSelf> : IRestEntity
-    where TSelf : IRestPipelineEntity<TSelf>
-{
-    static abstract IRestApiPipeline<TSelf> FromPipeline(IRestApiPipeline<HttpResponseMessage> pipeline);
 }

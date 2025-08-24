@@ -30,7 +30,7 @@ public sealed class UserConverter : JsonConverter<IUserModel>
         if (JsonNode.Parse(ref reader) is not JsonObject jsonObject)
             throw new JsonException("Expected object type");
         
-        return jsonObject.TryGetPropertyValue("email", out _)
+        return jsonObject.TryGetPropertyValue("email", out var xx)
             ? jsonObject.Deserialize(_currentUserTypeInfo)
             : jsonObject.Deserialize(_userTypeInfo);
     }

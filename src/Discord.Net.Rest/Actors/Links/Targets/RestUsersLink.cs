@@ -1,6 +1,6 @@
 ﻿using Discord.Models;
 
-namespace Discord.Rest.Targets;
+namespace Discord.Rest;
 
 public sealed class RestUsersLink : IUsersLink
 {
@@ -8,7 +8,7 @@ public sealed class RestUsersLink : IUsersLink
 
     public RestUserActor this[Snowflake id] => _indexable[id];
 
-    private readonly RestIndexableLink<Snowflake, RestUserActor, RestUser> _indexable;
+    private readonly RestIndexableLink<Snowflake, RestUserActor> _indexable;
 
     private readonly DiscordRestClient _client;
 
@@ -16,7 +16,7 @@ public sealed class RestUsersLink : IUsersLink
     {
         Current = new(client, TokenUtils.GetUserIdFromToken(client.Config.Token.Value));
         _client = client;
-        _indexable = new(client, static (id, client) => new RestUserActor(client, id));
+        _indexable = new(client, static (client, id) => new RestUserActor(client, id));
     }
 
     ICurrentUserActor IUsersLink.Current => Current;

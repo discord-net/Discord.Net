@@ -1,0 +1,16 @@
+base: IThumbnailComponentModel
+props:
+  Media: "media"
+  Description: "description"
+  Spoiler: "spoiler"
+  Type: "type"
+  Id: "id"
+hierarchy:
+  ancestors:
+  - IMessageComponentModel
+  - ISectionComponentAccessory
+  descendants: []
+variant:
+  property_name: Type
+  values:
+  - Thumbnail

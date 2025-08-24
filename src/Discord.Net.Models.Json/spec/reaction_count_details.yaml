@@ -1,0 +1,4 @@
+base: IReactionCountDetailsModel
+props:
+  Burst: "burst"
+  Normal: "normal"

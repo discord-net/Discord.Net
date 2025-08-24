@@ -4,3 +4,11 @@ props:
   Type: "type"
   Flags: "flags"
   Id: "id"
+hierarchy:
+  ancestors:
+  - IChannelModel
+  descendants: []
+variant:
+  property_name: Type
+  values:
+  - DM

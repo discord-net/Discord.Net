@@ -8,3 +8,12 @@ public interface IMessageChannelTrait :
 {
     IMessagesLink Messages { get; }
 }
+
+public interface IGuildMessageChannelTrait : 
+    IMessageChannelTrait,
+    IGuildChannelTrait
+{
+    new IMessagesLink<IGuildMessageActor> Messages { get; }
+
+    IMessagesLink IMessageChannelTrait.Messages => Messages;
+}

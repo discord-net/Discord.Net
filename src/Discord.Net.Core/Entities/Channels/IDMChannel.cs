@@ -1,7 +1,7 @@
 ﻿namespace Discord;
 
 public interface IDMChannel : 
-    IChannel
+    IChannel,
+    IDMChannelActor
 {
-    IMessagesLink Messages { get; }
 }

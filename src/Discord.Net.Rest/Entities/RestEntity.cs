@@ -2,6 +2,21 @@
 
 namespace Discord.Rest;
 
+// public abstract class RestEntity<TSelf, TId, TModel> :
+//     RestEntity<TId, TModel>,
+//     IRestEntity<TSelf, TId, TModel>
+//     where TId : IEquatable<TId>
+//     where TModel : IEntityModel<TId>
+//     where TSelf : IRestEntity<TSelf, TId, TModel>
+// {
+//     protected RestEntity(DiscordRestClient client, TModel model) : base(client, model)
+//     {
+//     }
+//
+//     public static TSelf Create(DiscordRestClient client, TModel model)
+//         => TSelf.Create(client, model);
+// }
+
 public abstract class RestEntity<TId, TModel> :
     RestEntity<TId>,
     IModeledBy<TModel>

@@ -1,0 +1,7 @@
+base: IMessageReferenceModel
+props:
+  Type: "type"
+  MessageId: "message_id"
+  ChannelId: "channel_id"
+  GuildId: "guild_id"
+  FailIfNotExists: "fail_if_not_exists"

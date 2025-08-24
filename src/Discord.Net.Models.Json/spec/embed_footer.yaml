@@ -1,0 +1,5 @@
+base: IEmbedFooterModel
+props:
+  Text: "text"
+  IconUrl: "icon_url"
+  ProxyIconUrl: "proxy_icon_url"

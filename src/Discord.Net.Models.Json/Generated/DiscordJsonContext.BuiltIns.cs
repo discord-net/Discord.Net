@@ -7,6 +7,7 @@ partial class DiscordJsonContext
 {
     private bool TryGetBuiltIn(Type type, [MaybeNullWhen(false)] out JsonTypeInfo builtIn)
     {
+        if (type == typeof(DateTimeOffset)) return (builtIn = DateTimeOffset) is not null;
         if (type == typeof(byte)) return (builtIn = Byte) is not null;
         if (type == typeof(sbyte)) return (builtIn = SByte) is not null;
         if (type == typeof(short)) return (builtIn = Int16) is not null;
@@ -26,6 +27,9 @@ partial class DiscordJsonContext
         return false;
     }
 
+    [field: MaybeNull]
+    public JsonTypeInfo<DateTimeOffset> DateTimeOffset
+        => field ??= JsonMetadataServices.CreateValueInfo<DateTimeOffset>(Options, JsonMetadataServices.DateTimeOffsetConverter);
     [field: MaybeNull]
     public JsonTypeInfo<byte> Byte
         => field ??= JsonMetadataServices.CreateValueInfo<byte>(Options, JsonMetadataServices.ByteConverter);

@@ -1,3 +1,4 @@
+using System.Net;
 using Discord.Models;
 
 namespace Discord.Rest.Api;

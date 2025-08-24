@@ -1,0 +1,4 @@
+base: IMessageCallModel
+props:
+  Participants: "participants"
+  EndedTimestamp: "ended_timestamp"

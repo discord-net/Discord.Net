@@ -13,3 +13,13 @@ props:
   Flags: "flags"
   Id: "id"
   ParentId: "parent_id"
+hierarchy:
+  ancestors:
+  - IChannelModel
+  - IGuildChannelModel
+  descendants:
+  - IAnnouncementChannelModel
+variant:
+  property_name: Type
+  values:
+  - GuildText

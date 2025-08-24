@@ -1,0 +1,4 @@
+base: ISelectDefaultValueModel
+props:
+  Type: "type"
+  Id: "id"

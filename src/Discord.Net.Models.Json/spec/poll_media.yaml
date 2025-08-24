@@ -1,0 +1,4 @@
+base: IPollMediaModel
+props:
+  Text: "text"
+  Emoji: "emoji"

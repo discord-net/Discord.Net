@@ -1,0 +1,8 @@
+base: IResolvedDataModel
+props:
+  Users: "users"
+  Members: "members"
+  Roles: "roles"
+  Channels: "channels"
+  Messages: "messages"
+  Attachments: "attachments"

@@ -1,0 +1,23 @@
+base: IGuildChannelModel
+props:
+  Name: "name"
+  GuildId: "guild_id"
+  Position: "position"
+  PermissionOverwrites: "permission_overwrites"
+  Permissions: "permissions"
+  Type: "type"
+  Flags: "flags"
+  Id: "id"
+hierarchy:
+  ancestors:
+  - IChannelModel
+  descendants:
+  - IAnnouncementChannelModel
+  - ICategoryChannelModel
+  - IDirectoryChannelModel
+  - IForumChannelModel
+  - IMediaChannelModel
+  - IStageChannelModel
+  - ITextChannelModel
+  - IThreadChannelModel
+  - IVoiceChannelModel

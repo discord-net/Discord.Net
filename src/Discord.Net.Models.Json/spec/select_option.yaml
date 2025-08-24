@@ -1,0 +1,7 @@
+base: ISelectOptionModel
+props:
+  Label: "label"
+  Value: "value"
+  Description: "description"
+  Emoji: "emoji"
+  Default: "default"

@@ -1,5 +1,8 @@
-﻿namespace Discord.Models;
+﻿using Discord.Models.Validation;
 
+namespace Discord.Models;
+
+[APIModel]
 public interface IGuildChannelModel : IChannelModel
 {
     string Name { get; }

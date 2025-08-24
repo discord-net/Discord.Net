@@ -1,0 +1,14 @@
+base: IActionRowComponentModel
+props:
+  Components: "components"
+  Type: "type"
+  Id: "id"
+hierarchy:
+  ancestors:
+  - IContainerAtom
+  - IMessageComponentModel
+  descendants: []
+variant:
+  property_name: Type
+  values:
+  - ActionRow

@@ -1,6 +1,6 @@
 ﻿namespace Discord;
 
-public interface INewsChannel :
+public interface IAnnouncementChannel :
     IGuildChannel
 {
     

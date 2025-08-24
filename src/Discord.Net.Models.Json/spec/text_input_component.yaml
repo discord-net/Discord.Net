@@ -1,0 +1,20 @@
+base: ITextInputComponentModel
+props:
+  Style: "style"
+  Label: "label"
+  MinLength: "min_length"
+  MaxLength: "max_length"
+  Required: "required"
+  Value: "value"
+  Placeholder: "placeholder"
+  Type: "type"
+  Id: "id"
+  CustomId: "custom_id"
+hierarchy:
+  ancestors:
+  - IMessageComponentModel
+  descendants: []
+variant:
+  property_name: Type
+  values:
+  - TextInput

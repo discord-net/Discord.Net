@@ -1,0 +1,5 @@
+base: IStickerItemModel
+props:
+  Name: "name"
+  FormatType: "format_type"
+  Id: "id"

@@ -12,6 +12,14 @@ public static class StringUtils
     public static string Prefix(this string str, int count, char c = ' ')
         => count is 0 ? str : $"{new string(c, count)}{str}";
 
+    public static string Postfix(this string str, int count, char c = ' ')
+        => count is 0 ? str : $"{str}{new string(c, count)}";
+
+    public static string ToCamelCase(this string str)
+        => string.IsNullOrWhiteSpace(str) || str.Length is 1
+            ? str.ToLower()
+            : $"{char.ToLower(str[0])}{str[1..]}";
+
     public static string ToSnakeCase(this string text)
     {
         if (text == null)

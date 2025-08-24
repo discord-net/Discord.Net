@@ -16,3 +16,7 @@ props:
   PublicFlags: "public_flags"
   Id: "id"
   AccentColor: "accent_color"
+hierarchy:
+  ancestors:
+  - IUserModel
+  descendants: []

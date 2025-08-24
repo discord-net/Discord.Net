@@ -1,0 +1,4 @@
+base: IEmbedProviderModel
+props:
+  Name: "name"
+  Url: "url"

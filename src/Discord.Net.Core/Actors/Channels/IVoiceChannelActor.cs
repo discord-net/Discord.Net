@@ -6,7 +6,7 @@ public interface IVoiceChannelActor :
     IActor<Snowflake, IVoiceChannel>,
     IChannel,
     IGuildChannelTrait, 
-    IMessageChannelTrait,
+    IGuildMessageChannelTrait,
     INestedChannelTrait,
     IInvitableGuildChannelTrait
 {

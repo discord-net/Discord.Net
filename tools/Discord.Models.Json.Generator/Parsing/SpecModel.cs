@@ -10,6 +10,22 @@ public sealed class SpecModel
 
     //public Dictionary<string>
     [YamlMember(Alias = "props")] public Dictionary<string, SpecProperty> Properties { get; set; } = [];
+    
+    public SpecHierarchy? Hierarchy { get; set; }
+    
+    public SpecVariant? Variant { get; set; }
+}
+
+public sealed class SpecVariant
+{
+    public required string PropertyName { get; set; }
+    public required object[] Values { get; set; }
+}
+
+public sealed class SpecHierarchy
+{
+    public List<string> Ancestors { get; set; } = [];
+    public List<string> Descendants { get; set;} = [];
 }
 
 public sealed class SpecProperty

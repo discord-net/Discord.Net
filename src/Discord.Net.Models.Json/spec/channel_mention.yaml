@@ -1,0 +1,6 @@
+base: IChannelMentionModel
+props:
+  GuildId: "guild_id"
+  Type: "type"
+  Name: "name"
+  Id: "id"

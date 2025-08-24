@@ -4,8 +4,8 @@ namespace Discord;
 
 public interface IDMChannelActor :
     IActor<Snowflake, IDMChannel>,
-    IChannelActor,
-    IMessageChannelTrait
+    IMessageChannelTrait,
+    IDeletable
 {
     
 }

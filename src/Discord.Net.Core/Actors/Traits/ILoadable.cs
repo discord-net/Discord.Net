@@ -1,6 +1,6 @@
 ﻿namespace Discord;
 
-public interface ILoadable<TEntity>
+public interface ILoadable<TResult>
 {
-    ValueTask<TEntity> GetAsync(RequestOptions options = default);
+    ValueTask<TResult> GetAsync(RequestOptions options = default);
 }

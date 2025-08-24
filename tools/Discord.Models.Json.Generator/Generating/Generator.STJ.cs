@@ -9,6 +9,7 @@ partial class Generator
 {
     public static readonly Type[] BuiltIns =
     [
+        typeof(DateTimeOffset),
         typeof(byte),
         typeof(sbyte),
         typeof(short),
@@ -83,11 +84,43 @@ partial class Generator
             Path.Combine(CONTEXT_OUT_DIR, "DiscordJsonContext.Mapping.cs"),
             $$"""
               using System.Diagnostics.CodeAnalysis;
+              using System.Text.Json.Serialization.Metadata;
+              using Discord.Models.Json.Converters;
 
               namespace Discord.Models.Json;
 
               partial class DiscordJsonContext
               {
+                  {{
+                      string.Join(
+                          $"{Environment.NewLine}{Environment.NewLine}    ",
+                          targets.Select(x =>
+                              $"""
+                                   [field: MaybeNull]
+                                   public JsonTypeInfo<{x.Type.ToCodeString()}> Core{x.TypeSpec.Name}
+                                       => field ??= JsonMetadataServices.CreateValueInfo<{x.Type.ToCodeString()}>(Options, {
+                                           x.CoreConverter ?? $"new ModelInterfaceConverter<{x.Type.ToCodeString()}, Discord.Models.Json.{x.TypeSpec.Name}>({x.TypeSpec.Name})"
+                                       });
+                                   """.WithNewlinePadding(4)
+                          )
+                      )
+                  }}
+
+                  public bool TryGetCoreJsonTypeInfo(Type type, [MaybeNullWhen(false)] out JsonTypeInfo info)
+                  {
+                      {{
+                          string.Join(
+                              $"{Environment.NewLine}        ",
+                              targets.Select(x =>
+                                  $"if (type == typeof({x.Type.ToCodeString()})) return (info = Core{x.TypeSpec.Name}) is not null;"
+                              )
+                          )
+                      }}
+                      
+                      info = null;
+                      return false;
+                  }
+
                   public static IJsonModel AsJsonModel(IModel model)
                   {
                       if (model is IJsonModel jsonModel) return jsonModel;
@@ -100,8 +133,8 @@ partial class Generator
                                   targets
                                       .OrderBy(x => targets.Count(y => y.Type.IsAssignableTo(x.Type) && x.Type != y.Type))
                                       .Select(x =>
-                                      $"{x.Type.ToCodeString()} narrowed => Discord.Models.Json.{x.TypeSpec.Name}.From(narrowed)"
-                                  )
+                                          $"{x.Type.ToCodeString()} narrowed => Discord.Models.Json.{x.TypeSpec.Name}.From(narrowed)"
+                                      )
                               )
                           }},
                           _ => throw new InvalidOperationException("The type '{model.GetType()}' is not implemented as a json model.")

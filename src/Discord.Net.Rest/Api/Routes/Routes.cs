@@ -10,6 +10,16 @@ public static partial class Routes
 
     public interface Out<out TResult>;
 
+    partial record GetMessage :
+        Out<IMessageModel>;
+
+    partial record UpdateMessage :
+        In<IModifyMessageParams>,
+        Out<IMessageModel>;
+
+    partial record GetChannel :
+        Out<IChannelModel>;
+
     partial record UpdateMyUser :
         In<IModifyCurrentUserParams>,
         Out<ICurrentUserModel>;
