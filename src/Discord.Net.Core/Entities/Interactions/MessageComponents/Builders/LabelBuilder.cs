@@ -11,6 +11,10 @@ public class LabelBuilder : IMessageComponentBuilder
     [
         ComponentType.SelectMenu,
         ComponentType.TextInput,
+        ComponentType.UserSelect,
+        ComponentType.RoleSelect,
+        ComponentType.MentionableSelect,
+        ComponentType.ChannelSelect,
     ];
 
     /// <summary>

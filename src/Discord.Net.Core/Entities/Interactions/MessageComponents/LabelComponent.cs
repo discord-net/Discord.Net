@@ -31,5 +31,7 @@ public class LabelComponent : IMessageComponent
         Component = component;
     }
 
-    public IMessageComponentBuilder ToBuilder() => throw new System.NotImplementedException();
+    /// <inheritdoc />
+    public IMessageComponentBuilder ToBuilder()
+        => new LabelBuilder(Label, Component.ToBuilder(), Description, Id);
 }
