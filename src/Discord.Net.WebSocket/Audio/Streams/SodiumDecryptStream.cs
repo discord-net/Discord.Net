@@ -9,6 +9,10 @@ namespace Discord.Audio.Streams
     /// </summary>
     public class SodiumDecryptStream : AudioOutStream
     {
+        private const int RtpHeaderSize = 12;
+        private const int NonceSize = 24;
+        private const int NonceCounterSize = 4;
+
         private readonly AudioClient _client;
         private readonly AudioStream _next;
         private readonly byte[] _nonce;
@@ -21,7 +25,7 @@ namespace Discord.Audio.Streams
         {
             _next = next;
             _client = (AudioClient)client;
-            _nonce = new byte[24];
+            _nonce = new byte[NonceSize];
         }
 
         public override Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancelToken)
@@ -31,9 +35,27 @@ namespace Discord.Audio.Streams
             if (_client.SecretKey == null)
                 return Task.CompletedTask;
 
-            Buffer.BlockCopy(buffer, 0, _nonce, 0, 12); //Copy RTP header to nonce
-            count = SecretBox.Decrypt(buffer, offset + 12, count - 12, buffer, offset + 12, _nonce, _client.SecretKey);
-            return _next.WriteAsync(buffer, 0, count + 12, cancelToken);
+            // Extract nonce from the payload.
+            for (int i = 0; i < NonceCounterSize; i++ )
+                _nonce[i] = buffer[offset + count + NonceCounterSize - i - 1]; // Big-endian to little-endian
+
+            // Decrypt payload
+            byte[] rtpHeader = new byte[RtpHeaderSize];
+            Buffer.BlockCopy(buffer, offset, rtpHeader, 0, rtpHeader.Length);
+            int payloadOffset = offset + rtpHeader.Length;
+            int payloadLength = count - rtpHeader.Length - NonceCounterSize;
+            int decryptedLength = SecretBox.Decrypt(
+                buffer,
+                payloadOffset,
+                payloadLength,
+                buffer,
+                payloadOffset,
+                rtpHeader,
+                _nonce,
+                _client.SecretKey);
+
+            int packageLength = rtpHeader.Length + decryptedLength;
+            return _next.WriteAsync(buffer, offset, packageLength, cancelToken);
         }
 
         public override Task FlushAsync(CancellationToken cancelToken)

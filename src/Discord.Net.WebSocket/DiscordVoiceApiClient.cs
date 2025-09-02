@@ -19,7 +19,7 @@ namespace Discord.Audio
     {
         #region DiscordVoiceAPIClient
         public const int MaxBitrate = 128 * 1024;
-        public const string Mode = "xsalsa20_poly1305";
+        public const string Mode = "aead_xchacha20_poly1305_rtpsize";
 
         public event Func<string, string, double, Task> SentRequest { add { _sentRequestEvent.Add(value); } remove { _sentRequestEvent.Remove(value); } }
         private readonly AsyncEvent<Func<string, string, double, Task>> _sentRequestEvent = new AsyncEvent<Func<string, string, double, Task>>();
@@ -129,8 +129,15 @@ namespace Discord.Audio
         #endregion
 
         #region WebSocket
-        public Task SendHeartbeatAsync(RequestOptions options = null)
-            => SendAsync(VoiceOpCode.Heartbeat, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(), options: options);
+        public Task SendHeartbeatAsync(int sequenceAck, RequestOptions options = null)
+        {
+            return SendAsync(VoiceOpCode.Heartbeat, new HeartbeatParams
+            {
+                Timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+                SequenceAck = sequenceAck
+            },
+            options: options);
+        }
 
         public Task SendIdentityAsync(ulong userId, string sessionId, string token)
         {
