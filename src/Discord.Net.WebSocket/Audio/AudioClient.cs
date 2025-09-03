@@ -315,7 +315,7 @@ namespace Discord.Audio
                             _ssrc = data.SSRC;
 
                             if (!data.Modes.Contains(DiscordVoiceAPIClient.Mode))
-                                throw new InvalidOperationException($"Discord does not support {DiscordVoiceAPIClient.Mode}");
+                                throw new InvalidOperationException($"Discord does not support {DiscordVoiceAPIClient.Mode}. Available modes: {string.Join(", ", data.Modes)}");
 
                             ApiClient.SetUdpEndpoint(data.Ip, data.Port);
                             await ApiClient.SendDiscoveryAsync(_ssrc).ConfigureAwait(false);
@@ -371,6 +371,9 @@ namespace Discord.Audio
                             await _speakingUpdatedEvent.InvokeAsync(data.UserId, data.Speaking);
                         }
                         break;
+                    case VoiceOpCode.ClientConnect:
+                        await _audioLogger.DebugAsync("Received ClientConnect").ConfigureAwait(false);
+                        break;
                     case VoiceOpCode.ClientDisconnect:
                         {
                             await _audioLogger.DebugAsync("Received ClientDisconnect").ConfigureAwait(false);
@@ -390,6 +393,10 @@ namespace Discord.Audio
 
                             _ = _connection.CompleteAsync();
                         }
+                        break;
+                    // Client flags and platform should be ignored: https://docs.discord.food/topics/voice-connections#client-connections
+                    case VoiceOpCode.ClientFlags:
+                    case VoiceOpCode.ClientPlatform:
                         break;
                     default:
                         await _audioLogger.WarningAsync($"Unknown OpCode ({opCode})").ConfigureAwait(false);
@@ -513,7 +520,9 @@ namespace Discord.Audio
                     _heartbeatTimes.Enqueue(now);
                     try
                     {
-                        await ApiClient.SendHeartbeatAsync().ConfigureAwait(false);
+                        // TODO: The last sequence number received should be sent.
+                        // https://discord.com/developers/docs/topics/voice-connections#buffered-resume
+                        await ApiClient.SendHeartbeatAsync(-1).ConfigureAwait(false);
                     }
                     catch (Exception ex)
                     {
