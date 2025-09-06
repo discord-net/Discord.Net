@@ -29,7 +29,7 @@ public abstract class ComponentNode
         context)
     {
         if (mapId)
-            Id = MapProperty<int>("id", ParseIntProperty, optional: true);
+            Id = MapProperty<int>("id", ValueParsers.ParseIntProperty, optional: true);
     }
 
     protected ComponentNode(ICXml xml, ComponentNodeContext context)
@@ -167,25 +167,28 @@ public abstract class ComponentNode
     protected ComponentProperty<string> MapProperty(
         string name,
         bool optional = false,
-        ParseDelegate<string>? parser = null,
+        ValueParseDelegate<string>? parser = null,
         IReadOnlyList<ComponentPropertyValidator<string>>? validators = null,
         Optional<string> defaultValue = default,
+        ITypeSymbol? apiType = null,
         params IReadOnlyList<string> aliases
     ) => MapProperty<string>(
         name,
-        parser ?? ParseStringProperty,
+        parser ?? ValueParsers.ParseStringProperty,
         optional,
         validators,
         defaultValue,
+        apiType,
         aliases
     );
 
     protected ComponentProperty<T> MapProperty<T>(
         string name,
-        ParseDelegate<T> parser,
+        ValueParseDelegate<T> parser,
         bool optional = false,
         IReadOnlyList<ComponentPropertyValidator<T>>? validators = null,
         Optional<T> defaultValue = default,
+        ITypeSymbol? apiType = null,
         params IReadOnlyList<string> aliases
     )
     {
@@ -197,7 +200,8 @@ public abstract class ComponentNode
             optional,
             validators ?? [],
             parser,
-            defaultValue
+            defaultValue,
+            apiType
         );
 
         _properties.Add(property);
@@ -232,213 +236,5 @@ public abstract class ComponentNode
         if (attribute is not null) _consumedProperties.Add(attribute.Name.Value);
 
         return attribute;
-    }
-
-    private ComponentPropertyValue<T>? ValidateInterpolationType<T>(
-        ComponentProperty<T> property,
-        CXmlValue.Interpolation value,
-        SpecialType specialType
-    ) => ValidateInterpolationType<T>(
-        property,
-        value,
-        (symbol) =>
-        {
-            if (symbol.SpecialType != specialType)
-            {
-                Context.ReportDiagnostic(
-                    Diagnostics.PropertyMismatch,
-                    Context.GetLocation(value),
-                    property.Name,
-                    nameof(Boolean),
-                    symbol.ToDisplayString()
-                );
-                return false;
-            }
-
-            return true;
-        }
-    );
-
-    private ComponentPropertyValue<T>? ValidateInterpolationType<T>(
-        ComponentProperty<T> property,
-        CXmlValue.Interpolation value,
-        Func<ITypeSymbol, bool> validator
-    )
-    {
-        var interpolationInfo = Context.Interpolations[value.InterpolationIndex];
-
-        if (!validator(interpolationInfo.Type))
-            return null;
-
-        return property.CreateValue(in interpolationInfo);
-    }
-
-    protected ComponentPropertyValue<int>? ParseIntProperty(ComponentProperty<int> property)
-    {
-        switch (property.Value)
-        {
-            case null or CXmlValue.Invalid: return null;
-
-            case CXmlValue.Interpolation interpolation:
-                return ValidateInterpolationType(property, interpolation, SpecialType.System_Int32);
-
-            case CXmlValue.Multipart multipart:
-                throw new NotImplementedException();
-            case CXmlValue.Scalar scalar:
-                if (int.TryParse(scalar.Value, out var result))
-                    return property.CreateValue(result);
-
-                Context.ReportDiagnostic(
-                    Diagnostics.InvalidPropertyValue,
-                    Context.GetLocation(scalar),
-                    scalar.Value,
-                    nameof(Int32)
-                );
-                return null;
-
-            default:
-                throw new ArgumentOutOfRangeException();
-        }
-    }
-
-    protected ComponentPropertyValue<bool>? ParseBooleanProperty(ComponentProperty<bool> property)
-    {
-        if (property is {IsSpecified: true, Value: null})
-            return property.CreateValue(true);
-
-        if (!property.IsSpecified)
-            return property.CreateValue(false);
-
-        switch (property.Value)
-        {
-            case null: return null;
-
-            case CXmlValue.Interpolation interpolation:
-                return ValidateInterpolationType(property, interpolation, SpecialType.System_Boolean);
-
-            case CXmlValue.Invalid: return null;
-
-            // multiparts are strings
-            case CXmlValue.Multipart multipart:
-                Context.ReportDiagnostic(
-                    Diagnostics.PropertyMismatch,
-                    Context.GetLocation(multipart),
-                    property.Name,
-                    nameof(Boolean),
-                    typeof(string)
-                );
-                return null;
-
-            case CXmlValue.Scalar scalar:
-                var str = scalar.Value.ToLowerInvariant();
-
-                if (str is not "true" and not "false")
-                {
-                    Context.ReportDiagnostic(
-                        Diagnostics.PropertyMismatch,
-                        Context.GetLocation(scalar),
-                        property.Name,
-                        nameof(Boolean),
-                        typeof(string)
-                    );
-                    return null;
-                }
-
-                return property.CreateValue(str is "true");
-            default:
-                throw new ArgumentOutOfRangeException();
-        }
-    }
-
-    protected ComponentPropertyValue<ulong>? ParseSnowflakeProperty(ComponentProperty<ulong> property)
-    {
-        switch (property.Value)
-        {
-            case null: return null;
-
-            case CXmlValue.Interpolation interpolation:
-                return ValidateInterpolationType(property, interpolation, SpecialType.System_UInt64);
-            case CXmlValue.Invalid: return null;
-            case CXmlValue.Multipart multipart:
-                // TODO: we can only verify the non-interpolated parts
-                throw new NotImplementedException();
-                break;
-            case CXmlValue.Scalar scalar:
-                if (ulong.TryParse(scalar.Value, out var snowflake))
-                {
-                    return property.CreateValue(snowflake);
-                }
-
-                Context.ReportDiagnostic(
-                    Diagnostics.InvalidSnowflakeIdentifier,
-                    Context.GetLocation(scalar),
-                    scalar.Value
-                );
-
-                return null;
-            default:
-                throw new ArgumentOutOfRangeException();
-        }
-    }
-
-    protected ComponentPropertyValue<string>? ParseEmojiProperty(ComponentProperty<string> property)
-    {
-        // TODO
-        return ParseStringProperty(property);
-    }
-
-    protected ComponentPropertyValue<string>? ParseStringProperty(ComponentProperty<string> property)
-    {
-        switch (property.Value)
-        {
-            case CXmlValue.Invalid or null: return null;
-
-            case CXmlValue.Interpolation interpolation:
-                // any type automatically gets a .ToString() call, so we don't even have to check this
-                return property.CreateValue(interpolation);
-
-            case CXmlValue.Multipart multipart:
-                return property.CreateValue(multipart);
-
-            case CXmlValue.Scalar scalar:
-                return property.CreateValue(scalar.Value);
-
-            default:
-                throw new ArgumentOutOfRangeException(nameof(property.Value));
-        }
-    }
-
-    protected ComponentPropertyValue<T>? ParseEnumProperty<T>(ComponentProperty<T> property) where T : struct
-    {
-        switch (property.Value)
-        {
-            case CXmlValue.Invalid or null: return null;
-
-            case CXmlValue.Interpolation interpolation:
-                // TODO: we'll have to validate against the actual api type
-                throw new NotImplementedException();
-
-            case CXmlValue.Multipart multipart:
-                // TODO: the usecase for this may not be great, but its to figure out later
-                throw new NotImplementedException();
-
-            case CXmlValue.Scalar scalar:
-            {
-                if (Enum.TryParse<T>(scalar.Value, out var result))
-                    return property.CreateValue(result);
-
-                Context.ReportDiagnostic(
-                    Diagnostics.InvalidEnumProperty,
-                    Context.GetLocation(scalar),
-                    scalar.Value,
-                    property.Name,
-                    string.Join(", ", Enum.GetNames(typeof(T)))
-                );
-
-                return null;
-            }
-            default:
-                throw new ArgumentOutOfRangeException(nameof(property.Value));
-        }
     }
 }

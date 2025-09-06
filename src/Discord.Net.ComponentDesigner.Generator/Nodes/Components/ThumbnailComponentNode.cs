@@ -23,7 +23,7 @@ public sealed class ThumbnailComponentNode : ComponentNode
             validators: [Validators.LengthBounds(upper: Constants.THUMBNAIL_DESCRIPTION_MAX_LENGTH)]
         );
 
-        IsSpoiler = MapProperty<bool>("spoiler", ParseBooleanProperty, optional: true);
+        IsSpoiler = MapProperty<bool>("spoiler", ValueParsers.ParseBooleanProperty, optional: true);
     }
 
     public override string Render()

@@ -381,7 +381,7 @@ public static class Diagnostics
     public static readonly DiagnosticDescriptor InvalidPropertyValue = new(
         "DC0043",
         "Invalid attribute value",
-        "'{0}' is not reconized as a valid value of '{1}'",
+        "'{0}' is not recognized as a valid value of '{1}'",
         "Components",
         DiagnosticSeverity.Error,
         true

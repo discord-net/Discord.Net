@@ -16,16 +16,17 @@ public sealed class SeparatorComponentNode : ComponentNode
     {
         IsDivider = MapProperty<bool>(
             "divider",
-            ParseBooleanProperty,
+            ValueParsers.ParseBooleanProperty,
             optional: true,
             defaultValue: true
         );
 
         Spacing = MapProperty<SeparatorSpacing>(
             "spacing",
-            ParseEnumProperty<SeparatorSpacing>,
+            ValueParsers.ParseEnumProperty<SeparatorSpacing>,
             optional: true,
-            defaultValue: SeparatorSpacing.Small
+            defaultValue: SeparatorSpacing.Small,
+            apiType: context.KnownTypes.SeparatorSpacingSizeType
         );
     }
 

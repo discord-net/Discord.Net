@@ -105,7 +105,7 @@ public sealed class MediaGalleryItem : ComponentNode
             validators: [Validators.LengthBounds(upper: Constants.MAX_MEDIA_ITEM_DESCRIPTION_LENGTH)]
         );
 
-        IsSpoiler = MapProperty<bool>("spoiler", ParseBooleanProperty, optional: true);
+        IsSpoiler = MapProperty<bool>("spoiler", ValueParsers.ParseBooleanProperty, optional: true);
     }
 
 

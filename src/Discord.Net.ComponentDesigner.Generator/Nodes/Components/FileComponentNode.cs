@@ -15,7 +15,7 @@ public sealed class FileComponentNode : ComponentNode
     public FileComponentNode(CXmlElement xml, ComponentNodeContext context, bool mapId = true) : base(xml, context, mapId)
     {
         Url = MapProperty("url");
-        IsSpoiler = MapProperty<bool>("spoiler", ParseBooleanProperty, optional: true);
+        IsSpoiler = MapProperty<bool>("spoiler", ValueParsers.ParseBooleanProperty, optional: true);
     }
 
     public override string Render()

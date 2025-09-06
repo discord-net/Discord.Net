@@ -17,13 +17,14 @@ public sealed class SelectDefaultValue : ComponentNode
     {
         Id = MapProperty<ulong>(
             "id",
-            ParseSnowflakeProperty
+            ValueParsers.ParseSnowflakeProperty
         );
 
         Type = MapProperty<SelectDefaultValueType>(
             "type",
-            ParseEnumProperty<SelectDefaultValueType>,
-            optional: true
+            ValueParsers.ParseEnumProperty<SelectDefaultValueType>,
+            optional: true,
+            apiType: context.KnownTypes.SelectDefaultValueTypeEnumType
         );
     }
 

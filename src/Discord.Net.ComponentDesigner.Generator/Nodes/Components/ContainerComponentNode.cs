@@ -26,7 +26,7 @@ public sealed class ContainerComponentNode : ComponentNode
 
         IsSpoiler = MapProperty<bool>(
             "spoiler",
-            ParseBooleanProperty,
+            ValueParsers.ParseBooleanProperty,
             optional: true
         );
 

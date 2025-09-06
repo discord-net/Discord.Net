@@ -33,7 +33,7 @@ public abstract class BaseSelectComponentNode : ComponentNode
         MinValues = MapProperty(
             "minValues",
             optional: true,
-            parser: ParseIntProperty,
+            parser: ValueParsers.ParseIntProperty,
             validators:
             [
                 Validators.Bounds(
@@ -47,7 +47,7 @@ public abstract class BaseSelectComponentNode : ComponentNode
         MaxValues = MapProperty(
             "maxValues",
             optional: true,
-            parser: ParseIntProperty,
+            parser: ValueParsers.ParseIntProperty,
             validators:
             [
                 Validators.Bounds(
@@ -58,7 +58,7 @@ public abstract class BaseSelectComponentNode : ComponentNode
             aliases: ["max"]
         );
 
-        IsDisabled = MapProperty<bool>("disabled", optional: true, parser: ParseBooleanProperty);
+        IsDisabled = MapProperty<bool>("disabled", optional: true, parser: ValueParsers.ParseBooleanProperty);
 
         if (!hasDefaultValues)
         {

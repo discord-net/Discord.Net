@@ -24,6 +24,26 @@ public class KnownTypes
 
     private Optional<INamedTypeSymbol?> _ICXElementType;
 
+    public INamedTypeSymbol? EmojiType
+        => GetOrResolveType("Discord.Emoji", ref _EmojiType);
+
+    private Optional<INamedTypeSymbol?> _EmojiType;
+
+    public INamedTypeSymbol? IEmoteType
+        => GetOrResolveType("Discord.IEmote", ref _IEmoteType);
+
+    private Optional<INamedTypeSymbol?> _IEmoteType;
+
+    public INamedTypeSymbol? EmoteType
+        => GetOrResolveType("Discord.Emote", ref _EmoteType);
+
+    private Optional<INamedTypeSymbol?> _EmoteType;
+
+    public INamedTypeSymbol? ButtonStyleEnumType
+        => GetOrResolveType("Discord.ButtonStyle", ref _ButtonStyleEnumType);
+
+    private Optional<INamedTypeSymbol?> _ButtonStyleEnumType;
+
     public INamedTypeSymbol? ComponentTypeEnumType
         => GetOrResolveType("Discord.ComponentType", ref _ComponentTypeEnumType);
 

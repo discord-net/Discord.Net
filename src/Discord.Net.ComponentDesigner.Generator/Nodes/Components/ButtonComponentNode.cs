@@ -23,9 +23,10 @@ public sealed class ButtonComponentNode : ComponentNode
     {
         Style = MapProperty<ButtonStyle>(
             "style",
-            ParseEnumProperty,
+            ValueParsers.ParseEnumProperty,
             defaultValue: ButtonStyle.Primary,
-            optional: true
+            optional: true,
+            apiType: context.KnownTypes.ButtonStyleEnumType
         );
 
         Label = MapProperty(
@@ -34,7 +35,7 @@ public sealed class ButtonComponentNode : ComponentNode
             validators: [Validators.LengthBounds(upper: Constants.BUTTON_MAX_LABEL_LENGTH)]
         );
 
-        Emoji = MapProperty("emoji", optional: true, parser: ParseEmojiProperty);
+        Emoji = MapProperty("emoji", optional: true, parser: ValueParsers.ParseEmojiProperty);
 
         CustomId = MapProperty(
             "customId",
@@ -42,7 +43,7 @@ public sealed class ButtonComponentNode : ComponentNode
             validators: [Validators.LengthBounds(upper: Constants.CUSTOM_ID_MAX_LENGTH)]
         );
 
-        SkuId = MapProperty<ulong>("skuId", ParseSnowflakeProperty, optional: true, aliases: "sku");
+        SkuId = MapProperty<ulong>("skuId", ValueParsers.ParseSnowflakeProperty, optional: true, aliases: "sku");
 
         Url = MapProperty(
             "url",
@@ -50,7 +51,7 @@ public sealed class ButtonComponentNode : ComponentNode
             validators: [Validators.LengthBounds(upper: Constants.BUTTON_URL_MAX_LENGTH)]
         );
 
-        IsDisabled = MapProperty<bool>("disabled", ParseBooleanProperty, optional: true, defaultValue: false);
+        IsDisabled = MapProperty<bool>("disabled", ValueParsers.ParseBooleanProperty, optional: true, defaultValue: false);
 
         if (xml.Children.Count > 1)
         {
@@ -157,7 +158,7 @@ public sealed class ButtonComponentNode : ComponentNode
             new {Context.KnownTypes.ButtonBuilderType!.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)}(
                 label: {RenderLabel().WithNewlinePadding(4)},
                 customId: {CustomId.ToString().WithNewlinePadding(4)},
-                style: global::Discord.ButtonStyle.{Style},
+                style: {Context.KnownTypes.ButtonStyleEnumType!.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)}.{Style},
                 url: {Url.ToString().WithNewlinePadding(4)},
                 emote: {Emoji.ToString().WithNewlinePadding(4)},
                 isDisabled: {IsDisabled.ToString().WithNewlinePadding(4)},
