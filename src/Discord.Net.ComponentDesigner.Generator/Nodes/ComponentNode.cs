@@ -123,6 +123,9 @@ public abstract class ComponentNode
 
         ComponentNode? TryBindCustomNode()
         {
+            // TODO: Disabled, for now
+            return null;
+
             var symbol = context
                 .LookupNode(xml.Name.Value)
                 .OfType<ITypeSymbol>()
