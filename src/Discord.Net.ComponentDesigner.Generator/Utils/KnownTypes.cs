@@ -24,6 +24,11 @@ public class KnownTypes
 
     private Optional<INamedTypeSymbol?> _ICXElementType;
 
+    public INamedTypeSymbol? ColorType
+        => GetOrResolveType("Discord.Color", ref _ColorType);
+
+    private Optional<INamedTypeSymbol?> _ColorType;
+
     public INamedTypeSymbol? EmojiType
         => GetOrResolveType("Discord.Emoji", ref _EmojiType);
 

@@ -20,7 +20,7 @@ public sealed class ContainerComponentNode : ComponentNode
         AccentColor = MapProperty(
             "accentColor",
             optional: true,
-            // TODO: validator
+            parser: ValueParsers.ParseColorProperty,
             aliases: ["color"]
         );
 
