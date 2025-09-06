@@ -4,6 +4,7 @@ using Microsoft.CodeAnalysis.Text;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 
 namespace Discord.ComponentDesigner.Generator.Nodes;
 
@@ -11,7 +12,7 @@ public sealed class ComponentNodeContext
 {
     public Compilation Compilation => KnownTypes.Compilation;
 
-    public bool HasErrors => _document.HasErrors || Diagnostics.Count > 0;
+    public bool HasErrors => _document.HasErrors || Diagnostics.Any(x => x.Severity is DiagnosticSeverity.Error);
 
     public List<Diagnostic> Diagnostics { get; } = [];
 
