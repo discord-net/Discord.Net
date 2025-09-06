@@ -15,7 +15,7 @@ public sealed class ComponentParser
 
     private const char UNDERSCORE_CHAR = '_';
     private const char HYPHEN_CHAR = '-';
-    private const char PERIOD_CHAR = '-';
+    private const char PERIOD_CHAR = '.';
 
     private const char TAG_OPEN_CHAR = '<';
     private const char TAG_CLOSE_CHAR = '>';
@@ -23,8 +23,8 @@ public sealed class ComponentParser
     private const char BACK_SLASH_CHAR = '\\';
 
     private const char EQUALS_CHAR = '=';
-    private const char QUOTE_CAHR = '\'';
-    private const char DOUBLE_QUOTE_CAHR = '"';
+    private const char QUOTE_CHAR = '\'';
+    private const char DOUBLE_QUOTE_CHAR = '"';
 
     /// <summary>
     ///     the raw source, in its entirety.
@@ -482,7 +482,7 @@ public sealed class ComponentParser
 
             case ValueParsingMode.AttributeValue:
                 // can be quoted
-                if (Current is not QUOTE_CAHR and not DOUBLE_QUOTE_CAHR)
+                if (Current is not QUOTE_CHAR and not DOUBLE_QUOTE_CHAR)
                 {
                     // check for string interpolation
                     if (IsAtStartOfInterpolation(out var interpolationIndex))
