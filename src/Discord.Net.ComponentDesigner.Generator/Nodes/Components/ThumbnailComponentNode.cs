@@ -29,7 +29,7 @@ public sealed class ThumbnailComponentNode : ComponentNode
     public override string Render()
         => $"""
             new {Context.KnownTypes.ThumbnailBuilderType!.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)}(
-                media: new global::Discord.UnfurledMediaItemProperties({Url.ToString().WithNewlinePadding(4)}),
+                media: {Context.KnownTypes.UnfurledMediaItemPropertiesType!.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)}({Url.ToString().WithNewlinePadding(4)}),
                 description: {Description.ToString().WithNewlinePadding(4)},
                 isSpoiler: {IsSpoiler}
             )

@@ -199,7 +199,7 @@ public sealed class SourceGenerator : IIncrementalGenerator
                         .TargetMethod
                         .ContainingType
                         .ToDisplayString()
-                    is "InlineComponent.InlineComponentBuilder"
+                    is "Discord.ComponentDesigner"
                 ) break;
                 goto default;
 
