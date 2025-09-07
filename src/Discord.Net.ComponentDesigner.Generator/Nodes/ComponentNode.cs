@@ -1,10 +1,10 @@
-using Discord.ComponentDesigner.Generator.Parser;
+using Discord.ComponentDesignerGenerator.Parser;
 using Microsoft.CodeAnalysis;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Discord.ComponentDesigner.Generator.Nodes;
+namespace Discord.ComponentDesignerGenerator.Nodes;
 
 public abstract class ComponentNode
 {

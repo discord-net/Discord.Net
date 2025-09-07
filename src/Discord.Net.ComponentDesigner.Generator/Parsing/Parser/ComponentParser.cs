@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Discord.ComponentDesigner.Generator.Parser;
+namespace Discord.ComponentDesignerGenerator.Parser;
 
 public sealed class ComponentParser
 {
@@ -104,11 +104,6 @@ public sealed class ComponentParser
     /// </summary>
     private readonly List<CXmlDiagnostic> _diagnostics;
 
-    /// <summary>
-    ///     A collection of trivia tokens parsed so far, ordered by appearance
-    /// </summary>
-    private readonly List<CXmlTriviaToken> _trivia;
-
     private ComponentParser(string[] slices, int[] interpolationLengths)
     {
         _source = string.Join(string.Empty, slices);
@@ -116,8 +111,6 @@ public sealed class ComponentParser
         _interpolationLengths = interpolationLengths;
 
         _diagnostics = [];
-
-        _trivia = [];
 
         _interpolationOffsets = new int[slices.Length - 1];
         _handledInterpolations = new bool[interpolationLengths.Length];
@@ -840,166 +833,6 @@ public sealed class ComponentParser
     /// </returns>
     private static bool IsValidNameRestChar(char c)
         => c is UNDERSCORE_CHAR or HYPHEN_CHAR or PERIOD_CHAR || char.IsLetterOrDigit(c);
-
-    /// <summary>
-    ///     Parses syntax trivia at the current <see cref="_position"/> and advances the parse state.
-    /// </summary>
-    /// <returns>
-    ///     A <see cref="TriviaTokenSpan"/> pointing to the syntax trivia tokens parsed.
-    /// </returns>
-    private TriviaTokenSpan ParseTrivia()
-    {
-        if (IsEOF) return default;
-
-        // have we parsed this trivia already?
-
-        var triviaStart = _trivia.Count;
-
-        if (_trivia.Count > 0)
-        {
-            var latestTrivia = _trivia[_trivia.Count - 1];
-
-            if (latestTrivia.Span.End.Offset >= _position)
-            {
-                // we have some trivia that has been parsed, update 'triviaStart' to trivia that's after
-                // our source position
-                triviaStart--;
-                for (; triviaStart >= 0; triviaStart--)
-                {
-                    var trivia = _trivia[triviaStart];
-
-                    if (trivia.Span.End.Offset < _position) break;
-                }
-            }
-        }
-
-        while (true)
-        {
-            var startLocation = CurrentLocation;
-
-            switch (Current)
-            {
-                case CARRAGE_RETURN_CHAR:
-                    Advance(1);
-
-                    if (Current is NEWLINE_CHAR)
-                    {
-                        Advance(1);
-                    }
-
-                    // todo: how do we want to handle improper returns?
-
-                    _trivia.Add(
-                        new CXmlTriviaToken(
-                            TriviaKind.Newline,
-                            (startLocation, CurrentLocation),
-                            _source.Substring(startLocation.Offset, CurrentLocation.Offset - startLocation.Offset)
-                        )
-                    );
-
-                    continue;
-
-                case NEWLINE_CHAR:
-                    Advance(1);
-                    _trivia.Add(
-                        new CXmlTriviaToken(
-                            TriviaKind.Newline,
-                            (startLocation, CurrentLocation),
-                            _source.Substring(startLocation.Offset, CurrentLocation.Offset - startLocation.Offset)
-                        )
-                    );
-                    continue;
-
-                case ' ':
-                    do
-                    {
-                        Advance();
-                    } while (char.IsWhiteSpace(Current));
-
-                    _trivia.Add(
-                        new CXmlTriviaToken(
-                            TriviaKind.Whitespace,
-                            (startLocation, CurrentLocation),
-                            _source.Substring(startLocation.Offset, CurrentLocation.Offset - startLocation.Offset)
-                        )
-                    );
-
-                    continue;
-
-                default:
-                    if (char.IsWhiteSpace(Current)) goto case ' ';
-
-                    // check for comments
-                    if (GetSlice(COMMENT_START.Length) == COMMENT_START)
-                    {
-                        Advance(COMMENT_START.Length);
-                        _trivia.Add(
-                            new CXmlTriviaToken(
-                                TriviaKind.CommentStart,
-                                (startLocation, CurrentLocation),
-                                _source.Substring(startLocation.Offset, CurrentLocation.Offset - startLocation.Offset)
-                            )
-                        );
-                        ParseComment();
-                        continue;
-                    }
-
-                    goto endTrivia;
-            }
-        }
-
-        endTrivia:
-        return new(triviaStart, _trivia.Count - triviaStart);
-
-        void ParseComment()
-        {
-            var commentBodyStart = CurrentLocation;
-
-            while (Current is not NULL_CHAR)
-            {
-                if (Current is not '-')
-                {
-                    Advance();
-                    continue;
-                }
-
-                // check for ending comment
-                if (GetSlice(COMMENT_END.Length) == COMMENT_END)
-                {
-                    _trivia.Add(
-                        new CXmlTriviaToken(
-                            TriviaKind.CommentText,
-                            (commentBodyStart, CurrentLocation),
-                            _source.Substring(commentBodyStart.Offset, CurrentLocation.Offset - commentBodyStart.Offset)
-                        )
-                    );
-
-                    var commentEndAt = CurrentLocation;
-                    Advance(COMMENT_END.Length);
-                    _trivia.Add(
-                        new CXmlTriviaToken(
-                            TriviaKind.CommentText,
-                            (commentEndAt, CurrentLocation),
-                            _source.Substring(commentEndAt.Offset, CurrentLocation.Offset - commentEndAt.Offset)
-                        )
-                    );
-                    return;
-                }
-            }
-
-            // we're missing the close tag
-            _trivia.Add(
-                new CXmlTriviaToken(
-                    TriviaKind.CommentText,
-                    (commentBodyStart, CurrentLocation),
-                    _source.Substring(commentBodyStart.Offset, CurrentLocation.Offset - commentBodyStart.Offset)
-                )
-            );
-
-            ReportError("Missing comment close tag", (commentBodyStart, CurrentLocation));
-
-        }
-    }
 
     /// <summary>
     ///     Skips any whitespace characters, updating the parse state in the process.

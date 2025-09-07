@@ -1,7 +1,7 @@
-﻿using Discord.ComponentDesigner.Generator.Parser;
+﻿using Discord.ComponentDesignerGenerator.Parser;
 using System.Collections.Generic;
 
-namespace Discord.ComponentDesigner.Generator.Nodes;
+namespace Discord.ComponentDesignerGenerator.Nodes;
 
 public interface IComponentProperty
 {

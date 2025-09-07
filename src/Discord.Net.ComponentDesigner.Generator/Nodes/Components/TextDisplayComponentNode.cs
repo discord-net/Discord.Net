@@ -1,7 +1,7 @@
-﻿using Discord.ComponentDesigner.Generator.Parser;
+﻿using Discord.ComponentDesignerGenerator.Parser;
 using SymbolDisplayFormat = Microsoft.CodeAnalysis.SymbolDisplayFormat;
 
-namespace Discord.ComponentDesigner.Generator.Nodes;
+namespace Discord.ComponentDesignerGenerator.Nodes;
 
 public sealed class TextDisplayComponentNode : ComponentNode
 {

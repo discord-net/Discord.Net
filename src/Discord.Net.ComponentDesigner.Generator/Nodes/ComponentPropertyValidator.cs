@@ -1,4 +1,4 @@
-﻿namespace Discord.ComponentDesigner.Generator.Nodes;
+﻿namespace Discord.ComponentDesignerGenerator.Nodes;
 
 public delegate void ComponentPropertyValidator<T>(
     ComponentNode node,

@@ -1,6 +1,6 @@
 using Microsoft.CodeAnalysis;
 
-namespace Discord.ComponentDesigner.Generator.Parser;
+namespace Discord.ComponentDesignerGenerator.Parser;
 
 public readonly record struct CXmlDiagnostic(
     DiagnosticSeverity Severity,

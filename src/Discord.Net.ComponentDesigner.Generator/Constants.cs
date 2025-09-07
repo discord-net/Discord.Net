@@ -1,4 +1,4 @@
-﻿namespace Discord.ComponentDesigner.Generator;
+﻿namespace Discord.ComponentDesignerGenerator;
 
 public static class Constants
 {

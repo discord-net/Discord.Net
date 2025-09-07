@@ -8,7 +8,7 @@ using System.Collections.ObjectModel;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
-namespace Discord.ComponentDesigner.Generator;
+namespace Discord.ComponentDesignerGenerator;
 
 public class KnownTypes
 {

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Discord.ComponentDesigner.Generator.Parser;
+namespace Discord.ComponentDesignerGenerator.Parser;
 
 public abstract record CXmlValue(
     SourceSpan Span,

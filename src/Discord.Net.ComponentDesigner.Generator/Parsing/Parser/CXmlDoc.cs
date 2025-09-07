@@ -2,7 +2,7 @@ using Microsoft.CodeAnalysis;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Discord.ComponentDesigner.Generator.Parser;
+namespace Discord.ComponentDesignerGenerator.Parser;
 
 public sealed record CXmlDoc(
     SourceSpan Span,

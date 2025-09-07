@@ -1,8 +1,8 @@
-﻿using Discord.ComponentDesigner.Generator.Parser;
+﻿using Discord.ComponentDesignerGenerator.Parser;
 using Microsoft.CodeAnalysis;
 using System;
 
-namespace Discord.ComponentDesigner.Generator.Nodes;
+namespace Discord.ComponentDesignerGenerator.Nodes;
 
 public static partial class ValueParsers
 {

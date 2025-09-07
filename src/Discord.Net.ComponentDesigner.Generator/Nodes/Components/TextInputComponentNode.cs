@@ -1,6 +1,6 @@
-﻿using Discord.ComponentDesigner.Generator.Parser;
+﻿using Discord.ComponentDesignerGenerator.Parser;
 
-namespace Discord.ComponentDesigner.Generator.Nodes;
+namespace Discord.ComponentDesignerGenerator.Nodes;
 
 public sealed class TextInputComponentNode : ComponentNode
 {

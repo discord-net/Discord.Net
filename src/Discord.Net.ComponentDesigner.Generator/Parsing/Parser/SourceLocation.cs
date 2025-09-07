@@ -1,4 +1,4 @@
-namespace Discord.ComponentDesigner.Generator.Parser;
+namespace Discord.ComponentDesignerGenerator.Parser;
 
 public readonly record struct SourceLocation(
     int Line,

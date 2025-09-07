@@ -1,3 +1,3 @@
-﻿namespace Discord.ComponentDesigner.Generator.Nodes;
+﻿namespace Discord.ComponentDesignerGenerator.Nodes;
 
 public delegate ComponentPropertyValue<T>? ValueParseDelegate<T>(ComponentProperty<T> property);

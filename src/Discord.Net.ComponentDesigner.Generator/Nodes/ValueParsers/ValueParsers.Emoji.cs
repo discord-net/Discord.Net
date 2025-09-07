@@ -1,9 +1,9 @@
-﻿using Discord.ComponentDesigner.Generator.Parser;
+﻿using Discord.ComponentDesignerGenerator.Parser;
 using Microsoft.CodeAnalysis;
 using System;
 using SymbolDisplayFormat = Microsoft.CodeAnalysis.SymbolDisplayFormat;
 
-namespace Discord.ComponentDesigner.Generator.Nodes;
+namespace Discord.ComponentDesignerGenerator.Nodes;
 
 partial class ValueParsers
 {

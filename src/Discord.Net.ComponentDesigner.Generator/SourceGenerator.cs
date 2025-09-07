@@ -1,5 +1,5 @@
-﻿using Discord.ComponentDesigner.Generator.Nodes;
-using Discord.ComponentDesigner.Generator.Parser;
+﻿using Discord.ComponentDesignerGenerator.Nodes;
+using Discord.ComponentDesignerGenerator.Parser;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -11,7 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 
-namespace Discord.ComponentDesigner.Generator;
+namespace Discord.ComponentDesignerGenerator;
 
 [Generator]
 public sealed class SourceGenerator : IIncrementalGenerator

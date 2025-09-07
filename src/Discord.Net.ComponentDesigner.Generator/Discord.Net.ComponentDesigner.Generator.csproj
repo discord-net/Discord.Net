@@ -8,6 +8,7 @@
 
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
     <IsRoslynComponent>true</IsRoslynComponent>
+    <RootNamespace>Discord.Net.ComponentDesignerGenerator</RootNamespace>
 
   </PropertyGroup>
 

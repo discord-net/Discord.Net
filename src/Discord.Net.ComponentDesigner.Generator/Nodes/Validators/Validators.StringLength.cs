@@ -1,4 +1,4 @@
-﻿namespace Discord.ComponentDesigner.Generator.Nodes;
+﻿namespace Discord.ComponentDesignerGenerator.Nodes;
 
 public static partial class Validators
 {
