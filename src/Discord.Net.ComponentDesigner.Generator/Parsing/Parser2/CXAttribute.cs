@@ -4,7 +4,7 @@ namespace Discord.ComponentDesignerGenerator.Parser;
 
 public sealed class CXAttribute : CXNode
 {
-    public CXToken Identifier { get; }
+    public CXToken Identifier { get; private set; }
 
     public CXToken? EqualsToken { get; }
 
@@ -23,9 +23,25 @@ public sealed class CXAttribute : CXNode
 
     public override void IncrementalParse(ParseSlot slot, TextChange change)
     {
-        if (slot == Identifier)
-        {
+        var oldMode = Parser.Lexer.Mode;
+        Parser.Lexer.Mode = CXLexer.LexMode.Attribute;
 
+        try
+        {
+            if (slot == Identifier)
+            {
+                UpdateSlot(slot, Identifier = Parser.ParseIdentifier());
+            }
+
+            // if (slot == EqualsToken)
+            // {
+            //
+            // }
         }
+        finally
+        {
+            Parser.Lexer.Mode = oldMode;
+        }
+
     }
 }

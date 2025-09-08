@@ -11,9 +11,9 @@ public sealed class CXParser
     public CXSource Source { get; }
     public CXToken CurrentToken => Lex(_tokenIndex);
     public CXToken NextToken => Lex(_tokenIndex + 1);
+    public CXLexer Lexer { get; }
 
     private readonly List<CXToken> _tokens;
-    private readonly CXLexer _lexer;
     private int _tokenIndex;
 
     private readonly CXSourceReader _reader;
@@ -26,7 +26,7 @@ public sealed class CXParser
     {
         Source = source;
         _reader = new CXSourceReader(source);
-        _lexer = new CXLexer(_reader);
+        Lexer = new CXLexer(_reader);
         _tokens = [];
         _diagnostics = [];
     }
@@ -45,7 +45,7 @@ public sealed class CXParser
         return new CXDoc(parser, elements);
     }
 
-    private CXElement ParseElement()
+    internal CXElement ParseElement()
     {
         var start = Expect(CXTokenKind.LessThan);
 
@@ -105,8 +105,8 @@ public sealed class CXParser
             //  - other elements
             //  - interpolations
             //  - text
-            var oldMode = _lexer.Mode;
-            _lexer.Mode = CXLexer.LexMode.ElementValue;
+            var oldMode = Lexer.Mode;
+            Lexer.Mode = CXLexer.LexMode.ElementValue;
 
             try
             {
@@ -117,7 +117,7 @@ public sealed class CXParser
                         case CXTokenKind.Interpolation:
                             yield return new CXValue.Interpolation(
                                 Eat(),
-                                _lexer.InterpolationIndex!.Value
+                                Lexer.InterpolationIndex!.Value
                             );
                             break;
                         case CXTokenKind.Text:
@@ -146,16 +146,16 @@ public sealed class CXParser
             }
             finally
             {
-                _lexer.Mode = oldMode;
+                Lexer.Mode = oldMode;
             }
         }
     }
 
-    private IEnumerable<CXAttribute> ParseAttributes()
+    internal IEnumerable<CXAttribute> ParseAttributes()
     {
         // expect identifiers
-        var oldMode = _lexer.Mode;
-        _lexer.Mode = CXLexer.LexMode.Identifier;
+        var oldMode = Lexer.Mode;
+        Lexer.Mode = CXLexer.LexMode.Identifier;
         try
         {
             while (CurrentToken.Kind is CXTokenKind.Identifier)
@@ -163,14 +163,14 @@ public sealed class CXParser
         }
         finally
         {
-            _lexer.Mode = oldMode;
+            Lexer.Mode = oldMode;
         }
     }
 
-    private CXAttribute ParseAttribute()
+    internal CXAttribute ParseAttribute()
     {
-        var oldMode = _lexer.Mode;
-        _lexer.Mode = CXLexer.LexMode.Attribute;
+        var oldMode = Lexer.Mode;
+        Lexer.Mode = CXLexer.LexMode.Attribute;
 
         try
         {
@@ -196,18 +196,18 @@ public sealed class CXParser
         }
         finally
         {
-            _lexer.Mode = oldMode;
+            Lexer.Mode = oldMode;
         }
     }
 
-    private CXValue ParseAttributeValue()
+    internal CXValue ParseAttributeValue()
     {
         switch (CurrentToken.Kind)
         {
             case CXTokenKind.Interpolation:
                 return new CXValue.Interpolation(
                     CurrentToken,
-                    _lexer.InterpolationIndex!.Value
+                    Lexer.InterpolationIndex!.Value
                 );
             case CXTokenKind.StringLiteralStart:
                 return ParseStringLiteral();
@@ -223,7 +223,7 @@ public sealed class CXParser
         }
     }
 
-    private CXValue ParseStringLiteral()
+    internal CXValue ParseStringLiteral()
     {
         var tokens = new List<CXToken>();
 
@@ -262,33 +262,33 @@ public sealed class CXParser
         );
     }
 
-    private CXToken ParseIdentifier()
+    internal CXToken ParseIdentifier()
     {
-        var oldMode = _lexer.Mode;
-        _lexer.Mode = CXLexer.LexMode.Identifier;
+        var oldMode = Lexer.Mode;
+        Lexer.Mode = CXLexer.LexMode.Identifier;
 
         try
         {
             var token = Expect(CXTokenKind.Identifier);
 
-            _lexer.Mode = oldMode;
+            Lexer.Mode = oldMode;
 
             return token;
         }
         finally
         {
-            _lexer.Mode = oldMode;
+            Lexer.Mode = oldMode;
         }
     }
 
-    private CXToken Eat()
+    internal CXToken Eat()
     {
         var token = CurrentToken;
         _tokenIndex++;
         return token;
     }
 
-    private bool Eat(CXTokenKind kind, out CXToken token)
+    internal bool Eat(CXTokenKind kind, out CXToken token)
     {
         token = CurrentToken;
 
@@ -301,7 +301,7 @@ public sealed class CXParser
         return false;
     }
 
-    private CXToken Expect(CXTokenKind kind)
+    internal CXToken Expect(CXTokenKind kind)
     {
         var token = CurrentToken;
 
@@ -321,13 +321,13 @@ public sealed class CXParser
         return token;
     }
 
-    private CXToken Lex(int index)
+    internal CXToken Lex(int index)
     {
         CXToken token;
 
         while (_tokens.Count <= index)
         {
-            token = _lexer.Next();
+            token = Lexer.Next();
 
             if (token.Kind is CXTokenKind.EOF) return token;
 
@@ -350,7 +350,7 @@ public sealed class CXParser
             {
                 // we need to re-lex
                 _reader.Position = token.AbsoluteStart;
-                _tokens[index] = token = _lexer.Next();
+                _tokens[index] = token = Lexer.Next();
             }
         }
 

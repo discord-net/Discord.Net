@@ -5,6 +5,11 @@ namespace Discord.ComponentDesignerGenerator.Parser;
 
 public abstract class CXValue : CXNode
 {
+    public override void IncrementalParse(ParseSlot slot, TextChange change)
+    {
+
+    }
+
     public sealed class Invalid : CXValue;
 
     public sealed class StringLiteral : CXValue

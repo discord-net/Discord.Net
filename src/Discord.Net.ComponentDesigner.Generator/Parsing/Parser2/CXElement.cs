@@ -37,4 +37,9 @@ public sealed class CXElement : CXNode
         Slot(ElementEndNameToken = elementEndNameToken);
         Slot(ElementEndCloseToken = elementEndCloseToken);
     }
+
+    public override void IncrementalParse(ParseSlot slot, TextChange change)
+    {
+
+    }
 }

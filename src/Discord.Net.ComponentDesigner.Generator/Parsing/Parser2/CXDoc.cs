@@ -6,7 +6,10 @@ namespace Discord.ComponentDesignerGenerator.Parser;
 
 public sealed class CXDoc : CXNode
 {
-    private readonly CXParser _parser;
+    public override CXParser Parser { get;  }
+
+    public IReadOnlyList<CXToken> Tokens { get; }
+
     private readonly IReadOnlyList<CXElement> _rootElements;
 
     public CXDoc(
@@ -14,18 +17,19 @@ public sealed class CXDoc : CXNode
         IReadOnlyList<CXElement> rootElements
     )
     {
-        _parser = parser;
+        Parser = parser;
         Slot(_rootElements = rootElements);
     }
 
     public void ApplyChanges(IEnumerable<TextChange> changes)
     {
         // find out largest node that encapsolates the change
-
         foreach (var change in changes)
         {
-            _parser.TextChange = change;
+            Parser.TextChange = change;
             var owner = FindOwningNode(change.Span, out var slot);
+
+            owner.IncrementalParse(slot, change);
         }
     }
 
@@ -50,6 +54,11 @@ public sealed class CXDoc : CXNode
         return current;
     }
 
-    public string GetTokenValue(CXToken token) => _parser.Source.GetValue(token.Span);
-    public string GetTokenValueWithTrivia(CXToken token) => _parser.Source.GetValue(token.FullSpan);
+    public override void IncrementalParse(ParseSlot slot, TextChange change)
+    {
+
+    }
+
+    public string GetTokenValue(CXToken token) => Parser.Source.GetValue(token.Span);
+    public string GetTokenValueWithTrivia(CXToken token) => Parser.Source.GetValue(token.FullSpan);
 }

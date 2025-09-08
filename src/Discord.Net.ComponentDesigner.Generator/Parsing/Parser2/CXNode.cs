@@ -6,20 +6,24 @@ namespace Discord.ComponentDesignerGenerator.Parser;
 
 public abstract class CXNode
 {
-    public readonly struct ParseSlot
+    public readonly struct ParseSlot : IEquatable<ParseSlot>
     {
         public TextSpan FullSpan => Node?.FullSpan ?? Token?.FullSpan ?? default;
+
+        public readonly int Id;
 
         public readonly CXNode? Node;
         public readonly CXToken? Token;
 
-        public ParseSlot(CXNode node)
+        public ParseSlot(int id, CXNode node)
         {
+            Id = id;
             Node = node;
         }
 
-        public ParseSlot(CXToken token)
+        public ParseSlot(int id, CXToken token)
         {
+            Id = id;
             Token = token;
         }
 
@@ -34,6 +38,26 @@ public abstract class CXNode
 
         public static bool operator !=(ParseSlot slot, CXToken token)
             => slot.Token != token;
+
+        public static bool operator ==(ParseSlot slot, CXToken? token)
+            => slot.Token == token;
+
+        public static bool operator !=(ParseSlot slot, CXToken? token)
+            => slot.Token != token;
+
+        public bool Equals(ParseSlot other)
+            => Equals(Node, other.Node) && Nullable.Equals(Token, other.Token);
+
+        public override bool Equals(object? obj)
+            => obj is ParseSlot other && Equals(other);
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return ((Node != null ? Node.GetHashCode() : 0) * 397) ^ Token.GetHashCode();
+            }
+        }
     }
 
     public CXNode? Parent { get; set; }
@@ -45,11 +69,11 @@ public abstract class CXNode
     {
         get => this is CXDoc doc
             ? doc
-            : _doc ??= Parent?._doc ?? throw new InvalidOperationException();
+            : _doc ??= Parent?.Document ?? throw new InvalidOperationException();
         set => _doc = value;
     }
 
-    protected CXParser Parser => Document.Parser;
+    public virtual CXParser Parser => Document.Parser;
 
     public CXToken FirstTerminal
     {
@@ -127,14 +151,14 @@ public abstract class CXNode
 
         node.Parent = this;
         node._parentSlotIndex = _slots.Count;
-        _slots.Add(new(node));
+        _slots.Add(new(_slots.Count, node));
     }
 
     protected void Slot(CXToken? token)
     {
         if (token is null) return;
 
-        _slots.Add(new(token.Value));
+        _slots.Add(new(_slots.Count, token.Value));
         Width += token.Value.AbsoluteWidth;
     }
 
@@ -149,4 +173,20 @@ public abstract class CXNode
     }
 
     public abstract void IncrementalParse(ParseSlot slot, TextChange change);
+
+    public void UpdateSlot(ParseSlot slot, CXToken token)
+    {
+        _slots[slot.Id] = new(slot.Id, token);
+
+        // do we have to update the widths?
+
+    }
+
+    public void UpdateSlot(ParseSlot slot, CXNode token)
+    {
+        _slots[slot.Id] = new(slot.Id, token);
+
+        // do we have to update the widths?
+
+    }
 }
