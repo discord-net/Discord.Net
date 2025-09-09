@@ -53,8 +53,12 @@ public sealed class SourceGenerator : IIncrementalGenerator
         Diagnostic[] Diagnostics
     );
 
+
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
+        var manager = new SourceManager(context);
+        return;
+
         var provider = context
             .SyntaxProvider
             .CreateSyntaxProvider((x, _) =>

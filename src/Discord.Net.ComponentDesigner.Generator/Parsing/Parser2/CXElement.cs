@@ -1,4 +1,5 @@
 ﻿using Microsoft.CodeAnalysis.Text;
+using System;
 using System.Collections.Generic;
 
 namespace Discord.ComponentDesignerGenerator.Parser;
@@ -7,11 +8,11 @@ public sealed class CXElement : CXNode
 {
     public CXToken ElementStartOpenToken { get; }
     public CXToken ElementStartNameToken { get; }
-    public IReadOnlyList<CXAttribute> Attributes { get; }
+    public CXCollection<CXAttribute> Attributes { get; }
 
     public CXToken ElementStartCloseToken { get; }
 
-    public IReadOnlyList<CXNode> Children { get; }
+    public CXCollection<CXNode> Children { get; }
 
     public CXToken? ElementEndOpenToken { get; }
     public CXToken? ElementEndNameToken { get; }
@@ -20,9 +21,9 @@ public sealed class CXElement : CXNode
     public CXElement(
         CXToken elementStartOpenToken,
         CXToken elementStartNameToken,
-        IReadOnlyList<CXAttribute> attributes,
+        CXCollection<CXAttribute> attributes,
         CXToken elementStartCloseToken,
-        IEnumerable<CXNode>? children = null,
+        CXCollection<CXNode> children,
         CXToken? elementEndOpenToken = null,
         CXToken? elementEndNameToken = null,
         CXToken? elementEndCloseToken = null
@@ -32,14 +33,9 @@ public sealed class CXElement : CXNode
         Slot(ElementStartNameToken = elementStartNameToken);
         Slot(Attributes = attributes);
         Slot(ElementStartCloseToken = elementStartCloseToken);
-        Slot(Children = [..children ?? []]);
+        Slot(Children = children);
         Slot(ElementEndOpenToken = elementEndOpenToken);
         Slot(ElementEndNameToken = elementEndNameToken);
         Slot(ElementEndCloseToken = elementEndCloseToken);
-    }
-
-    public override void IncrementalParse(ParseSlot slot, TextChange change)
-    {
-
     }
 }

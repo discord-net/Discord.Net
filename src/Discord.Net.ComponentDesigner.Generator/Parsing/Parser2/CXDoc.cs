@@ -1,12 +1,13 @@
 ﻿using Microsoft.CodeAnalysis.Text;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 
 namespace Discord.ComponentDesignerGenerator.Parser;
 
 public sealed class CXDoc : CXNode
 {
-    public override CXParser Parser { get;  }
+    public override CXParser Parser { get; }
 
     public IReadOnlyList<CXToken> Tokens { get; }
 
@@ -14,26 +15,62 @@ public sealed class CXDoc : CXNode
 
     public CXDoc(
         CXParser parser,
-        IReadOnlyList<CXElement> rootElements
+        IReadOnlyList<CXElement> rootElements,
+        IReadOnlyList<CXToken> tokens
     )
     {
+        Tokens = tokens;
         Parser = parser;
         Slot(_rootElements = rootElements);
     }
 
-    public void ApplyChanges(IEnumerable<TextChange> changes)
+    public void ApplyChanges(
+        CXSource source,
+        IReadOnlyList<TextChange> changes
+    )
     {
-        // find out largest node that encapsolates the change
-        foreach (var change in changes)
-        {
-            Parser.TextChange = change;
-            var owner = FindOwningNode(change.Span, out var slot);
+        var blender = new CXBlender2(Parser.Lexer, this, changes.Select(x => (TextChangeRange)x));
 
-            owner.IncrementalParse(slot, change);
-        }
+        Parser.Source = source;
+        Parser.Reset();
+        Parser.RootBlender = blender;
+        var x = Parser.ParseElement();
     }
 
-    private CXNode FindOwningNode(TextSpan span, out ParseSlot slot)
+    public bool TryFindToken(int position, out CXToken token)
+    {
+        if (!FullSpan.Contains(position))
+        {
+            token = default;
+            return false;
+        }
+
+        CXNode? current = this;
+
+        while (current is not null)
+        {
+            for (var i = 0; i < current.Slots.Count; i++)
+            {
+                var slot = current.Slots[i];
+
+                if (!slot.FullSpan.Contains(position)) continue;
+
+                if (slot.Token.HasValue)
+                {
+                    token = slot.Token.Value;
+                    return true;
+                }
+
+                current = slot.Node;
+                break;
+            }
+        }
+
+        token = default;
+        return false;
+    }
+
+    public CXNode FindOwningNode(TextSpan span, out ParseSlot slot)
     {
         CXNode current = this;
         slot = default;
@@ -43,7 +80,10 @@ public sealed class CXDoc : CXNode
         {
             slot = current.Slots[i];
 
-            if (!slot.FullSpan.Contains(span)) continue;
+            if (
+                // the end is exclusive, since its char-based
+                !(span.Start >= slot.FullSpan.Start && span.End < slot.FullSpan.End)
+            ) continue;
 
             if (slot.Node is null) break;
 
@@ -51,12 +91,11 @@ public sealed class CXDoc : CXNode
             goto search;
         }
 
+        // // we only want the top most container
+        // while (current.Parent is not null && current.FullSpan == current.Parent.FullSpan)
+        //     current = current.Parent;
+
         return current;
-    }
-
-    public override void IncrementalParse(ParseSlot slot, TextChange change)
-    {
-
     }
 
     public string GetTokenValue(CXToken token) => Parser.Source.GetValue(token.Span);

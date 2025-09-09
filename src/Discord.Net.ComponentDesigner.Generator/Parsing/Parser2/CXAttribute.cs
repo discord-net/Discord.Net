@@ -20,28 +20,4 @@ public sealed class CXAttribute : CXNode
         Slot(EqualsToken = equalsToken);
         Slot(Value = value);
     }
-
-    public override void IncrementalParse(ParseSlot slot, TextChange change)
-    {
-        var oldMode = Parser.Lexer.Mode;
-        Parser.Lexer.Mode = CXLexer.LexMode.Attribute;
-
-        try
-        {
-            if (slot == Identifier)
-            {
-                UpdateSlot(slot, Identifier = Parser.ParseIdentifier());
-            }
-
-            // if (slot == EqualsToken)
-            // {
-            //
-            // }
-        }
-        finally
-        {
-            Parser.Lexer.Mode = oldMode;
-        }
-
-    }
 }

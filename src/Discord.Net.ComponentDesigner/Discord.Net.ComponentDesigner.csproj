@@ -1,14 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
-        <RootNamespace>Discord</RootNamespace>
-    </PropertyGroup>
+  <PropertyGroup>
+    <TargetFrameworks>net9.0;net8.0;net6.0;</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <RootNamespace>Discord</RootNamespace>
+  </PropertyGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\Discord.Net.Core\Discord.Net.Core.csproj" />
-    </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Discord.Net.Core\Discord.Net.Core.csproj"/>
+  </ItemGroup>
 
 </Project>

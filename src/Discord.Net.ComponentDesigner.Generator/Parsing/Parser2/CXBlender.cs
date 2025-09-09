@@ -5,26 +5,34 @@ namespace Discord.ComponentDesignerGenerator.Parser;
 
 public sealed class CXBlender
 {
-    private int CurrentSourcePosition => _lexer.Reader.Position;
+    public Queue<TextChange> Changes { get; }
 
-    private readonly CXDoc _document;
-    private readonly Queue<TextChange> _changes;
+    private int CurrentSourcePosition => Lexer.Reader.Position;
+    public CXLexer Lexer => Document.Parser.Lexer;
+
+    public CXDoc Document { get; }
 
     private readonly List<CXToken> _tokens;
 
     private int _docTokenIndex;
 
     private int _changeDelta;
-
-    private CXLexer _lexer;
-
+    
     public CXBlender(
-        CXDoc document,
-        IReadOnlyList<TextChange> changes
+        CXDoc document
     )
     {
-        _document = document;
-        _changes = new(changes);
+        _tokens = [];
+        Document = document;
+        Changes = [];
+    }
+
+    public void Reset()
+    {
+        _tokens.Clear();
+        _docTokenIndex = 0;
+        _changeDelta = 0;
+        Changes.Clear();
     }
 
     public CXToken GetToken(int index)
@@ -45,9 +53,9 @@ public sealed class CXBlender
 
         while (true)
         {
-            while (_changeDelta < 0 && _docTokenIndex < _document.Tokens.Count)
+            while (_changeDelta < 0 && _docTokenIndex < Document.Tokens.Count)
             {
-                var oldToken = _document.Tokens[_docTokenIndex++];
+                var oldToken = Document.Tokens[_docTokenIndex++];
                 _changeDelta += oldToken.AbsoluteWidth;
             }
 
@@ -56,25 +64,25 @@ public sealed class CXBlender
 
             if (TryReuseToken(out var token)) return token;
 
-            if (_document.Tokens.Count <= _docTokenIndex) return LexNewToken();
+            if (Document.Tokens.Count <= _docTokenIndex) return LexNewToken();
 
-            _changeDelta += _document.Tokens[_docTokenIndex++].AbsoluteWidth;
+            _changeDelta += Document.Tokens[_docTokenIndex++].AbsoluteWidth;
         }
 
         bool TryReuseToken(out CXToken token)
         {
-            if (_docTokenIndex >= _document.Tokens.Count)
+            if (_docTokenIndex >= Document.Tokens.Count)
             {
                 token = default;
                 return false;
             }
 
-            token = _document.Tokens[_docTokenIndex];
+            token = Document.Tokens[_docTokenIndex];
 
             if (!CanReuse(token)) return false;
 
             _docTokenIndex++;
-            _lexer.Reader.Advance(token.AbsoluteWidth);
+            Lexer.Reader.Advance(token.AbsoluteWidth);
 
             _tokens.Add(token);
             return true;
@@ -83,7 +91,7 @@ public sealed class CXBlender
 
     private CXToken LexNewToken()
     {
-        var token = _lexer.Next();
+        var token = Lexer.Next();
 
         _tokens.Add(token);
         _changeDelta += token.AbsoluteWidth;
@@ -93,22 +101,22 @@ public sealed class CXBlender
 
     private void SkipPastChanges()
     {
-        while (_changes.Count > 0)
+        while (Changes.Count > 0)
         {
-            var change = _changes.Peek();
+            var change = Changes.Peek();
             var newLength = change.NewText?.Length ?? 0;
 
             if (change.Span.Start + newLength > CurrentSourcePosition)
                 break;
 
-            _changes.Dequeue();
+            Changes.Dequeue();
 
             _changeDelta += newLength - change.Span.Length;
 
             // update the cursor to the new change
-            while (_docTokenIndex < _document.Tokens.Count)
+            while (_docTokenIndex < Document.Tokens.Count)
             {
-                var token = _document.Tokens[_docTokenIndex];
+                var token = Document.Tokens[_docTokenIndex];
 
                 if (token.AbsoluteStart >= change.Span.Start)
                     break;
@@ -129,8 +137,8 @@ public sealed class CXBlender
 
     private bool IntersectsNextChange(TextSpan span)
     {
-        if (_changes.Count is 0) return false;
+        if (Changes.Count is 0) return false;
 
-        return span.IntersectsWith(_changes.Peek().Span);
+        return span.IntersectsWith(Changes.Peek().Span);
     }
 }

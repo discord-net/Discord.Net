@@ -1,6 +1,7 @@
 ﻿using Microsoft.CodeAnalysis.Text;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Discord.ComponentDesignerGenerator.Parser;
 
@@ -107,7 +108,10 @@ public abstract class CXNode
 
     public TextSpan FullSpan => new(Offset, Width);
 
-    public int Offset => _offset ??= ComputeOffset();
+    // TODO:
+    // this could be cached, a caveat though is if we incrementally parse, we need to update the
+    // offset/width of any nodes right of the change
+    public int Offset => ComputeOffset();
 
     private int? _offset;
 
@@ -116,7 +120,6 @@ public abstract class CXNode
     public IReadOnlyList<ParseSlot> Slots => _slots;
 
     private readonly List<ParseSlot> _slots;
-    private int _parentSlotIndex = -1;
 
     public CXNode()
     {
@@ -124,17 +127,29 @@ public abstract class CXNode
         _slots = [];
     }
 
+    public int GetParentSlotIndex()
+    {
+        if (Parent is null) return -1;
+
+        for (var i = 0; i < Parent._slots.Count; i++)
+            if (Parent._slots[i] == this)
+                return i;
+
+        return -1;
+    }
+
     private int ComputeOffset()
     {
-        if (Parent is null) return 0;
+        if (Parent is null) return Document.Parser.Source.SourceSpan.Start;
 
         var parentOffset = Parent.Offset;
+        var parentSlotIndex = GetParentSlotIndex();
 
-        return _parentSlotIndex switch
+        return parentSlotIndex switch
         {
             -1 => throw new InvalidOperationException(),
             0 => parentOffset,
-            _ => Parent._slots[_parentSlotIndex - 1] switch
+            _ => Parent._slots[parentSlotIndex - 1] switch
             {
                 {Node: { } sibling} => sibling.Offset + sibling.Width,
                 {Token: { } token} => token.AbsoluteEnd,
@@ -143,6 +158,35 @@ public abstract class CXNode
         };
     }
 
+    protected bool IsGraphChild(CXNode node) => IsGraphChild(node, out _);
+
+    protected bool IsGraphChild(CXNode node, out int index)
+    {
+        index = -1;
+
+        if (node.Parent != this) return false;
+
+        index = node.GetParentSlotIndex();
+
+        return index >= 0 && index < _slots.Count && _slots.ElementAt(index) == node;
+    }
+
+
+    protected void UpdateSlot(CXNode old, CXNode @new)
+    {
+        if (!IsGraphChild(old, out var slotIndex)) return;
+
+        _slots[slotIndex] = new(slotIndex, @new);
+    }
+
+    protected void RemoveSlot(CXNode node)
+    {
+        if (!IsGraphChild(node, out var index)) return;
+
+        _slots.RemoveAt(index);
+    }
+
+    protected void Slot<T>(CXCollection<T>? node) where T : CXNode => Slot((CXNode?)node);
     protected void Slot(CXNode? node)
     {
         if (node is null) return;
@@ -150,7 +194,6 @@ public abstract class CXNode
         Width += node.Width;
 
         node.Parent = this;
-        node._parentSlotIndex = _slots.Count;
         _slots.Add(new(_slots.Count, node));
     }
 
@@ -172,21 +215,14 @@ public abstract class CXNode
         foreach (var node in nodes) Slot(node);
     }
 
-    public abstract void IncrementalParse(ParseSlot slot, TextChange change);
+    public virtual void IncrementalParse(TextChange change) => Parent?.IncrementalParse(change);
 
-    public void UpdateSlot(ParseSlot slot, CXToken token)
+    protected void UpdateSelf(CXNode? node)
     {
-        _slots[slot.Id] = new(slot.Id, token);
-
-        // do we have to update the widths?
-
+        // TODO: update the parents slot
+        OnDescendantUpdated(this, node);
     }
 
-    public void UpdateSlot(ParseSlot slot, CXNode token)
-    {
-        _slots[slot.Id] = new(slot.Id, token);
-
-        // do we have to update the widths?
-
-    }
+    protected virtual void OnDescendantUpdated(CXNode? old, CXNode? descendant)
+        => Parent?.OnDescendantUpdated(old, descendant);
 }

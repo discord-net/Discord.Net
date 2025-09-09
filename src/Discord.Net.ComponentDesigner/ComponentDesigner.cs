@@ -14,5 +14,5 @@ public static class ComponentDesigner
     public static T cx<T>(
         [StringSyntax("html")] DesignerInterpolationHandler designer
     ) where T : IMessageComponentBuilder
-        => throw new UnreachableException();
+        => throw new InvalidOperationException();
 }

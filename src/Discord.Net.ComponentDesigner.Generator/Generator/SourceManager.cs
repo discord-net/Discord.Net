@@ -2,6 +2,8 @@
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Operations;
+using Microsoft.CodeAnalysis.Text;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
@@ -13,29 +15,131 @@ public sealed record Target(
     InvocationExpressionSyntax InvocationSyntax,
     ExpressionSyntax ArgumentExpressionSyntax,
     IOperation Operation,
-    Compilation Compilation
+    Compilation Compilation,
+    string? ParentKey,
+    string CXDesigner,
+    TextSpan CXDesignerSpan,
+    DesignerInterpolationInfo[] Interpolations
+)
+{
+    public SyntaxTree SyntaxTree => InvocationSyntax.SyntaxTree;
+}
+
+public sealed record DesignerInterpolationInfo(
+    TextSpan Span,
+    ITypeSymbol? Symbol
 );
 
 public sealed class SourceManager
 {
+    private readonly Dictionary<string, CXGraphManager> _cache = [];
+
     public SourceManager(IncrementalGeneratorInitializationContext context)
     {
-        context
+        var provider = context
             .SyntaxProvider
             .CreateSyntaxProvider(
                 IsComponentDesignerCall,
                 MapPossibleComponentDesignerCall
             )
             .Collect();
+
+        context.RegisterSourceOutput(
+            provider
+                .Combine(provider.Select(GetKeysAndUpdateCachedEntries))
+                .SelectMany(MapManagers),
+            Generate
+        );
     }
+
+    private void Generate(SourceProductionContext arg1, CXGraphManager arg2)
+    {
+    }
+
+    private IEnumerable<CXGraphManager> MapManagers(
+        (ImmutableArray<Target?> targets, ImmutableArray<string?> keys) tuple,
+        CancellationToken token
+    )
+    {
+        var (targets, keys) = tuple;
+
+        for (var i = 0; i < targets.Length; i++)
+        {
+            var target = targets[i];
+            var key = keys[i];
+
+            if (target is null || key is null) continue;
+
+            // TODO: handle key updates
+
+            if (_cache.TryGetValue(key, out var manager))
+            {
+                manager.OnUpdate(key, target);
+            }
+            else
+            {
+                manager = _cache[key] = CXGraphManager.Create(
+                    this,
+                    key,
+                    target
+                );
+            }
+
+            yield return manager;
+        }
+    }
+
+    private ImmutableArray<string?> GetKeysAndUpdateCachedEntries(ImmutableArray<Target?> target,
+        CancellationToken token)
+    {
+        var result = new string?[target.Length];
+
+        var map = new Dictionary<string, int>();
+        var globalCount = 0;
+
+        for (var i = 0; i < target.Length; i++)
+        {
+            var targetItem = target[i];
+
+            if (targetItem is null) continue;
+
+            string key;
+            if (targetItem.ParentKey is null)
+            {
+                key = $"<global>:{globalCount++}";
+            }
+            else
+            {
+                map.TryGetValue(targetItem.ParentKey, out var index);
+
+                key = $"{targetItem.ParentKey}:{index}";
+                map[targetItem.ParentKey] = index + 1;
+            }
+
+            result[i] = key;
+        }
+
+        foreach (var key in _cache.Keys.Except(result))
+        {
+            if (key is not null) _cache.Remove(key);
+        }
+
+        return [..result];
+    }
+
+    private static void OnTargetUpdated(Target? target, CancellationToken token)
+    {
+        if (target is null) return;
+
+        //target.Compilation.SyntaxTrees
+    }
+
 
     private static void ProcessTargetsUpdate(ImmutableArray<Target?> targets, CancellationToken token)
     {
         foreach (var target in targets)
         {
-            if(target is null) continue;
-
-            
+            if (target is null) continue;
         }
     }
 
@@ -51,14 +155,65 @@ public sealed class SourceManager
             )
         ) return null;
 
+        if (
+            !TryGetCXDesigner(
+                argumentSyntax,
+                context.SemanticModel,
+                out var cxDesigner,
+                out var span,
+                out var interpolationInfos
+            )
+        ) return null;
+
+
         return new Target(
             interceptLocation,
             invocationSyntax,
             argumentSyntax,
             operation,
-            context.SemanticModel.Compilation
+            context.SemanticModel.Compilation,
+            context.SemanticModel
+                .GetEnclosingSymbol(invocationSyntax.SpanStart, token)
+                ?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
+            cxDesigner,
+            span,
+            interpolationInfos
         );
 
+        static bool TryGetCXDesigner(
+            ExpressionSyntax expression,
+            SemanticModel semanticModel,
+            out string content,
+            out TextSpan span,
+            out DesignerInterpolationInfo[] interpolations
+        )
+        {
+            switch (expression)
+            {
+                case LiteralExpressionSyntax {Token.Value: string literalContent} literal:
+                    content = literalContent;
+                    interpolations = [];
+                    span = literal.Token.Span;
+                    return true;
+
+                case InterpolatedStringExpressionSyntax interpolated:
+                    content = interpolated.Contents.ToString();
+                    interpolations = interpolated.Contents
+                        .OfType<InterpolationSyntax>()
+                        .Select(x => new DesignerInterpolationInfo(
+                            x.FullSpan,
+                            semanticModel.GetTypeInfo(x.Expression).Type
+                        ))
+                        .ToArray();
+                    span = interpolated.Contents.Span;
+                    return true;
+                default:
+                    content = string.Empty;
+                    span = default;
+                    interpolations = [];
+                    return false;
+            }
+        }
 
         bool TryGetValidDesignerCall(
             out IOperation operation,

@@ -3,11 +3,11 @@
 public sealed class CXSourceReader
 {
     public char this[int index]
-        => index < 0 || index >= Source.Length
-            ? CXLexer.NULL_CHAR
-            : Source.Value[index];
+        => Source.SourceSpan.Contains(index)
+            ? Source[index]
+            : CXLexer.NULL_CHAR;
 
-    public bool IsEOF => Position >= Source.Length;
+    public bool IsEOF => Position >= Source.SourceSpan.End;
 
     public char Current => this[Position];
 
@@ -19,8 +19,7 @@ public sealed class CXSourceReader
 
 
     public int Position { get; set; }
-    public CXSource Source { get; }
-
+    public CXSource Source { get; set; }
 
     public CXSourceReader(CXSource source)
     {

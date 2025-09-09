@@ -26,13 +26,6 @@ public sealed class CXLexer
         Attribute
     }
 
-    private struct State
-    {
-        public int NextInterpolationIndex;
-        public int InterpolationIndex;
-        public char? QuoteChar;
-    }
-
     public const string COMMENT_START = "<!--";
     public const string COMMENT_END = "-->";
 
@@ -61,14 +54,12 @@ public sealed class CXLexer
     {
         get
         {
-            ref var interpolationIndex = ref _state.InterpolationIndex;
-
             // there's no next interpolation
-            if (Reader.Source.Interpolations.Length <= interpolationIndex) return null;
+            if (Reader.Source.Interpolations.Length <= _interpolationIndex) return null;
 
-            for (; interpolationIndex < Reader.Source.Interpolations.Length; interpolationIndex++)
+            for (; _interpolationIndex < Reader.Source.Interpolations.Length; _interpolationIndex++)
             {
-                var interpolationSpan = Reader.Source.Interpolations[interpolationIndex];
+                var interpolationSpan = Reader.Source.Interpolations[_interpolationIndex];
 
                 if (interpolationSpan.End < Reader.Position) continue;
 
@@ -87,17 +78,15 @@ public sealed class CXLexer
     {
         get
         {
-            ref var interpolationIndex = ref _state.NextInterpolationIndex;
-
             // there's no next interpolation
-            if (Reader.Source.Interpolations.Length <= interpolationIndex) return null;
+            if (Reader.Source.Interpolations.Length <= _nextInterpolationIndex) return null;
 
             // check if it's ahead of us
             TextSpan? interpolationSpan = null;
 
-            for (; interpolationIndex < Reader.Source.Interpolations.Length; interpolationIndex++)
+            for (; _nextInterpolationIndex < Reader.Source.Interpolations.Length; _nextInterpolationIndex++)
             {
-                interpolationSpan = Reader.Source.Interpolations[interpolationIndex];
+                interpolationSpan = Reader.Source.Interpolations[_nextInterpolationIndex];
                 if (interpolationSpan.Value.Start > Reader.Position) break;
             }
 
@@ -108,25 +97,38 @@ public sealed class CXLexer
     private readonly bool[] _handledInterpolations;
 
     public LexMode Mode { get; set; }
-    private State _state;
+
+
+    public char? QuoteChar;
+
+    private int _nextInterpolationIndex;
+    private int _interpolationIndex;
 
     public CXLexer(CXSourceReader reader)
     {
         Reader = reader;
         _handledInterpolations = new bool[reader.Source.Interpolations.Length];
         Mode = LexMode.Default;
-        _state = default;
     }
 
-    private void UpdateInterpolationState()
+    public readonly struct ModeSentinel(CXLexer? lexer) : IDisposable
     {
-        ref var interpolationIndex = ref _state.NextInterpolationIndex;
-        if (Reader.Source.Interpolations.Length > interpolationIndex)
+        private readonly LexMode _mode = lexer?.Mode ?? LexMode.Default;
+        public void Dispose()
         {
-            var interpolation = Reader.Source.Interpolations[interpolationIndex];
+            if (lexer is null) return;
 
-            if (Reader.Position > interpolation.End) interpolationIndex++;
+            lexer.Mode = _mode;
         }
+    }
+
+    public ModeSentinel SetMode(LexMode mode)
+    {
+        if (mode == Mode) return default;
+
+        var sentinel = new ModeSentinel(this);
+        Mode = mode;
+        return sentinel;
     }
 
     public CXToken Next()
@@ -212,7 +214,7 @@ public sealed class CXLexer
 
     private bool TryScanElementValue(ref TokenInfo info)
     {
-        var interpolationUpperBounds = NextInterpolationSpan?.Start ?? Reader.Source.Length;
+        var interpolationUpperBounds = NextInterpolationSpan?.Start ?? Reader.Source.SourceSpan.End;
 
         var start = Reader.Position;
 
@@ -238,7 +240,7 @@ public sealed class CXLexer
 
     private void LexStringLiteral(ref TokenInfo info)
     {
-        if (_state.QuoteChar is null)
+        if (QuoteChar is null)
         {
             // bad state
             throw new InvalidOperationException("Missing closing char for string literal");
@@ -251,7 +253,7 @@ public sealed class CXLexer
             return;
         }
 
-        var interpolationUpperBounds = NextInterpolationSpan?.Start ?? Reader.Source.Length;
+        var interpolationUpperBounds = NextInterpolationSpan?.Start ?? Reader.Source.SourceSpan.End;
 
         if (Reader.Position >= interpolationUpperBounds)
         {
@@ -263,20 +265,19 @@ public sealed class CXLexer
             return;
         }
 
-        if (Reader.Current == _state.QuoteChar)
+        if (Reader.Current == QuoteChar)
         {
             Reader.Advance();
 
             info.Kind = CXTokenKind.StringLiteralEnd;
-            Mode = LexMode.Default;
-            _state.QuoteChar = null;
+            QuoteChar = null;
 
             return;
         }
 
         for (; Reader.Position < interpolationUpperBounds; Reader.Advance())
         {
-            if (_state.QuoteChar == Reader.Current)
+            if (QuoteChar == Reader.Current)
             {
                 // is it escaped?
                 if (Reader.Previous is FORWARD_SLASH_CHAR)
@@ -302,7 +303,7 @@ public sealed class CXLexer
             return TryScanInterpolation(ref info);
         }
 
-        _state.QuoteChar = Reader.Current;
+        QuoteChar = Reader.Current;
         Reader.Advance();
         info.Kind = CXTokenKind.StringLiteralStart;
         Mode = LexMode.StringLiteral;
@@ -311,7 +312,7 @@ public sealed class CXLexer
 
     private bool TryScanIdentifier(ref TokenInfo info)
     {
-        var upperBounds = NextInterpolationSpan?.Start ?? Reader.Source.Length;
+        var upperBounds = NextInterpolationSpan?.Start ?? Reader.Source.SourceSpan.End;
 
         if (!IsValidIdentifierStartChar(Reader.Current) || Reader.Position >= upperBounds)
             return false;
@@ -340,7 +341,7 @@ public sealed class CXLexer
             Reader.Advance(
                 span.End - Reader.Position
             );
-            InterpolationIndex = _state.InterpolationIndex;
+            InterpolationIndex = _interpolationIndex;
             return true;
         }
 
