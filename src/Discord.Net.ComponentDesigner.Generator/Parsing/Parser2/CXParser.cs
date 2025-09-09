@@ -77,7 +77,11 @@ public sealed class CXParser
 
     internal CXElement ParseElement()
     {
-        if (IsIncremental && CurrentNode is CXElement element) return element;
+        if (IsIncremental && CurrentNode is CXElement element)
+        {
+            EatNode();
+            return element;
+        }
 
         var start = Expect(CXTokenKind.LessThan);
 
@@ -134,7 +138,11 @@ public sealed class CXParser
 
         CXCollection<CXNode> ParseElementChildren()
         {
-            if (IsIncremental && CurrentNode is CXCollection<CXNode> incrementalChildren) return incrementalChildren;
+            if (IsIncremental && CurrentNode is CXCollection<CXNode> incrementalChildren)
+            {
+                EatNode();
+                return incrementalChildren;
+            }
 
             // valid children are:
             //  - other elements
@@ -156,6 +164,7 @@ public sealed class CXParser
             if (IsIncremental && CurrentNode is CXValue or CXElement)
             {
                 node = CurrentNode;
+                EatNode();
                 return true;
             }
 
@@ -196,7 +205,11 @@ public sealed class CXParser
 
     internal CXCollection<CXAttribute> ParseAttributes()
     {
-        if (IsIncremental && CurrentNode is CXCollection<CXAttribute> incrementalNode) return incrementalNode;
+        if (IsIncremental && CurrentNode is CXCollection<CXAttribute> incrementalNode)
+        {
+            EatNode();
+            return incrementalNode;
+        }
 
         var attributes = new List<CXAttribute>();
 
@@ -250,7 +263,11 @@ public sealed class CXParser
 
     internal CXValue ParseAttributeValue()
     {
-        if (IsIncremental && CurrentNode is CXValue value) return value;
+        if (IsIncremental && CurrentNode is CXValue value)
+        {
+            EatNode();
+            return value;
+        }
 
         switch (CurrentToken.Kind)
         {
@@ -275,7 +292,11 @@ public sealed class CXParser
 
     internal CXValue ParseStringLiteral()
     {
-        if (IsIncremental && CurrentNode is CXValue value) return value;
+        if (IsIncremental && CurrentNode is CXValue value)
+        {
+            EatNode();
+            return value;
+        }
 
         var tokens = new List<CXToken>();
 
