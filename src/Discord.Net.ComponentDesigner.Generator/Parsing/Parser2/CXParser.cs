@@ -37,7 +37,7 @@ public sealed class CXParser
 
     public bool IsIncremental => RootBlender.HasValue;
 
-    public CXBlender2? RootBlender { get; set; }
+    public CXBlender? RootBlender { get; set; }
     private BlendedNode? _currentBlendedNode;
 
 
@@ -433,9 +433,9 @@ public sealed class CXParser
         {
             var token = Lexer.Next();
 
-            if (token.Kind is CXTokenKind.EOF) return token;
-
             _tokens.Add(token);
+
+            if (token.Kind is CXTokenKind.EOF) return token;
         }
 
         return _tokens[index];
@@ -448,7 +448,10 @@ public sealed class CXParser
                     ? RootBlender!.Value
                     : _blendedTokens[_blendedTokens.Count - 1].Blender;
 
-                _blendedTokens.Add(blender.ReadToken());
+                var node = blender.ReadToken();
+                _blendedTokens.Add(node);
+
+                if (node.Token?.Kind is CXTokenKind.EOF) return node.Token.Value;
             }
 
             return _blendedTokens[index].Token!.Value;

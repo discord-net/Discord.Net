@@ -127,6 +127,8 @@ public abstract class CXNode
         _slots = [];
     }
 
+    protected void ClearSlots() => _slots.Clear();
+
     public int GetParentSlotIndex()
     {
         if (Parent is null) return -1;
@@ -215,7 +217,7 @@ public abstract class CXNode
         foreach (var node in nodes) Slot(node);
     }
 
-    public virtual void IncrementalParse(TextChange change) => Parent?.IncrementalParse(change);
+    public virtual void IncrementalParse(IncrementalParseContext change) => Parent?.IncrementalParse(change);
 
     protected void UpdateSelf(CXNode? node)
     {

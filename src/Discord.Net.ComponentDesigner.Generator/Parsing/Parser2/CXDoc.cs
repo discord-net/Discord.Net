@@ -11,7 +11,7 @@ public sealed class CXDoc : CXNode
 
     public IReadOnlyList<CXToken> Tokens { get; }
 
-    private readonly IReadOnlyList<CXElement> _rootElements;
+    public IReadOnlyList<CXElement> RootElements { get; private set; }
 
     public CXDoc(
         CXParser parser,
@@ -21,7 +21,7 @@ public sealed class CXDoc : CXNode
     {
         Tokens = tokens;
         Parser = parser;
-        Slot(_rootElements = rootElements);
+        Slot(RootElements = rootElements);
     }
 
     public void ApplyChanges(
@@ -29,12 +29,35 @@ public sealed class CXDoc : CXNode
         IReadOnlyList<TextChange> changes
     )
     {
-        var blender = new CXBlender2(Parser.Lexer, this, changes.Select(x => (TextChangeRange)x));
+        var affectedRange = CXBlender.GetAffectedRange(
+            this,
+            TextChangeRange.Collapse(changes.Select(x => (TextChangeRange)x))
+        );
+
+        var blender = new CXBlender(Parser.Lexer, this, [affectedRange]);
 
         Parser.Source = source;
         Parser.Reset();
         Parser.RootBlender = blender;
-        var x = Parser.ParseElement();
+
+        var context = new IncrementalParseContext(changes, affectedRange);
+
+        var owner = FindOwningNode(affectedRange.Span, out _);
+
+        owner.IncrementalParse(context);
+    }
+
+    public override void IncrementalParse(IncrementalParseContext context)
+    {
+        var children = new List<CXElement>();
+
+        while (Parser.CurrentToken.Kind is not CXTokenKind.EOF and not CXTokenKind.Invalid)
+        {
+            children.Add(Parser.ParseElement());
+        }
+
+        ClearSlots();
+        Slot(RootElements = children);
     }
 
     public bool TryFindToken(int position, out CXToken token)
