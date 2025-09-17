@@ -1,3 +1,6 @@
+using Discord.Interactions.Attributes.Modals;
+using Discord.Interactions.Builders.Modals.Inputs;
+using Discord.Interactions.Info.InputComponents;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -615,6 +618,21 @@ namespace Discord.Interactions.Builders
                         case ComponentType.TextInput:
                             builder.AddTextComponent(x => BuildTextInput(x, prop, prop.GetValue(instance)));
                             break;
+                        case ComponentType.SelectMenu:
+                            builder.AddSelectMenuComponent(x => BuildSelectMenuInput(x, prop, prop.GetValue(instance)));
+                            break;
+                        case ComponentType.UserSelect:
+                            builder.AddUserSelectComponent(x => BuildSnowflakeSelectInput(x, prop, prop.GetValue(instance)));
+                            break;
+                        case ComponentType.RoleSelect:
+                            builder.AddRoleSelectComponent(x => BuildSnowflakeSelectInput(x, prop, prop.GetValue(instance)));
+                            break;
+                        case ComponentType.MentionableSelect:
+                            builder.AddMentionableSelectComponent(x => BuildSnowflakeSelectInput(x, prop, prop.GetValue(instance)));
+                            break;
+                        case ComponentType.ChannelSelect:
+                            builder.AddChannelSelectComponent(x => BuildSnowflakeSelectInput(x, prop, prop.GetValue(instance)));
+                            break;
                         case null:
                             throw new InvalidOperationException($"{prop.Name} of {prop.DeclaringType.Name} isn't a valid modal input field.");
                         default:
@@ -653,6 +671,74 @@ namespace Discord.Interactions.Builders
                         builder.MaxLength = textInput.MaxLength;
                         builder.MinLength = textInput.MinLength;
                         builder.InitialValue = textInput.InitialValue;
+                        break;
+                    case RequiredInputAttribute requiredInput:
+                        builder.IsRequired = requiredInput.IsRequired;
+                        break;
+                    case InputLabelAttribute inputLabel:
+                        builder.Label = inputLabel.Label;
+                        break;
+                    default:
+                        builder.WithAttributes(attribute);
+                        break;
+                }
+            }
+        }
+
+        private static void BuildSelectMenuInput(SelectMenuInputComponentBuilder builder, PropertyInfo propertyInfo, object defaultValue)
+        {
+            var attributes = propertyInfo.GetCustomAttributes();
+
+            builder.Label = propertyInfo.Name;
+            builder.DefaultValue = defaultValue;
+            builder.WithType(propertyInfo.PropertyType);
+            builder.PropertyInfo = propertyInfo;
+
+            foreach (var attribute in attributes)
+            {
+                switch (attribute)
+                {
+                    case ModalSelectMenuInputAttribute selectMenuInput:
+                        builder.CustomId = selectMenuInput.CustomId;
+                        builder.ComponentType = selectMenuInput.ComponentType;
+                        builder.MinValues = selectMenuInput.MinValues;
+                        builder.MaxValues = selectMenuInput.MaxValues;
+                        builder.Placeholder = selectMenuInput.Placeholder;
+                        break;
+                    case RequiredInputAttribute requiredInput:
+                        builder.IsRequired = requiredInput.IsRequired;
+                        break;
+                    case InputLabelAttribute inputLabel:
+                        builder.Label = inputLabel.Label;
+                        break;
+                    default:
+                        builder.WithAttributes(attribute);
+                        break;
+                }
+            }
+        }
+
+        private static void BuildSnowflakeSelectInput<TInfo, TBuilder>(SnowflakeSelectInputComponentBuilder<TInfo, TBuilder> builder, PropertyInfo propertyInfo, object defaultValue)
+            where TInfo: SnowflakeSelectInputComponentInfo
+            where TBuilder: SnowflakeSelectInputComponentBuilder<TInfo, TBuilder>
+        {
+            var attributes = propertyInfo.GetCustomAttributes();
+
+            builder.Label = propertyInfo.Name;
+            builder.DefaultValue = defaultValue;
+            builder.WithType(propertyInfo.PropertyType);
+            builder.PropertyInfo = propertyInfo;
+
+            foreach (var attribute in attributes)
+            {
+                switch (attribute)
+                {
+                    case SelectInputAttribute selectInput:
+                        builder.CustomId = selectInput.CustomId;
+                        builder.ComponentType = selectInput.ComponentType;
+                        builder.MinValues = selectInput.MinValues;
+                        builder.MaxValues = selectInput.MaxValues;
+                        builder.Placeholder = selectInput.Placeholder;
                         break;
                     case RequiredInputAttribute requiredInput:
                         builder.IsRequired = requiredInput.IsRequired;
