@@ -1,3 +1,4 @@
+using Discord.Interactions.TypeConverters.ModalInputs;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -38,7 +39,7 @@ namespace Discord.Interactions.Builders
         public PropertyInfo PropertyInfo { get; internal set; }
 
         /// <inheritdoc/>
-        public ComponentTypeConverter TypeConverter { get; private set; }
+        public ModalComponentTypeConverter TypeConverter { get; private set; }
 
         /// <inheritdoc/>
         public object DefaultValue { get; set; }
@@ -102,7 +103,7 @@ namespace Discord.Interactions.Builders
         /// <returns>
         ///     The builder instance.
         /// </returns>
-        public TBuilder WithComponentType(ComponentType componentType)
+        public virtual TBuilder WithComponentType(ComponentType componentType)
         {
             ComponentType = componentType;
             return Instance;
@@ -118,7 +119,7 @@ namespace Discord.Interactions.Builders
         public TBuilder WithType(Type type)
         {
             Type = type;
-            TypeConverter = Modal._interactionService.GetComponentTypeConverter(type);
+            TypeConverter = Modal._interactionService.GetModalInputTypeConverter(type);
             return Instance;
         }
 
