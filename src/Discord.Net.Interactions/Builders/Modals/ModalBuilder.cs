@@ -1,3 +1,4 @@
+using Discord.Interactions.Builders.Modals.Inputs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -75,6 +76,53 @@ namespace Discord.Interactions.Builders
         public ModalBuilder AddTextComponent(Action<TextInputComponentBuilder> configure)
         {
             var builder = new TextInputComponentBuilder(this);
+            configure(builder);
+            _components.Add(builder);
+            return this;
+        }
+
+        /// <summary>
+        ///     Adds a select menu component to <see cref="Components"/>.
+        /// </summary>
+        /// <param name="configure">Select menu component builder factory.</param>
+        /// <returns>
+        ///     The builder instance.
+        /// </returns>
+        public ModalBuilder AddSelectMenuComponent(Action<SelectMenuInputComponentBuilder> configure)
+        {
+            var builder = new SelectMenuInputComponentBuilder(this);
+            configure(builder);
+            _components.Add(builder);
+            return this;
+        }
+
+        public ModalBuilder AddUserSelectComponent(Action<UserSelectInputComponentBuilder> configure)
+        {
+            var builder = new UserSelectInputComponentBuilder(this);
+            configure(builder);
+            _components.Add(builder);
+            return this;
+        }
+
+        public ModalBuilder AddRoleSelectComponent(Action<RoleSelectInputComponentBuilder> configure)
+        {
+            var builder = new RoleSelectInputComponentBuilder(this);
+            configure(builder);
+            _components.Add(builder);
+            return this;
+        }
+
+        public ModalBuilder AddMentionableSelectComponent(Action<MentionableSelectInputComponentBuilder> configure)
+        {
+            var builder = new MentionableSelectInputComponentBuilder(this);
+            configure(builder);
+            _components.Add(builder);
+            return this;
+        }
+
+        public ModalBuilder AddChannelSelectComponent(Action<ChannelSelectInputComponentBuilder> configure)
+        {
+            var builder = new ChannelSelectInputComponentBuilder(this);
             configure(builder);
             _components.Add(builder);
             return this;
