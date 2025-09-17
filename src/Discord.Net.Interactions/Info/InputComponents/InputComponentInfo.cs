@@ -1,3 +1,4 @@
+using Discord.Interactions.TypeConverters.ModalInputs;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -50,12 +51,12 @@ namespace Discord.Interactions
         public PropertyInfo PropertyInfo { get; }
 
         /// <summary>
-        ///     Gets the <see cref="ComponentTypeConverter"/> assigned to this component.
+        ///     Gets the <see cref="ModalComponentTypeConverter"/> assigned to this component.
         /// </summary>
-        public ComponentTypeConverter TypeConverter { get; }
+        public ModalComponentTypeConverter TypeConverter { get; }
 
         /// <summary>
-        ///     Gets the default value of this component.
+        ///     Gets the default value of this component property.
         /// </summary>
         public object DefaultValue { get; }
 
