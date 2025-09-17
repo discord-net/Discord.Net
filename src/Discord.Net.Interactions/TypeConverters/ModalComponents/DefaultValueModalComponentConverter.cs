@@ -1,5 +1,6 @@
 using Discord.Interactions.TypeConverters.ModalInputs;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Discord.Interactions.TypeConverters.ModalComponents;
@@ -13,7 +14,7 @@ internal sealed class DefaultValueModalComponentConverter<T> : ModalComponentTyp
         {
             return option.Type switch
             {
-                ComponentType.SelectMenu => Task.FromResult(TypeConverterResult.FromSuccess(Convert.ChangeType(string.Join(",", option.Values), typeof(T)))),
+                ComponentType.SelectMenu when option.Values.Count == 1 => Task.FromResult(TypeConverterResult.FromSuccess(Convert.ChangeType(option.Values.First(), typeof(T)))),
                 ComponentType.TextInput => Task.FromResult(TypeConverterResult.FromSuccess(Convert.ChangeType(option.Value, typeof(T)))),
                 _ => Task.FromResult(TypeConverterResult.FromError(InteractionCommandError.ConvertFailed, $"{option.Type} doesn't have a convertible value."))
             };
@@ -22,5 +23,24 @@ internal sealed class DefaultValueModalComponentConverter<T> : ModalComponentTyp
         {
             return Task.FromResult(TypeConverterResult.FromError(ex));
         }
+    }
+
+    public override Task WriteAsync<TBuilder>(TBuilder builder, InputComponentInfo component, object value)
+    {
+        var strValue = Convert.ToString(value);
+
+        switch (builder)
+        {
+            case TextInputBuilder textInput:
+                textInput.WithValue(strValue);
+                break;
+            case SelectMenuBuilder selectMenu when component.ComponentType is ComponentType.SelectMenu:
+                selectMenu.Options.FirstOrDefault(x => x.Value == strValue)?.IsDefault = true;
+                break;
+            default:
+                throw new InvalidOperationException($"{nameof(IConvertible)}s cannot be used to populate components other than SelectMenu and TextInput.");
+        };
+
+        return Task.CompletedTask;
     }
 }
