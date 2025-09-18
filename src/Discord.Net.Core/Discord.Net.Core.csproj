@@ -11,6 +11,7 @@
     <IsTrimmable>false</IsTrimmable>
     <IsAotCompatible>false</IsAotCompatible>
     <IncludeSymbols>true</IncludeSymbols>
+    <NoWarn>NU1510</NoWarn>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
   <ItemGroup>

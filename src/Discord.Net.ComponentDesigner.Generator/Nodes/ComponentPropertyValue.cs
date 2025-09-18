@@ -1,20 +1,19 @@
 ﻿using Discord.ComponentDesignerGenerator.Parser;
+using Microsoft.CodeAnalysis;
+using System.Collections.Generic;
 
 namespace Discord.ComponentDesignerGenerator.Nodes;
 
-public abstract record ComponentPropertyValue<T>(ComponentProperty<T> Property)
+public sealed record ComponentPropertyValue(
+    ComponentProperty Property,
+    CXAttribute? Attribute
+)
 {
-    public sealed record Serializable(ComponentProperty<T> Property, T Value) : ComponentPropertyValue<T>(Property);
+    public CXValue? Value => Attribute?.Value;
 
-    public sealed record InlineCode(ComponentProperty<T> Property, string Code) : ComponentPropertyValue<T>(Property);
+    public bool IsSpecified => Attribute is not null;
 
-    public sealed record Interpolated(
-        ComponentProperty<T> Property,
-        int InterpolationId
-    ) : ComponentPropertyValue<T>(Property);
+    private readonly List<Diagnostic> _diagnostics = [];
 
-    public sealed record MultiPartInterpolation(
-        ComponentProperty<T> Property,
-        CXmlValue.Multipart Multipart
-    ) : ComponentPropertyValue<T>(Property);
+    public void AddDiagnostic(Diagnostic diagnostic) => _diagnostics.Add(diagnostic);
 }

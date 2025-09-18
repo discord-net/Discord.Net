@@ -6,5 +6,5 @@ namespace Discord.ComponentDesignerGenerator.Parser;
 public enum CXTokenFlags : byte
 {
     None = 0,
-    HasErrors = 1 << 0
+    Missing = 1 << 0
 }

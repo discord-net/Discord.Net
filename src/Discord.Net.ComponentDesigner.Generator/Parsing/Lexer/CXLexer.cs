@@ -94,10 +94,9 @@ public sealed class CXLexer
         }
     }
 
-    private readonly bool[] _handledInterpolations;
-
     public LexMode Mode { get; set; }
 
+    public CXToken[] InterpolationMap;
 
     public char? QuoteChar;
 
@@ -107,8 +106,13 @@ public sealed class CXLexer
     public CXLexer(CXSourceReader reader)
     {
         Reader = reader;
-        _handledInterpolations = new bool[reader.Source.Interpolations.Length];
         Mode = LexMode.Default;
+        InterpolationMap = new CXToken[Reader.Source.Interpolations.Length];
+    }
+
+    public void Reset()
+    {
+        InterpolationMap = new CXToken[Reader.Source.Interpolations.Length];
     }
 
     public readonly struct ModeSentinel(CXLexer? lexer) : IDisposable
@@ -147,13 +151,21 @@ public sealed class CXLexer
 
         GetTrivia(isTrailing: true, ref info.TrailingTriviaLength);
 
-        return new CXToken(
+        var span = new TextSpan(info.Start, info.End - info.Start);
+
+        var token = new CXToken(
             info.Kind,
-            new TextSpan(info.Start, info.End - info.Start),
+            span,
             info.LeadingTriviaLength,
             info.TrailingTriviaLength,
-            info.Flags
+            info.Flags,
+            Reader.Source.GetValue(span)
         );
+
+        if (info.Kind is CXTokenKind.Interpolation)
+            InterpolationMap[_interpolationIndex] = token;
+
+        return token;
     }
 
     private void Scan(ref TokenInfo info)
@@ -342,6 +354,7 @@ public sealed class CXLexer
                 span.End - Reader.Position
             );
             InterpolationIndex = _interpolationIndex;
+
             return true;
         }
 

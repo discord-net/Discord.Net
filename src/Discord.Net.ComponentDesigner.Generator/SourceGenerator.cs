@@ -4,6 +4,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Operations;
+using Microsoft.CodeAnalysis.Text;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -13,155 +14,75 @@ using System.Threading;
 
 namespace Discord.ComponentDesignerGenerator;
 
+public sealed record Target(
+    InterceptableLocation InterceptLocation,
+    InvocationExpressionSyntax InvocationSyntax,
+    ExpressionSyntax ArgumentExpressionSyntax,
+    IOperation Operation,
+    Compilation Compilation,
+    string? ParentKey,
+    string CXDesigner,
+    TextSpan CXDesignerSpan,
+    DesignerInterpolationInfo[] Interpolations
+)
+{
+    public SyntaxTree SyntaxTree => InvocationSyntax.SyntaxTree;
+}
+
+public sealed record DesignerInterpolationInfo(
+    TextSpan Span,
+    ITypeSymbol? Symbol
+);
+
 [Generator]
 public sealed class SourceGenerator : IIncrementalGenerator
 {
-    private readonly record struct Target(
-        InterceptableLocation InterceptableLocation,
-        Location Location,
-        string[] Content,
-        InterpolationInfo[] Interpolations,
-        bool IsMultiLine,
-        KnownTypes KnownTypes,
-        Func<string, ImmutableArray<ISymbol>> LookupNode
-    )
-    {
-        public bool Equals(Target? other)
-            => other is { } target &&
-               InterceptableLocation.Equals(target.InterceptableLocation) &&
-               Location.Equals(target.Location) &&
-               Content.SequenceEqual(target.Content) &&
-               Interpolations.SequenceEqual(target.Interpolations) &&
-               IsMultiLine == target.IsMultiLine;
-
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                var hashCode = InterceptableLocation.GetHashCode();
-                hashCode = (hashCode * 397) ^ Location.GetHashCode();
-                hashCode = (hashCode * 397) ^ Content.Aggregate(0, (a, b) => (a * 397) ^ b.GetHashCode());
-                hashCode = (hashCode * 397) ^ Interpolations.Aggregate(0, (a, b) => (a * 397) ^ b.GetHashCode());
-                hashCode = (hashCode * 397) ^ IsMultiLine.GetHashCode();
-                return hashCode;
-            }
-        }
-    }
-
-    private readonly record struct Interceptor(
-        string? Source,
-        Diagnostic[] Diagnostics
-    );
-
+    private readonly Dictionary<string, CXGraphManager> _cache = [];
 
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        var manager = new SourceManager(context);
-        return;
-
         var provider = context
             .SyntaxProvider
-            .CreateSyntaxProvider((x, _) =>
-                    x is InvocationExpressionSyntax
-                    {
-                        Expression: MemberAccessExpressionSyntax
-                        {
-                            Name: {Identifier.Value: "Create" or "cx"}
-                        } or IdentifierNameSyntax
-                        {
-                            Identifier.ValueText: "cx"
-                        }
-                    },
-                Transform
+            .CreateSyntaxProvider(
+                IsComponentDesignerCall,
+                MapPossibleComponentDesignerCall
             )
-            .Select(BuildInterceptor)
             .Collect();
 
-        context.RegisterSourceOutput(provider, Generate);
-    }
-
-    private static Interceptor? BuildInterceptor(Target? rawTarget, CancellationToken token)
-    {
-        if (rawTarget is not { } target) return null;
-
-        var diagnostics = new List<Diagnostic>();
-
-        var interpolationLengths = target.Interpolations.Select(x => x.Length).ToArray();
-        var doc = ComponentParser.Parse(target.Content, interpolationLengths);
-
-        var componentContext = new ComponentNodeContext(
-            doc,
-            target.Location,
-            target.IsMultiLine,
-            target.Interpolations,
-            target.KnownTypes,
-            target.LookupNode
-        );
-
-        foreach (var parsingDiagnostic in doc.Diagnostics)
-        {
-            diagnostics.Add(
-                Diagnostic.Create(
-                    Diagnostics.ComponentParseError,
-                    componentContext.GetLocation(parsingDiagnostic.Span),
-                    parsingDiagnostic.Message
-                )
-            );
-        }
-
-        var nodes = doc
-            .Elements
-            .Select(x => ComponentNode.Create(x, componentContext))
-            .Where(x => x is not null)
-            .ToArray();
-
-        foreach (var node in nodes)
-        {
-            node!.ReportValidationErrors();
-        }
-
-        diagnostics.AddRange(componentContext.Diagnostics);
-
-        if (componentContext.HasErrors) return new(null, [..diagnostics]);
-
-        return new Interceptor(
-            $$"""
-              [global::System.Runtime.CompilerServices.InterceptsLocation(version: {{target.InterceptableLocation.Version}}, data: "{{target.InterceptableLocation.Data}}")]
-              public static global::Discord.ComponentBuilderV2 _{{Math.Abs(target.GetHashCode())}}(
-                  global::{{Constants.COMPONENT_DESIGNER_QUALIFIED_NAME}} designer
-              )
-              {
-                  return new([
-                      {{
-                          string.Join(
-                              "\n".Postfix(8),
-                              nodes.Select(x => x!.Render().WithNewlinePadding(8))
-                          )
-                      }}
-                  ]);
-              }
-              """,
-            [..diagnostics]
+        context.RegisterSourceOutput(
+            provider
+                .Combine(provider.Select(GetKeysAndUpdateCachedEntries))
+                .SelectMany(MapManagers)
+                .Select((x, _) => x.Render())
+                .Collect(),
+            Generate
         );
     }
 
-    private void Generate(SourceProductionContext context, ImmutableArray<Interceptor?> arg2)
+    private void Generate(SourceProductionContext context, ImmutableArray<RenderedInterceptor> interceptors)
     {
+        if (interceptors.Length is 0) return;
+
         var sb = new StringBuilder();
 
-        foreach (var interceptor in arg2)
+        foreach (var interceptor in interceptors)
         {
-            if (!interceptor.HasValue) continue;
-
-            foreach (var diagnostic in interceptor.Value.Diagnostics)
+            foreach (var diagnostic in interceptor.Diagnostics)
             {
                 context.ReportDiagnostic(diagnostic);
             }
 
-            if (interceptor.Value.Source is not null) sb.AppendLine(interceptor.Value.Source);
+            sb.AppendLine(
+                $$"""
+                  [global::System.Runtime.CompilerServices.InterceptsLocation(version: {{interceptor.Location.Version}}, data: "{{interceptor.Location.Data}}")]
+                  public static global::Discord.ComponentBuilderV2 _{{Math.Abs(interceptor.GetHashCode())}}(
+                      global::{{Constants.COMPONENT_DESIGNER_QUALIFIED_NAME}} designer
+                  ) => new(
+                      {{interceptor.Source.WithNewlinePadding(4)}}
+                  )
+                  """
+            );
         }
-
-        if (sb.Length is 0) return;
 
         context.AddSource(
             "Interceptors.g.cs",
@@ -171,117 +92,236 @@ public sealed class SourceGenerator : IIncrementalGenerator
               namespace System.Runtime.CompilerServices
               {
                   [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
-                  sealed file class InterceptsLocationAttribute(int version, string data) : Attribute
-                  {
-                  }
+                  sealed file class InterceptsLocationAttribute(int version, string data) : Attribute;
               }
 
               namespace InlineComponent
               {
                   static file class Interceptors
                   {
-                      {{sb.ToString().Replace("\n", "\n        ")}}
+                      {{sb.ToString().WithNewlinePadding(8)}}
                   }
               }
               """
         );
     }
 
-    private Target? Transform(GeneratorSyntaxContext context, CancellationToken token)
+    private IEnumerable<CXGraphManager> MapManagers(
+        (ImmutableArray<Target?> targets, ImmutableArray<string?> keys) tuple,
+        CancellationToken token
+    )
     {
-        var operation = context.SemanticModel.GetOperation(context.Node, token);
+        var (targets, keys) = tuple;
 
-        checkOperation:
-        switch (operation)
+        for (var i = 0; i < targets.Length; i++)
         {
-            case IInvalidOperation invalid:
-                operation = invalid.ChildOperations.OfType<IInvocationOperation>().FirstOrDefault();
-                goto checkOperation;
-            case IInvocationOperation invocation:
-                if (
-                    invocation
-                        .TargetMethod
-                        .ContainingType
-                        .ToDisplayString()
-                    is "Discord.ComponentDesigner"
-                ) break;
-                goto default;
+            var target = targets[i];
+            var key = keys[i];
 
-            default: return null;
+            if (target is null || key is null) continue;
+
+            // TODO: handle key updates
+
+            if (_cache.TryGetValue(key, out var manager))
+            {
+                manager.OnUpdate(key, target);
+            }
+            else
+            {
+                manager = _cache[key] = CXGraphManager.Create(
+                    this,
+                    key,
+                    target
+                );
+            }
+
+            yield return manager;
+        }
+    }
+
+    private ImmutableArray<string?> GetKeysAndUpdateCachedEntries(ImmutableArray<Target?> target,
+        CancellationToken token)
+    {
+        var result = new string?[target.Length];
+
+        var map = new Dictionary<string, int>();
+        var globalCount = 0;
+
+        for (var i = 0; i < target.Length; i++)
+        {
+            var targetItem = target[i];
+
+            if (targetItem is null) continue;
+
+            string key;
+            if (targetItem.ParentKey is null)
+            {
+                key = $"<global>:{globalCount++}";
+            }
+            else
+            {
+                map.TryGetValue(targetItem.ParentKey, out var index);
+
+                key = $"{targetItem.ParentKey}:{index}";
+                map[targetItem.ParentKey] = index + 1;
+            }
+
+            result[i] = key;
         }
 
-        if (context.Node is not InvocationExpressionSyntax invocationSyntax) return null;
-
-        if (context.SemanticModel.GetInterceptableLocation(invocationSyntax) is not { } location)
-            return null;
-
-        if (invocationSyntax.ArgumentList.Arguments.Count is not 1) return null;
-
-        var argument = invocationSyntax.ArgumentList.Arguments[0].Expression;
-
-        var content = new List<string>();
-        var interpolations = new List<InterpolationInfo>();
-        var isMultiLine = false;
-
-        switch (argument)
+        foreach (var key in _cache.Keys.Except(result))
         {
-            case InterpolatedStringExpressionSyntax interpolated:
-                foreach (var interpolation in interpolated.Contents)
-                {
-                    switch (interpolation)
-                    {
-                        case InterpolatedStringTextSyntax interpolatedStringTextSyntax:
-                            content.Add(interpolatedStringTextSyntax.TextToken.ValueText);
-                            break;
-                        case InterpolationSyntax interpolationSyntax:
-                            var typeInfo = ModelExtensions.GetTypeInfo(context
-                                    .SemanticModel, interpolationSyntax.Expression, token);
-
-                            if (typeInfo.Type is null) return null;
-
-                            interpolations.Add(
-                                new InterpolationInfo(
-                                    interpolations.Count,
-                                    interpolationSyntax.FullSpan.Length,
-                                    typeInfo.Type
-                                )
-                            );
-                            // interpolationLengths.Add(interpolationSyntax.FullSpan.Length);
-                            break;
-                        default:
-                            throw new ArgumentOutOfRangeException(nameof(interpolation));
-                    }
-                }
-
-                if (content.Count is 0) return null;
-                isMultiLine = interpolated.StringStartToken.Kind()
-                    is SyntaxKind.MultiLineRawStringLiteralToken
-                    or SyntaxKind.InterpolatedMultiLineRawStringStartToken;
-                break;
-
-
-            case LiteralExpressionSyntax {Token.Value: string stringContent} literal:
-                content.Add(stringContent);
-                isMultiLine = literal.Token.Kind()
-                    is SyntaxKind.MultiLineRawStringLiteralToken
-                    or SyntaxKind.InterpolatedMultiLineRawStringStartToken;
-                break;
-
-            default: return null;
+            if (key is not null) _cache.Remove(key);
         }
+
+        return [..result];
+    }
+
+    private static void OnTargetUpdated(Target? target, CancellationToken token)
+    {
+        if (target is null) return;
+
+        //target.Compilation.SyntaxTrees
+    }
+
+
+    private static void ProcessTargetsUpdate(ImmutableArray<Target?> targets, CancellationToken token)
+    {
+        foreach (var target in targets)
+        {
+            if (target is null) continue;
+        }
+    }
+
+
+    private static Target? MapPossibleComponentDesignerCall(GeneratorSyntaxContext context, CancellationToken token)
+    {
+        if (
+            !TryGetValidDesignerCall(
+                out var operation,
+                out var invocationSyntax,
+                out var interceptLocation,
+                out var argumentSyntax
+            )
+        ) return null;
+
+        if (
+            !TryGetCXDesigner(
+                argumentSyntax,
+                context.SemanticModel,
+                out var cxDesigner,
+                out var span,
+                out var interpolationInfos
+            )
+        ) return null;
 
 
         return new Target(
-            location,
-            argument.GetLocation(),
-            content.ToArray(),
-            interpolations.ToArray(),
-            isMultiLine,
-            context.SemanticModel.Compilation.GetKnownTypes(),
-            LookupNode
+            interceptLocation,
+            invocationSyntax,
+            argumentSyntax,
+            operation,
+            context.SemanticModel.Compilation,
+            context.SemanticModel
+                .GetEnclosingSymbol(invocationSyntax.SpanStart, token)
+                ?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
+            cxDesigner,
+            span,
+            interpolationInfos
         );
 
-        ImmutableArray<ISymbol> LookupNode(string? name)
-            => context.SemanticModel.LookupNamespacesAndTypes(context.Node.SpanStart, name: name);
+        static bool TryGetCXDesigner(
+            ExpressionSyntax expression,
+            SemanticModel semanticModel,
+            out string content,
+            out TextSpan span,
+            out DesignerInterpolationInfo[] interpolations
+        )
+        {
+            switch (expression)
+            {
+                case LiteralExpressionSyntax {Token.Value: string literalContent} literal:
+                    content = literalContent;
+                    interpolations = [];
+                    span = literal.Token.Span;
+                    return true;
+
+                case InterpolatedStringExpressionSyntax interpolated:
+                    content = interpolated.Contents.ToString();
+                    interpolations = interpolated.Contents
+                        .OfType<InterpolationSyntax>()
+                        .Select(x => new DesignerInterpolationInfo(
+                            x.FullSpan,
+                            semanticModel.GetTypeInfo(x.Expression).Type
+                        ))
+                        .ToArray();
+                    span = interpolated.Contents.Span;
+                    return true;
+                default:
+                    content = string.Empty;
+                    span = default;
+                    interpolations = [];
+                    return false;
+            }
+        }
+
+        bool TryGetValidDesignerCall(
+            out IOperation operation,
+            out InvocationExpressionSyntax invocationSyntax,
+            out InterceptableLocation interceptLocation,
+            out ExpressionSyntax argumentExpressionSyntax
+        )
+        {
+            operation = context.SemanticModel.GetOperation(context.Node, token)!;
+            interceptLocation = null!;
+            argumentExpressionSyntax = null!;
+            invocationSyntax = null!;
+
+            checkOperation:
+            switch (operation)
+            {
+                case IInvalidOperation invalid:
+                    operation = invalid.ChildOperations.OfType<IInvocationOperation>().FirstOrDefault()!;
+                    goto checkOperation;
+                case IInvocationOperation invocation:
+                    if (
+                        invocation
+                            .TargetMethod
+                            .ContainingType
+                            .ToDisplayString()
+                        is "Discord.ComponentDesigner"
+                    ) break;
+                    goto default;
+
+                default: return false;
+            }
+
+            if (context.Node is not InvocationExpressionSyntax syntax) return false;
+
+            invocationSyntax = syntax;
+
+            if (context.SemanticModel.GetInterceptableLocation(invocationSyntax) is not { } location)
+                return false;
+
+            interceptLocation = location;
+
+            if (invocationSyntax.ArgumentList.Arguments.Count is not 1) return false;
+
+            argumentExpressionSyntax = invocationSyntax.ArgumentList.Arguments[0].Expression;
+
+            return true;
+        }
     }
+
+    private static bool IsComponentDesignerCall(SyntaxNode node, CancellationToken token)
+        => node is InvocationExpressionSyntax
+        {
+            Expression: MemberAccessExpressionSyntax
+            {
+                Name: {Identifier.Value: "Create" or "cx"}
+            } or IdentifierNameSyntax
+            {
+                Identifier.ValueText: "cx"
+            }
+        };
 }

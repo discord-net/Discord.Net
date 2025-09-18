@@ -1,8 +1,10 @@
-﻿using Discord.ComponentDesignerGenerator.Parser;
+﻿using Discord.ComponentDesignerGenerator.Nodes;
+using Discord.ComponentDesignerGenerator.Parser;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -11,6 +13,7 @@ namespace Discord.ComponentDesignerGenerator;
 
 public sealed class CXGraphManager
 {
+    public SyntaxTree SyntaxTree => InvocationSyntax.SyntaxTree;
     public InterceptableLocation InterceptLocation => _target.InterceptLocation;
     public InvocationExpressionSyntax InvocationSyntax => _target.InvocationSyntax;
     public ExpressionSyntax ArgumentExpressionSyntax => _target.ArgumentExpressionSyntax;
@@ -24,7 +27,7 @@ public sealed class CXGraphManager
 
     public CXParser Parser => _document.Parser;
 
-    private readonly SourceManager _manager;
+    private readonly SourceGenerator _generator;
 
     private CXDoc _document;
     private Target _target;
@@ -32,14 +35,16 @@ public sealed class CXGraphManager
 
     private string _basicCXSource;
 
+    private CXGraph _graph;
+
     public CXGraphManager(
-        SourceManager manager,
+        SourceGenerator generator,
         string key,
         Target target,
         CXDoc document
     )
     {
-        _manager = manager;
+        _generator = generator;
         _target = target;
         _document = document;
         _key = key;
@@ -49,9 +54,11 @@ public sealed class CXGraphManager
             CXDesigner,
             InterpolationInfos
         );
+
+        _graph = CXGraph.Create(_document, this);
     }
 
-    public static CXGraphManager Create(SourceManager manager, string key, Target target)
+    public static CXGraphManager Create(SourceGenerator generator, string key, Target target)
     {
         var source = new CXSource(
             target.CXDesignerSpan,
@@ -59,7 +66,7 @@ public sealed class CXGraphManager
             target.Interpolations.Select(x => x.Span).ToArray()
         );
 
-        return new CXGraphManager(manager, key, target, CXParser.Parse(source));
+        return new CXGraphManager(generator, key, target, CXParser.Parse(source));
     }
 
     public void OnUpdate(string key, Target target)
@@ -75,17 +82,23 @@ public sealed class CXGraphManager
          * Regenerating
          *   Caused mostly by interpolation types changing, the actual values don't matter since it doesn't change
          *   out emitted code
+         *
+         *   Some key things to note:
+         *     A fast-path is possible for regenerating, if an interpolations content (source code) has changed, we
+         *     can skip reparse and regeneration, and simply update any diagnostics' text spans.
+         *     If an interpolations type has changed, we re-run the validator wrapping the interpolation, and regenerate
+         *     our emitted source.
          */
 
-        var newSource = GetCXWithoutInterpolations(
+        var newCXWithoutInterpolations = GetCXWithoutInterpolations(
             target.ArgumentExpressionSyntax.SpanStart,
             target.CXDesigner,
             target.Interpolations
         );
 
-        if (newSource != _basicCXSource)
+        if (newCXWithoutInterpolations != _basicCXSource)
         {
-            // we're gonna need to reparse
+            // we're going to need to reparse, the underlying CX structure changed
             DoReparse(target);
         }
 
@@ -103,18 +116,58 @@ public sealed class CXGraphManager
             target.Interpolations.Select(x => x.Span).ToArray()
         );
 
-        _document!.ApplyChanges(
+        var changes = target
+            .SyntaxTree
+            .GetChanges(_target.SyntaxTree)
+            .Where(x => CXDesignerSpan.Contains(x.Span))
+            .ToArray();
+
+        var result = _document!.ApplyChanges(
             source,
-            [
-                ..target
-                    .SyntaxTree
-                    .GetChanges(_target.SyntaxTree)
-                    .Where(x => CXDesignerSpan.Contains(x.Span))
-            ]
+            changes
+        );
+
+        _graph.Update(_document, result.ReusedNodes);
+    }
+
+    public RenderedInterceptor Render()
+    {
+        var diagnostics = new List<Diagnostic>(
+            _document
+                .Diagnostics
+                .Select(x => Diagnostic.Create(
+                        Diagnostics.ParseError,
+                        SyntaxTree.GetLocation(x.Span),
+                        x.Message
+                    )
+                )
+        );
+
+        if (diagnostics.Count > 0)
+        {
+            return new(InterceptLocation, string.Empty, [..diagnostics]);
+        }
+
+        var context = new ComponentContext(_graph) {Diagnostics = diagnostics};
+
+        _graph.Validate(context);
+
+        var source = context.HasErrors
+            ? string.Empty
+            : _graph.Render(context);
+
+        return new(
+            this.InterceptLocation,
+            _graph.Render(),
+            [..diagnostics]
         );
     }
 
-    private static string GetCXWithoutInterpolations(int offset, string cx, DesignerInterpolationInfo[] interpolations)
+    private static string GetCXWithoutInterpolations(
+        int offset,
+        string cx,
+        DesignerInterpolationInfo[] interpolations
+    )
     {
         if (interpolations.Length is 0) return cx;
 
