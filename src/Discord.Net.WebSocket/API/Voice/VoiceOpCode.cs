@@ -22,7 +22,13 @@ namespace Discord.API.Voice
         Hello = 8,
         /// <summary> C←S - Used to acknowledge a resumed connection. </summary>
         Resumed = 9,
+        /// <summary> C←S - One or more clients have connected to the voice channel. </summary>
+        ClientConnect = 11,
         /// <summary> C←S - Used to notify that a client has disconnected. </summary>
         ClientDisconnect = 13,
+        /// <summary> C←S - Contains the flags of a user that connected to voice, also sent on initial connection for each existing user. </summary>
+        ClientFlags = 18,
+        /// <summary> C←S - Contains the platform type of a user that connected to voice, also sent on initial connection for each existing user. </summary>
+        ClientPlatform = 20,
     }
 }

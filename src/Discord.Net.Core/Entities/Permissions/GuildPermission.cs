@@ -302,5 +302,10 @@ namespace Discord
         ///     Allows user-installed apps to send public responses.
         /// </summary>
         UseExternalApps = 1L << 50,
+
+        /// <summary>
+        ///     Allows pinning and unpinning messages.
+        /// </summary>
+        PinMessages = 1L << 51,
     }
 }

@@ -9,18 +9,23 @@ namespace Discord.Audio.Streams
     /// </summary>
     public class SodiumEncryptStream : AudioOutStream
     {
+        private const int RtpHeaderSize = 12;
+        private const int NonceSize = 24;
+
         private readonly AudioClient _client;
         private readonly AudioStream _next;
         private readonly byte[] _nonce;
         private bool _hasHeader;
         private ushort _nextSeq;
         private uint _nextTimestamp;
+        private uint _nonceCounter;
 
         public SodiumEncryptStream(AudioStream next, IAudioClient client)
         {
             _next = next;
             _client = (AudioClient)client;
-            _nonce = new byte[24];
+            _nonce = new byte[NonceSize];
+            _nonceCounter = 0;
         }
 
         /// <exception cref="InvalidOperationException">Header received with no payload.</exception>
@@ -46,10 +51,35 @@ namespace Discord.Audio.Streams
             if (_client.SecretKey == null)
                 return;
 
-            Buffer.BlockCopy(buffer, offset, _nonce, 0, 12); //Copy nonce from RTP header
-            count = SecretBox.Encrypt(buffer, offset + 12, count - 12, buffer, 12, _nonce, _client.SecretKey);
+            // The first bytes of the nonce are the counter in big-endian.
+            byte[] counterBytes = BitConverter.GetBytes(_nonceCounter);
+            if (BitConverter.IsLittleEndian)
+                Array.Reverse(counterBytes); // big-endian
+            Buffer.BlockCopy(counterBytes, offset, _nonce, 0, counterBytes.Length);
+            if (++_nonceCounter >= uint.MaxValue)
+                _nonceCounter = 0;
+
+            // Encrypt payload 
+            byte[] rtpHeader = new byte[RtpHeaderSize];
+            Buffer.BlockCopy(buffer, offset, rtpHeader, 0, rtpHeader.Length);
+            int payloadOffset = offset + rtpHeader.Length;
+            int payloadLength = count - rtpHeader.Length;
+            int encryptedLength = SecretBox.Encrypt(
+                buffer,
+                payloadOffset,
+                payloadLength,
+                buffer,
+                payloadOffset,
+                rtpHeader,
+                _nonce,
+                _client.SecretKey);
+
+            // Append nonce to encripted payload
+            Buffer.BlockCopy(counterBytes, 0, buffer, payloadOffset + encryptedLength, counterBytes.Length);
+            int packageLength = rtpHeader.Length + encryptedLength + counterBytes.Length;
+
             _next.WriteHeader(_nextSeq, _nextTimestamp, false);
-            await _next.WriteAsync(buffer, 0, count + 12, cancelToken).ConfigureAwait(false);
+            await _next.WriteAsync(buffer, offset, packageLength, cancelToken).ConfigureAwait(false);
         }
 
         public override Task FlushAsync(CancellationToken cancelToken)

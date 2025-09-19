@@ -1,7 +1,6 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
-using System.ComponentModel;
 
 namespace Discord.Net.Converters
 {
@@ -21,8 +20,10 @@ namespace Discord.Net.Converters
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
             var jsonObject = JObject.Load(reader);
-            var messageComponent = default(IMessageComponent);
-            switch ((ComponentType)jsonObject["type"].Value<int>())
+            var typeProperty = jsonObject["type"].Value<int>();
+
+            IMessageComponent messageComponent;
+            switch ((ComponentType)typeProperty)
             {
                 case ComponentType.ActionRow:
                     messageComponent = new API.ActionRowComponent();
@@ -35,7 +36,7 @@ namespace Discord.Net.Converters
                 case ComponentType.MentionableSelect:
                 case ComponentType.RoleSelect:
                 case ComponentType.UserSelect:
-                    messageComponent = new API.SelectMenuComponent();
+                    messageComponent = new API.SelectMenuComponent(){Type = (ComponentType)typeProperty};
                     break;
                 case ComponentType.TextInput:
                     messageComponent = new API.TextInputComponent();
@@ -67,6 +68,8 @@ namespace Discord.Net.Converters
                 case ComponentType.FileUpload:
                     messageComponent = new API.FileUploadComponent();
                     break;
+                default:
+                    throw new JsonSerializationException($"Unknown component type value '{typeProperty}' while deserializing message component");
             }
             serializer.Populate(jsonObject.CreateReader(), messageComponent);
             return messageComponent;
