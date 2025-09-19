@@ -44,6 +44,9 @@ internal static class MessageComponentExtension
 
             case LabelComponent label:
                 return new API.LabelComponent(label);
+
+            case FileUploadComponent fileUpload:
+                return new API.FileUploadComponent(fileUpload);
         }
 
         return null;
@@ -180,6 +183,16 @@ internal static class MessageComponentExtension
             {
                 var parsed = (API.LabelComponent)component;
                 return new LabelComponent(parsed.Id.ToNullable(), parsed.Label, parsed.Description, parsed.Component.ToEntity());
+            }
+
+            case ComponentType.FileUpload:
+            {
+                var parsed = (API.FileUploadComponent)component;
+                return new FileUploadComponent(parsed.Id.ToNullable(),
+                    parsed.CustomId,
+                    parsed.MaxValues.ToNullable(),
+                    parsed.MaxValues.ToNullable(),
+                    parsed.IsRequired.GetValueOrDefault(false));
             }
 
             default:

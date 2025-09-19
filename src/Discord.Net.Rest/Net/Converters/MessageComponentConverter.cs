@@ -64,6 +64,9 @@ namespace Discord.Net.Converters
                 case ComponentType.Label:
                     messageComponent = new API.LabelComponent();
                     break;
+                case ComponentType.FileUpload:
+                    messageComponent = new API.FileUploadComponent();
+                    break;
             }
             serializer.Populate(jsonObject.CreateReader(), messageComponent);
             return messageComponent;

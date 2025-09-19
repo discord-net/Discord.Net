@@ -15,6 +15,7 @@ public class LabelBuilder : IMessageComponentBuilder
         ComponentType.RoleSelect,
         ComponentType.MentionableSelect,
         ComponentType.ChannelSelect,
+        ComponentType.FileUpload
     ];
 
     /// <summary>

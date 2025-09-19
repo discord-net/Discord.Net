@@ -84,5 +84,10 @@ namespace Discord
         ///     
         /// </summary>
         Label = 18,
+
+        /// <summary>
+        ///     
+        /// </summary>
+        FileUpload = 19,
     }
 }
