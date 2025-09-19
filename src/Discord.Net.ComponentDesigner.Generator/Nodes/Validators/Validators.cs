@@ -1,13 +1,16 @@
 ﻿using Discord.ComponentDesignerGenerator.Parser;
 using Microsoft.CodeAnalysis;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 
 namespace Discord.ComponentDesignerGenerator.Nodes;
 
 public static class Validators
 {
+
     public static void Snowflake(ComponentContext context, ComponentPropertyValue propertyValue)
     {
         switch (propertyValue.Value)
@@ -74,16 +77,48 @@ public static class Validators
             switch (propertyValue.Value)
             {
                 case null or CXValue.Invalid: return;
+                case CXValue.Interpolation interpolation:
+                    if (context.GetInterpolationInfo(interpolation).Constant.Value is string constantValue)
+                        Check(constantValue.Length);
+                    break;
 
-                case CXValue.Scalar {Value.Length: { } length}:
-                    if (
-                        length > upper || length < lower
-                    )
+                case CXValue.StringLiteral literal:
+                    int? length = null;
+
+                    foreach (var token in literal.Tokens)
                     {
-                        context.AddDiagnostic(Diagnostics.OutOfRange, propertyValue.Value, propertyValue.Property.Name, bounds);
+                        switch (token.Kind)
+                        {
+                            case CXTokenKind.Text:
+                                length += token.Span.Length;
+                                break;
+                            case CXTokenKind.Interpolation
+                                when literal.Document.TryGetInterpolationIndex(token, out var index):
+                                var info = context.GetInterpolationInfo(index);
+                                if (info.Constant.Value is string str)
+                                    length += str.Length;
+                                break;
+                        }
                     }
 
+                    if (length.HasValue) Check(length.Value);
+
+                    break;
+                case CXValue.Scalar scalar:
+                    Check(scalar.Value.Length);
+
                     return;
+            }
+
+            void Check(int length)
+            {
+                if (
+                    length > upper || length < lower
+                )
+                {
+                    context.AddDiagnostic(Diagnostics.OutOfRange, propertyValue.Value, propertyValue.Property.Name,
+                        bounds);
+                }
             }
         };
     }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.CodeAnalysis.Text;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Discord.ComponentDesignerGenerator.Parser;
 
@@ -9,13 +10,14 @@ public abstract class CXValue : CXNode
 
     public sealed class StringLiteral : CXValue
     {
+        public bool HasInterpolations => Tokens.Any(x => x.Kind is CXTokenKind.Interpolation);
         public CXToken StartToken { get; }
-        public IReadOnlyList<CXToken> Tokens { get; }
+        public CXCollection<CXToken> Tokens { get; }
         public CXToken EndToken { get; }
 
         public StringLiteral(
             CXToken start,
-            List<CXToken> tokens,
+            CXCollection<CXToken> tokens,
             CXToken end
         )
         {

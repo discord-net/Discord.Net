@@ -1,8 +1,11 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Text;
 
 namespace Discord.ComponentDesignerGenerator.Parser;
 
@@ -39,11 +42,7 @@ public abstract partial class CXNode : ICXNode
 
     public CXDoc Document
     {
-        get => _doc ??= (
-            this is CXDoc doc
-                ? doc
-                : _doc ??= Parent?.Document ?? throw new InvalidOperationException()
-        );
+        get => TryGetDocument(out var doc) ? doc : throw new InvalidOperationException();
         set => _doc = value;
     }
 
@@ -53,8 +52,6 @@ public abstract partial class CXNode : ICXNode
     {
         get
         {
-            if (_firstTerminal is not null) return _firstTerminal;
-
             for (var i = 0; i < _slots.Count; i++)
             {
                 switch (_slots[i].Value)
@@ -73,8 +70,6 @@ public abstract partial class CXNode : ICXNode
     {
         get
         {
-            if (_lastTerminal is not null) return _lastTerminal;
-
             for (var i = _slots.Count - 1; i >= 0; i--)
             {
                 switch (_slots[i].Value)
@@ -103,11 +98,9 @@ public abstract partial class CXNode : ICXNode
     public TextSpan FullSpan => new(Offset, Width);
 
     public TextSpan Span
-        => _span ??= (
-            FirstTerminal is { } first && LastTerminal is { } last
-                ? TextSpan.FromBounds(first.Span.Start, last.Span.End)
-                : FullSpan
-        );
+        => FirstTerminal is { } first && LastTerminal is { } last
+            ? TextSpan.FromBounds(first.Span.Start, last.Span.End)
+            : FullSpan;
 
     // TODO:
     // this could be cached, a caveat though is if we incrementally parse, we need to update the
@@ -121,7 +114,6 @@ public abstract partial class CXNode : ICXNode
 
     // cached state
     private int? _offset;
-    private TextSpan? _span;
     private CXToken? _firstTerminal;
     private CXToken? _lastTerminal;
     private CXDoc? _doc;
@@ -132,6 +124,31 @@ public abstract partial class CXNode : ICXNode
     {
         _diagnostics = [];
         _slots = [];
+    }
+
+    private bool TryGetDocument(out CXDoc result)
+    {
+        if (_doc is not null)
+        {
+            result = _doc;
+            return true;
+        }
+
+        var current = this;
+
+        while (current is not null)
+        {
+            if (current is CXDoc document)
+            {
+                result = _doc = document;
+                return true;
+            }
+
+            current = current.Parent;
+        }
+
+        result = null!;
+        return false;
     }
 
     public bool TryFindToken(int position, out CXToken token)
@@ -225,7 +242,8 @@ public abstract partial class CXNode : ICXNode
 
     private int ComputeOffset()
     {
-        if (Parent is null) return Document.Parser.Source.SourceSpan.Start;
+        if (Parent is null)
+            return TryGetDocument(out var doc) ? doc.Parser.Source.SourceSpan.Start : 0;
 
         var parentOffset = Parent.Offset;
         var parentSlotIndex = GetParentSlotIndex();
@@ -237,10 +255,22 @@ public abstract partial class CXNode : ICXNode
             _ => Parent._slots[parentSlotIndex - 1].Value switch
             {
                 CXNode sibling => sibling.Offset + sibling.Width,
-                CXToken token => token.AbsoluteEnd,
+                CXToken token => token.FullSpan.End,
                 _ => throw new InvalidOperationException()
             }
         };
+    }
+
+    private int ComputeWidth()
+    {
+        if (Slots.Count is 0) return 0;
+
+        return Slots.Sum(x => x.Value switch
+        {
+            CXToken token => token.FullSpan.Length,
+            CXNode node => node.Width,
+            _ => 0
+        });
     }
 
     protected bool IsGraphChild(CXNode node) => IsGraphChild(node, out _);
@@ -271,7 +301,7 @@ public abstract partial class CXNode : ICXNode
         _slots.RemoveAt(index);
     }
 
-    protected void Slot<T>(CXCollection<T>? node) where T : ICXNode => Slot((CXNode?)node);
+    protected void Slot<T>(CXCollection<T>? node) where T : class, ICXNode => Slot((CXNode?)node);
 
     protected void Slot(ICXNode? node)
     {
@@ -293,7 +323,6 @@ public abstract partial class CXNode : ICXNode
     public void ResetCachedState()
     {
         _offset = null;
-        _span = null;
         _firstTerminal = null;
         _lastTerminal = null;
         _doc = null;
@@ -304,5 +333,69 @@ public abstract partial class CXNode : ICXNode
             descendant.ResetCachedState();
 
         _descendants = null;
+    }
+
+    public override string ToString() => ToString(false, false);
+    public string ToFullString() => ToString(true, true);
+
+    public string ToString(bool includeLeadingTrivia, bool includeTrailingTrivia)
+    {
+        if (TryGetDocument(out var document))
+        {
+            return document.Source.GetValue(
+                (includeLeadingTrivia, includeTrailingTrivia) switch
+                {
+                    (true, true) => FullSpan,
+                    (false, false) => Span,
+                    (true, false) => TextSpan.FromBounds(FullSpan.Start, Span.End),
+                    (false, true) => TextSpan.FromBounds(Span.Start, FullSpan.Start),
+                }
+            );
+        }
+
+        var tokens = new List<CXToken>();
+
+        var stack = new Stack<(CXNode Node, int Index)>([(this, 0)]);
+
+        while (stack.Count > 0)
+        {
+            var (node, index) = stack.Pop();
+
+            if (node.Slots.Count <= index) continue;
+
+            var child = node.Slots[index];
+
+            if (node.Slots.Count - 1 > index)
+                stack.Push((node, index + 1));
+
+            switch (child.Value)
+            {
+                case CXToken token:
+                    tokens.Add(token);
+                    continue;
+                case CXNode childNode:
+                    stack.Push((childNode, 0));
+                    continue;
+            }
+        }
+
+        var sb = new StringBuilder();
+
+        for (var i = 0; i < tokens.Count; i++)
+        {
+            var token = tokens[i];
+
+            var isFirst = i == 0;
+            var isLast = i == tokens.Count - 1;
+
+            sb.Append(
+                token.ToString(
+                    !isFirst || includeLeadingTrivia,
+                    !isLast || includeTrailingTrivia
+                )
+            );
+        }
+
+        return sb.ToString();
     }
 }

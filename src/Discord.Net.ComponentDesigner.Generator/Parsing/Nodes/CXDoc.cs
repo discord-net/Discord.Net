@@ -1,4 +1,5 @@
 ﻿using Microsoft.CodeAnalysis.Text;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -8,6 +9,8 @@ namespace Discord.ComponentDesignerGenerator.Parser;
 public sealed class CXDoc : CXNode
 {
     public override CXParser Parser { get; }
+
+    public CXSource Source => Parser.Source;
 
     public IReadOnlyList<CXToken> Tokens { get; }
 
@@ -25,6 +28,18 @@ public sealed class CXDoc : CXNode
         Parser = parser;
         Slot(RootElements = rootElements);
         InterpolationTokens = parser.Lexer.InterpolationMap;
+    }
+
+    public bool TryGetInterpolationIndex(CXToken token, out int index)
+    {
+        if (token.Kind is not CXTokenKind.Interpolation)
+        {
+            index = -1;
+            return false;
+        }
+
+        index = Array.IndexOf(InterpolationTokens, token);
+        return index != -1;
     }
 
     public IncrementalParseResult ApplyChanges(

@@ -251,6 +251,9 @@ public sealed class CXBlender
 
         MoveToNextSibling(ref cursor);
 
+        if (current is CXToken token)
+            current = token.WithNewPosition(cursor.NewPosition);
+
         blendedNode = new(
             current,
             cursor with {NewPosition = cursor.NewPosition + current.FullSpan.Length,}
@@ -264,15 +267,26 @@ public sealed class CXBlender
 
         if (node.FullSpan.IsEmpty) return false;
 
-        if (IntersectsChange(node.FullSpan, cursor)) return false;
+        if (IntersectsChange(node, cursor)) return false;
 
         if (node.HasErrors) return false;
 
         return true;
     }
 
-    private static bool IntersectsChange(TextSpan span, Cursor cursor)
-        => !cursor.Changes.IsEmpty && span.IntersectsWith(cursor.Changes.Peek().Span);
+    private static bool IntersectsChange(ICXNode node, Cursor cursor)
+    {
+        if (cursor.Changes.IsEmpty) return false;
+
+        // for collections, we assume anything after *could* be another element to
+        // the collection. A simple way to force that is to up the nodes span by 1
+        // before checking the changes
+        var span = node is ICXCollection
+            ? new TextSpan(node.FullSpan.Start, node.FullSpan.Length + 1)
+            : node.FullSpan;
+
+        return span.IntersectsWith(cursor.Changes.Peek().Span);
+    }
 
     private BlendedNode ReadNewToken(Cursor cursor)
     {

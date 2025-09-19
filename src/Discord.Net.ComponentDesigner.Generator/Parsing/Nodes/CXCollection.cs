@@ -4,8 +4,17 @@ using System.Collections.Generic;
 
 namespace Discord.ComponentDesignerGenerator.Parser;
 
-public sealed class CXCollection<T> : CXNode, IReadOnlyList<T>
-    where T : ICXNode
+public interface ICXCollection : ICXNode
+{
+    int Count { get; }
+    ICXNode this[int index] { get; }
+}
+
+public sealed class CXCollection<T> :
+    CXNode,
+    ICXCollection,
+    IReadOnlyList<T>
+    where T : class, ICXNode
 {
     public T this[int index] => _items[index];
 
@@ -18,7 +27,10 @@ public sealed class CXCollection<T> : CXNode, IReadOnlyList<T>
         Slot((IEnumerable<ICXNode>)(_items = [..items]));
     }
 
+
     public IEnumerator<T> GetEnumerator() => _items.GetEnumerator();
 
     IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable) _items).GetEnumerator();
+    ICXNode ICXCollection.this[int index] => this[index];
+    int ICXCollection.Count => Count;
 }

@@ -1,5 +1,6 @@
 ﻿using Discord.ComponentDesignerGenerator.Parser;
 using Microsoft.CodeAnalysis;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -12,39 +13,41 @@ public class ComponentState
 
     public bool HasChildren => OwningNode?.Children.Count > 0;
 
+    public IReadOnlyList<CXGraph.Node> Children
+        => OwningNode?.Children ?? [];
+
     public bool IsElement => Source is CXElement;
 
     private readonly Dictionary<ComponentProperty, ComponentPropertyValue> _properties = [];
 
-    public ComponentPropertyValue? GetProperty(ComponentProperty property)
+    public ComponentPropertyValue GetProperty(ComponentProperty property)
     {
-        if (!IsElement) return null;
+        //if (!IsElement) return null;
 
         if (_properties.TryGetValue(property, out var value)) return value;
 
-        var attribute = ((CXElement)Source)
+        var attribute = (Source as CXElement)?
             .Attributes
             .FirstOrDefault(x =>
                 property.Name == x.Identifier.Value || property.Aliases.Contains(x.Identifier.Value)
             );
 
-        ComponentPropertyValue? propertyValue;
-
-        if (attribute is null)
-        {
-            propertyValue = new(property, attribute);
-        }
-        else if (OwningNode is null || !OwningNode.Graph.PropertyCacheMap.TryGetValue(attribute, out propertyValue))
-        {
-            propertyValue = new(property, attribute);
-
-            if (OwningNode is not null) OwningNode.Graph.PropertyCacheMap[attribute] = propertyValue;
-        }
-
-        return _properties[property] = propertyValue;
+        return _properties[property] = new(property, attribute);
     }
 
-    public string RenderProperties(ComponentNode node, ComponentContext context)
+    public void SubstitutePropertyValue(ComponentProperty property, CXValue value)
+    {
+        if (!_properties.TryGetValue(property, out var existing))
+            _properties[property] = new(property, null) {Value = value};
+        else
+            _properties[property] = _properties[property] with {Value = value};
+    }
+
+    public string RenderProperties(
+        ComponentNode node,
+        ComponentContext context,
+        bool asInitializers = false
+    )
     {
         // TODO: correct handling?
         if (Source is not CXElement element) return string.Empty;
@@ -55,20 +58,44 @@ public class ComponentState
         {
             var propertyValue = GetProperty(property);
 
-            if (propertyValue?.Value is not null)
-                values.Add($"{property.DotnetPropertyName}: {property.Renderer(context, propertyValue)}");
+            if (propertyValue?.Value is null) continue;
+
+            var prefix = asInitializers
+                ? $"{property.DotnetPropertyName} = "
+                : $"{property.DotnetPropertyName}: ";
+
+            values.Add($"{prefix}{property.Renderer(context, propertyValue)}");
         }
 
-        return string.Join(",\n", values);
+        var joiner = asInitializers ? "," : string.Empty;
+        return string.Join($"{joiner}\n", values);
     }
 
-    public string RenderChildren(ComponentContext context)
+    public string RenderInitializer(ComponentNode node, ComponentContext context)
+    {
+        var props = RenderProperties(node, context, asInitializers: true);
+
+        if (string.IsNullOrWhiteSpace(props)) return string.Empty;
+
+        return
+            $$"""
+              {
+                  {{props.WithNewlinePadding(4)}}
+              }
+              """;
+    }
+
+    public string RenderChildren(ComponentContext context, Func<CXGraph.Node, bool>? predicate = null)
     {
         if (OwningNode is null || !HasChildren) return string.Empty;
 
+        IEnumerable<CXGraph.Node> children = OwningNode.Children;
+
+        if (predicate is not null) children = children.Where(predicate);
+
         return string.Join(
             ",\n",
-            OwningNode.Children.Select(x => x.Render(context))
+            children.Select(x => x.Render(context))
         );
     }
 }

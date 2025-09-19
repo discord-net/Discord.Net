@@ -30,8 +30,10 @@ public sealed record Target(
 }
 
 public sealed record DesignerInterpolationInfo(
+    int Id,
     TextSpan Span,
-    ITypeSymbol? Symbol
+    ITypeSymbol? Symbol,
+    Optional<object?> Constant
 );
 
 [Generator]
@@ -124,7 +126,7 @@ public sealed class SourceGenerator : IIncrementalGenerator
 
             if (_cache.TryGetValue(key, out var manager))
             {
-                manager.OnUpdate(key, target);
+                manager = _cache[key] = manager.OnUpdate(key, target);
             }
             else
             {
@@ -250,9 +252,11 @@ public sealed class SourceGenerator : IIncrementalGenerator
                     content = interpolated.Contents.ToString();
                     interpolations = interpolated.Contents
                         .OfType<InterpolationSyntax>()
-                        .Select(x => new DesignerInterpolationInfo(
+                        .Select((x, i) => new DesignerInterpolationInfo(
+                            i,
                             x.FullSpan,
-                            semanticModel.GetTypeInfo(x.Expression).Type
+                            semanticModel.GetTypeInfo(x.Expression).Type,
+                            semanticModel.GetConstantValue(x.Expression)
                         ))
                         .ToArray();
                     span = interpolated.Contents.Span;

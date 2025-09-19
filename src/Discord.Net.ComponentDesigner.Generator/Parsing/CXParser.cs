@@ -59,10 +59,13 @@ public sealed class CXParser
 
     public void Reset()
     {
-        _tokens.Clear();
         Reader.Position = Source.SourceSpan.Start;
-        _tokenIndex = 0;
         Lexer.Reset();
+
+        _tokens.Clear();
+        _blendedNodes.Clear();
+        _tokenIndex = 0;
+
         _currentBlendedNode = null;
     }
 
@@ -87,6 +90,8 @@ public sealed class CXParser
             EatNode();
             return element;
         }
+
+        using var _ = Lexer.SetMode(CXLexer.LexMode.Default);
 
         var diagnostics = new List<CXDiagnostic>();
 
@@ -119,16 +124,15 @@ public sealed class CXParser
                     endIdent,
                     endClose
                 ) {Diagnostics = diagnostics};
+            default:
             case CXTokenKind.ForwardSlashGreaterThan:
                 return new CXElement(
                     start,
                     identifier,
                     attributes,
-                    Eat(),
+                    Expect(CXTokenKind.ForwardSlashGreaterThan),
                     new()
                 );
-            default:
-                throw new InvalidOperationException("Unexpected token");
         }
 
         void ParseClosingElement(
@@ -280,7 +284,7 @@ public sealed class CXParser
         {
             case CXTokenKind.Interpolation:
                 return new CXValue.Interpolation(
-                    CurrentToken,
+                    Eat(),
                     Lexer.InterpolationIndex!.Value
                 );
             case CXTokenKind.StringLiteralStart:
@@ -347,7 +351,7 @@ public sealed class CXParser
 
         return new CXValue.StringLiteral(
             start,
-            tokens,
+            new CXCollection<CXToken>(tokens),
             end
         ) {Diagnostics = diagnostics};
     }
@@ -397,10 +401,10 @@ public sealed class CXParser
                 return new CXToken(
                     kinds[0],
                     new TextSpan(current.Span.Start, 0),
-                    current.LeadingTriviaLength,
+                    0,
                     0,
                     Flags: CXTokenFlags.Missing,
-                    Value: string.Empty,
+                    FullValue: string.Empty,
                     CreateError(
                         $"Unexpected token, expected one of '{string.Join(", ", kinds.ToArray())}', got '{current.Kind}'",
                         current.Span
@@ -421,10 +425,10 @@ public sealed class CXParser
             return new CXToken(
                 kind,
                 new TextSpan(token.Span.Start, 0),
-                token.LeadingTriviaLength,
+                0,
                 0,
                 Flags: CXTokenFlags.Missing,
-                Value: string.Empty,
+                FullValue: string.Empty,
                 CreateError($"Unexpected token, expected '{kind}', got '{token.Kind}'", token.Span)
             );
         }
@@ -444,7 +448,7 @@ public sealed class CXParser
 
         _blendedNodes.Add(_currentBlendedNode!.Value);
 
-        _tokenIndex++;
+        _tokenIndex += 2; // add two since we want to cause a re-lex of the blender
 
         _currentBlendedNode = null;
 

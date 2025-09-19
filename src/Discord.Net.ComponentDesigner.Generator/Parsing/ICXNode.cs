@@ -21,4 +21,6 @@ public interface ICXNode
     IReadOnlyList<CXNode.ParseSlot> Slots { get; }
 
     void ResetCachedState();
+
+    string ToString(bool includeLeadingTrivia, bool includeTrailingTrivia);
 }

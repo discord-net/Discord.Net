@@ -12,7 +12,10 @@ public readonly record struct RenderedInterceptor(
 )
 {
     public bool Equals(RenderedInterceptor other)
-        => Location.Equals(other.Location) && Source == other.Source && Diagnostics.SequenceEqual(other.Diagnostics);
+        => Location.Data == other.Location.Data &&
+           Location.Version == other.Location.Version &&
+           Source == other.Source &&
+           Diagnostics.SequenceEqual(other.Diagnostics);
 
     public override int GetHashCode()
     {

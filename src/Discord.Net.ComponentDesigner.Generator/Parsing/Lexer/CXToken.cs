@@ -8,14 +8,24 @@ namespace Discord.ComponentDesignerGenerator.Parser;
 
 public sealed record CXToken(
     CXTokenKind Kind,
-    TextSpan Span,
+    TextSpan FullSpan,
     int LeadingTriviaLength,
     int TrailingTriviaLength,
     CXTokenFlags Flags,
-    string Value,
+    string FullValue,
     params IReadOnlyList<CXDiagnostic> Diagnostics
 ) : ICXNode
 {
+    public string Value => FullValue.Substring(
+        LeadingTriviaLength,
+        FullValue.Length - LeadingTriviaLength - TrailingTriviaLength
+    );
+
+    public TextSpan Span => new(
+        FullSpan.Start + LeadingTriviaLength,
+        FullValue.Length - LeadingTriviaLength - TrailingTriviaLength
+    );
+
     public CXNode? Parent { get; set; }
 
     public bool HasErrors
@@ -31,13 +41,6 @@ public sealed record CXToken(
 
     public bool IsInvalid => Kind is CXTokenKind.Invalid;
 
-    public int AbsoluteStart => Span.Start - LeadingTriviaLength;
-    public int AbsoluteEnd => Span.End + TrailingTriviaLength;
-
-    public int AbsoluteWidth => AbsoluteEnd - AbsoluteStart;
-
-    public TextSpan FullSpan => new(AbsoluteStart, AbsoluteWidth);
-
     public int Width => FullSpan.Length;
 
     int ICXNode.GraphWidth => 0;
@@ -49,6 +52,25 @@ public sealed record CXToken(
     {
         _hasErrors = null;
     }
+
+    public CXToken WithNewPosition(int position)
+    {
+        if (FullSpan.Start == position) return this;
+
+        return this with {FullSpan = new(position, FullSpan.Length)};
+    }
+
+    public override string ToString() => ToString(false, false);
+    public string ToFullString() => ToString(true, true);
+
+    public string ToString(bool includeLeadingTrivia, bool includeTrailingTrivia)
+        => (includeLeadingTrivia, includeTrailingTrivia) switch
+        {
+            (false, false) => Value,
+            (true, true) => FullValue,
+            (false, true) => FullValue.Substring(LeadingTriviaLength),
+            (true, false) => FullValue.Substring(0, FullValue.Length - TrailingTriviaLength)
+        };
 
     public bool Equals(CXToken? other)
     {

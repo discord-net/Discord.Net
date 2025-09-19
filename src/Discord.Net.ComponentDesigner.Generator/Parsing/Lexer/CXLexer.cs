@@ -141,25 +141,25 @@ public sealed class CXLexer
 
         var info = default(TokenInfo);
 
-        GetTrivia(isTrailing: false, ref info.LeadingTriviaLength);
-
         info.Start = Reader.Position;
+
+        GetTrivia(isTrailing: false, ref info.LeadingTriviaLength);
 
         Scan(ref info);
 
-        info.End = Reader.Position;
-
         GetTrivia(isTrailing: true, ref info.TrailingTriviaLength);
 
-        var span = new TextSpan(info.Start, info.End - info.Start);
+        info.End = Reader.Position;
+
+        var fullSpan = TextSpan.FromBounds(info.Start, info.End);
 
         var token = new CXToken(
             info.Kind,
-            span,
+            fullSpan,
             info.LeadingTriviaLength,
             info.TrailingTriviaLength,
             info.Flags,
-            Reader.Source.GetValue(span)
+            fullSpan.IsEmpty ? string.Empty : Reader.Source.GetValue(fullSpan)
         );
 
         if (info.Kind is CXTokenKind.Interpolation)
@@ -318,7 +318,6 @@ public sealed class CXLexer
         QuoteChar = Reader.Current;
         Reader.Advance();
         info.Kind = CXTokenKind.StringLiteralStart;
-        Mode = LexMode.StringLiteral;
         return true;
     }
 
