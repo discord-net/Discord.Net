@@ -13,6 +13,7 @@ public enum CXTokenKind : byte
 
     Text,
     Interpolation,
+
     StringLiteralStart,
     StringLiteralEnd,
 

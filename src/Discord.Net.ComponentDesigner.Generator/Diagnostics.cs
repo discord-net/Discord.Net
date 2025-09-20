@@ -230,9 +230,18 @@ public static partial class Diagnostics
     );
 
     public static readonly DiagnosticDescriptor SpecifiedInvalidSelectMenuType = new(
-        "DC0024",
+        "DC0025",
         "Invalid select menu type",
         "'{0}' is not a valid elect menu type; must be either 'string', 'user', 'role', 'channel', or 'mentionable'",
+        "Components",
+        DiagnosticSeverity.Error,
+        true
+    );
+
+    public static readonly DiagnosticDescriptor ActionRowInvalidChild = new(
+        "DC0026",
+        "Invalid action row child component",
+        "An action row can only contain 1 select menu OR at most 5 buttons",
         "Components",
         DiagnosticSeverity.Error,
         true

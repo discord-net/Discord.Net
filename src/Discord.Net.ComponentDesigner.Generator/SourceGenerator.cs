@@ -23,7 +23,8 @@ public sealed record Target(
     string? ParentKey,
     string CXDesigner,
     TextSpan CXDesignerSpan,
-    DesignerInterpolationInfo[] Interpolations
+    DesignerInterpolationInfo[] Interpolations,
+    int CXQuoteCount
 )
 {
     public SyntaxTree SyntaxTree => InvocationSyntax.SyntaxTree;
@@ -81,7 +82,7 @@ public sealed class SourceGenerator : IIncrementalGenerator
                       global::{{Constants.COMPONENT_DESIGNER_QUALIFIED_NAME}} designer
                   ) => new(
                       {{interceptor.Source.WithNewlinePadding(4)}}
-                  )
+                  );
                   """
             );
         }
@@ -126,14 +127,15 @@ public sealed class SourceGenerator : IIncrementalGenerator
 
             if (_cache.TryGetValue(key, out var manager))
             {
-                manager = _cache[key] = manager.OnUpdate(key, target);
+                manager = _cache[key] = manager.OnUpdate(key, target, token);
             }
             else
             {
                 manager = _cache[key] = CXGraphManager.Create(
                     this,
                     key,
-                    target
+                    target,
+                    token
                 );
             }
 
@@ -141,8 +143,10 @@ public sealed class SourceGenerator : IIncrementalGenerator
         }
     }
 
-    private ImmutableArray<string?> GetKeysAndUpdateCachedEntries(ImmutableArray<Target?> target,
-        CancellationToken token)
+    private ImmutableArray<string?> GetKeysAndUpdateCachedEntries(
+        ImmutableArray<Target?> target,
+        CancellationToken token
+    )
     {
         var result = new string?[target.Length];
 
@@ -179,24 +183,14 @@ public sealed class SourceGenerator : IIncrementalGenerator
         return [..result];
     }
 
-    private static void OnTargetUpdated(Target? target, CancellationToken token)
-    {
-        if (target is null) return;
-
-        //target.Compilation.SyntaxTrees
-    }
-
-
-    private static void ProcessTargetsUpdate(ImmutableArray<Target?> targets, CancellationToken token)
-    {
-        foreach (var target in targets)
-        {
-            if (target is null) continue;
-        }
-    }
-
-
     private static Target? MapPossibleComponentDesignerCall(GeneratorSyntaxContext context, CancellationToken token)
+        => MapPossibleComponentDesignerCall(context.SemanticModel, context.Node, token);
+
+    public static Target? MapPossibleComponentDesignerCall(
+        SemanticModel semanticModel,
+        SyntaxNode node,
+        CancellationToken token
+    )
     {
         if (
             !TryGetValidDesignerCall(
@@ -210,10 +204,12 @@ public sealed class SourceGenerator : IIncrementalGenerator
         if (
             !TryGetCXDesigner(
                 argumentSyntax,
-                context.SemanticModel,
+                semanticModel,
                 out var cxDesigner,
                 out var span,
-                out var interpolationInfos
+                out var interpolationInfos,
+                out var quoteCount,
+                token
             )
         ) return null;
 
@@ -223,13 +219,14 @@ public sealed class SourceGenerator : IIncrementalGenerator
             invocationSyntax,
             argumentSyntax,
             operation,
-            context.SemanticModel.Compilation,
-            context.SemanticModel
+            semanticModel.Compilation,
+            semanticModel
                 .GetEnclosingSymbol(invocationSyntax.SpanStart, token)
                 ?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
             cxDesigner,
             span,
-            interpolationInfos
+            interpolationInfos,
+            quoteCount
         );
 
         static bool TryGetCXDesigner(
@@ -237,15 +234,26 @@ public sealed class SourceGenerator : IIncrementalGenerator
             SemanticModel semanticModel,
             out string content,
             out TextSpan span,
-            out DesignerInterpolationInfo[] interpolations
+            out DesignerInterpolationInfo[] interpolations,
+            out int quoteCount,
+            CancellationToken token
         )
         {
             switch (expression)
             {
-                case LiteralExpressionSyntax {Token.Value: string literalContent} literal:
-                    content = literalContent;
+                case LiteralExpressionSyntax {Token.Text: { } literalContent} literal:
+                    content = PrepareRawLiteral(
+                        literalContent,
+                        out var startQuoteCount,
+                        out var endQuoteCount
+                    );
+
+                    quoteCount = startQuoteCount;
                     interpolations = [];
-                    span = literal.Token.Span;
+                    span = TextSpan.FromBounds(
+                        literal.Token.Span.Start + startQuoteCount,
+                        literal.Token.Span.End - endQuoteCount
+                    );
                     return true;
 
                 case InterpolatedStringExpressionSyntax interpolated:
@@ -255,18 +263,45 @@ public sealed class SourceGenerator : IIncrementalGenerator
                         .Select((x, i) => new DesignerInterpolationInfo(
                             i,
                             x.FullSpan,
-                            semanticModel.GetTypeInfo(x.Expression).Type,
-                            semanticModel.GetConstantValue(x.Expression)
+                            semanticModel.GetTypeInfo(x.Expression, token).Type,
+                            semanticModel.GetConstantValue(x.Expression, token)
                         ))
                         .ToArray();
                     span = interpolated.Contents.Span;
+                    quoteCount = interpolated.StringEndToken.Span.Length;
                     return true;
                 default:
                     content = string.Empty;
                     span = default;
                     interpolations = [];
+                    quoteCount = 0;
                     return false;
             }
+        }
+
+        static string PrepareRawLiteral(
+            string literal,
+            out int startQuoteCount,
+            out int endQuoteCount
+        )
+        {
+            for (startQuoteCount = 0; startQuoteCount < literal.Length; startQuoteCount++)
+            {
+                if (literal[startQuoteCount] is not '"') break;
+            }
+
+            endQuoteCount = 0;
+            if (literal.Length == startQuoteCount)
+            {
+                return string.Empty;
+            }
+
+            for (var i = literal.Length - 1; i >= startQuoteCount; i--, endQuoteCount++)
+                if (literal[i] is not '"') break;
+
+            return literal.Substring(
+                startQuoteCount, literal.Length - startQuoteCount - endQuoteCount
+            );
         }
 
         bool TryGetValidDesignerCall(
@@ -276,7 +311,7 @@ public sealed class SourceGenerator : IIncrementalGenerator
             out ExpressionSyntax argumentExpressionSyntax
         )
         {
-            operation = context.SemanticModel.GetOperation(context.Node, token)!;
+            operation = semanticModel.GetOperation(node, token)!;
             interceptLocation = null!;
             argumentExpressionSyntax = null!;
             invocationSyntax = null!;
@@ -300,11 +335,11 @@ public sealed class SourceGenerator : IIncrementalGenerator
                 default: return false;
             }
 
-            if (context.Node is not InvocationExpressionSyntax syntax) return false;
+            if (node is not InvocationExpressionSyntax syntax) return false;
 
             invocationSyntax = syntax;
 
-            if (context.SemanticModel.GetInterceptableLocation(invocationSyntax) is not { } location)
+            if (semanticModel.GetInterceptableLocation(invocationSyntax, token) is not { } location)
                 return false;
 
             interceptLocation = location;

@@ -6,6 +6,7 @@ namespace Discord.ComponentDesignerGenerator.Parser;
 public sealed class CXSource
 {
     public string Value { get; }
+    public int WrappingQuoteCount { get; }
 
     public char this[int index] => Value[index - SourceSpan.Start];
 
@@ -14,10 +15,16 @@ public sealed class CXSource
 
     public readonly TextSpan SourceSpan;
 
-    public CXSource(TextSpan sourceSpan, string content, TextSpan[] interpolations)
+    public CXSource(
+        TextSpan sourceSpan,
+        string content,
+        TextSpan[] interpolations,
+        int wrappingQuoteCount
+    )
     {
         SourceSpan = sourceSpan;
         Value = content;
+        WrappingQuoteCount = wrappingQuoteCount;
         Interpolations = interpolations;
     }
 

@@ -4,23 +4,13 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 
 namespace Discord.ComponentDesignerGenerator.Parser;
 
 public sealed class CXParser
 {
-    public CXSource Source
-    {
-        get => _source;
-        set
-        {
-            _source = value;
-            Reader.Source = value;
-        }
-    }
-
     public CXToken CurrentToken => Lex(_tokenIndex);
-    public CXToken NextToken => Lex(_tokenIndex + 1);
 
     public ICXNode? CurrentNode
         => (_currentBlendedNode ??= GetCurrentBlendedNode())?.Value;
@@ -37,24 +27,38 @@ public sealed class CXParser
             .Where(x => x is not null)!
     ];
 
+    public IReadOnlyList<CXToken> Tokens
+        => IsIncremental ? [..BlendedNodes.OfType<CXToken>()] : [.._tokens];
+
     private readonly List<BlendedNode> _blendedNodes;
 
     public CXSourceReader Reader { get; }
 
     public bool IsIncremental => Blender is not null;
 
-    public CXBlender? Blender { get; set; }
+    public CXBlender? Blender { get; }
+
+    public CXSource Source { get; }
+
+    public CancellationToken CancellationToken { get; }
+
+
     private BlendedNode? _currentBlendedNode;
 
-    private CXSource _source;
-
-    public CXParser(CXSource source)
+    public CXParser(CXSource source, CancellationToken token = default)
     {
-        _source = source;
+        CancellationToken = token;
+        Source = source;
         Reader = new CXSourceReader(source);
-        Lexer = new CXLexer(Reader);
+        Lexer = new CXLexer(Reader, token);
         _tokens = [];
         _blendedNodes = [];
+    }
+
+    public CXParser(CXSource source, CXDoc document, TextChangeRange change, CancellationToken token = default)
+        : this(source, token)
+    {
+        Blender = new CXBlender(Lexer, document, change);
     }
 
     public void Reset()
@@ -69,18 +73,22 @@ public sealed class CXParser
         _currentBlendedNode = null;
     }
 
-    public static CXDoc Parse(CXSource source)
+    public static CXDoc Parse(CXSource source, CancellationToken token = default)
     {
         var elements = new List<CXElement>();
 
-        var parser = new CXParser(source);
+        var parser = new CXParser(source, token: token);
 
         while (parser.CurrentToken.Kind is not CXTokenKind.EOF and not CXTokenKind.Invalid)
         {
-            elements.Add(parser.ParseElement());
+            var element = parser.ParseElement();
+            elements.Add(element);
+            token.ThrowIfCancellationRequested();
+
+            if (element.Width is 0) break;
         }
 
-        return new CXDoc(parser, elements, [..parser._tokens]);
+        return new CXDoc(parser, elements);
     }
 
     internal CXElement ParseElement()
@@ -173,6 +181,8 @@ public sealed class CXParser
             {
                 while (TryParseElementChild(diagnostics, out var child))
                     children.Add(child);
+
+                CancellationToken.ThrowIfCancellationRequested();
             }
 
             return new CXCollection<CXNode>(children) {Diagnostics = diagnostics};
@@ -235,6 +245,8 @@ public sealed class CXParser
         {
             while (CurrentToken.Kind is CXTokenKind.Identifier)
                 attributes.Add(ParseAttribute());
+
+            CancellationToken.ThrowIfCancellationRequested();
         }
 
         return new CXCollection<CXAttribute>(attributes);
@@ -321,10 +333,14 @@ public sealed class CXParser
         var start = Expect(CXTokenKind.StringLiteralStart);
 
         using var _ = Lexer.SetMode(CXLexer.LexMode.StringLiteral);
-        Lexer.QuoteChar = Reader[start.Span.Start];
+
+        // we grab the last char to ensure it's a quote incase its actually escaped
+        Lexer.QuoteChar = start.Value[start.Value.Length - 1];
 
         while (CurrentToken.Kind is not CXTokenKind.StringLiteralEnd)
         {
+            CancellationToken.ThrowIfCancellationRequested();
+
             switch (CurrentToken.Kind)
             {
                 case CXTokenKind.Text:
@@ -410,10 +426,7 @@ public sealed class CXParser
                         current.Span
                     )
                 );
-                break;
         }
-
-        return current;
     }
 
     internal CXToken Expect(CXTokenKind kind)
@@ -462,6 +475,8 @@ public sealed class CXParser
 
         while (_tokens.Count <= index)
         {
+            CancellationToken.ThrowIfCancellationRequested();
+
             var token = Lexer.Next();
 
             _tokens.Add(token);
@@ -475,6 +490,8 @@ public sealed class CXParser
         {
             while (_blendedNodes.Count <= index)
             {
+                CancellationToken.ThrowIfCancellationRequested();
+
                 var cursor = _blendedNodes.Count is 0
                     ? Blender.StartingCursor
                     : _blendedNodes[_blendedNodes.Count - 1].Cursor;

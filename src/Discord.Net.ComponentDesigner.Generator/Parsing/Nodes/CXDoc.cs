@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Threading;
 
 namespace Discord.ComponentDesignerGenerator.Parser;
 
@@ -20,12 +21,11 @@ public sealed class CXDoc : CXNode
 
     public CXDoc(
         CXParser parser,
-        IReadOnlyList<CXElement> rootElements,
-        IReadOnlyList<CXToken> tokens
+        IReadOnlyList<CXElement> rootElements
     )
     {
-        Tokens = tokens;
         Parser = parser;
+        Tokens = parser.Tokens;
         Slot(RootElements = rootElements);
         InterpolationTokens = parser.Lexer.InterpolationMap;
     }
@@ -42,24 +42,29 @@ public sealed class CXDoc : CXNode
         return index != -1;
     }
 
-    public IncrementalParseResult ApplyChanges(
+    public CXDoc IncrementalParse(
         CXSource source,
-        IReadOnlyList<TextChange> changes
+        IReadOnlyList<TextChange> changes,
+        out IncrementalParseResult result,
+        CancellationToken token = default
     )
     {
         var affectedRange = TextChangeRange.Collapse(changes.Select(x => (TextChangeRange)x));
 
-        var blender = new CXBlender(Parser.Lexer, this, affectedRange);
-
-        Parser.Source = source;
-        Parser.Reset();
-        Parser.Blender = blender;
+        var parser = new CXParser(source, this, affectedRange, token);
 
         var context = new IncrementalParseContext(changes, affectedRange);
 
-        var owner = FindOwningNode(affectedRange.Span, out _);
+        var children = new List<CXElement>();
 
-        owner.IncrementalParse(context);
+        while (parser.CurrentToken.Kind is not CXTokenKind.EOF and not CXTokenKind.Invalid)
+        {
+            var element = parser.ParseElement();
+
+            children.Add(element);
+
+            if (element.Width is 0) break;
+        }
 
         var reusedNodes = new List<ICXNode>();
         var flatGraph = GetFlatGraph();
@@ -74,25 +79,14 @@ public sealed class CXDoc : CXNode
             reusedNodes.AddRange(concreteNode.Descendants);
         }
 
-        return new(
+        result = new(
             reusedNodes,
             [..GetFlatGraph().Except(Parser.BlendedNodes)],
             changes,
             affectedRange
         );
-    }
 
-    public override void IncrementalParse(IncrementalParseContext context)
-    {
-        var children = new List<CXElement>();
-
-        while (Parser.CurrentToken.Kind is not CXTokenKind.EOF and not CXTokenKind.Invalid)
-        {
-            children.Add(Parser.ParseElement());
-        }
-
-        ClearSlots();
-        Slot(RootElements = children);
+        return new CXDoc(parser, children);
     }
 
     public string GetTokenValue(CXToken token) => Parser.Source.GetValue(token.Span);

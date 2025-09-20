@@ -29,7 +29,7 @@ public abstract partial class CXNode : ICXNode
             .._diagnostics
                 .Concat(Slots.SelectMany(x => x.Value.Diagnostics))
         ];
-        set
+        init
         {
             _diagnostics.Clear();
             _diagnostics.AddRange(value);
@@ -43,7 +43,6 @@ public abstract partial class CXNode : ICXNode
     public CXDoc Document
     {
         get => TryGetDocument(out var doc) ? doc : throw new InvalidOperationException();
-        set => _doc = value;
     }
 
     public virtual CXParser Parser => Document.Parser;
@@ -218,8 +217,6 @@ public abstract partial class CXNode : ICXNode
         return current;
     }
 
-    protected void ClearSlots() => _slots.Clear();
-
     public int GetParentSlotIndex()
     {
         if (Parent is null) return -1;
@@ -286,7 +283,6 @@ public abstract partial class CXNode : ICXNode
         return index >= 0 && index < _slots.Count && _slots.ElementAt(index) == node;
     }
 
-
     protected void UpdateSlot(CXNode old, CXNode @new)
     {
         if (!IsGraphChild(old, out var slotIndex)) return;
@@ -317,8 +313,6 @@ public abstract partial class CXNode : ICXNode
     {
         foreach (var node in nodes) Slot(node);
     }
-
-    public virtual void IncrementalParse(IncrementalParseContext change) => Parent?.IncrementalParse(change);
 
     public void ResetCachedState()
     {

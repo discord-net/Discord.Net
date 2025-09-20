@@ -1,6 +1,8 @@
-﻿using Discord.ComponentDesignerGenerator.Parser;
+﻿using Discord.ComponentDesignerGenerator.Nodes.Components.SelectMenus;
+using Discord.ComponentDesignerGenerator.Parser;
 using Microsoft.CodeAnalysis;
 using System.Collections.Generic;
+using System.Linq;
 using SymbolDisplayFormat = Microsoft.CodeAnalysis.SymbolDisplayFormat;
 
 namespace Discord.ComponentDesignerGenerator.Nodes.Components;
@@ -26,19 +28,60 @@ public sealed class ActionRowComponentNode : ComponentNode
             return;
         }
 
-        for (var i = 0; i < state.Children.Count; i++)
+        switch (state.Children[0].Inner)
         {
-            var child = state.Children[i];
-            // TODO: validate children types
+            case ButtonComponentNode:
+                foreach (var rest in state.Children.Skip(1))
+                {
+                    if (rest.Inner is not ButtonComponentNode)
+                    {
+                        context.AddDiagnostic(
+                            Diagnostics.ActionRowInvalidChild,
+                            rest.State.Source
+                        );
+                    }
+                }
 
+                break;
+            case SelectMenuComponentNode:
+                foreach (var rest in state.Children.Skip(1))
+                {
+                    context.AddDiagnostic(
+                        Diagnostics.ActionRowInvalidChild,
+                        rest.State.Source
+                    );
+                }
+
+                break;
+
+            case InterleavedComponentNode: break;
+
+            default:
+                foreach (
+                    var rest
+                    in state.Children.Where(x => !IsValidChild(x.Inner))
+                )
+                {
+                    context.AddDiagnostic(
+                        Diagnostics.ActionRowInvalidChild,
+                        rest.State.Source
+                    );
+                }
+
+                break;
         }
 
         base.Validate(state, context);
     }
 
+    private static bool IsValidChild(ComponentNode node)
+        => node is ButtonComponentNode
+            or SelectMenuComponentNode
+            or InterleavedComponentNode;
+
     public override string Render(ComponentState state, ComponentContext context)
         => $$"""
-            new {{context.KnownTypes.ActionRowBuilderType!.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)}}{{
+             new {{context.KnownTypes.ActionRowBuilderType!.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)}}{{
                 $"{
                     state
                         .RenderProperties(this, context, asInitializers: true)
@@ -59,5 +102,5 @@ public sealed class ActionRowComponentNode : ComponentNode
                     .PrefixIfSome("\n{\n".Postfix(4))
                     .PostfixIfSome("\n}")
             }}
-            """;
+             """;
 }

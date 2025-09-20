@@ -188,8 +188,7 @@ public sealed class SelectMenuComponentNode : ComponentNode
                                     _ => string.Empty
                                 }
                             ).Map(x => $"type: {context.KnownTypes.ComponentTypeEnumType!.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)}.{x}"),
-                            state.RenderProperties(this,
-                                context),
+                            state.RenderProperties(this, context),
                             state.RenderChildren(context, x => x.Inner is StringSelectOptionComponentNode)
                                 .Map(x =>
                                     $"""

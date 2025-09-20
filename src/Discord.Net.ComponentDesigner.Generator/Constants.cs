@@ -2,7 +2,7 @@
 
 public static class Constants
 {
-    public const string COMPONENT_DESIGNER_QUALIFIED_NAME = "Discord.ComponentDesigner";
+    public const string COMPONENT_DESIGNER_QUALIFIED_NAME = "Discord.DesignerInterpolationHandler";
     public const string INTERPOLATION_DESIGNER_QUALIFIED_NAME = "Discord.DesignerInterpolationHandler";
 
     public const int PLACEHOLDER_MAX_LENGTH = 150;

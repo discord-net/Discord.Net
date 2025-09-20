@@ -9,23 +9,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 
 namespace Discord.ComponentDesignerGenerator;
-
-// public sealed class GraphManagerComparer : IEqualityComparer<CXGraphManager>
-// {
-//     public static readonly GraphManagerComparer Instance = new();
-//
-//     public bool Equals(CXGraphManager? x, CXGraphManager? y)
-//         => (x, y) switch
-//         {
-//             (not null, not null) => x.SyntaxTree.Equals(y.SyntaxTree) && x.Version == y.Version,
-//             _ => false
-//         };
-//
-//     public int GetHashCode(CXGraphManager manager)
-//         => (manager.SyntaxTree.GetHashCode() * 397) ^ manager.Version;
-// }
 
 public sealed record CXGraphManager(
     SourceGenerator Generator,
@@ -75,15 +61,16 @@ public sealed record CXGraphManager(
         Document = other.Document;
     }
 
-    public static CXGraphManager Create(SourceGenerator generator, string key, Target target)
+    public static CXGraphManager Create(SourceGenerator generator, string key, Target target, CancellationToken token)
     {
         var source = new CXSource(
             target.CXDesignerSpan,
             target.CXDesigner,
-            target.Interpolations.Select(x => x.Span).ToArray()
+            target.Interpolations.Select(x => x.Span).ToArray(),
+            target.CXQuoteCount
         );
 
-        var doc = CXParser.Parse(source);
+        var doc = CXParser.Parse(source, token);
 
         return new CXGraphManager(
             generator,
@@ -93,7 +80,7 @@ public sealed record CXGraphManager(
         );
     }
 
-    public CXGraphManager OnUpdate(string key, Target target)
+    public CXGraphManager OnUpdate(string key, Target target, CancellationToken token)
     {
         /*
          * TODO:
@@ -125,18 +112,19 @@ public sealed record CXGraphManager(
         if (newCXWithoutInterpolations != SimpleSource)
         {
             // we're going to need to reparse, the underlying CX structure changed
-            result.DoReparse(target, this, ref result);
+            result.DoReparse(target, this, ref result, token);
         }
 
         return result;
     }
 
-    private void DoReparse(Target target, CXGraphManager old, ref CXGraphManager result)
+    private void DoReparse(Target target, CXGraphManager old, ref CXGraphManager result, CancellationToken token)
     {
         var source = new CXSource(
             target.CXDesignerSpan,
             target.CXDesigner,
-            target.Interpolations.Select(x => x.Span).ToArray()
+            target.Interpolations.Select(x => x.Span).ToArray(),
+            target.CXQuoteCount
         );
 
         var changes = target
@@ -145,15 +133,21 @@ public sealed record CXGraphManager(
             .Where(x => CXDesignerSpan.IntersectsWith(x.Span))
             .ToArray();
 
-        var parseResult = Document.ApplyChanges(
+        var document = Document.IncrementalParse(
             source,
-            changes
+            changes,
+            out var parseResult,
+            token
         );
 
-        result = result with {Graph = result.Graph.Update(result, parseResult)};
+        result = result with
+        {
+            Graph = result.Graph.Update(result, parseResult, document),
+            Document = document
+        };
     }
 
-    public RenderedInterceptor Render()
+    public RenderedInterceptor Render(CancellationToken token = default)
     {
         var diagnostics = new List<Diagnostic>(
             Document
@@ -199,10 +193,12 @@ public sealed record CXGraphManager(
 
         var builder = new StringBuilder(cx);
 
+        var rmDelta = 0;
         for (var i = 0; i < interpolations.Length; i++)
         {
             var interpolation = interpolations[i];
-            builder.Remove(interpolation.Span.Start - offset, interpolation.Span.Length);
+            builder.Remove(interpolation.Span.Start - offset - rmDelta, interpolation.Span.Length);
+            rmDelta += interpolation.Span.Length;
         }
 
         return builder.ToString();

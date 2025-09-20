@@ -1,5 +1,6 @@
 ﻿using Microsoft.CodeAnalysis.Text;
 using System;
+using System.Threading;
 
 namespace Discord.ComponentDesignerGenerator.Parser;
 
@@ -57,8 +58,11 @@ public sealed class CXLexer
             // there's no next interpolation
             if (Reader.Source.Interpolations.Length <= _interpolationIndex) return null;
 
+
             for (; _interpolationIndex < Reader.Source.Interpolations.Length; _interpolationIndex++)
             {
+                CancellationToken.ThrowIfCancellationRequested();
+
                 var interpolationSpan = Reader.Source.Interpolations[_interpolationIndex];
 
                 if (interpolationSpan.End < Reader.Position) continue;
@@ -82,17 +86,28 @@ public sealed class CXLexer
             if (Reader.Source.Interpolations.Length <= _nextInterpolationIndex) return null;
 
             // check if it's ahead of us
-            TextSpan? interpolationSpan = null;
+            var interpolationSpan = Reader.Source.Interpolations[_nextInterpolationIndex];
+
+            if (interpolationSpan.End > Reader.Position) return interpolationSpan;
 
             for (; _nextInterpolationIndex < Reader.Source.Interpolations.Length; _nextInterpolationIndex++)
             {
+                CancellationToken.ThrowIfCancellationRequested();
+
                 interpolationSpan = Reader.Source.Interpolations[_nextInterpolationIndex];
-                if (interpolationSpan.Value.Start > Reader.Position) break;
+                if (interpolationSpan.Start > Reader.Position) break;
             }
 
             return interpolationSpan;
         }
     }
+
+    private int InterpolationBoundary
+        => CurrentInterpolationSpan?.Start ??
+           NextInterpolationSpan?.Start ??
+           Reader.Source.SourceSpan.End;
+
+    public bool ForcedEscapedQuotes => Reader.Source.WrappingQuoteCount == 1;
 
     public LexMode Mode { get; set; }
 
@@ -103,11 +118,25 @@ public sealed class CXLexer
     private int _nextInterpolationIndex;
     private int _interpolationIndex;
 
-    public CXLexer(CXSourceReader reader)
+    public CancellationToken CancellationToken { get; set; }
+
+
+    public CXLexer(
+        CXSourceReader reader,
+        CancellationToken cancellationToken = default
+    )
     {
+        CancellationToken = cancellationToken;
         Reader = reader;
         Mode = LexMode.Default;
         InterpolationMap = new CXToken[Reader.Source.Interpolations.Length];
+    }
+
+    public void Seek(int position)
+    {
+        Reader.Position = position;
+        _interpolationIndex = 0;
+        _nextInterpolationIndex = 0;
     }
 
     public void Reset()
@@ -118,6 +147,7 @@ public sealed class CXLexer
     public readonly struct ModeSentinel(CXLexer? lexer) : IDisposable
     {
         private readonly LexMode _mode = lexer?.Mode ?? LexMode.Default;
+
         public void Dispose()
         {
             if (lexer is null) return;
@@ -162,8 +192,8 @@ public sealed class CXLexer
             fullSpan.IsEmpty ? string.Empty : Reader.Source.GetValue(fullSpan)
         );
 
-        if (info.Kind is CXTokenKind.Interpolation)
-            InterpolationMap[_interpolationIndex] = token;
+        if (info.Kind is CXTokenKind.Interpolation && InterpolationIndex.HasValue)
+            InterpolationMap[InterpolationIndex.Value] = token;
 
         return token;
     }
@@ -193,6 +223,7 @@ public sealed class CXLexer
                     Reader.Advance();
                     return;
                 }
+
                 info.Kind = CXTokenKind.LessThan;
                 return;
             case FORWARD_SLASH_CHAR when Reader.Next is GREATER_THAN_CHAR:
@@ -226,12 +257,14 @@ public sealed class CXLexer
 
     private bool TryScanElementValue(ref TokenInfo info)
     {
-        var interpolationUpperBounds = NextInterpolationSpan?.Start ?? Reader.Source.SourceSpan.End;
+        var interpolationUpperBounds = InterpolationBoundary;
 
         var start = Reader.Position;
 
         for (; Reader.Position < interpolationUpperBounds; Reader.Advance())
         {
+            CancellationToken.ThrowIfCancellationRequested();
+
             switch (Reader.Current)
             {
                 case NULL_CHAR
@@ -265,7 +298,7 @@ public sealed class CXLexer
             return;
         }
 
-        var interpolationUpperBounds = NextInterpolationSpan?.Start ?? Reader.Source.SourceSpan.End;
+        var interpolationUpperBounds = InterpolationBoundary;
 
         if (Reader.Position >= interpolationUpperBounds)
         {
@@ -277,9 +310,13 @@ public sealed class CXLexer
             return;
         }
 
-        if (Reader.Current == QuoteChar)
+        if (
+            ForcedEscapedQuotes
+                ? Reader.Current is BACK_SLASH_CHAR && Reader.Next == QuoteChar
+                : Reader.Current == QuoteChar
+        )
         {
-            Reader.Advance();
+            Reader.Advance(ForcedEscapedQuotes ? 2 : 1);
 
             info.Kind = CXTokenKind.StringLiteralEnd;
             QuoteChar = null;
@@ -289,41 +326,61 @@ public sealed class CXLexer
 
         for (; Reader.Position < interpolationUpperBounds; Reader.Advance())
         {
-            if (QuoteChar == Reader.Current)
+            CancellationToken.ThrowIfCancellationRequested();
+
+            if (Reader.Current is BACK_SLASH_CHAR)
             {
-                // is it escaped?
-                if (Reader.Previous is FORWARD_SLASH_CHAR)
+                // escaped backslash, advance thru the current and next character
+                if (Reader.Next is BACK_SLASH_CHAR && ForcedEscapedQuotes)
                 {
-                    // allow
+                    Reader.Advance();
                     continue;
                 }
 
-                // we've reached the end
-                info.Kind = CXTokenKind.Text;
-                return;
+                // is the escaped quote forced? meaning we treat it as the ending quote to the string literal
+                if (QuoteChar == Reader.Next && ForcedEscapedQuotes)
+                {
+                    break;
+                }
+
+                // TODO: open back slash error?
             }
+            else if (QuoteChar == Reader.Current) break;
         }
+
+        // we've reached the end
+        info.Kind = CXTokenKind.Text;
+        return;
     }
 
     private bool TryScanAttributeValue(ref TokenInfo info)
     {
         if (Mode is LexMode.StringLiteral) return false;
 
-        if (Reader.Current is not QUOTE_CHAR and not DOUBLE_QUOTE_CHAR)
+        var isEscaped = ForcedEscapedQuotes && Reader.Current is BACK_SLASH_CHAR;
+
+        // this is the gate for handling single vs double quotes:
+        // single quotes *can not* be escaped as a valid starting
+        // quote
+        var quoteTestChar = isEscaped && Reader.Next is DOUBLE_QUOTE_CHAR
+            ? Reader.Next
+            : Reader.Current;
+
+        if (quoteTestChar is not QUOTE_CHAR and not DOUBLE_QUOTE_CHAR)
         {
             // interpolations only
             return TryScanInterpolation(ref info);
         }
 
-        QuoteChar = Reader.Current;
-        Reader.Advance();
+        QuoteChar = quoteTestChar;
+        Reader.Advance(isEscaped ? 2 : 1);
         info.Kind = CXTokenKind.StringLiteralStart;
         return true;
     }
 
     private bool TryScanIdentifier(ref TokenInfo info)
     {
-        var upperBounds = NextInterpolationSpan?.Start ?? Reader.Source.SourceSpan.End;
+        var upperBounds = InterpolationBoundary;
 
         if (!IsValidIdentifierStartChar(Reader.Current) || Reader.Position >= upperBounds)
             return false;
@@ -331,8 +388,10 @@ public sealed class CXLexer
         do
         {
             Reader.Advance();
-        } while (IsValidIdentifierChar(Reader.Current) && Reader.Position < upperBounds);
+        } while (IsValidIdentifierChar(Reader.Current) && Reader.Position < upperBounds &&
+                 !CancellationToken.IsCancellationRequested);
 
+        CancellationToken.ThrowIfCancellationRequested();
         info.Kind = CXTokenKind.Identifier;
         return true;
 
@@ -368,6 +427,8 @@ public sealed class CXLexer
         {
             start:
 
+            CancellationToken.ThrowIfCancellationRequested();
+
             var current = Reader.Current;
 
             if (CurrentInterpolationSpan is not null) return;
@@ -395,9 +456,24 @@ public sealed class CXLexer
                 continue;
             }
 
+            if (current is LESS_THAN_CHAR && IsCurrentlyAtCommentStart())
+            {
+                while (!Reader.IsEOF && !IsCurrentlAtCommentEnd() && !CancellationToken.IsCancellationRequested)
+                {
+                    trivia++;
+                    Reader.Advance();
+                }
+            }
+
             return;
         }
     }
+
+    private bool IsCurrentlyAtCommentStart()
+        => Reader.Peek(COMMENT_START.Length) == COMMENT_START;
+
+    private bool IsCurrentlAtCommentEnd()
+        => Reader.Peek(COMMENT_END.Length) == COMMENT_END;
 
     private static bool IsWhitespace(char ch)
         => char.IsWhiteSpace(ch);

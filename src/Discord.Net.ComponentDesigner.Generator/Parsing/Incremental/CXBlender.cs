@@ -1,6 +1,7 @@
 ﻿using Microsoft.CodeAnalysis.Text;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Threading;
 
 namespace Discord.ComponentDesignerGenerator.Parser;
 
@@ -44,6 +45,8 @@ public sealed class CXBlender
     private ICXNode? this[in Cursor cursor] =>
         cursor.Index >= 0 && cursor.Index < _graph.Count ? _graph[cursor.Index] : null;
 
+    public CancellationToken CancellationToken => _lexer.CancellationToken;
+
     private readonly CXLexer _lexer;
 
     private readonly IReadOnlyList<ICXNode> _graph;
@@ -76,7 +79,10 @@ public sealed class CXBlender
         var index = cursor.Index;
 
         while (index < _graph.Count && _graph[index] is not CXToken)
+        {
             index++;
+            CancellationToken.ThrowIfCancellationRequested();
+        }
 
         cursor = cursor with {Index = index};
     }
@@ -85,7 +91,10 @@ public sealed class CXBlender
     {
         while (this[cursor]?.Parent is not null)
         {
+            CancellationToken.ThrowIfCancellationRequested();
+
             var tempCursor = cursor;
+
             FindNextNonZeroWidthOrIsEOFSibling(ref cursor);
 
             if (cursor.IsInvalid)
@@ -112,7 +121,9 @@ public sealed class CXBlender
         var delta = 1;
 
         for (var i = index - 1; i >= 0; i--)
+        {
             delta += current.Parent.Slots[i].Value.GraphWidth + 1;
+        }
 
         cursor = cursor with {Index = cursor.Index - delta};
     }
@@ -132,6 +143,8 @@ public sealed class CXBlender
                 cursorIndex += parent.Slots[slotIndex++].Value.GraphWidth + 1
             )
             {
+                CancellationToken.ThrowIfCancellationRequested();
+
                 var sibling = parent.Slots[slotIndex];
 
                 if (IsNonZeroWidthOrIsEOF(sibling.Value))
@@ -161,6 +174,8 @@ public sealed class CXBlender
             childGraphIndex += current.Slots[childIndex++].Value.GraphWidth + 1
         )
         {
+            CancellationToken.ThrowIfCancellationRequested();
+
             var child = current.Slots[childIndex];
             if (IsNonZeroWidthOrIsEOF(child.Value))
             {
@@ -185,6 +200,8 @@ public sealed class CXBlender
     {
         while (true)
         {
+            CancellationToken.ThrowIfCancellationRequested();
+
             if (IsCompletedCursor(cursor)) return ReadNewToken(cursor);
 
             if (cursor.ChangeDelta < 0) SkipOldToken(ref cursor);
@@ -308,7 +325,7 @@ public sealed class CXBlender
 
     private CXToken LexNewToken(Cursor cursor)
     {
-        _lexer.Reader.Position = cursor.NewPosition;
+        _lexer.Seek(cursor.NewPosition);
         return _lexer.Next();
     }
 }

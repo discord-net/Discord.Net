@@ -1,4 +1,7 @@
-﻿namespace Discord.ComponentDesignerGenerator.Parser;
+﻿using Microsoft.CodeAnalysis.Text;
+using System;
+
+namespace Discord.ComponentDesignerGenerator.Parser;
 
 public sealed class CXSourceReader
 {
@@ -33,5 +36,12 @@ public sealed class CXSourceReader
         {
             Position++;
         }
+    }
+
+    public string Peek(int count = 1)
+    {
+        var upper = Math.Min(Source.SourceSpan.End, Position + count);
+
+        return Source.GetValue(TextSpan.FromBounds(Position, upper));
     }
 }

@@ -257,6 +257,7 @@ public static class Renderers
 
     public static string Snowflake(ComponentContext context, ComponentPropertyValue propertyValue)
         => Snowflake(context, propertyValue.Value);
+
     public static string Snowflake(ComponentContext context, CXValue? value)
     {
         switch (value)
@@ -277,12 +278,22 @@ public static class Renderers
                 return UseParseMethod($"designer.GetValueAsString({interpolation.InterpolationIndex})");
 
             case CXValue.Scalar scalar:
-                return UseParseMethod(ToCSharpString(scalar.Value));
+                return FromText(scalar.Value.Trim());
 
             case CXValue.StringLiteral stringLiteral:
+                if (!stringLiteral.HasInterpolations)
+                    return FromText(stringLiteral.Tokens.ToString().Trim());
+
                 return UseParseMethod(RenderStringLiteral(stringLiteral));
 
             default: return "default";
+        }
+
+        string FromText(string text)
+        {
+            if (ulong.TryParse(text, out _)) return text;
+
+            return UseParseMethod(ToCSharpString(text));
         }
 
         static string UseParseMethod(string input)

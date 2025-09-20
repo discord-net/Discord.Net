@@ -124,6 +124,9 @@ public abstract class ComponentNode
             .ToDictionary(x => x.Key, x => x.Value);
     }
 
+    public static T GetComponentNode<T>() where T : ComponentNode
+        => _nodes.Values.OfType<T>().First();
+
     public static bool TryGetNode(string name, out ComponentNode node)
         => _nodes.TryGetValue(name, out node);
 }
