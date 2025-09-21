@@ -75,7 +75,7 @@ public class ComponentBuilder
                     AddComponent(cmp, row);
                 break;
             case SelectMenuComponent menu:
-                WithSelectMenu(menu.CustomId, menu.Options?.Select(x => new SelectMenuOptionBuilder(x.Label, x.Value, x.Description, x.Emote, x.IsDefault)).ToList(), menu.Placeholder, menu.MinValues, menu.MaxValues, menu.IsDisabled, row);
+                WithSelectMenu(menu.CustomId, menu.Options?.Select(x => new SelectMenuOptionBuilder(x.Label, x.Value, x.Description, x.Emote, x.IsDefault)).ToList(), menu.Placeholder, menu.MinValues, menu.MaxValues, menu.IsDisabled, row, menu.Type, menu.ChannelTypes.ToArray(), menu.DefaultValues.ToArray());
                 break;
         }
     }

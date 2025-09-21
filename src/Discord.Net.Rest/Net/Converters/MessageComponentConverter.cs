@@ -36,7 +36,7 @@ namespace Discord.Net.Converters
                 case ComponentType.MentionableSelect:
                 case ComponentType.RoleSelect:
                 case ComponentType.UserSelect:
-                    messageComponent = new API.SelectMenuComponent();
+                    messageComponent = new API.SelectMenuComponent(){Type = (ComponentType)typeProperty};
                     break;
                 case ComponentType.TextInput:
                     messageComponent = new API.TextInputComponent();
