@@ -38,10 +38,10 @@ public class FileUploadComponent : IMessageComponent
         IsRequired = isRequired;
     }
 
-    IMessageComponentBuilder IMessageComponent.ToBuilder() => new FileUploadComponentBuilder()
-        .WithId(Id)
-        .WithCustomId(CustomId)
-        .WithMinValues(MinValues)
-        .WithMaxValues(MaxValues)
-        .WithRequired(IsRequired);
+    /// <inheritdoc cref="IMessageComponent.ToBuilder"/>
+    public FileUploadComponentBuilder ToBuilder()
+        => new(CustomId, MinValues, MaxValues, IsRequired, Id);
+
+    /// <inheritdoc/>
+    IMessageComponentBuilder IMessageComponent.ToBuilder() => ToBuilder();
 }

@@ -68,6 +68,23 @@ public class FileUploadComponentBuilder : IInteractableComponentBuilder
         return this;
     }
 
+    /// <summary>
+    ///     
+    /// </summary>
+    public FileUploadComponentBuilder() {}
+
+    /// <summary>
+    ///     
+    /// </summary>
+    public FileUploadComponentBuilder(string customId, int? minValues = null, int? maxValues = null, bool isRequired = false, int? id = null)
+    {
+        CustomId = customId;
+        MinValues = minValues;
+        MaxValues = maxValues;
+        IsRequired = isRequired;
+        Id = id;
+    }
+
     public FileUploadComponent Build()
     {
         Preconditions.NotNullOrWhitespace(CustomId, nameof(CustomId));
