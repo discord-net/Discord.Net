@@ -1,9 +1,9 @@
-﻿using Discord.ComponentDesignerGenerator.Parser;
+﻿using Discord.CX.Parser;
 using Microsoft.CodeAnalysis;
 using System.Collections.Generic;
 using SymbolDisplayFormat = Microsoft.CodeAnalysis.SymbolDisplayFormat;
 
-namespace Discord.ComponentDesignerGenerator.Nodes.Components;
+namespace Discord.CX.Nodes.Components;
 
 public sealed class ButtonComponentNode : ComponentNode
 {

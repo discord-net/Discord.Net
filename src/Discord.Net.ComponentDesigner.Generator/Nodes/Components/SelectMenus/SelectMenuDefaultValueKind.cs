@@ -1,4 +1,4 @@
-﻿namespace Discord.ComponentDesignerGenerator.Nodes.Components.SelectMenus;
+﻿namespace Discord.CX.Nodes.Components.SelectMenus;
 
 public enum SelectMenuDefaultValueKind
 {

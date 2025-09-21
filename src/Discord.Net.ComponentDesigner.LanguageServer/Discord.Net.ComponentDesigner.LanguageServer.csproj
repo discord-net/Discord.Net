@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net9.0</TargetFramework>
+        <LangVersion>preview</LangVersion>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <RootNamespace>Discord.ComponentDesigner.LanguageServer</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Discord.Net.ComponentDesigner.Parser\Discord.Net.ComponentDesigner.Parser.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="OmniSharp.Extensions.LanguageServer" Version="0.19.9" />
+      <PackageReference Include="Serilog.Extensions.Logging" Version="9.0.2" />
+      <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="CX\" />
+    </ItemGroup>
+
+</Project>

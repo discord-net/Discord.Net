@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using SymbolDisplayFormat = Microsoft.CodeAnalysis.SymbolDisplayFormat;
 
-namespace Discord.ComponentDesignerGenerator.Nodes.Components;
+namespace Discord.CX.Nodes.Components;
 
 public sealed class SectionComponentnode : ComponentNode
 {

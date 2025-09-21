@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using SymbolDisplayFormat = Microsoft.CodeAnalysis.SymbolDisplayFormat;
 
-namespace Discord.ComponentDesignerGenerator.Nodes.Components;
+namespace Discord.CX.Nodes.Components;
 
 public sealed class FileComponentNode : ComponentNode
 {

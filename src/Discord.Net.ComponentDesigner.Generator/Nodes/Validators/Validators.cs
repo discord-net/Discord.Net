@@ -1,4 +1,4 @@
-﻿using Discord.ComponentDesignerGenerator.Parser;
+﻿using Discord.CX.Parser;
 using Microsoft.CodeAnalysis;
 using System;
 using System.Collections.Generic;
@@ -6,7 +6,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 
-namespace Discord.ComponentDesignerGenerator.Nodes;
+namespace Discord.CX.Nodes;
 
 public static class Validators
 {

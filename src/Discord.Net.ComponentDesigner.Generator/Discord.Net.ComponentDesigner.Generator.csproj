@@ -20,4 +20,8 @@
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.14.0"/>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Discord.Net.ComponentDesigner.Parser\Discord.Net.ComponentDesigner.Parser.csproj" />
+  </ItemGroup>
+
 </Project>

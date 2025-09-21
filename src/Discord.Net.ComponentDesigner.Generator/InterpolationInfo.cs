@@ -1,6 +1,6 @@
 using Microsoft.CodeAnalysis;
 
-namespace Discord.ComponentDesignerGenerator;
+namespace Discord.CX;
 
 public readonly record struct InterpolationInfo(
     int Id,

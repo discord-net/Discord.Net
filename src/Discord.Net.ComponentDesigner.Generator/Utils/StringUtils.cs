@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Discord.ComponentDesignerGenerator;
+namespace Discord.CX;
 
 public static class StringUtils
 {

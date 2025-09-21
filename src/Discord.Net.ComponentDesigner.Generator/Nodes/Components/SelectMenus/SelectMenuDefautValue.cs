@@ -1,6 +1,6 @@
-﻿using Discord.ComponentDesignerGenerator.Parser;
+﻿using Discord.CX.Parser;
 
-namespace Discord.ComponentDesignerGenerator.Nodes.Components.SelectMenus;
+namespace Discord.CX.Nodes.Components.SelectMenus;
 
 public readonly record struct SelectMenuDefautValue(
     SelectMenuDefaultValueKind Kind,

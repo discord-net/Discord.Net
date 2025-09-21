@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Discord.ComponentDesignerGenerator.Nodes.Components;
+namespace Discord.CX.Nodes.Components;
 
 public sealed class LabelComponentNode : ComponentNode
 {

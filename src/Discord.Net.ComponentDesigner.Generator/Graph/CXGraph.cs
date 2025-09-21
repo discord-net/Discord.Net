@@ -1,6 +1,6 @@
-﻿using Discord.ComponentDesignerGenerator.Nodes;
-using Discord.ComponentDesignerGenerator.Nodes.Components;
-using Discord.ComponentDesignerGenerator.Parser;
+﻿using Discord.CX.Nodes;
+using Discord.CX.Nodes.Components;
+using Discord.CX.Parser;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 using System;
@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 
-namespace Discord.ComponentDesignerGenerator;
+namespace Discord.CX;
 
 public readonly struct CXGraph
 {
@@ -147,7 +147,7 @@ public readonly struct CXGraph
                 {
                     diagnostics.Add(
                         Diagnostic.Create(
-                            ComponentDesignerGenerator.Diagnostics.UnknownComponent,
+                            CX.Diagnostics.UnknownComponent,
                             GetLocation(manager, element),
                             element.Identifier
                         )

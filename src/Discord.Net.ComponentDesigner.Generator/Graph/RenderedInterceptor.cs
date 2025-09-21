@@ -3,7 +3,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using System.Collections.Immutable;
 using System.Linq;
 
-namespace Discord.ComponentDesignerGenerator;
+namespace Discord.CX;
 
 public readonly record struct RenderedInterceptor(
     InterceptableLocation Location,

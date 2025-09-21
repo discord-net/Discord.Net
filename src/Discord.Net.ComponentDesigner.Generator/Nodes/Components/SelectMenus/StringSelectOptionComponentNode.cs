@@ -1,8 +1,8 @@
-﻿using Discord.ComponentDesignerGenerator.Parser;
+﻿using Discord.CX.Parser;
 using Microsoft.CodeAnalysis;
 using System.Collections.Generic;
 
-namespace Discord.ComponentDesignerGenerator.Nodes.Components.SelectMenus;
+namespace Discord.CX.Nodes.Components.SelectMenus;
 
 public sealed class StringSelectOptionComponentNode : ComponentNode
 {

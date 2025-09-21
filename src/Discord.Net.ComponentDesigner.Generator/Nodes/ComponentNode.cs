@@ -1,10 +1,10 @@
-﻿using Discord.ComponentDesignerGenerator.Parser;
+﻿using Discord.CX.Parser;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
-namespace Discord.ComponentDesignerGenerator.Nodes;
+namespace Discord.CX.Nodes;
 
 public abstract class ComponentNode<TState> : ComponentNode
     where TState : ComponentState

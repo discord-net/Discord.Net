@@ -1,8 +1,8 @@
-﻿using Discord.ComponentDesignerGenerator.Parser;
+﻿using Discord.CX.Parser;
 using Microsoft.CodeAnalysis;
 using System.Collections.Generic;
 
-namespace Discord.ComponentDesignerGenerator.Nodes;
+namespace Discord.CX.Nodes;
 
 public sealed record ComponentPropertyValue(
     ComponentProperty Property,

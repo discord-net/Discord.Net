@@ -1,6 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 
-namespace Discord.ComponentDesignerGenerator;
+namespace Discord.CX;
 
 public static partial class Diagnostics
 {

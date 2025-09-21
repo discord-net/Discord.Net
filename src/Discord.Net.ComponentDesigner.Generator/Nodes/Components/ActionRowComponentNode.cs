@@ -1,11 +1,11 @@
-﻿using Discord.ComponentDesignerGenerator.Nodes.Components.SelectMenus;
-using Discord.ComponentDesignerGenerator.Parser;
+﻿using Discord.CX.Parser;
+using Discord.CX.Nodes.Components.SelectMenus;
 using Microsoft.CodeAnalysis;
 using System.Collections.Generic;
 using System.Linq;
 using SymbolDisplayFormat = Microsoft.CodeAnalysis.SymbolDisplayFormat;
 
-namespace Discord.ComponentDesignerGenerator.Nodes.Components;
+namespace Discord.CX.Nodes.Components;
 
 public sealed class ActionRowComponentNode : ComponentNode
 {

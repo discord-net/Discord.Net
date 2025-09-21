@@ -1,5 +1,5 @@
-﻿using Discord.ComponentDesignerGenerator.Nodes;
-using Discord.ComponentDesignerGenerator.Parser;
+﻿using Discord.CX.Nodes;
+using Discord.CX.Parser;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -11,7 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 
-namespace Discord.ComponentDesignerGenerator;
+namespace Discord.CX;
 
 public sealed record CXGraphManager(
     SourceGenerator Generator,
