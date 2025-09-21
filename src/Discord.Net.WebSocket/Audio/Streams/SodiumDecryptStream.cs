@@ -35,15 +35,19 @@ namespace Discord.Audio.Streams
             if (_client.SecretKey == null)
                 return Task.CompletedTask;
 
-            // Extract nonce from the payload.
-            for (int i = 0; i < NonceCounterSize; i++ )
-                _nonce[i] = buffer[offset + count + NonceCounterSize - i - 1]; // Big-endian to little-endian
+            // Extract nonce counter from the end of the payload.
+            for (int i = 0; i < NonceCounterSize; i++)
+                _nonce[i] = buffer[offset + count - NonceCounterSize + i];
+
+            // Extract RTP header
+            bool hasExtendedHeader = (buffer[0] & 0x10) != 0;
+            int rtpHeaderSize = RtpHeaderSize + (hasExtendedHeader ? 4 : 0);
+            byte[] rtpHeader = new byte[rtpHeaderSize];
+            Buffer.BlockCopy(buffer, offset, rtpHeader, 0, rtpHeader.Length);
 
             // Decrypt payload
-            byte[] rtpHeader = new byte[RtpHeaderSize];
-            Buffer.BlockCopy(buffer, offset, rtpHeader, 0, rtpHeader.Length);
             int payloadOffset = offset + rtpHeader.Length;
-            int payloadLength = count - rtpHeader.Length - NonceCounterSize;
+            int payloadLength = count - offset - rtpHeader.Length - NonceCounterSize;
             int decryptedLength = SecretBox.Decrypt(
                 buffer,
                 payloadOffset,
