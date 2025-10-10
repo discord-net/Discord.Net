@@ -40,7 +40,7 @@ namespace Discord.Rest
 
             if ((args.Icon.IsSpecified && args.Icon.Value != null) && role.Emoji != null)
             {
-                apiArgs.Emoji = "";
+                apiArgs.Emoji = Optional.Create<string>();
             }
 
             if ((args.Emoji.IsSpecified && args.Emoji.Value != null) && !string.IsNullOrEmpty(role.Icon))
