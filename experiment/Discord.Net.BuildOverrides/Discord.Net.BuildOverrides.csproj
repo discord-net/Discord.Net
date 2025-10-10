@@ -16,8 +16,4 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
-    <Reference Include="System.Net.Http" />
-  </ItemGroup>
-
 </Project>
