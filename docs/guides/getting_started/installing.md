@@ -10,24 +10,15 @@ recommended way for you to install this library. Alternatively, you
 may also compile this library yourself should you so desire.
 
 ## Supported Platforms
-
-Discord.Net targets [.NET 6.0] and [.NET 5.0], but is also available on older versions, like [.NET Standard] and [.NET Core]; this still means
-that creating applications using the latest version of .NET (6.0)
-is most recommended. If you are bound by Windows-specific APIs or
-other limitations, you may also consider targeting [.NET Framework]
-4.6.1 or higher.
+Discord.Net targets [.NET 8.0] and [.NET 9.0].
 
 > [!WARNING]
 > Using this library with [Mono] is not supported until further
 > notice. It is known to have issues with the library's WebSockets
 > implementation and may crash the application upon startup.
 
-[mono]: https://www.mono-project.com/
-[.net 6.0]: https://docs.microsoft.com/en-us/dotnet/core/whats-new/dotnet-6
-[.net 5.0]: https://docs.microsoft.com/en-us/dotnet/core/whats-new/dotnet-5
-[.net standard]: https://docs.microsoft.com/en-us/dotnet/articles/standard/library
-[.net core]: https://docs.microsoft.com/en-us/dotnet/articles/core/
-[.net framework]: https://docs.microsoft.com/en-us/dotnet/framework/get-started/
+[.net 9.0]: https://docs.microsoft.com/en-us/dotnet/core/whats-new/dotnet-9
+[.net 8.0]: https://docs.microsoft.com/en-us/dotnet/core/whats-new/dotnet-8
 [additional steps]: #installing-on-net-standard-11
 
 ## Installing
@@ -100,15 +91,15 @@ In order to compile Discord.Net, you will need the following:
 
 ### Using Visual Studio
 
-- [Visual Studio 2019](https://visualstudio.microsoft.com/) or later.
-- [.NET 5 SDK]
+- [Visual Studio 2022](https://visualstudio.microsoft.com/) or later.
+- [.NET 9 SDK]
 
-The .NET 5 workload is required during Visual Studio
+The .NET 8 workload is required during Visual Studio
 installation.
 
 ### Using Command Line
 
-* [.NET 5 SDK]
+* [.NET 9 SDK]
 
 ## Additional Information
 
@@ -151,4 +142,4 @@ by installing one or more custom packages as listed below.
 
 ---
 
-[.NET 5 SDK]: https://dotnet.microsoft.com/download
+[.NET 9 SDK]: https://dotnet.microsoft.com/download
