@@ -261,9 +261,8 @@ namespace Discord.Net.ED25519
             // Leading zero bytes get encoded as leading `1` characters
             int leadingZeroCount = input.TakeWhile(c => c == '1').Count();
             var leadingZeros = Enumerable.Repeat((byte)0, leadingZeroCount);
-            var bytesWithoutLeadingZeros =
-                intData.ToByteArray()
-                .Reverse()// to big endian
+
+            var bytesWithoutLeadingZeros = Enumerable.Reverse(intData.ToByteArray()) // to big endian
                 .SkipWhile(b => b == 0);//strip sign byte
             var result = leadingZeros.Concat(bytesWithoutLeadingZeros).ToArray();
             return result;

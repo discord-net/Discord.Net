@@ -14,6 +14,7 @@ namespace Discord.Audio.Streams
 
         private readonly AudioClient _client;
         private readonly AudioStream _next;
+        private readonly byte[] _rtpHeader;
         private readonly byte[] _nonce;
         private bool _hasHeader;
         private ushort _nextSeq;
@@ -24,6 +25,7 @@ namespace Discord.Audio.Streams
         {
             _next = next;
             _client = (AudioClient)client;
+            _rtpHeader = new byte[RtpHeaderSize];
             _nonce = new byte[NonceSize];
             _nonceCounter = 0;
         }
@@ -59,24 +61,23 @@ namespace Discord.Audio.Streams
             if (++_nonceCounter >= uint.MaxValue)
                 _nonceCounter = 0;
 
-            // Encrypt payload 
-            byte[] rtpHeader = new byte[RtpHeaderSize];
-            Buffer.BlockCopy(buffer, offset, rtpHeader, 0, rtpHeader.Length);
-            int payloadOffset = offset + rtpHeader.Length;
-            int payloadLength = count - rtpHeader.Length;
+            // Encrypt payload
+            Buffer.BlockCopy(buffer, offset, _rtpHeader, 0, _rtpHeader.Length);
+            int payloadOffset = offset + _rtpHeader.Length;
+            int payloadLength = count - offset - _rtpHeader.Length;
             int encryptedLength = SecretBox.Encrypt(
                 buffer,
                 payloadOffset,
                 payloadLength,
                 buffer,
                 payloadOffset,
-                rtpHeader,
+                _rtpHeader,
                 _nonce,
                 _client.SecretKey);
 
             // Append nonce to encripted payload
             Buffer.BlockCopy(counterBytes, 0, buffer, payloadOffset + encryptedLength, counterBytes.Length);
-            int packageLength = rtpHeader.Length + encryptedLength + counterBytes.Length;
+            int packageLength = _rtpHeader.Length + encryptedLength + counterBytes.Length;
 
             _next.WriteHeader(_nextSeq, _nextTimestamp, false);
             await _next.WriteAsync(buffer, offset, packageLength, cancelToken).ConfigureAwait(false);

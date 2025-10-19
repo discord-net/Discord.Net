@@ -31,7 +31,7 @@ namespace Discord.Audio
             }
         }
 
-        public static int Decrypt(byte[] input, int inputOffset, int inputLength, byte[] output, int outputOffset, byte[] header, byte[] nonce, byte[] key)
+        public static int Decrypt(byte[] input, int inputOffset, int inputLength, byte[] output, int outputOffset, byte[] header, int headerSize, byte[] nonce, byte[] key)
         {
             fixed (byte* inPtr = input)
             fixed (byte* outPtr = output)
@@ -41,7 +41,7 @@ namespace Discord.Audio
                     outPtr + outputOffset, out ulong plainLen,
                     null,
                     inPtr + inputOffset, (ulong)inputLength,
-                    adPtr, (ulong)header.Length,
+                    adPtr, (ulong)headerSize,
                     nonce, key
                 );
 
