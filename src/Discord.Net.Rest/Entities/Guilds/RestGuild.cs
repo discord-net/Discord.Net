@@ -412,6 +412,10 @@ namespace Discord.Rest
         /// <inheritdoc />
         public Task<BulkBanResult> BulkBanAsync(IEnumerable<ulong> userIds, int? deleteMessageSeconds = null, RequestOptions options = null)
             => GuildHelper.BulkBanAsync(this, Discord, userIds.ToArray(), deleteMessageSeconds, options);
+
+        /// <inheritdoc />
+        public Task<ImmutableDictionary<ulong, int>> GetRoleUserCountsAsync(RequestOptions options = null)
+            => GuildHelper.GetRoleUserCountsAsync(this, Discord, options);
         #endregion
 
         #region Channels

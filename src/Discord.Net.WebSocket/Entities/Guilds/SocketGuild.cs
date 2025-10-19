@@ -1187,6 +1187,9 @@ namespace Discord.WebSocket
                 return sticker;
             return null;
         }
+        /// <inheritdoc />
+        public Task<ImmutableDictionary<ulong, int>> GetRoleUserCountsAsync(RequestOptions options = null)
+            => GuildHelper.GetRoleUserCountsAsync(this, Discord, options);
         #endregion
 
         #region Users
