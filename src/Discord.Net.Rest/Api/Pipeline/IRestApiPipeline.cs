@@ -2,7 +2,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
 using Discord.Models;
-using MorseCode.ITask;
 
 namespace Discord.Rest.Api;
 

@@ -33,7 +33,5 @@ public static class MessageExtensions
         public bool MentionsEveryone => message.Model.MentionEveryone;
 
         public IReadOnlyList<Embed> Embeds => [..message.Model.Embeds.Select(Embed.FromModel)];
-        
-        
     }
 }

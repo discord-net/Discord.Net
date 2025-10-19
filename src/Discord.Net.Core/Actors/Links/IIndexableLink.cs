@@ -1,4 +1,6 @@
-﻿namespace Discord;
+﻿using Discord.Models;
+
+namespace Discord;
 
 public interface IIndexableLink<in TId, out TActor>
 { 

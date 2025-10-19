@@ -40,7 +40,7 @@ internal sealed class WeakTable<TKey, TValue>
         public void Dispose()
         {
             GC.SuppressFinalize(this);
-            
+
             _handle.Dispose();
             _table.UnsafeRemove(_key);
             _handle = default;
@@ -49,7 +49,7 @@ internal sealed class WeakTable<TKey, TValue>
 
     // ReSharper disable once InconsistentlySynchronizedField
     public int Count => _dictionary.Count;
-    
+
     private readonly Dictionary<TKey, WeakReference<ValueHolder>> _dictionary = new();
     private readonly object _syncRoot = new();
 
@@ -60,7 +60,7 @@ internal sealed class WeakTable<TKey, TValue>
 
     public void Clear()
     {
-        lock(_syncRoot)
+        lock (_syncRoot)
             _dictionary.Clear();
     }
 
@@ -99,6 +99,62 @@ internal sealed class WeakTable<TKey, TValue>
             _dictionary[key] = new(
                 new(this, key, value)
             );
+
+            return value;
+        }
+    }
+
+    public TValue this[TKey key]
+    {
+        get => Get(key);
+        set => Set(key, value);
+    }
+
+    public TValue Get(TKey key)
+    {
+        lock (_syncRoot)
+        {
+            var handle = _dictionary[key];
+
+            if (!handle.TryGetTarget(out var target))
+                throw new KeyNotFoundException();
+
+            if (!target.TryGetValue(out var value))
+            {
+                target.Dispose();
+                throw new KeyNotFoundException();
+            }
+
+            return value;
+        }
+    }
+
+    public bool TryGetValue(TKey key, [MaybeNullWhen(false)] out TValue value)
+    {
+        lock (_syncRoot)
+        {
+            if (!_dictionary.TryGetValue(key, out var handle) || !handle.TryGetTarget(out var target))
+            {
+                value = null;
+                return false;
+            }
+
+            return target.TryGetValue(out value);
+        }
+    }
+
+    public TValue Set(TKey key, TValue value)
+    {
+        lock (_syncRoot)
+        {
+            if (_dictionary.TryGetValue(key, out var weakRef) && weakRef.TryGetTarget(out var target))
+            {
+                target.Dispose();
+            }
+            else _dictionary.Remove(key);
+
+            var holder = new ValueHolder(this, key, value);
+            _dictionary.Add(key, new(holder));
 
             return value;
         }

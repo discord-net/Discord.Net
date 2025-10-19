@@ -1,8 +1,10 @@
 ﻿namespace Discord.Rest;
 
+public interface IRestActor : IRestClientProvider;
+
 public interface IRestActor<out TId> :
     IActor<TId>,
-    IRestClientProvider
+    IRestActor
     where TId : IEquatable<TId>;
 
 public interface IRestActor<out TId, out TEntity> : 
@@ -30,6 +32,8 @@ public abstract class RestActor<TId, TEntity> :
     where TId : IEquatable<TId>
     where TEntity : IEntity<TId>
 {
+    public virtual TEntity? Entity => Client.Cache.GetCachedEntity<TId, TEntity>(this);
+    
     protected RestActor(DiscordRestClient client, TId id) : base(client, id)
     {
     }

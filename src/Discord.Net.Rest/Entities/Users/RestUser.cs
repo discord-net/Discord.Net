@@ -23,4 +23,6 @@ public class RestUser :
         };
 
     ValueTask<IUser> ILoadable<IUser>.GetAsync(RequestOptions options) => ValueTask.FromResult<IUser>(this);
+
+    public static implicit operator RestUserActor(RestUser user) => user.Actor;
 }

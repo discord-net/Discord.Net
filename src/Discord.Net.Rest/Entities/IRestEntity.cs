@@ -8,7 +8,10 @@ public interface IRestEntity :
 {
 }
 
-public interface IRestEntity<out TId> : IRestEntity, IEntity<TId> where TId : IEquatable<TId>;
+public interface IRestEntity<out TId> : IRestEntity, IEntity<TId> where TId : IEquatable<TId>
+{
+    IRestActor<TId> Actor { get; }
+}
 
 public interface IRestEntity<out TId, out TModel> :
     IRestEntity<TId>,

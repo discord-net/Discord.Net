@@ -16,9 +16,12 @@ public class DiscordRestClient : IDiscordClient
     
     public IGuildsLink Guilds => throw new NotImplementedException();
 
+    internal RestCache Cache { get; }
+    
     public DiscordRestClient(DiscordConfig config)
     {
         Config = config;
+        Cache = new(this);
         Api = new(this);
         JsonContext = new(null);
     }

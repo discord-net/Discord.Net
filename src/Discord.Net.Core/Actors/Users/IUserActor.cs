@@ -3,7 +3,7 @@
 namespace Discord;
 
 public interface IUserActor :
-    IActor<Snowflake, IUser>,
+    IActor<Snowflake, IUser, IUserModel>,
     ILoadable<IUser>
 {
     

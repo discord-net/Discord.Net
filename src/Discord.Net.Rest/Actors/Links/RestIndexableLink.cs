@@ -7,18 +7,12 @@ public sealed class RestIndexableLink<TId, TActor> :
     where TActor : RestActor<TId>
     where TId : IEquatable<TId>
 {
-    public TActor this[TId id] => _actors.GetOrAdd(id, _factory, _client);
+    public TActor this[TId id] => _cache.Get(id);
 
-    private readonly DiscordRestClient _client;
-    private readonly Func<DiscordRestClient, TId, TActor> _factory;
-    private readonly WeakTable<TId, TActor> _actors;
-    
+    private readonly IKeyedCache<TId, TActor> _cache;
     
     internal RestIndexableLink(DiscordRestClient client, Func<DiscordRestClient, TId, TActor> factory)
     {
-        _client = client;
-        _factory = factory;
-        _actors = new();
+        _cache = client.Cache.CreateActorsCache(typeof(TActor), factory);
     }
-
 }

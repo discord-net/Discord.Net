@@ -1,4 +1,5 @@
-﻿using Discord.Models;
+﻿using System.Diagnostics.CodeAnalysis;
+using Discord.Models;
 
 namespace Discord.Rest;
 
@@ -11,8 +12,9 @@ public class RestMessage :
     public IRestMessageChannelTrait Channel => Actor.Channel;
     public RestUserActor Author => Client.Users[Model.Author.Id];
     
-    public IReadOnlyList<IUserActor> MentionedUsers
-        => [..Model.Mentions.Select(x => Client.Users[x])];
+    [field: MaybeNull]
+    public IReadOnlyList<RestUserActor> MentionedUsers
+        => field ??= [..Model.Mentions.Select(x => Client.Users[x])];
 
     public IReadOnlyList<IChannelActor> MentionedChannels => throw new NotImplementedException();
 

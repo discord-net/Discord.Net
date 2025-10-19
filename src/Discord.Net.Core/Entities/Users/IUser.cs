@@ -4,8 +4,7 @@ using Discord.Models;
 namespace Discord;
 
 public interface IUser : 
-    IEntity<Snowflake>,
-    IModeledBy<IUserModel>,
+    IEntity<Snowflake, IUserModel>,
     IUserActor
 {
     
