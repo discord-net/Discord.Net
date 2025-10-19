@@ -56,8 +56,17 @@ public class TextInputComponent : IInteractableComponent
     public TextInputBuilder ToBuilder()
         => new TextInputBuilder(this);
 
-    internal TextInputComponent(string customId, string label, string placeholder, int? minLength, int? maxLength,
-        TextInputStyle style, bool? required, string value, int? id)
+    internal TextInputComponent(
+        string customId,
+        string label,
+        string placeholder,
+        int? minLength,
+        int? maxLength,
+        TextInputStyle style,
+        bool? required,
+        string value,
+        int? id
+    )
     {
         CustomId = customId;
         Label = label;

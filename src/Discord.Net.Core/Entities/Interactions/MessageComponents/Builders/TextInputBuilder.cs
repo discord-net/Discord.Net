@@ -14,6 +14,7 @@ public class TextInputBuilder : IInteractableComponentBuilder
     ///     The max length of a <see cref="TextInputComponent.Placeholder"/>.
     /// </summary>
     public const int MaxPlaceholderLength = 100;
+
     public const int LargestMaxLength = 4000;
 
     /// <summary>
@@ -44,6 +45,7 @@ public class TextInputBuilder : IInteractableComponentBuilder
     /// <summary>
     ///     Gets or sets the label of the current text input.
     /// </summary>
+    [Obsolete("Label is no longer supported", error: false)]
     public string Label { get; set; }
 
     /// <summary>
@@ -55,7 +57,8 @@ public class TextInputBuilder : IInteractableComponentBuilder
         get => _placeholder;
         set => _placeholder = (value?.Length ?? 0) <= MaxPlaceholderLength
             ? value
-            : throw new ArgumentException($"Placeholder cannot have more than {MaxPlaceholderLength} characters. Value: \"{value}\"");
+            : throw new ArgumentException(
+                $"Placeholder cannot have more than {MaxPlaceholderLength} characters. Value: \"{value}\"");
     }
 
     /// <summary>
@@ -72,7 +75,8 @@ public class TextInputBuilder : IInteractableComponentBuilder
             if (value < 0)
                 throw new ArgumentOutOfRangeException(nameof(value), $"MinLength must not be less than 0");
             if (value > LargestMaxLength)
-                throw new ArgumentOutOfRangeException(nameof(value), $"MinLength must not be greater than {LargestMaxLength}");
+                throw new ArgumentOutOfRangeException(nameof(value),
+                    $"MinLength must not be greater than {LargestMaxLength}");
             if (value > (MaxLength ?? LargestMaxLength))
                 throw new ArgumentOutOfRangeException(nameof(value), $"MinLength must be less than MaxLength");
             _minLength = value;
@@ -93,9 +97,11 @@ public class TextInputBuilder : IInteractableComponentBuilder
             if (value < 0)
                 throw new ArgumentOutOfRangeException(nameof(value), $"MaxLength must not be less than 0");
             if (value > LargestMaxLength)
-                throw new ArgumentOutOfRangeException(nameof(value), $"MaxLength most not be greater than {LargestMaxLength}");
+                throw new ArgumentOutOfRangeException(nameof(value),
+                    $"MaxLength most not be greater than {LargestMaxLength}");
             if (value < (MinLength ?? -1))
-                throw new ArgumentOutOfRangeException(nameof(value), $"MaxLength must be greater than MinLength ({MinLength})");
+                throw new ArgumentOutOfRangeException(nameof(value),
+                    $"MaxLength must be greater than MinLength ({MinLength})");
             _maxLength = value;
         }
     }
@@ -123,9 +129,11 @@ public class TextInputBuilder : IInteractableComponentBuilder
         set
         {
             if (value?.Length > (MaxLength ?? LargestMaxLength))
-                throw new ArgumentOutOfRangeException(nameof(value), $"Value must not be longer than {MaxLength ?? LargestMaxLength}. Value: \"{value}\"");
+                throw new ArgumentOutOfRangeException(nameof(value),
+                    $"Value must not be longer than {MaxLength ?? LargestMaxLength}. Value: \"{value}\"");
             if (value?.Length < (MinLength ?? 0))
-                throw new ArgumentOutOfRangeException(nameof(value), $"Value must not be shorter than {MinLength}. Value: \"{value}\"");
+                throw new ArgumentOutOfRangeException(nameof(value),
+                    $"Value must not be shorter than {MinLength}. Value: \"{value}\"");
 
             _value = value;
         }
@@ -137,20 +145,17 @@ public class TextInputBuilder : IInteractableComponentBuilder
     private string _placeholder;
     private string _value;
 
-    /// <summary>
-    ///     Creates a new instance of a <see cref="TextInputBuilder"/>.
-    /// </summary>
-    /// <param name="label">The text input's label.</param>
-    /// <param name="style">The text input's style.</param>
-    /// <param name="customId">The text input's custom id.</param>
-    /// <param name="placeholder">The text input's placeholder.</param>
-    /// <param name="minLength">The text input's minimum length.</param>
-    /// <param name="maxLength">The text input's maximum length.</param>
-    /// <param name="required">The text input's required value.</param>
-    public TextInputBuilder(string label, string customId, TextInputStyle style = TextInputStyle.Short, string placeholder = null,
-        int? minLength = null, int? maxLength = null, bool? required = null, string value = null, int? id = null)
+    public TextInputBuilder(
+        string customId,
+        TextInputStyle style = TextInputStyle.Short,
+        string placeholder = null,
+        int? minLength = null,
+        int? maxLength = null,
+        bool? required = null,
+        string value = null,
+        int? id = null
+    )
     {
-        Label = label;
         Style = style;
         CustomId = customId;
         Placeholder = placeholder;
@@ -164,9 +169,34 @@ public class TextInputBuilder : IInteractableComponentBuilder
     /// <summary>
     ///     Creates a new instance of a <see cref="TextInputBuilder"/>.
     /// </summary>
+    /// <param name="label">The text input's label.</param>
+    /// <param name="style">The text input's style.</param>
+    /// <param name="customId">The text input's custom id.</param>
+    /// <param name="placeholder">The text input's placeholder.</param>
+    /// <param name="minLength">The text input's minimum length.</param>
+    /// <param name="maxLength">The text input's maximum length.</param>
+    /// <param name="required">The text input's required value.</param>
+    [Obsolete("label is no longer supported", error: false)]
+    public TextInputBuilder(
+        string label,
+        string customId,
+        TextInputStyle style = TextInputStyle.Short,
+        string placeholder = null,
+        int? minLength = null,
+        int? maxLength = null,
+        bool? required = null,
+        string value = null,
+        int? id = null
+    ) : this(customId, style, placeholder, minLength, maxLength, required, value, id)
+    {
+        Label = label;
+    }
+
+    /// <summary>
+    ///     Creates a new instance of a <see cref="TextInputBuilder"/>.
+    /// </summary>
     public TextInputBuilder()
     {
-
     }
 
     /// <summary>
@@ -174,7 +204,9 @@ public class TextInputBuilder : IInteractableComponentBuilder
     /// </summary>
     public TextInputBuilder(TextInputComponent textInput)
     {
+#pragma warning disable CS0618 // Type or member is obsolete
         Label = textInput.Label;
+#pragma warning restore CS0618 // Type or member is obsolete
         Style = textInput.Style;
         CustomId = textInput.CustomId;
         Placeholder = textInput.Placeholder;
@@ -190,6 +222,7 @@ public class TextInputBuilder : IInteractableComponentBuilder
     /// </summary>
     /// <param name="label">The value to set.</param>
     /// <returns>The current builder. </returns>
+    [Obsolete("Label is no longer supported", error: false)]
     public TextInputBuilder WithLabel(string label)
     {
         Label = label;
@@ -277,12 +310,14 @@ public class TextInputBuilder : IInteractableComponentBuilder
     {
         if (string.IsNullOrEmpty(CustomId))
             throw new ArgumentException("TextInputComponents must have a custom id.", nameof(CustomId));
-        if (string.IsNullOrWhiteSpace(Label))
-            throw new ArgumentException("TextInputComponents must have a label.", nameof(Label));
-        if (Style is TextInputStyle.Short && Value?.Any(x => x == '\n') is true)
-            throw new ArgumentException($"Value must not contain new line characters when style is {TextInputStyle.Short}.", nameof(Value));
 
+        if (Style is TextInputStyle.Short && Value?.Any(x => x == '\n') is true)
+            throw new ArgumentException(
+                $"Value must not contain new line characters when style is {TextInputStyle.Short}.", nameof(Value));
+
+#pragma warning disable CS0618 // Type or member is obsolete
         return new TextInputComponent(CustomId, Label, Placeholder, MinLength, MaxLength, Style, Required, Value, Id);
+#pragma warning restore CS0618 // Type or member is obsolete
     }
 
     IMessageComponent IMessageComponentBuilder.Build() => Build();

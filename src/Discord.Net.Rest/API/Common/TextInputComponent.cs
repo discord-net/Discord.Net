@@ -16,8 +16,9 @@ namespace Discord.API
         [JsonProperty("custom_id")]
         public string CustomId { get; set; }
 
+        // deprecated
         [JsonProperty("label")]
-        public string Label { get; set; }
+        public Optional<string> Label { get; set; }
 
         [JsonProperty("placeholder")]
         public Optional<string> Placeholder { get; set; }
