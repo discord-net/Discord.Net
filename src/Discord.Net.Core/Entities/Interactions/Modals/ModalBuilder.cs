@@ -16,7 +16,10 @@ namespace Discord
         /// <summary>
         ///     Creates a new and empty <see cref="ModalBuilder"/>.
         /// </summary>
-        public ModalBuilder() { }
+        public ModalBuilder()
+        {
+            Components = new();
+        }
 
         /// <summary>
         ///     Creates a new instance of the <see cref="ModalBuilder"/>.
@@ -127,7 +130,6 @@ namespace Discord
             string placeholder = null,
             int? minLength = null,
             int? maxLength = null,
-            int row = 0,
             bool? required = null,
             string value = null,
             int? id = null,
@@ -136,7 +138,7 @@ namespace Discord
         )
         {
             Components.WithTextInput(
-                label, customId, style, placeholder, minLength, maxLength, row, required, value, id, description,
+                label, customId, style, placeholder, minLength, maxLength, 0, required, value, id, description,
                 labelId
             );
 

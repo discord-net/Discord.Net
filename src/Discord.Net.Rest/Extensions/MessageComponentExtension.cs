@@ -116,7 +116,7 @@ internal static class MessageComponentExtension
             {
                 var parsed = (API.TextInputComponent)component;
                 return new TextInputComponent(parsed.CustomId,
-                    parsed.Label,
+                    parsed.Label.GetValueOrDefault(),
                     parsed.Placeholder.GetValueOrDefault(null),
                     parsed.MinLength.ToNullable(),
                     parsed.MaxLength.ToNullable(),
