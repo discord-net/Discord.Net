@@ -492,7 +492,7 @@ public static class ComponentContainerExtensions
         string customId,
         int? minValues = null,
         int? maxValues = null,
-        bool isRequired = false,
+        bool isRequired = true,
         int? id = null)
         where BuilderT : class, IInteractableComponentContainer
         => container.WithFileUpload(new FileUploadComponentBuilder()

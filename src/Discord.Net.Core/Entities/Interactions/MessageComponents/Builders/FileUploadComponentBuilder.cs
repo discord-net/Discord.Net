@@ -77,9 +77,9 @@ public class FileUploadComponentBuilder : IInteractableComponentBuilder
     }
 
     /// <summary>
-    ///     Gets or sets a value indicating whether the current file upload requires files to be uploaded before submitting the modal.
+    ///     Gets or sets a value indicating whether the current file upload requires files to be uploaded before submitting the modal (defaults to <see langword="true"></see>).
     /// </summary>
-    public bool IsRequired { get; set; }
+    public bool IsRequired { get; set; } = true;
 
     /// <summary>
     ///     Sets the custom id of the current file upload.
@@ -151,7 +151,7 @@ public class FileUploadComponentBuilder : IInteractableComponentBuilder
     /// <param name="maxValues">the maximum number of items that can be uploaded (defaults to 1).</param>
     /// <param name="isRequired">Whether the current file upload requires files to be uploaded before submitting the modal.</param>
     /// <param name="id">The id for the component.</param>
-    public FileUploadComponentBuilder(string customId, int? minValues = null, int? maxValues = null, bool isRequired = false, int? id = null)
+    public FileUploadComponentBuilder(string customId, int? minValues = null, int? maxValues = null, bool isRequired = true, int? id = null)
     {
         CustomId = customId;
         MinValues = minValues;

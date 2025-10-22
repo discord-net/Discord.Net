@@ -234,7 +234,7 @@ namespace Discord
             string customId,
             int? minValues = null,
             int? maxValues = null,
-            bool isRequired = false,
+            bool isRequired = true,
             int? id = null,
             string description = null,
             int? labelId = null
@@ -714,7 +714,7 @@ namespace Discord
             string customId,
             int? minValues = null,
             int? maxValues = null,
-            bool isRequired = false,
+            bool isRequired = true,
             int? id = null,
             string description = null,
             int? labelId = null
