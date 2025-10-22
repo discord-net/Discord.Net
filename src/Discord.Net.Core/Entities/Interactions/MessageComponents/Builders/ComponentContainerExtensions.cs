@@ -475,10 +475,10 @@ public static class ComponentContainerExtensions
     /// <returns>
     ///     The current container.
     /// </returns>
-    public static BuilderT WithFileUpload<BuilderT>(this BuilderT container, FileUploadComponentBuilder separator)
+    public static BuilderT WithFileUpload<BuilderT>(this BuilderT container, FileUploadComponentBuilder fileUpload)
         where BuilderT : class, IInteractableComponentContainer
     {
-        container.AddComponent(separator);
+        container.AddComponent(fileUpload);
         return container;
     }
 
