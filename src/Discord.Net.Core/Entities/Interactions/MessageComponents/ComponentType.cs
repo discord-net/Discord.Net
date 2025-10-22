@@ -81,13 +81,13 @@ namespace Discord
         Container = 17,
 
         /// <summary>
-        ///     
+        ///     A layout component that wraps modal components (text input, select menu or file upload) with a label and description.
         /// </summary>
         Label = 18,
 
         /// <summary>
-        ///     
+        ///     A component that allows users to upload files in modals.
         /// </summary>
-        FileUpload = 19,
+        FileUpload = 19
     }
 }

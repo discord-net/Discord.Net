@@ -8,7 +8,6 @@ namespace Discord
     /// <summary>
     ///     Represents a builder for creating a <see cref="Modal"/>.
     /// </summary>
-
     public class ModalBuilder
     {
         private string _customId;
@@ -72,7 +71,7 @@ namespace Discord
                 if (value is not null)
                 {
                     Preconditions.AtLeast(value.Length, 1, nameof(CustomId));
-                    Preconditions.AtMost(value.Length, ComponentBuilder.MaxCustomIdLength, nameof(CustomId));
+                    Preconditions.AtMost(value.Length, ModalComponentBuilder.MaxCustomIdLength, nameof(CustomId));
                 }
 
                 _customId = value;

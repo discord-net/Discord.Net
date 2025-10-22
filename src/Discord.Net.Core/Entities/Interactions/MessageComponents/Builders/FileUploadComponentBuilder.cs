@@ -21,7 +21,7 @@ public class FileUploadComponentBuilder : IInteractableComponentBuilder
     /// <summary>
     ///     Gets or sets the custom id of the current file upload.
     /// </summary>
-    /// <exception cref="ArgumentException" accessor="set"><see cref="CustomId"/> length exceeds <see cref="ComponentBuilder.MaxCustomIdLength"/></exception>
+    /// <exception cref="ArgumentException" accessor="set"><see cref="CustomId"/> length exceeds <see cref="ModalComponentBuilder.MaxCustomIdLength"/>.</exception>
     /// <exception cref="ArgumentException" accessor="set"><see cref="CustomId"/> length subceeds 1.</exception>
     public string CustomId
     {
@@ -31,7 +31,7 @@ public class FileUploadComponentBuilder : IInteractableComponentBuilder
             if (value is not null)
             {
                 Preconditions.AtLeast(value.Length, 1, nameof(CustomId));
-                Preconditions.AtMost(value.Length, ComponentBuilder.MaxCustomIdLength, nameof(CustomId));
+                Preconditions.AtMost(value.Length, ModalComponentBuilder.MaxCustomIdLength, nameof(CustomId));
             }
 
             _customId = value;

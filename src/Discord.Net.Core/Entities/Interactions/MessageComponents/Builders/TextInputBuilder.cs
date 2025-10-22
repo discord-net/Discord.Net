@@ -15,12 +15,15 @@ public class TextInputBuilder : IInteractableComponentBuilder
     /// </summary>
     public const int MaxPlaceholderLength = 100;
 
+    /// <summary>
+    ///     The max value for <see cref="TextInputBuilder.MaxLength"/> and <see cref="TextInputBuilder.MinLength"/>, and the max length for <see cref="TextInputBuilder.Value"/>.
+    /// </summary>
     public const int LargestMaxLength = 4000;
 
     /// <summary>
     ///     Gets or sets the custom id of the current text input.
     /// </summary>
-    /// <exception cref="ArgumentException" accessor="set"><see cref="CustomId"/> length exceeds <see cref="ComponentBuilder.MaxCustomIdLength"/></exception>
+    /// <exception cref="ArgumentException" accessor="set"><see cref="CustomId"/> length exceeds <see cref="ModalComponentBuilder.MaxCustomIdLength"/>.</exception>
     /// <exception cref="ArgumentException" accessor="set"><see cref="CustomId"/> length subceeds 1.</exception>
     public string CustomId
     {
@@ -30,7 +33,7 @@ public class TextInputBuilder : IInteractableComponentBuilder
             if (value is not null)
             {
                 Preconditions.AtLeast(value.Length, 1, nameof(CustomId));
-                Preconditions.AtMost(value.Length, ComponentBuilder.MaxCustomIdLength, nameof(CustomId));
+                Preconditions.AtMost(value.Length, ModalComponentBuilder.MaxCustomIdLength, nameof(CustomId));
             }
 
             _customId = value;
@@ -111,6 +114,7 @@ public class TextInputBuilder : IInteractableComponentBuilder
     /// </summary>
     public bool? Required { get; set; }
 
+    /// <inheritdoc/>
     public int? Id { get; set; }
 
     /// <summary>
@@ -145,6 +149,17 @@ public class TextInputBuilder : IInteractableComponentBuilder
     private string _placeholder;
     private string _value;
 
+    /// <summary>
+    ///     Creates a new instance of a <see cref="TextInputBuilder"/>.
+    /// </summary>
+    /// <param name="style">The text input's style.</param>
+    /// <param name="customId">The text input's custom id.</param>
+    /// <param name="placeholder">The text input's placeholder.</param>
+    /// <param name="minLength">The text input's minimum length.</param>
+    /// <param name="maxLength">The text input's maximum length.</param>
+    /// <param name="required">The text input's required value.</param>
+    /// <param name="value">The text input's default value.</param>
+    /// <param name="id">The id for the component.</param>
     public TextInputBuilder(
         string customId,
         TextInputStyle style = TextInputStyle.Short,
@@ -306,6 +321,7 @@ public class TextInputBuilder : IInteractableComponentBuilder
         return this;
     }
 
+    /// <inheritdoc cref="IMessageComponentBuilder.Build" />
     public TextInputComponent Build()
     {
         if (string.IsNullOrEmpty(CustomId))

@@ -517,7 +517,6 @@ public static class ComponentContainerExtensions
         return container.WithFileUpload(comp);
     }
 
-
     /// <summary>
     ///     Finds the first <see cref="IMessageComponentBuilder"/> in the <see cref="IComponentContainer"/>
     ///     or any of its child <see cref="IComponentContainer"/>s with matching id.
