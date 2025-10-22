@@ -1,27 +1,30 @@
 namespace Discord;
 
+/// <summary>
+///    Represents a layout component that wraps modal components (text input, select menu or file upload) with a label and description.
+/// </summary>
 public class LabelComponent : IMessageComponent
 {
     /// <inheritdoc />
     public ComponentType Type => ComponentType.Label;
 
     /// <inheritdoc />
-    public int? Id { get; private set; }
+    public int? Id { get; }
 
     /// <summary>
-    ///     
+    ///     Gets the label text.
     /// </summary>
-    public string Label { get; private set; }
+    public string Label { get; }
 
     /// <summary>
-    ///     
+    ///     Gets the description text for the label.
     /// </summary>
-    public string Description { get; private set; }
+    public string Description { get; }
 
     /// <summary>
-    ///     
+    ///     Gets the component within the label.
     /// </summary>
-    public IMessageComponent Component { get; private set; }
+    public IMessageComponent Component { get; }
 
     internal LabelComponent(int? id, string label, string description, IMessageComponent component)
     {
@@ -33,5 +36,5 @@ public class LabelComponent : IMessageComponent
 
     /// <inheritdoc />
     public IMessageComponentBuilder ToBuilder()
-        => new LabelBuilder(Label, Component.ToBuilder(), Description, Id);
+        => new LabelBuilder(this);
 }

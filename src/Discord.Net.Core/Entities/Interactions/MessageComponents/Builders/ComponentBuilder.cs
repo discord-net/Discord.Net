@@ -10,7 +10,7 @@ namespace Discord;
 public class ComponentBuilder
 {
     /// <summary>
-    ///     The max length of a <see cref="ButtonComponent.CustomId"/>.
+    ///     The max length of <see cref="ButtonComponent.CustomId"/>, <see cref="SelectMenuComponent.CustomId"/>, <see cref="TextInputComponent.CustomId"/> and <see cref="FileUploadComponent.CustomId"/>.
     /// </summary>
     public const int MaxCustomIdLength = 100;
 
