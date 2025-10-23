@@ -243,6 +243,22 @@ namespace Discord
             return this;
         }
 
+        /// <inheritdoc cref="ModalComponentBuilder.WithTextDisplay(TextDisplayBuilder)"/>
+        /// <returns>The current <see cref="ModalBuilder"/>.</returns>
+        public ModalBuilder AddTextDisplay(TextDisplayBuilder textDisplay)
+        {
+            Components.WithTextDisplay(textDisplay);
+            return this;
+        }
+
+        /// <inheritdoc cref="ModalComponentBuilder.WithTextDisplay(string, int?)"/>
+        /// <returns>The current <see cref="ModalBuilder"/>.</returns>
+        public ModalBuilder AddTextDisplay(string content, int? id = null)
+        {
+            Components.WithTextDisplay(content, id);
+            return this;
+        }
+
         /// <summary>
         ///     Adds multiple components to the current builder.
         /// </summary>
@@ -729,6 +745,23 @@ namespace Discord
             description,
             labelId
         );
+
+        /// <summary>
+        ///     Adds a <see cref="TextDisplayBuilder"/> to the current <see cref="ModalComponentBuilder"/>.
+        /// </summary>
+        /// <param name="textDisplay">The <see cref="TextDisplayBuilder"/> to add.</param>
+        /// <returns>The current <see cref="ModalComponentBuilder"/>.</returns>
+        public ModalComponentBuilder WithTextDisplay(TextDisplayBuilder textDisplay)
+            => Add(textDisplay);
+
+        /// <summary>
+        ///     Constructs and adds a <see cref="TextDisplayBuilder"/> to the current <see cref="ModalComponentBuilder"/>.
+        /// </summary>
+        /// <param name="content">The content of the <see cref="TextDisplayBuilder"/>.</param>
+        /// <param name="id">The id of the <see cref="TextDisplayBuilder"/>.</param>
+        /// <returns>The current <see cref="ModalComponentBuilder"/>.</returns>
+        public ModalComponentBuilder WithTextDisplay(string content, int? id = null)
+            => WithTextDisplay(new TextDisplayBuilder(content, id));
 
         /// <summary>
         ///     Constructs and adds a <see cref="LabelBuilder"/> with the provided <see cref="TextInputBuilder"/> to
