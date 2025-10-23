@@ -2,7 +2,7 @@ using Newtonsoft.Json;
 
 namespace Discord.API;
 
-public class FileUploadComponent : IMessageComponent
+public class FileUploadComponent : IInteractableComponent
 {
     [JsonProperty("type")]
     public ComponentType Type { get; set; }
@@ -21,6 +21,9 @@ public class FileUploadComponent : IMessageComponent
 
     [JsonProperty("required")]
     public Optional<bool> IsRequired { get; set; }
+
+    [JsonProperty("values")]
+    public Optional<string[]> Values { get; set; }
 
     public FileUploadComponent() {}
 

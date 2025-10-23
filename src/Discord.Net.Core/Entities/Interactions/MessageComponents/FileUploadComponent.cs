@@ -3,7 +3,7 @@ namespace Discord;
 /// <summary>
 ///     Represents a component that allows users to upload files in modals.
 /// </summary>
-public class FileUploadComponent : IMessageComponent
+public class FileUploadComponent : IInteractableComponent
 {
     /// <inheritdoc/>
     public ComponentType Type => ComponentType.FileUpload;

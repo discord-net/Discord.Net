@@ -509,9 +509,9 @@ namespace Discord
 
         private static void ValidateComponentBuilder(IMessageComponentBuilder builder)
         {
-            if (builder is not LabelBuilder and not ActionRowBuilder)
+            if (builder is not LabelBuilder and not ActionRowBuilder and not TextDisplayBuilder)
                 throw new InvalidOperationException(
-                    $"Modal components only allow labels or rows, not {builder.GetType().Name}"
+                    $"Only top-level modal components (labels, action rows or text displays) are allowed, not {builder.GetType().Name}."
                 );
         }
 
