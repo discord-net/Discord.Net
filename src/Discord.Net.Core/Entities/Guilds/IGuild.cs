@@ -1475,5 +1475,10 @@ namespace Discord
         ///     Gets a mapping of role IDs to the number of users that have each role.
         /// </summary>
         Task<ImmutableDictionary<ulong, int>> GetRoleUserCountsAsync(RequestOptions options = null);
+
+        /// <summary>
+        ///     Modifies the current user in this guild.
+        /// </summary>
+        Task ModifyCurrentUserAsync(Action<SelfGuildUserProperties> props, RequestOptions options = null);
     }
 }
