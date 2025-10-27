@@ -2037,6 +2037,7 @@ namespace Discord.API
                     Nickname = args.Nickname
                 };
                 await ModifyCurrentMemberAsync(guildId, nickArgs).ConfigureAwait(false);
+                args.Nickname = Optional.Create<string>(); // Remove so it's not getting updated again
             }
             if (!isCurrentUser || args.Deaf.IsSpecified || args.Mute.IsSpecified || args.RoleIds.IsSpecified)
             {
