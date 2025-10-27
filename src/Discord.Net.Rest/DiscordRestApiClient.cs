@@ -2022,7 +2022,7 @@ namespace Discord.API
             return SendAsync("DELETE", () => $"guilds/{guildId}/members/{userId}", ids, options: options);
         }
 
-        public async Task ModifyGuildMemberAsync(ulong guildId, ulong userId, Rest.ModifyGuildMemberParams args, RequestOptions options = null)
+        public async Task ModifyGuildMemberAsync(ulong guildId, ulong userId, ModifyGuildMemberParams args, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             Preconditions.NotEqual(userId, 0, nameof(userId));
@@ -2030,17 +2030,18 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
 
             bool isCurrentUser = userId == CurrentUserId;
-
             if (isCurrentUser && args.Nickname.IsSpecified)
             {
-                var nickArgs = new Rest.ModifyCurrentUserNickParams(args.Nickname.Value ?? "");
-                await ModifyMyNickAsync(guildId, nickArgs).ConfigureAwait(false);
-                args.Nickname = Optional.Create<string>(); //Remove
+                var nickArgs = new ModifyCurrentMemberParams
+                {
+                    Nickname = args.Nickname
+                };
+                await ModifyCurrentMemberAsync(guildId, nickArgs).ConfigureAwait(false);
             }
             if (!isCurrentUser || args.Deaf.IsSpecified || args.Mute.IsSpecified || args.RoleIds.IsSpecified)
             {
                 var ids = new BucketIds(guildId: guildId);
-                await SendJsonAsync("PATCH", () => $"guilds/{guildId}/members/{userId}", args, ids, options: options).ConfigureAwait(false);
+                await SendJsonAsync<GuildMember>("PATCH", () => $"guilds/{guildId}/members/{userId}", args, ids, options: options).ConfigureAwait(false);
             }
         }
 
@@ -2454,14 +2455,14 @@ namespace Discord.API
             return SendJsonAsync<User>("PATCH", () => "users/@me", args, new BucketIds(), options: options);
         }
 
-        public Task ModifyMyNickAsync(ulong guildId, Rest.ModifyCurrentUserNickParams args, RequestOptions options = null)
+        public Task<GuildMember> ModifyCurrentMemberAsync(ulong guildId, ModifyCurrentMemberParams args, RequestOptions options = null)
         {
             Preconditions.NotNull(args, nameof(args));
-            Preconditions.NotNull(args.Nickname, nameof(args.Nickname));
+
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(guildId: guildId);
-            return SendJsonAsync("PATCH", () => $"guilds/{guildId}/members/@me/nick", args, ids, options: options);
+            return SendJsonAsync<GuildMember>("PATCH", () => $"guilds/{guildId}/members/@me", args, ids, options: options);
         }
 
         public Task<Channel> CreateDMChannelAsync(CreateDMChannelParams args, RequestOptions options = null)
