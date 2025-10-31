@@ -125,7 +125,7 @@ namespace Discord
         ///     The duration on which this thread archives after.
         ///     <para>
         ///         <b>Note: </b> Options <see cref="ThreadArchiveDuration.OneWeek"/> and <see cref="ThreadArchiveDuration.ThreeDays"/>
-        ///         are only available for guilds that are boosted. You can check in the <see cref="IGuild.Features"/> to see if the 
+        ///         are only available for guilds that are boosted. You can check in the <see cref="IGuild.Features"/> to see if the
         ///         guild has the <b>THREE_DAY_THREAD_ARCHIVE</b> and <b>SEVEN_DAY_THREAD_ARCHIVE</b>.
         ///     </para>
         /// </param>
@@ -148,5 +148,44 @@ namespace Discord
         ///     a collection of active threads.
         /// </returns>
         Task<IReadOnlyCollection<IThreadChannel>> GetActiveThreadsAsync(RequestOptions options = null);
+
+        /// <summary>
+        ///     Gets a collection of publicly archived threads within this channel.
+        /// </summary>
+        /// <param name="limit">The optional limit of how many to get.</param>
+        /// <param name="before">The optional date to return threads created before this timestamp.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents an asynchronous get operation for retrieving the threads. The task result contains
+        ///     a collection of publicly archived threads.
+        /// </returns>
+        Task<IReadOnlyCollection<IThreadChannel>> GetPublicArchivedThreadsAsync(int? limit = null, DateTimeOffset? before = null, RequestOptions options = null);
+
+        /// <summary>
+        ///     Gets a collection of privately archived threads within this channel.
+        /// </summary>
+        /// <remarks>
+        ///     The bot requires the <see cref="GuildPermission.ManageThreads"/> permission in order to execute this request.
+        /// </remarks>
+        /// <param name="limit">The optional limit of how many to get.</param>
+        /// <param name="before">The optional date to return threads created before this timestamp.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents an asynchronous get operation for retrieving the threads. The task result contains
+        ///     a collection of privately archived threads.
+        /// </returns>
+        Task<IReadOnlyCollection<IThreadChannel>> GetPrivateArchivedThreadsAsync(int? limit = null, DateTimeOffset? before = null, RequestOptions options = null);
+
+        /// <summary>
+        ///     Gets a collection of privately archived threads that the current bot has joined within this channel.
+        /// </summary>
+        /// <param name="limit">The optional limit of how many to get.</param>
+        /// <param name="before">The optional date to return threads created before this timestamp.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents an asynchronous get operation for retrieving the threads. The task result contains
+        ///     a collection of privately archived threads.
+        /// </returns>
+        Task<IReadOnlyCollection<IThreadChannel>> GetJoinedPrivateArchivedThreadsAsync(int? limit = null, DateTimeOffset? before = null, RequestOptions options = null);
     }
 }

@@ -133,7 +133,15 @@ namespace Discord.WebSocket
         /// <inheritdoc cref="ITextChannel.GetActiveThreadsAsync(RequestOptions)"/>
         public virtual Task<IReadOnlyCollection<RestThreadChannel>> GetActiveThreadsAsync(RequestOptions options = null)
             => ThreadHelper.GetActiveThreadsAsync(Guild, Id, Discord, options);
-
+        /// <inheritdoc cref="ITextChannel.GetPublicArchivedThreadsAsync(int?,System.DateTimeOffset?,RequestOptions)"/>
+        public virtual Task<IReadOnlyCollection<RestThreadChannel>> GetPublicArchivedThreadsAsync(int? limit, DateTimeOffset? before, RequestOptions options)
+            => ThreadHelper.GetPublicArchivedThreadsAsync(this, Discord, limit, before, options);
+        /// <inheritdoc cref="ITextChannel.GetPrivateArchivedThreadsAsync(int?,System.DateTimeOffset?,RequestOptions)"/>
+        public virtual Task<IReadOnlyCollection<RestThreadChannel>> GetPrivateArchivedThreadsAsync(int? limit, DateTimeOffset? before, RequestOptions options)
+            => ThreadHelper.GetPrivateArchivedThreadsAsync(this, Discord, limit, before, options);
+        /// <inheritdoc cref="ITextChannel.GetJoinedPrivateArchivedThreadsAsync(int?,System.DateTimeOffset?,RequestOptions)"/>
+        public virtual Task<IReadOnlyCollection<RestThreadChannel>> GetJoinedPrivateArchivedThreadsAsync(int? limit, DateTimeOffset? before, RequestOptions options)
+            => ThreadHelper.GetJoinedPrivateArchivedThreadsAsync(this, Discord, limit, before, options);
         #endregion
 
         #region Messages
@@ -389,6 +397,12 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         async Task<IReadOnlyCollection<IThreadChannel>> ITextChannel.GetActiveThreadsAsync(RequestOptions options)
             => await GetActiveThreadsAsync(options);
+        async Task<IReadOnlyCollection<IThreadChannel>> ITextChannel.GetPublicArchivedThreadsAsync(int? limit, DateTimeOffset? before, RequestOptions options)
+            => await GetPublicArchivedThreadsAsync(limit, before, options);
+        async Task<IReadOnlyCollection<IThreadChannel>> ITextChannel.GetPrivateArchivedThreadsAsync(int? limit, DateTimeOffset? before, RequestOptions options)
+            => await GetPrivateArchivedThreadsAsync(limit, before, options);
+        async Task<IReadOnlyCollection<IThreadChannel>> ITextChannel.GetJoinedPrivateArchivedThreadsAsync(int? limit, DateTimeOffset? before, RequestOptions options)
+            => await GetJoinedPrivateArchivedThreadsAsync(limit, before, options);
         #endregion
 
         #region IGuildChannel
