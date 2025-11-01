@@ -186,13 +186,13 @@ namespace Discord.WebSocket
         #endregion
 
         #region IForumChannel
-        async Task<IReadOnlyCollection<IThreadChannel>> IForumChannel.GetActiveThreadsAsync(RequestOptions options)
+        async Task<IReadOnlyCollection<IThreadChannel>> IThreadContainerChannel.GetActiveThreadsAsync(RequestOptions options)
             => await GetActiveThreadsAsync(options).ConfigureAwait(false);
-        async Task<IReadOnlyCollection<IThreadChannel>> IForumChannel.GetPublicArchivedThreadsAsync(int? limit, DateTimeOffset? before, RequestOptions options)
+        async Task<IReadOnlyCollection<IThreadChannel>> IThreadContainerChannel.GetPublicArchivedThreadsAsync(int? limit, DateTimeOffset? before, RequestOptions options)
             => await GetPublicArchivedThreadsAsync(limit, before, options).ConfigureAwait(false);
-        async Task<IReadOnlyCollection<IThreadChannel>> IForumChannel.GetPrivateArchivedThreadsAsync(int? limit, DateTimeOffset? before, RequestOptions options)
+        async Task<IReadOnlyCollection<IThreadChannel>> IThreadContainerChannel.GetPrivateArchivedThreadsAsync(int? limit, DateTimeOffset? before, RequestOptions options)
             => await GetPrivateArchivedThreadsAsync(limit, before, options).ConfigureAwait(false);
-        async Task<IReadOnlyCollection<IThreadChannel>> IForumChannel.GetJoinedPrivateArchivedThreadsAsync(int? limit, DateTimeOffset? before, RequestOptions options)
+        async Task<IReadOnlyCollection<IThreadChannel>> IThreadContainerChannel.GetJoinedPrivateArchivedThreadsAsync(int? limit, DateTimeOffset? before, RequestOptions options)
             => await GetJoinedPrivateArchivedThreadsAsync(limit, before, options).ConfigureAwait(false);
 
         async Task<IThreadChannel> IForumChannel.CreatePostAsync(string title, ThreadArchiveDuration archiveDuration, int? slowmode, string text, Embed embed, RequestOptions options, AllowedMentions allowedMentions, MessageComponent components, ISticker[] stickers, Embed[] embeds, MessageFlags flags, ForumTag[] tags)
