@@ -395,13 +395,13 @@ namespace Discord.WebSocket
         async Task<IThreadChannel> ITextChannel.CreateThreadAsync(string name, ThreadType type, ThreadArchiveDuration autoArchiveDuration, IMessage message, bool? invitable, int? slowmode, RequestOptions options)
             => await CreateThreadAsync(name, type, autoArchiveDuration, message, invitable, slowmode, options);
         /// <inheritdoc />
-        async Task<IReadOnlyCollection<IThreadChannel>> ITextChannel.GetActiveThreadsAsync(RequestOptions options)
+        async Task<IReadOnlyCollection<IThreadChannel>> IThreadContainerChannel.GetActiveThreadsAsync(RequestOptions options)
             => await GetActiveThreadsAsync(options);
-        async Task<IReadOnlyCollection<IThreadChannel>> ITextChannel.GetPublicArchivedThreadsAsync(int? limit, DateTimeOffset? before, RequestOptions options)
+        async Task<IReadOnlyCollection<IThreadChannel>> IThreadContainerChannel.GetPublicArchivedThreadsAsync(int? limit, DateTimeOffset? before, RequestOptions options)
             => await GetPublicArchivedThreadsAsync(limit, before, options);
-        async Task<IReadOnlyCollection<IThreadChannel>> ITextChannel.GetPrivateArchivedThreadsAsync(int? limit, DateTimeOffset? before, RequestOptions options)
+        async Task<IReadOnlyCollection<IThreadChannel>> IThreadContainerChannel.GetPrivateArchivedThreadsAsync(int? limit, DateTimeOffset? before, RequestOptions options)
             => await GetPrivateArchivedThreadsAsync(limit, before, options);
-        async Task<IReadOnlyCollection<IThreadChannel>> ITextChannel.GetJoinedPrivateArchivedThreadsAsync(int? limit, DateTimeOffset? before, RequestOptions options)
+        async Task<IReadOnlyCollection<IThreadChannel>> IThreadContainerChannel.GetJoinedPrivateArchivedThreadsAsync(int? limit, DateTimeOffset? before, RequestOptions options)
             => await GetJoinedPrivateArchivedThreadsAsync(limit, before, options);
         #endregion
 
