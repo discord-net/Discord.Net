@@ -83,6 +83,30 @@ namespace Discord.Rest
         public override Task<IReadOnlyCollection<RestThreadChannel>> GetActiveThreadsAsync(RequestOptions options = null)
             => throw new NotSupportedException("Threads are not supported in voice channels");
 
+        /// <inheritdoc />
+        /// <remarks>
+        ///     Threads are not supported in voice channels
+        /// </remarks>
+        /// <exception cref="NotSupportedException">Threads are not supported in voice channels</exception>
+        public override Task<IReadOnlyCollection<RestThreadChannel>> GetPublicArchivedThreadsAsync(int? limit, DateTimeOffset? before, RequestOptions options)
+            => throw new NotSupportedException("Threads are not supported in voice channels");
+
+        /// <inheritdoc />
+        /// <remarks>
+        ///     Threads are not supported in voice channels
+        /// </remarks>
+        /// <exception cref="NotSupportedException">Threads are not supported in voice channels</exception>
+        public override Task<IReadOnlyCollection<RestThreadChannel>> GetPrivateArchivedThreadsAsync(int? limit, DateTimeOffset? before, RequestOptions options)
+            => throw new NotSupportedException("Threads are not supported in voice channels");
+
+        /// <inheritdoc />
+        /// <remarks>
+        ///     Threads are not supported in voice channels.
+        /// </remarks>
+        /// <exception cref="NotSupportedException">Threads are not supported in voice channels</exception>
+        public override Task<IReadOnlyCollection<RestThreadChannel>> GetJoinedPrivateArchivedThreadsAsync(int? limit, DateTimeOffset? before, RequestOptions options)
+            => throw new NotSupportedException("Threads are not supported in voice channels");
+
         #endregion
 
 

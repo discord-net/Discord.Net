@@ -287,10 +287,6 @@ namespace Discord.Rest
         /// <inheritdoc />
         public Task SyncPermissionsAsync(RequestOptions options = null)
             => ChannelHelper.SyncPermissionsAsync(this, Discord, options);
-
-        /// <inheritdoc cref="ITextChannel.GetActiveThreadsAsync(RequestOptions)"/>
-        public virtual Task<IReadOnlyCollection<RestThreadChannel>> GetActiveThreadsAsync(RequestOptions options = null)
-            => ThreadHelper.GetActiveThreadsAsync(Guild, Id, Discord, options);
         #endregion
 
         #region Invites
@@ -329,10 +325,6 @@ namespace Discord.Rest
 
         async Task<IThreadChannel> ITextChannel.CreateThreadAsync(string name, ThreadType type, ThreadArchiveDuration autoArchiveDuration, IMessage message, bool? invitable, int? slowmode, RequestOptions options)
             => await CreateThreadAsync(name, type, autoArchiveDuration, message, invitable, slowmode, options);
-
-        /// <inheritdoc />
-        async Task<IReadOnlyCollection<IThreadChannel>> ITextChannel.GetActiveThreadsAsync(RequestOptions options)
-            => await GetActiveThreadsAsync(options);
         #endregion
 
         #region IMessageChannel
@@ -452,6 +444,32 @@ namespace Discord.Rest
                 return (await Guild.GetChannelAsync(CategoryId.Value, mode, options).ConfigureAwait(false)) as ICategoryChannel;
             return null;
         }
+        #endregion
+
+        #region IThreadContainerChannel
+        /// <inheritdoc cref="IThreadContainerChannel.GetActiveThreadsAsync(RequestOptions)"/>
+        public virtual Task<IReadOnlyCollection<RestThreadChannel>> GetActiveThreadsAsync(RequestOptions options = null)
+            => ThreadHelper.GetActiveThreadsAsync(Guild, Id, Discord, options);
+        /// <inheritdoc cref="IThreadContainerChannel.GetPublicArchivedThreadsAsync(int?,System.DateTimeOffset?,RequestOptions)"/>
+        public virtual Task<IReadOnlyCollection<RestThreadChannel>> GetPublicArchivedThreadsAsync(int? limit, DateTimeOffset? before, RequestOptions options)
+            => ThreadHelper.GetPublicArchivedThreadsAsync(this, Discord, limit, before, options);
+        /// <inheritdoc cref="IThreadContainerChannel.GetPrivateArchivedThreadsAsync(int?,System.DateTimeOffset?,RequestOptions)"/>
+        public virtual Task<IReadOnlyCollection<RestThreadChannel>> GetPrivateArchivedThreadsAsync(int? limit, DateTimeOffset? before, RequestOptions options)
+            => ThreadHelper.GetPrivateArchivedThreadsAsync(this, Discord, limit, before, options);
+        /// <inheritdoc cref="IThreadContainerChannel.GetJoinedPrivateArchivedThreadsAsync(int?,System.DateTimeOffset?,RequestOptions)"/>
+        public virtual Task<IReadOnlyCollection<RestThreadChannel>> GetJoinedPrivateArchivedThreadsAsync(int? limit, DateTimeOffset? before, RequestOptions options)
+            => ThreadHelper.GetJoinedPrivateArchivedThreadsAsync(this, Discord, limit, before, options);
+
+
+        /// <inheritdoc />
+        async Task<IReadOnlyCollection<IThreadChannel>> IThreadContainerChannel.GetActiveThreadsAsync(RequestOptions options)
+            => await GetActiveThreadsAsync(options);
+        async Task<IReadOnlyCollection<IThreadChannel>> IThreadContainerChannel.GetPublicArchivedThreadsAsync(int? limit, DateTimeOffset? before, RequestOptions options)
+            => await GetPublicArchivedThreadsAsync(limit, before, options);
+        async Task<IReadOnlyCollection<IThreadChannel>> IThreadContainerChannel.GetPrivateArchivedThreadsAsync(int? limit, DateTimeOffset? before, RequestOptions options)
+            => await GetPrivateArchivedThreadsAsync(limit, before, options);
+        async Task<IReadOnlyCollection<IThreadChannel>> IThreadContainerChannel.GetJoinedPrivateArchivedThreadsAsync(int? limit, DateTimeOffset? before, RequestOptions options)
+            => await GetJoinedPrivateArchivedThreadsAsync(limit, before, options);
         #endregion
     }
 }
