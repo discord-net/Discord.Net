@@ -26,6 +26,9 @@ namespace Discord.API
         [JsonProperty("max_values")]
         public int MaxValues { get; set; }
 
+        [JsonProperty("required")]
+        public bool Required { get; set; }
+
         [JsonProperty("disabled")]
         public bool Disabled { get; set; }
 
@@ -51,6 +54,7 @@ namespace Discord.API
             Placeholder = component.Placeholder;
             MinValues = component.MinValues;
             MaxValues = component.MaxValues;
+            Required = component.IsRequired;
             Disabled = component.IsDisabled;
             ChannelTypes = component.ChannelTypes.ToArray();
             DefaultValues = component.DefaultValues.Select(x => new SelectMenuDefaultValue {Id = x.Id, Type = x.Type}).ToArray();
