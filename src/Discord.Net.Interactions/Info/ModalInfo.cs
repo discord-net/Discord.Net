@@ -1,3 +1,6 @@
+using Discord.Interactions.Builders;
+using Discord.Interactions.Builders.Modals.Inputs;
+using Discord.Interactions.Info.InputComponents;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -43,17 +46,40 @@ namespace Discord.Interactions
         /// </summary>
         public IReadOnlyCollection<TextInputComponentInfo> TextComponents { get; }
 
+        /// <summary>
+        ///     Get a collection of the select menu components of this modal.
+        /// </summary>
+        public IReadOnlyCollection<SelectMenuInputComponentInfo> SelectMenuComponents { get; }
+
+        public IReadOnlyCollection<UserSelectInputComponentInfo> UserSelectComponents { get; }
+
+        public IReadOnlyCollection<RoleSelectInputComponentInfo> RoleSelectComponents { get; }
+
+        public IReadOnlyCollection<MentionableSelectInputComponentInfo> MentionableSelectComponents { get; }
+
+        public IReadOnlyCollection<ChannelSelectInputComponentInfo> ChannelSelectComponents { get; }
+
         internal ModalInfo(Builders.ModalBuilder builder)
         {
             Title = builder.Title;
             Type = builder.Type;
-            Components = builder.Components.Select(x => x switch
+            Components = builder.Components.Select<IInputComponentBuilder, InputComponentInfo>(x => x switch
             {
-                Builders.TextInputComponentBuilder textComponent => textComponent.Build(this),
+                TextInputComponentBuilder textComponent => textComponent.Build(this),
+                SelectMenuInputComponentBuilder selectMenuComponent => selectMenuComponent.Build(this),
+                RoleSelectInputComponentBuilder roleSelectComponent => roleSelectComponent.Build(this),
+                ChannelSelectInputComponentBuilder channelSelectComponent => channelSelectComponent.Build(this),
+                UserSelectInputComponentBuilder userSelectComponent => userSelectComponent.Build(this),
+                MentionableSelectInputComponentBuilder mentionableSelectComponent => mentionableSelectComponent.Build(this),
                 _ => throw new InvalidOperationException($"{x.GetType().FullName} isn't a supported modal input component builder type.")
             }).ToImmutableArray();
 
             TextComponents = Components.OfType<TextInputComponentInfo>().ToImmutableArray();
+            SelectMenuComponents = Components.OfType<SelectMenuInputComponentInfo>().ToImmutableArray();
+            UserSelectComponents = Components.OfType<UserSelectInputComponentInfo>().ToImmutableArray();
+            RoleSelectComponents = Components.OfType<RoleSelectInputComponentInfo>().ToImmutableArray();
+            MentionableSelectComponents = Components.OfType<MentionableSelectInputComponentInfo>().ToImmutableArray();
+            ChannelSelectComponents = Components.OfType<ChannelSelectInputComponentInfo>().ToImmutableArray();
 
             _interactionService = builder._interactionService;
             _initializer = builder.ModalInitializer;

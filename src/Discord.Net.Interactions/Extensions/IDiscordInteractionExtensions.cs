@@ -1,4 +1,6 @@
+using Discord.Interactions.Info.InputComponents;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Discord.Interactions
@@ -57,7 +59,7 @@ namespace Discord.Interactions
         /// <param name="options">The request options for this <see langword="async"/> request.</param>
         /// <param name="modifyModal">Delegate that can be used to modify the modal.</param>
         /// <returns>A task that represents the asynchronous operation of responding to the interaction.</returns>
-        public static Task RespondWithModalAsync<T>(this IDiscordInteraction interaction, string customId, T modal, RequestOptions options = null,
+        public static async Task RespondWithModalAsync<T>(this IDiscordInteraction interaction, string customId, T modal, RequestOptions options = null,
             Action<ModalBuilder> modifyModal = null)
             where T : class, IModal
         {
@@ -71,13 +73,30 @@ namespace Discord.Interactions
                 {
                     case TextInputComponentInfo textComponent:
                         {
-                            var boxedValue = textComponent.Getter(modal);
-                            var value = textComponent.TypeOverridesToString
-                                ? boxedValue?.ToString()
-                                : boxedValue as string;
+                            var inputBuilder = new TextInputBuilder(textComponent.Label, textComponent.CustomId, textComponent.Style, textComponent.Placeholder, textComponent.IsRequired ? textComponent.MinLength : null,
+                            textComponent.MaxLength, textComponent.IsRequired);
 
-                            builder.AddTextInput(textComponent.Label, textComponent.CustomId, textComponent.Style, textComponent.Placeholder, textComponent.IsRequired ? textComponent.MinLength : null,
-                                textComponent.MaxLength, textComponent.IsRequired, value);
+                            await textComponent.TypeConverter.WriteAsync(inputBuilder, textComponent, textComponent.Getter(modal));
+
+                            builder.AddTextInput(inputBuilder);
+                        }
+                        break;
+                    case SelectMenuInputComponentInfo selectMenuComponent:
+                        {
+                            var inputBuilder = new SelectMenuBuilder(selectMenuComponent.CustomId, selectMenuComponent.Options.Select(x => new SelectMenuOptionBuilder(x)).ToList(), selectMenuComponent.Placeholder, selectMenuComponent.MaxValues, selectMenuComponent.MinValues, false);
+
+                            await selectMenuComponent.TypeConverter.WriteAsync(inputBuilder, selectMenuComponent, selectMenuComponent.Getter(modal));
+
+                            //todo: add to builder
+                        }
+                        break;
+                    case SnowflakeSelectInputComponentInfo snowflakeSelectComponent:
+                        {
+                            var inputBuilder = new SelectMenuBuilder(snowflakeSelectComponent.CustomId, null, snowflakeSelectComponent.Placeholder, snowflakeSelectComponent.MaxValues, snowflakeSelectComponent.MinValues, false, snowflakeSelectComponent.ComponentType, null, snowflakeSelectComponent.DefaultValues.ToList());
+
+                            await snowflakeSelectComponent.TypeConverter.WriteAsync(inputBuilder, snowflakeSelectComponent, snowflakeSelectComponent.Getter(modal));
+
+                            //todo: add to builder
                         }
                         break;
                     default:
@@ -86,7 +105,7 @@ namespace Discord.Interactions
 
             modifyModal?.Invoke(builder);
 
-            return interaction.RespondWithModalAsync(builder.Build(), options);
+            await interaction.RespondWithModalAsync(builder.Build(), options);
         }
 
         private static Task SendModalResponseAsync(IDiscordInteraction interaction, string customId, ModalInfo modalInfo, RequestOptions options = null, Action<ModalBuilder> modifyModal = null)

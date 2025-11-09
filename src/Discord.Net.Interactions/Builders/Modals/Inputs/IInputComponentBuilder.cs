@@ -1,3 +1,4 @@
+using Discord.Interactions.TypeConverters.ModalInputs;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -45,12 +46,12 @@ namespace Discord.Interactions.Builders
         PropertyInfo PropertyInfo { get; }
 
         /// <summary>
-        ///     Get the <see cref="ComponentTypeConverter"/> assigned to this input.
+        ///     Get the <see cref="ModalComponentTypeConverter"/> assigned to this input.
         /// </summary>
-        ComponentTypeConverter TypeConverter { get; }
+        ModalComponentTypeConverter TypeConverter { get; }
 
         /// <summary>
-        ///     Gets the default value of this input component.
+        ///     Gets the default value of this input component property.
         /// </summary>
         object DefaultValue { get; }
 
