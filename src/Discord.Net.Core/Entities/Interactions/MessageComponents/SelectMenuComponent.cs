@@ -38,6 +38,11 @@ public class SelectMenuComponent : IInteractableComponent
     public int MaxValues { get; }
 
     /// <summary>
+    ///     Gets whether this menu is required to answer in a modal.
+    /// </summary>
+    public bool IsRequired { get;}
+
+    /// <summary>
     ///     Gets whether this menu is disabled or not.
     /// </summary>
     public bool IsDisabled { get; }
@@ -58,7 +63,7 @@ public class SelectMenuComponent : IInteractableComponent
     public SelectMenuBuilder ToBuilder()
         => new(this);
 
-    internal SelectMenuComponent(string customId, List<SelectMenuOption> options, string placeholder, int minValues, int maxValues,
+    internal SelectMenuComponent(string customId, List<SelectMenuOption> options, string placeholder, int minValues, int maxValues, bool required,
         bool disabled, ComponentType type, int? id, IEnumerable<ChannelType> channelTypes = null, IEnumerable<SelectMenuDefaultValue> defaultValues = null)
     {
         CustomId = customId;
@@ -66,6 +71,7 @@ public class SelectMenuComponent : IInteractableComponent
         Placeholder = placeholder;
         MinValues = minValues;
         MaxValues = maxValues;
+        IsRequired = required;
         IsDisabled = disabled;
         Type = type;
         Id = id;
