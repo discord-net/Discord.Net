@@ -504,7 +504,7 @@ namespace Discord.WebSocket
                 {
                     CustomId = modal.CustomId,
                     Title = modal.Title,
-                    Components = modal.Component.Components.Select(x => new Discord.API.ActionRowComponent(x)).ToArray()
+                    Components = modal.Component.Components.Select(x => x.ToModel()).ToArray()
                 }
             };
 

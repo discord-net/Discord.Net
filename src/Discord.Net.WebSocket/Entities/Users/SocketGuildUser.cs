@@ -241,7 +241,12 @@ namespace Discord.WebSocket
 
         /// <inheritdoc />
         public Task ModifyAsync(Action<GuildUserProperties> func, RequestOptions options = null)
-            => UserHelper.ModifyAsync(this, Discord, func, options);
+        {
+            var args = new GuildUserProperties();
+            func(args);
+            return UserHelper.ModifyAsync(Guild, this, Discord, args, options);
+        }
+
         /// <inheritdoc />
         public Task KickAsync(string reason = null, RequestOptions options = null)
             => UserHelper.KickAsync(this, Discord, reason, options);

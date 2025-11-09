@@ -8,7 +8,7 @@ namespace Discord
     /// <summary>
     ///     Represents a generic channel in a guild that can send and receive messages.
     /// </summary>
-    public interface ITextChannel : IMessageChannel, IMentionable, INestedChannel, IIntegrationChannel
+    public interface ITextChannel : IMessageChannel, IMentionable, INestedChannel, IIntegrationChannel, IThreadContainerChannel
     {
         /// <summary>
         ///     Gets a value that indicates whether the channel is NSFW.
@@ -125,7 +125,7 @@ namespace Discord
         ///     The duration on which this thread archives after.
         ///     <para>
         ///         <b>Note: </b> Options <see cref="ThreadArchiveDuration.OneWeek"/> and <see cref="ThreadArchiveDuration.ThreeDays"/>
-        ///         are only available for guilds that are boosted. You can check in the <see cref="IGuild.Features"/> to see if the 
+        ///         are only available for guilds that are boosted. You can check in the <see cref="IGuild.Features"/> to see if the
         ///         guild has the <b>THREE_DAY_THREAD_ARCHIVE</b> and <b>SEVEN_DAY_THREAD_ARCHIVE</b>.
         ///     </para>
         /// </param>
@@ -139,14 +139,5 @@ namespace Discord
         Task<IThreadChannel> CreateThreadAsync(string name, ThreadType type = ThreadType.PublicThread, ThreadArchiveDuration autoArchiveDuration = ThreadArchiveDuration.OneDay,
             IMessage message = null, bool? invitable = null, int? slowmode = null, RequestOptions options = null);
 
-        /// <summary>
-        ///     Gets a collection of active threads within this channel.
-        /// </summary>
-        /// <param name="options">The options to be used when sending the request.</param>
-        /// <returns>
-        ///     A task that represents an asynchronous get operation for retrieving the threads. The task result contains
-        ///     a collection of active threads.
-        /// </returns>
-        Task<IReadOnlyCollection<IThreadChannel>> GetActiveThreadsAsync(RequestOptions options = null);
     }
 }

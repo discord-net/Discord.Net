@@ -38,9 +38,10 @@ namespace Discord.Rest
             var embed = args.Embed;
             var embeds = args.Embeds;
 
-            bool hasText = args.Content.IsSpecified && string.IsNullOrEmpty(args.Content.Value);
-            bool hasEmbeds = embed.IsSpecified && embed.Value != null || embeds.IsSpecified && embeds.Value?.Length > 0;
-            bool hasComponents = args.Components.IsSpecified && args.Components.Value != null;
+            bool hasText = args.Content.IsSpecified && !string.IsNullOrEmpty(args.Content.Value);
+            bool hasEmbeds = embed is { IsSpecified: true, Value: not null }
+                             || embeds is { IsSpecified: true, Value.Length: > 0 };
+            bool hasComponents = args.Components is { IsSpecified: true, Value: not null };
             bool hasAttachments = args.Attachments.IsSpecified;
             bool hasFlags = args.Flags.IsSpecified;
 
@@ -50,7 +51,7 @@ namespace Discord.Rest
 
             if (args.AllowedMentions.IsSpecified)
             {
-                AllowedMentions allowedMentions = args.AllowedMentions.Value;
+                var allowedMentions = args.AllowedMentions.Value;
                 Preconditions.AtMost(allowedMentions?.RoleIds?.Count ?? 0, 100, nameof(allowedMentions.RoleIds), "A max of 100 role Ids are allowed.");
                 Preconditions.AtMost(allowedMentions?.UserIds?.Count ?? 0, 100, nameof(allowedMentions.UserIds), "A max of 100 user Ids are allowed.");
 
@@ -73,12 +74,12 @@ namespace Discord.Rest
 
             var apiEmbeds = embed.IsSpecified || embeds.IsSpecified ? new List<API.Embed>() : null;
 
-            if (embed.IsSpecified && embed.Value != null)
+            if (embed is { IsSpecified: true, Value: not null })
             {
                 apiEmbeds.Add(embed.Value.ToModel());
             }
 
-            if (embeds.IsSpecified && embeds.Value != null)
+            if (embeds is { IsSpecified: true, Value: not null })
             {
                 apiEmbeds.AddRange(embeds.Value.Select(x => x.ToModel()));
             }
@@ -87,7 +88,7 @@ namespace Discord.Rest
 
             if (!args.Attachments.IsSpecified)
             {
-                var apiArgs = new API.Rest.ModifyMessageParams
+                var apiArgs = new ModifyMessageParams
                 {
                     Content = args.Content,
                     Embeds = apiEmbeds?.ToArray() ?? Optional<API.Embed[]>.Unspecified,

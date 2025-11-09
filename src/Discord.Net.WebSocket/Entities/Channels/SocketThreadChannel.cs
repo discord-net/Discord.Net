@@ -387,6 +387,30 @@ namespace Discord.WebSocket
         public override Task<IReadOnlyCollection<RestThreadChannel>> GetActiveThreadsAsync(RequestOptions options = null)
             => throw new NotSupportedException("This method is not supported in threads.");
 
+        /// <inheritdoc />
+        /// <remarks>
+        ///     This method is not supported in threads.
+        /// </remarks>
+        /// <exception cref="NotSupportedException">This method is not supported in threads.</exception>
+        public override Task<IReadOnlyCollection<RestThreadChannel>> GetPublicArchivedThreadsAsync(int? limit, DateTimeOffset? before, RequestOptions options)
+            => throw new NotSupportedException("This method is not supported in threads.");
+
+        /// <inheritdoc />
+        /// <remarks>
+        ///     This method is not supported in threads.
+        /// </remarks>
+        /// <exception cref="NotSupportedException">This method is not supported in threads.</exception>
+        public override Task<IReadOnlyCollection<RestThreadChannel>> GetPrivateArchivedThreadsAsync(int? limit, DateTimeOffset? before, RequestOptions options)
+            => throw new NotSupportedException("This method is not supported in threads.");
+
+        /// <inheritdoc />
+        /// <remarks>
+        ///     This method is not supported in threads.
+        /// </remarks>
+        /// <exception cref="NotSupportedException">This method is not supported in threads.</exception>
+        public override Task<IReadOnlyCollection<RestThreadChannel>> GetJoinedPrivateArchivedThreadsAsync(int? limit, DateTimeOffset? before, RequestOptions options)
+            => throw new NotSupportedException("This method is not supported in threads.");
+
         string IChannel.Name => Name;
     }
 }

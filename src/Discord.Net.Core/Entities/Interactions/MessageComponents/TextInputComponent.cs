@@ -49,15 +49,23 @@ public class TextInputComponent : IInteractableComponent
     /// </summary>
     public string Value { get; }
 
-
     /// <summary>
     ///     Converts a <see cref="TextInputComponent"/> to a <see cref="TextInputBuilder"/>.
     /// </summary>
     public TextInputBuilder ToBuilder()
-        => new TextInputBuilder(this);
+        => new(this);
 
-    internal TextInputComponent(string customId, string label, string placeholder, int? minLength, int? maxLength,
-        TextInputStyle style, bool? required, string value, int? id)
+    internal TextInputComponent(
+        string customId,
+        string label,
+        string placeholder,
+        int? minLength,
+        int? maxLength,
+        TextInputStyle style,
+        bool? required,
+        string value,
+        int? id
+    )
     {
         CustomId = customId;
         Label = label;
