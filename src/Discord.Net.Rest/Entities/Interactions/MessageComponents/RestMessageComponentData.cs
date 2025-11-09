@@ -99,7 +99,7 @@ namespace Discord.Rest
             Type = component.Type;
 
             if (component is API.TextInputComponent textInput)
-                Value = textInput.Value.Value;
+                Value = textInput.Value.GetValueOrDefault();
 
             if (component is API.SelectMenuComponent select)
             {
@@ -128,6 +128,11 @@ namespace Discord.Rest
                         ? select.Resolved.Value.Roles.Value.Select(role => RestRole.Create(discord, guild, role.Value)).ToImmutableArray()
                         : null;
                 }
+            }
+
+            if (component is API.FileUploadComponent fileUpload)
+            {
+                Values = fileUpload.Values.GetValueOrDefault(null);
             }
         }
     }

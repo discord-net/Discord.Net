@@ -45,18 +45,49 @@ namespace Discord
         /// </summary>
         ChannelSelect = 8,
 
+        /// <summary>
+        ///     A container to display text alongside an accessory component.
+        /// </summary>
         Section = 9,
 
+        /// <summary>
+        ///     A component displaying Markdown text.
+        /// </summary>
         TextDisplay = 10,
 
+        /// <summary>
+        ///     A small image that can be used as an accessory.
+        /// </summary>
         Thumbnail = 11,
 
+        /// <summary>
+        ///     A component displaying images and other media.
+        /// </summary>
         MediaGallery = 12,
 
+        /// <summary>
+        ///     A component displaying an attached file.
+        /// </summary>
         File = 13,
 
+        /// <summary>
+        ///     A component to add vertical padding between other components.
+        /// </summary>
         Separator = 14,
 
+        /// <summary>
+        ///     A container that visually groups a set of components.
+        /// </summary>
         Container = 17,
+
+        /// <summary>
+        ///     A layout component that wraps modal components (text input, select menu or file upload) with a label and description.
+        /// </summary>
+        Label = 18,
+
+        /// <summary>
+        ///     A component that allows users to upload files in modals.
+        /// </summary>
+        FileUpload = 19
     }
 }

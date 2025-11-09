@@ -8,6 +8,9 @@ namespace Discord.API
         public string CustomId { get; set; }
 
         [JsonProperty("components")]
-        public API.ActionRowComponent[] Components { get; set; }
+        public IMessageComponent[] Components { get; set; }
+
+        [JsonProperty("resolved")]
+        public Optional<ModalInteractionDataResolved> Resolved { get; set; }
     }
 }

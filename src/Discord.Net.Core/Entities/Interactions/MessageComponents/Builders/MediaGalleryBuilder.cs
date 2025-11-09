@@ -18,7 +18,7 @@ public class MediaGalleryBuilder : IMessageComponentBuilder
     /// <inheritdoc/>
     public int? Id { get; set; }
 
-    private List<MediaGalleryItemProperties> _items = new();
+    private List<MediaGalleryItemProperties> _items = [];
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="MediaGalleryBuilder"/>.
