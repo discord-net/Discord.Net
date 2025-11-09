@@ -2,6 +2,9 @@ using System;
 
 namespace Discord;
 
+/// <summary>
+///     Represents a class used to build <see cref="FileComponent"/>'s.
+/// </summary>
 public class FileComponentBuilder : IMessageComponentBuilder
 {
     /// <inheritdoc />

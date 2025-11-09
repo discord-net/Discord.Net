@@ -1187,6 +1187,9 @@ namespace Discord.WebSocket
                 return sticker;
             return null;
         }
+        /// <inheritdoc />
+        public Task<ImmutableDictionary<ulong, int>> GetRoleUserCountsAsync(RequestOptions options = null)
+            => GuildHelper.GetRoleUserCountsAsync(this, Discord, options);
         #endregion
 
         #region Users
@@ -1340,6 +1343,15 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public Task<MemberSearchResult> SearchUsersAsyncV2(int limit = DiscordConfig.MaxUsersPerBatch, MemberSearchPropertiesV2 args = null, RequestOptions options = null)
             => GuildHelper.SearchUsersAsyncV2(this, Discord, limit, args, options);
+        
+        /// <inheritdoc />
+        public Task ModifyCurrentUserAsync(Action<SelfGuildUserProperties> props, RequestOptions options = null)
+        {
+            var args = new SelfGuildUserProperties();
+            props(args);
+            return UserHelper.ModifyCurrentUserAsync(this, Discord.CurrentUser, Discord, args, options);
+        }
+
         #endregion
 
         #region Guild Events

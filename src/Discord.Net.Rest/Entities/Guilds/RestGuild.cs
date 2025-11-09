@@ -412,6 +412,10 @@ namespace Discord.Rest
         /// <inheritdoc />
         public Task<BulkBanResult> BulkBanAsync(IEnumerable<ulong> userIds, int? deleteMessageSeconds = null, RequestOptions options = null)
             => GuildHelper.BulkBanAsync(this, Discord, userIds.ToArray(), deleteMessageSeconds, options);
+
+        /// <inheritdoc />
+        public Task<ImmutableDictionary<ulong, int>> GetRoleUserCountsAsync(RequestOptions options = null)
+            => GuildHelper.GetRoleUserCountsAsync(this, Discord, options);
         #endregion
 
         #region Channels
@@ -987,6 +991,15 @@ namespace Discord.Rest
         /// <inheritdoc />
         public Task<MemberSearchResult> SearchUsersAsyncV2(int limit = DiscordConfig.MaxUsersPerBatch, MemberSearchPropertiesV2 args = null, RequestOptions options = null)
             => GuildHelper.SearchUsersAsyncV2(this, Discord, limit, args, options);
+
+        /// <inheritdoc />
+        public Task ModifyCurrentUserAsync(Action<SelfGuildUserProperties> props, RequestOptions options = null)
+        {
+            var args = new SelfGuildUserProperties();
+            props(args);
+            return UserHelper.ModifyCurrentUserAsync(this, Discord.CurrentUser, Discord, args, options);
+        }
+
         #endregion
 
         #region Audit logs

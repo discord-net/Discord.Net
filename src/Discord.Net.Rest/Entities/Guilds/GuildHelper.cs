@@ -651,6 +651,13 @@ namespace Discord.Rest
             return model is null ? null : RestRole.Create(client, guild, model);
         }
 
+        public static async Task<ImmutableDictionary<ulong, int>> GetRoleUserCountsAsync(IGuild guild, BaseDiscordClient client, RequestOptions options = null)
+        {
+            var model = await client.ApiClient.GetRoleUserCountsAsync(guild.Id, options);
+            return model.ToImmutableDictionary();
+        }
+
+
         #endregion
 
         #region Users

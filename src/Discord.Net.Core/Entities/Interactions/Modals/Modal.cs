@@ -10,7 +10,9 @@ namespace Discord
         /// </summary>
         public string Title { get; set; }
 
-        /// <inheritdoc/>
+        /// <summary>
+        ///     Gets the custom id of the modal.
+        /// </summary>
         public string CustomId { get; set; }
 
         /// <summary>

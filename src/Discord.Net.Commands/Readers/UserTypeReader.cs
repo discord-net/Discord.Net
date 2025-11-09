@@ -61,10 +61,10 @@ namespace Discord.Commands
 
             //By global (display) name
             {
-                await channelUsers
+                await foreach (var channelUser in channelUsers
                     .Where(x => string.Equals(input, x.GlobalName, StringComparison.OrdinalIgnoreCase))
-                    .ForEachAsync(channelUser => AddResult(results, channelUser as T, channelUser.GlobalName == input ? 0.65f : 0.55f))
-                    .ConfigureAwait(false);
+                    .ConfigureAwait(false))
+                    AddResult(results, channelUser as T, channelUser.GlobalName == input ? 0.65f : 0.55f);
 
                 foreach (var guildUser in guildUsers.Where(x => string.Equals(input, x.GlobalName, StringComparison.OrdinalIgnoreCase)))
                     AddResult(results, guildUser as T, guildUser.GlobalName == input ? 0.60f : 0.50f);
@@ -72,10 +72,9 @@ namespace Discord.Commands
 
             //By Username (0.5-0.6)
             {
-                await channelUsers
-                    .Where(x => string.Equals(input, x.Username, StringComparison.OrdinalIgnoreCase))
-                    .ForEachAsync(channelUser => AddResult(results, channelUser as T, channelUser.Username == input ? 0.65f : 0.55f))
-                    .ConfigureAwait(false);
+                await foreach (var channelUser in channelUsers
+                    .Where(x => string.Equals(input, x.Username, StringComparison.OrdinalIgnoreCase)).ConfigureAwait(false))
+                    AddResult(results, channelUser as T, channelUser.Username == input ? 0.65f : 0.55f);
 
                 foreach (var guildUser in guildUsers.Where(x => string.Equals(input, x.Username, StringComparison.OrdinalIgnoreCase)))
                     AddResult(results, guildUser as T, guildUser.Username == input ? 0.60f : 0.50f);
@@ -83,10 +82,10 @@ namespace Discord.Commands
 
             //By Nickname (0.5-0.6)
             {
-                await channelUsers
+                await foreach (var channelUser in channelUsers
                     .Where(x => string.Equals(input, (x as IGuildUser)?.Nickname, StringComparison.OrdinalIgnoreCase))
-                    .ForEachAsync(channelUser => AddResult(results, channelUser as T, (channelUser as IGuildUser).Nickname == input ? 0.65f : 0.55f))
-                    .ConfigureAwait(false);
+                    .ConfigureAwait(false))
+                    AddResult(results, channelUser as T, (channelUser as IGuildUser).Nickname == input ? 0.65f : 0.55f);
 
                 foreach (var guildUser in guildUsers.Where(x => string.Equals(input, x.Nickname, StringComparison.OrdinalIgnoreCase)))
                     AddResult(results, guildUser as T, guildUser.Nickname == input ? 0.60f : 0.50f);

@@ -10,9 +10,9 @@ namespace Discord
         /// <summary>
         ///     Gets the components to be used in a modal.
         /// </summary>
-        public IReadOnlyCollection<ActionRowComponent> Components { get; }
+        public IReadOnlyCollection<IMessageComponent> Components { get; }
 
-        internal ModalComponent(List<ActionRowComponent> components)
+        internal ModalComponent(List<IMessageComponent> components)
         {
             Components = components;
         }

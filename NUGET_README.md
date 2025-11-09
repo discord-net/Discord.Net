@@ -70,7 +70,7 @@ alternatively, you may choose to install the
 
 Discord supports only TLS1.2+ on all their websites including the API since 07/19/2022.
 .NET Framework does not support this protocol by default.
-If you depend on .NET Framework, it is suggested to upgrade your project to `net6-windows`.
+If you depend on .NET Framework, it is suggested to upgrade your project to `net8-windows`.
 This framework supports most of the windows-only features introduced by fx, and resolves startup errors from the TLS protocol mismatch.
 
 ## 🗃️ Versioning Guarantees

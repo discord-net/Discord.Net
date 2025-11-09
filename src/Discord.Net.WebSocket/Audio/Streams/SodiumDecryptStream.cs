@@ -9,8 +9,14 @@ namespace Discord.Audio.Streams
     /// </summary>
     public class SodiumDecryptStream : AudioOutStream
     {
+        private const int RtpHeaderSize = 12;
+        private const int ExtendedRtpHeaderSize = RtpHeaderSize + 4;
+        private const int NonceSize = 24;
+        private const int NonceCounterSize = 4;
+
         private readonly AudioClient _client;
         private readonly AudioStream _next;
+        private readonly byte[] _rtpHeader;
         private readonly byte[] _nonce;
 
         public override bool CanRead => true;
@@ -21,7 +27,8 @@ namespace Discord.Audio.Streams
         {
             _next = next;
             _client = (AudioClient)client;
-            _nonce = new byte[24];
+            _rtpHeader = new byte[ExtendedRtpHeaderSize];
+            _nonce = new byte[NonceSize];
         }
 
         public override Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancelToken)
@@ -31,9 +38,31 @@ namespace Discord.Audio.Streams
             if (_client.SecretKey == null)
                 return Task.CompletedTask;
 
-            Buffer.BlockCopy(buffer, 0, _nonce, 0, 12); //Copy RTP header to nonce
-            count = SecretBox.Decrypt(buffer, offset + 12, count - 12, buffer, offset + 12, _nonce, _client.SecretKey);
-            return _next.WriteAsync(buffer, 0, count + 12, cancelToken);
+            // Extract nonce counter from the end of the payload.
+            for (int i = 0; i < NonceCounterSize; i++)
+                _nonce[i] = buffer[offset + count - NonceCounterSize + i];
+
+            // Extract RTP header
+            bool hasExtendedHeader = (buffer[0] & 0x10) != 0;
+            int rtpHeaderSize = hasExtendedHeader ? ExtendedRtpHeaderSize : RtpHeaderSize;
+            Buffer.BlockCopy(buffer, offset, _rtpHeader, 0, rtpHeaderSize);
+
+            // Decrypt payload
+            int payloadOffset = offset + rtpHeaderSize;
+            int payloadLength = count - offset - rtpHeaderSize - NonceCounterSize;
+            int decryptedLength = SecretBox.Decrypt(
+                buffer,
+                payloadOffset,
+                payloadLength,
+                buffer,
+                payloadOffset,
+                _rtpHeader,
+                rtpHeaderSize,
+                _nonce,
+                _client.SecretKey);
+
+            int packageLength = rtpHeaderSize + decryptedLength;
+            return _next.WriteAsync(buffer, offset, packageLength, cancelToken);
         }
 
         public override Task FlushAsync(CancellationToken cancelToken)

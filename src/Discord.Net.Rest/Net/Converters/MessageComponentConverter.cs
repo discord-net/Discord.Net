@@ -36,7 +36,7 @@ namespace Discord.Net.Converters
                 case ComponentType.MentionableSelect:
                 case ComponentType.RoleSelect:
                 case ComponentType.UserSelect:
-                    messageComponent = new API.SelectMenuComponent();
+                    messageComponent = new API.SelectMenuComponent(){Type = (ComponentType)typeProperty};
                     break;
                 case ComponentType.TextInput:
                     messageComponent = new API.TextInputComponent();
@@ -61,6 +61,12 @@ namespace Discord.Net.Converters
                     break;
                 case ComponentType.Container:
                     messageComponent = new API.ContainerComponent();
+                    break;
+                case ComponentType.Label:
+                    messageComponent = new API.LabelComponent();
+                    break;
+                case ComponentType.FileUpload:
+                    messageComponent = new API.FileUploadComponent();
                     break;
                 default:
                     throw new JsonSerializationException($"Unknown component type value '{typeProperty}' while deserializing message component");
