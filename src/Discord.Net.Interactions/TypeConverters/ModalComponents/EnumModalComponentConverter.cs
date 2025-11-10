@@ -26,7 +26,7 @@ internal sealed class EnumModalComponentConverter<T> : ModalComponentTypeConvert
         _options = members.Select(x =>
         {
             var selectMenuOptionAttr = x.GetCustomAttribute<SelectMenuOptionAttribute>();
-            return new SelectMenuOptionBuilder(x.GetCustomAttribute<ChoiceDisplayAttribute>()?.Name ?? x.Name, x.Name, selectMenuOptionAttr?.Description, Emote.Parse(selectMenuOptionAttr?.Emote), selectMenuOptionAttr?.IsDefault);
+            return new SelectMenuOptionBuilder(x.GetCustomAttribute<ChoiceDisplayAttribute>()?.Name ?? x.Name, x.Name, selectMenuOptionAttr?.Description, selectMenuOptionAttr?.Emote != null ? Emote.Parse(selectMenuOptionAttr?.Emote) : null, selectMenuOptionAttr?.IsDefault);
         }).ToImmutableArray();
     }
 
