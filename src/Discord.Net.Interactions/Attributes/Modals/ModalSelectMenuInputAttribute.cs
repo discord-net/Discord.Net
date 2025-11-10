@@ -1,11 +1,20 @@
 namespace Discord.Interactions.Attributes.Modals;
 
-public sealed class ModalSelectMenuInputAttribute : SelectInputAttribute
+/// <summary>
+///     Marks a <see cref="IModal"/> property as a select menu input.
+/// </summary>
+public sealed class ModalSelectMenuInputAttribute : ModalSelectInputAttribute
 {
+    /// <inheritdoc />
     public override ComponentType ComponentType => ComponentType.SelectMenu;
 
-    public ModalSelectMenuInputAttribute(string customId) : base(customId)
+    /// <summary>
+    ///     Create a new <see cref="ModalSelectMenuInputAttribute"/>.
+    /// </summary>
+    /// <param name="customId">Custom ID of the select menu component.</param>
+    /// <param name="minValues">Minimum number of values that can be selected.</param>
+    /// <param name="maxValues">Maximum number of values that can be selected.</param>
+    public ModalSelectMenuInputAttribute(string customId, int minValues, int maxValues) : base(customId)
     {
-
     }
 }

@@ -1,10 +1,20 @@
 namespace Discord.Interactions.Attributes.Modals;
 
-public class ModalRoleSelectInputAttribute : SelectInputAttribute
+/// <summary>
+///     Marks a <see cref="IModal"/> property as a role select input.
+/// </summary>
+public class ModalRoleSelectInputAttribute : ModalSelectInputAttribute
 {
+    /// <inheritdoc/>
     public override ComponentType ComponentType => ComponentType.RoleSelect;
 
-    public ModalRoleSelectInputAttribute(string customId) : base(customId)
+    /// <summary>
+    ///     Create a new <see cref="ModalRoleSelectInputAttribute"/>.
+    /// </summary>
+    /// <param name="customId">Custom ID of the role select component.</param>
+    /// <param name="minValues">Minimum number of values that can be selected.</param>
+    /// <param name="maxValues">Maximum number of values that can be selected.</param>
+    public ModalRoleSelectInputAttribute(string customId, int minValues = 1, int maxValues = 1) : base(customId, minValues, maxValues)
     {
     }
 }
