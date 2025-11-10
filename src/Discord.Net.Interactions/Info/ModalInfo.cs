@@ -1,165 +1,181 @@
 using Discord.Interactions.Builders;
-using Discord.Interactions.Builders.Modals.Inputs;
-using Discord.Interactions.Info.InputComponents;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Discord.Interactions
+namespace Discord.Interactions;
+
+/// <summary>
+///     Represents a cached object initialization delegate.
+/// </summary>
+/// <param name="args">Property arguments array.</param>
+/// <returns>
+///     Returns the constructed object.
+/// </returns>
+public delegate IModal ModalInitializer(object[] args);
+
+/// <summary>
+///     Represents the info class of an <see cref="IModal"/> form.
+/// </summary>
+public class ModalInfo
 {
-    /// <summary>
-    ///     Represents a cached object initialization delegate.
-    /// </summary>
-    /// <param name="args">Property arguments array.</param>
-    /// <returns>
-    ///     Returns the constructed object.
-    /// </returns>
-    public delegate IModal ModalInitializer(object[] args);
+    internal readonly InteractionService _interactionService;
+    internal readonly ModalInitializer _initializer;
 
     /// <summary>
-    ///     Represents the info class of an <see cref="IModal"/> form.
+    ///     Gets the title of this modal.
     /// </summary>
-    public class ModalInfo
+    public string Title { get; }
+
+    /// <summary>
+    ///     Gets the <see cref="IModal"/> implementation used to initialize this object.
+    /// </summary>
+    public Type Type { get; }
+
+    /// <summary>
+    ///     Gets a collection of the components of this modal.
+    /// </summary>
+    public IReadOnlyCollection<InputComponentInfo> Components { get; }
+
+    /// <summary>
+    ///     Gets a collection of the text components of this modal.
+    /// </summary>
+    public IReadOnlyCollection<TextInputComponentInfo> TextComponents { get; }
+
+    /// <summary>
+    ///     Get a collection of the select menu components of this modal.
+    /// </summary>
+    public IReadOnlyCollection<SelectMenuInputComponentInfo> SelectMenuComponents { get; }
+
+    /// <summary>
+    ///     Get a collection of the user select components of this modal.
+    /// </summary>
+    public IReadOnlyCollection<UserSelectInputComponentInfo> UserSelectComponents { get; }
+
+    /// <summary>
+    ///     Get a collection of the role select components of this modal.
+    /// </summary>
+    public IReadOnlyCollection<RoleSelectInputComponentInfo> RoleSelectComponents { get; }
+
+    /// <summary>
+    ///     Get a collection of the mentionable select components of this modal.
+    /// </summary>
+    public IReadOnlyCollection<MentionableSelectInputComponentInfo> MentionableSelectComponents { get; }
+
+    /// <summary>
+    ///     Get a collection of the channel select components of this modal.
+    /// </summary>
+    public IReadOnlyCollection<ChannelSelectInputComponentInfo> ChannelSelectComponents { get; }
+
+    /// <summary>
+    ///     Get a collection of the file upload components of this modal.
+    /// </summary>
+    public IReadOnlyCollection<FileUploadInputComponentInfo> FileUploadComponents { get; }
+
+    internal ModalInfo(Builders.ModalBuilder builder)
     {
-        internal readonly InteractionService _interactionService;
-        internal readonly ModalInitializer _initializer;
-
-        /// <summary>
-        ///     Gets the title of this modal.
-        /// </summary>
-        public string Title { get; }
-
-        /// <summary>
-        ///     Gets the <see cref="IModal"/> implementation used to initialize this object.
-        /// </summary>
-        public Type Type { get; }
-
-        /// <summary>
-        ///     Gets a collection of the components of this modal.
-        /// </summary>
-        public IReadOnlyCollection<InputComponentInfo> Components { get; }
-
-        /// <summary>
-        ///     Gets a collection of the text components of this modal.
-        /// </summary>
-        public IReadOnlyCollection<TextInputComponentInfo> TextComponents { get; }
-
-        /// <summary>
-        ///     Get a collection of the select menu components of this modal.
-        /// </summary>
-        public IReadOnlyCollection<SelectMenuInputComponentInfo> SelectMenuComponents { get; }
-
-        public IReadOnlyCollection<UserSelectInputComponentInfo> UserSelectComponents { get; }
-
-        public IReadOnlyCollection<RoleSelectInputComponentInfo> RoleSelectComponents { get; }
-
-        public IReadOnlyCollection<MentionableSelectInputComponentInfo> MentionableSelectComponents { get; }
-
-        public IReadOnlyCollection<ChannelSelectInputComponentInfo> ChannelSelectComponents { get; }
-
-        internal ModalInfo(Builders.ModalBuilder builder)
+        Title = builder.Title;
+        Type = builder.Type;
+        Components = builder.Components.Select<IInputComponentBuilder, InputComponentInfo>(x => x switch
         {
-            Title = builder.Title;
-            Type = builder.Type;
-            Components = builder.Components.Select<IInputComponentBuilder, InputComponentInfo>(x => x switch
-            {
-                TextInputComponentBuilder textComponent => textComponent.Build(this),
-                SelectMenuInputComponentBuilder selectMenuComponent => selectMenuComponent.Build(this),
-                RoleSelectInputComponentBuilder roleSelectComponent => roleSelectComponent.Build(this),
-                ChannelSelectInputComponentBuilder channelSelectComponent => channelSelectComponent.Build(this),
-                UserSelectInputComponentBuilder userSelectComponent => userSelectComponent.Build(this),
-                MentionableSelectInputComponentBuilder mentionableSelectComponent => mentionableSelectComponent.Build(this),
-                _ => throw new InvalidOperationException($"{x.GetType().FullName} isn't a supported modal input component builder type.")
-            }).ToImmutableArray();
+            TextInputComponentBuilder textComponent => textComponent.Build(this),
+            SelectMenuInputComponentBuilder selectMenuComponent => selectMenuComponent.Build(this),
+            RoleSelectInputComponentBuilder roleSelectComponent => roleSelectComponent.Build(this),
+            ChannelSelectInputComponentBuilder channelSelectComponent => channelSelectComponent.Build(this),
+            UserSelectInputComponentBuilder userSelectComponent => userSelectComponent.Build(this),
+            MentionableSelectInputComponentBuilder mentionableSelectComponent => mentionableSelectComponent.Build(this),
+            FileUploadInputComponentBuilder fileUploadComponent => fileUploadComponent.Build(this),
+            _ => throw new InvalidOperationException($"{x.GetType().FullName} isn't a supported modal input component builder type.")
+        }).ToImmutableArray();
 
-            TextComponents = Components.OfType<TextInputComponentInfo>().ToImmutableArray();
-            SelectMenuComponents = Components.OfType<SelectMenuInputComponentInfo>().ToImmutableArray();
-            UserSelectComponents = Components.OfType<UserSelectInputComponentInfo>().ToImmutableArray();
-            RoleSelectComponents = Components.OfType<RoleSelectInputComponentInfo>().ToImmutableArray();
-            MentionableSelectComponents = Components.OfType<MentionableSelectInputComponentInfo>().ToImmutableArray();
-            ChannelSelectComponents = Components.OfType<ChannelSelectInputComponentInfo>().ToImmutableArray();
+        TextComponents = Components.OfType<TextInputComponentInfo>().ToImmutableArray();
+        SelectMenuComponents = Components.OfType<SelectMenuInputComponentInfo>().ToImmutableArray();
+        UserSelectComponents = Components.OfType<UserSelectInputComponentInfo>().ToImmutableArray();
+        RoleSelectComponents = Components.OfType<RoleSelectInputComponentInfo>().ToImmutableArray();
+        MentionableSelectComponents = Components.OfType<MentionableSelectInputComponentInfo>().ToImmutableArray();
+        ChannelSelectComponents = Components.OfType<ChannelSelectInputComponentInfo>().ToImmutableArray();
+        FileUploadComponents = Components.OfType<FileUploadInputComponentInfo>().ToImmutableArray();
 
-            _interactionService = builder._interactionService;
-            _initializer = builder.ModalInitializer;
-        }
+        _interactionService = builder._interactionService;
+        _initializer = builder.ModalInitializer;
+    }
 
-        /// <summary>
-        ///     Creates an <see cref="IModal"/> and fills it with provided message components.
-        /// </summary>
-        /// <param name="modalInteraction"><see cref="IModalInteraction"/> that will be injected into the modal.</param>
-        /// <returns>
-        ///     A <see cref="IModal"/> filled with the provided components.
-        /// </returns>
-        [Obsolete("This method is no longer supported with the introduction of Component TypeConverters, please use the CreateModalAsync method.")]
-        public IModal CreateModal(IModalInteraction modalInteraction, bool throwOnMissingField = false)
+    /// <summary>
+    ///     Creates an <see cref="IModal"/> and fills it with provided message components.
+    /// </summary>
+    /// <param name="modalInteraction"><see cref="IModalInteraction"/> that will be injected into the modal.</param>
+    /// <returns>
+    ///     A <see cref="IModal"/> filled with the provided components.
+    /// </returns>
+    [Obsolete("This method is no longer supported with the introduction of Component TypeConverters, please use the CreateModalAsync method.")]
+    public IModal CreateModal(IModalInteraction modalInteraction, bool throwOnMissingField = false)
+    {
+        var args = new object[Components.Count];
+        var components = modalInteraction.Data.Components.ToList();
+
+        for (var i = 0; i < Components.Count; i++)
         {
-            var args = new object[Components.Count];
-            var components = modalInteraction.Data.Components.ToList();
+            var input = Components.ElementAt(i);
+            var component = components.Find(x => x.CustomId == input.CustomId);
 
-            for (var i = 0; i < Components.Count; i++)
+            if (component is null)
             {
-                var input = Components.ElementAt(i);
-                var component = components.Find(x => x.CustomId == input.CustomId);
-
-                if (component is null)
-                {
-                    if (!throwOnMissingField)
-                        args[i] = input.DefaultValue;
-                    else
-                        throw new InvalidOperationException($"Modal interaction is missing the required field: {input.CustomId}");
-                }
+                if (!throwOnMissingField)
+                    args[i] = input.DefaultValue;
                 else
-                    args[i] = component.Value;
+                    throw new InvalidOperationException($"Modal interaction is missing the required field: {input.CustomId}");
             }
-
-            return _initializer(args);
+            else
+                args[i] = component.Value;
         }
 
-        /// <summary>
-        ///     Creates an <see cref="IModal"/> and fills it with provided message components.
-        /// </summary>
-        /// <param name="context">Context of the <see cref="IModalInteraction"/> that will be injected into the modal.</param>
-        /// <param name="services">Services to be passed onto the <see cref="ComponentTypeConverter"/>s of the modal fields.</param>
-        /// <param name="throwOnMissingField">Whether or not this method should exit on encountering a missing modal field.</param>
-        /// <returns>
-        ///     A <see cref="TypeConverterResult"/> if a type conversion has failed, else  a <see cref="ParseResult"/>.
-        /// </returns>
-        public async Task<IResult> CreateModalAsync(IInteractionContext context, IServiceProvider services = null, bool throwOnMissingField = false)
+        return _initializer(args);
+    }
+
+    /// <summary>
+    ///     Creates an <see cref="IModal"/> and fills it with provided message components.
+    /// </summary>
+    /// <param name="context">Context of the <see cref="IModalInteraction"/> that will be injected into the modal.</param>
+    /// <param name="services">Services to be passed onto the <see cref="ComponentTypeConverter"/>s of the modal fields.</param>
+    /// <param name="throwOnMissingField">Whether or not this method should exit on encountering a missing modal field.</param>
+    /// <returns>
+    ///     A <see cref="TypeConverterResult"/> if a type conversion has failed, else  a <see cref="ParseResult"/>.
+    /// </returns>
+    public async Task<IResult> CreateModalAsync(IInteractionContext context, IServiceProvider services = null, bool throwOnMissingField = false)
+    {
+        if (context.Interaction is not IModalInteraction modalInteraction)
+            return TypeConverterResult.FromError(InteractionCommandError.Unsuccessful, "Provided context doesn't belong to a Modal Interaction.");
+
+        services ??= EmptyServiceProvider.Instance;
+
+        var args = new object[Components.Count];
+        var components = modalInteraction.Data.Components.ToList();
+
+        for (var i = 0; i < Components.Count; i++)
         {
-            if (context.Interaction is not IModalInteraction modalInteraction)
-                return TypeConverterResult.FromError(InteractionCommandError.Unsuccessful, "Provided context doesn't belong to a Modal Interaction.");
+            var input = Components.ElementAt(i);
+            var component = components.Find(x => x.CustomId == input.CustomId);
 
-            services ??= EmptyServiceProvider.Instance;
-
-            var args = new object[Components.Count];
-            var components = modalInteraction.Data.Components.ToList();
-
-            for (var i = 0; i < Components.Count; i++)
+            if (component is null)
             {
-                var input = Components.ElementAt(i);
-                var component = components.Find(x => x.CustomId == input.CustomId);
-
-                if (component is null)
-                {
-                    if (!throwOnMissingField)
-                        args[i] = input.DefaultValue;
-                    else
-                        return TypeConverterResult.FromError(InteractionCommandError.BadArgs, $"Modal interaction is missing the required field: {input.CustomId}");
-                }
+                if (!throwOnMissingField)
+                    args[i] = input.DefaultValue;
                 else
-                {
-                    var readResult = await input.TypeConverter.ReadAsync(context, component, services).ConfigureAwait(false);
-
-                    if (!readResult.IsSuccess)
-                        return readResult;
-
-                    args[i] = readResult.Value;
-                }
+                    return TypeConverterResult.FromError(InteractionCommandError.BadArgs, $"Modal interaction is missing the required field: {input.CustomId}");
             }
+            else
+            {
+                var readResult = await input.TypeConverter.ReadAsync(context, component, services).ConfigureAwait(false);
 
-            return TypeConverterResult.FromSuccess(_initializer(args));
+                if (!readResult.IsSuccess)
+                    return readResult;
+
+                args[i] = readResult.Value;
+            }
         }
+
+        return TypeConverterResult.FromSuccess(_initializer(args));
     }
 }
