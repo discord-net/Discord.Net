@@ -128,6 +128,21 @@ namespace Discord.Interactions.Builders
             return this;
         }
 
+    /// <summary>
+    ///     Adds a file upload component to <see cref="Components"/>.
+    /// </summary>
+    /// <param name="configure">File upload component builder factory.</param>
+    /// <returns>
+    ///     The builder instance.
+    /// </returns>
+    public ModalBuilder AddFileUploadComponent(Action<FileUploadInputComponentBuilder> configure)
+    {
+        var builder = new FileUploadInputComponentBuilder(this);
+        configure(builder);
+        _components.Add(builder);
+        return this;
+    }
+
         internal ModalInfo Build() => new(this);
     }
 }

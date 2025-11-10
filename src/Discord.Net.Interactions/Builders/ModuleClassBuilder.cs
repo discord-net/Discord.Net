@@ -633,6 +633,11 @@ namespace Discord.Interactions.Builders
                         case ComponentType.ChannelSelect:
                             builder.AddChannelSelectComponent(x => BuildSnowflakeSelectInput(x, prop, prop.GetValue(instance)));
                             break;
+                    case ComponentType.FileUpload:
+                        builder.AddFileUploadComponent(x => BuildFileUploadInput(x, prop, prop.GetValue(instance)));
+                        break;
+                    case ComponentType.TextDisplay:
+                        throw new NotImplementedException();
                         case null:
                             throw new InvalidOperationException($"{prop.Name} of {prop.DeclaringType.Name} isn't a valid modal input field.");
                         default:
@@ -752,6 +757,45 @@ namespace Discord.Interactions.Builders
                 }
             }
         }
+
+    private static void BuildFileUploadInput(FileUploadInputComponentBuilder builder, PropertyInfo propertyInfo, object defaultValue)
+    {
+        var attributes = propertyInfo.GetCustomAttributes();
+
+        builder.Label = propertyInfo.Name;
+        builder.DefaultValue = defaultValue;
+        builder.WithType(propertyInfo.PropertyType);
+        builder.PropertyInfo = propertyInfo;
+
+        foreach(var attribute in attributes)
+        {
+            switch (attribute)
+            {
+                case ModalFileUploadInputAttribute fileUploadInput:
+                    builder.CustomId = fileUploadInput.CustomId;
+                    builder.ComponentType = fileUploadInput.ComponentType;
+                    builder.MinValues = fileUploadInput.MinValues;
+                    builder.MaxValues = fileUploadInput.MaxValues;
+                    break;
+                case RequiredInputAttribute requiredInput:
+                    builder.IsRequired = requiredInput.IsRequired;
+                    break;
+                case InputLabelAttribute inputLabel:
+                    builder.Label = inputLabel.Label;
+                    builder.Description = inputLabel.Description;
+                    break;
+                default:
+                    builder.WithAttributes(attribute);
+                    break;
+            }
+        }
+
+    }
+
+    private static void BuildTextDisplayComponent()
+    {
+
+    }
         #endregion
 
         internal static bool IsValidModuleDefinition(TypeInfo typeInfo)
