@@ -1,8 +1,9 @@
-using Discord.Interactions.Builders.Modals.Inputs;
+namespace Discord.Interactions;
 
-namespace Discord.Interactions.Info.InputComponents;
-
+/// <summary>
+///     Represents the <see cref="InputComponentInfo"/> class for <see cref="ComponentType.ChannelSelect"/> type.
+/// </summary>
 public class ChannelSelectInputComponentInfo : SnowflakeSelectInputComponentInfo
 {
-    public ChannelSelectInputComponentInfo(ChannelSelectInputComponentBuilder builder, ModalInfo modal) : base(builder, modal) { }
+    internal ChannelSelectInputComponentInfo(Builders.ChannelSelectInputComponentBuilder builder, ModalInfo modal) : base(builder, modal) { }
 }

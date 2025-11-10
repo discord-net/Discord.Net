@@ -1,8 +1,9 @@
-using Discord.Interactions.Builders.Modals.Inputs;
+namespace Discord.Interactions;
 
-namespace Discord.Interactions.Info.InputComponents;
-
+/// <summary>
+///     Represents the <see cref="InputComponentInfo"/> class for <see cref="ComponentType.MentionableSelect"/> type.
+/// </summary>
 public class MentionableSelectInputComponentInfo : SnowflakeSelectInputComponentInfo
 {
-    public MentionableSelectInputComponentInfo(MentionableSelectInputComponentBuilder builder, ModalInfo modal) : base(builder, modal) { }
+    internal MentionableSelectInputComponentInfo(Builders.MentionableSelectInputComponentBuilder builder, ModalInfo modal) : base(builder, modal) { }
 }

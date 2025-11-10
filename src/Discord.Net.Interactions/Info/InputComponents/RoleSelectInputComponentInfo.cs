@@ -1,8 +1,9 @@
-using Discord.Interactions.Builders.Modals.Inputs;
+namespace Discord.Interactions;
 
-namespace Discord.Interactions.Info.InputComponents;
-
+/// <summary>
+///     Represents the <see cref="InputComponentInfo"/> class for <see cref="ComponentType.RoleSelect"/> type.
+/// </summary>
 public class RoleSelectInputComponentInfo : SnowflakeSelectInputComponentInfo
 {
-    public RoleSelectInputComponentInfo(RoleSelectInputComponentBuilder builder, ModalInfo modal) : base(builder, modal) { }
+    internal RoleSelectInputComponentInfo(Builders.RoleSelectInputComponentBuilder builder, ModalInfo modal) : base(builder, modal) { }
 }

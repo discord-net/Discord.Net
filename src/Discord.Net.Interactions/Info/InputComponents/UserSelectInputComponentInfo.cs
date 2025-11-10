@@ -1,8 +1,9 @@
-using Discord.Interactions.Builders.Modals.Inputs;
+namespace Discord.Interactions;
 
-namespace Discord.Interactions.Info.InputComponents;
-
+/// <summary>
+///     Represents the <see cref="InputComponentInfo"/> class for <see cref="ComponentType.UserSelect"/> type.
+/// </summary>
 public class UserSelectInputComponentInfo : SnowflakeSelectInputComponentInfo
 {
-    public UserSelectInputComponentInfo(UserSelectInputComponentBuilder builder, ModalInfo modal) : base(builder, modal) { }
+    internal UserSelectInputComponentInfo(Builders.UserSelectInputComponentBuilder builder, ModalInfo modal) : base(builder, modal) { }
 }

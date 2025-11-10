@@ -1,20 +1,35 @@
-using Discord.Interactions.Builders;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 
-namespace Discord.Interactions.Info.InputComponents;
+namespace Discord.Interactions;
+
+/// <summary>
+///     Represents the <see cref="InputComponentInfo"/> class for <see cref="ComponentType.SelectMenu"/> type.
+/// </summary>
 public class SelectMenuInputComponentInfo : InputComponentInfo
 {
-    public string Placeholder { get; set; }
+    /// <summary>
+    ///     Gets the placeholder of the select menu input.
+    /// </summary>
+    public string Placeholder { get; }
 
-    public int MinValues { get; set; }
+    /// <summary>
+    ///     Gets the minimum number of values that can be selected.
+    /// </summary>
+    public int MinValues { get; }
 
-    public int MaxValues { get; set; }
+    /// <summary>
+    ///     Gets the maximum number of values that can be selected.
+    /// </summary>
+    public int MaxValues { get; }
 
+    /// <summary>
+    ///     Gets the options of this select menu component.
+    /// </summary>
     public IReadOnlyCollection<SelectMenuOption> Options { get; }
 
-    internal SelectMenuInputComponentInfo(SelectMenuInputComponentBuilder builder, ModalInfo modal) : base(builder, modal)
+    internal SelectMenuInputComponentInfo(Builders.SelectMenuInputComponentBuilder builder, ModalInfo modal) : base(builder, modal)
     {
         Placeholder = builder.Placeholder;
         MinValues = builder.MinValues;
