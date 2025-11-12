@@ -1,12 +1,13 @@
-namespace Discord.Interactions;
-
-/// <summary>
-///     Represents a generic <see cref="Modal"/> for use with the interaction service.
-/// </summary>
-public interface IModal
+namespace Discord.Interactions
 {
     /// <summary>
-    ///     Gets the modal's title.
+    ///     Represents a generic <see cref="Modal"/> for use with the interaction service.
     /// </summary>
-    string Title { get; }
+    public interface IModal
+    {
+        /// <summary>
+        ///     Gets the modal's title.
+        /// </summary>
+        string Title { get; }
+    }
 }
