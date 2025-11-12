@@ -95,7 +95,7 @@ public static class IDiscordInteractionExtentions
                     break;
                 case SelectMenuInputComponentInfo selectMenuComponent:
                     {
-                        var inputBuilder = new SelectMenuBuilder(selectMenuComponent.CustomId, selectMenuComponent.Options.Select(x => new SelectMenuOptionBuilder(x)).ToList(), selectMenuComponent.Placeholder, selectMenuComponent.MaxValues, selectMenuComponent.MinValues, false);
+                        var inputBuilder = new SelectMenuBuilder(selectMenuComponent.CustomId, selectMenuComponent.Options.Select(x => new SelectMenuOptionBuilder(x)).ToList(), selectMenuComponent.Placeholder, selectMenuComponent.MaxValues, selectMenuComponent.MinValues, false, isRequired: selectMenuComponent.IsRequired);
 
                         if (modalInstance != null)
                         {
@@ -108,7 +108,7 @@ public static class IDiscordInteractionExtentions
                     break;
                 case SnowflakeSelectInputComponentInfo snowflakeSelectComponent:
                     {
-                        var inputBuilder = new SelectMenuBuilder(snowflakeSelectComponent.CustomId, null, snowflakeSelectComponent.Placeholder, snowflakeSelectComponent.MaxValues, snowflakeSelectComponent.MinValues, false, snowflakeSelectComponent.ComponentType, null, snowflakeSelectComponent.DefaultValues.ToList());
+                        var inputBuilder = new SelectMenuBuilder(snowflakeSelectComponent.CustomId, null, snowflakeSelectComponent.Placeholder, snowflakeSelectComponent.MaxValues, snowflakeSelectComponent.MinValues, false, snowflakeSelectComponent.ComponentType, null, snowflakeSelectComponent.DefaultValues.ToList(), null, snowflakeSelectComponent.IsRequired);
 
                         if (modalInstance != null)
                         {
