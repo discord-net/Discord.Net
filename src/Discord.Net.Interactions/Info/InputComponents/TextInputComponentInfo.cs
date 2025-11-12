@@ -8,7 +8,7 @@ namespace Discord.Interactions
     public class TextInputComponentInfo : InputComponentInfo
     {
         /// <summary>
-        /// <c>true</c> when <see cref="InputComponentInfo.Type"/> overrides <see cref="object.ToString"/>.
+        /// <c>true</c> when <see cref="ModalComponentInfo.Type"/> overrides <see cref="object.ToString"/>.
         /// </summary>
         internal bool TypeOverridesToString => _typeOverridesToString.Value;
         private readonly Lazy<bool> _typeOverridesToString;

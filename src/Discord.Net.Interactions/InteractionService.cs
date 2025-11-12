@@ -1149,7 +1149,7 @@ namespace Discord.Interactions
             TryRemoveGenericModalComponentTypeConverter(typeof(T), out converterType);
 
         /// <summary>
-        ///     Removes a generic <see cref="ModalComponentTypeConverter"/> for the type <typeparamref name="T"/>.
+        ///     Removes a generic <see cref="ModalComponentTypeConverter"/> for the type <paramref name="type"/>.
         /// </summary>
         /// <remarks>
         ///     Removing a <see cref="ModalComponentTypeConverter"/> from the <see cref="InteractionService"/> will not dereference the <see cref="ModalComponentTypeConverter"/> from the loaded module/command instances.

@@ -39,7 +39,7 @@ public class FileUploadInputComponentBuilder : InputComponentBuilder<FileUploadI
     /// <summary>
     ///     Sets <see cref="MinValues"/>.
     /// </summary>
-    /// <param name="minValues">New value of the <see cref="MinValues"/>.</param>
+    /// <param name="maxValues">New value of the <see cref="MaxValues"/>.</param>
     /// <returns>
     ///     The builder instance.
     /// </returns>

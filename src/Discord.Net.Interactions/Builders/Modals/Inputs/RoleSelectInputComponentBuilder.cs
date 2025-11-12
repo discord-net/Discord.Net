@@ -45,7 +45,7 @@ public class RoleSelectInputComponentBuilder : SnowflakeSelectInputComponentBuil
     /// <summary>
     ///     Adds default values to <see cref="SnowflakeSelectInputComponentBuilder{TInfo, TBuilder}.DefaultValues"/>.
     /// </summary>
-    /// <param name="role">The roles to add as a default value.</param>
+    /// <param name="roles">The roles to add as a default value.</param>
     /// <returns>
     ///     The builder instance.
     /// </returns>
@@ -58,7 +58,7 @@ public class RoleSelectInputComponentBuilder : SnowflakeSelectInputComponentBuil
     /// <summary>
     ///     Adds default values to <see cref="SnowflakeSelectInputComponentBuilder{TInfo, TBuilder}.DefaultValues"/>.
     /// </summary>
-    /// <param name="role">The roles to add as a default value.</param>
+    /// <param name="roles">The roles to add as a default value.</param>
     /// <returns>
     ///     The builder instance.
     /// </returns>
