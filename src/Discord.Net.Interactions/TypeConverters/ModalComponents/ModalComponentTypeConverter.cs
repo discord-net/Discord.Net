@@ -27,7 +27,7 @@ public abstract class ModalComponentTypeConverter : ITypeConverter<IComponentInt
     /// <summary>
     ///     Will be used to manipulate the outgoing modal component, before the modal gets sent to Discord.
     /// </summary>
-    public virtual Task WriteAsync<TBuilder>(TBuilder builder, InputComponentInfo component, object value)
+    public virtual Task WriteAsync<TBuilder>(TBuilder builder, IDiscordInteraction interaction, InputComponentInfo component, object value)
         where TBuilder : class, IInteractableComponentBuilder
         => Task.CompletedTask;
 

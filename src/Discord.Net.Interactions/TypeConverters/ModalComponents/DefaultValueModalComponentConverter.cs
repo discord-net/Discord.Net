@@ -24,7 +24,7 @@ internal sealed class DefaultValueModalComponentConverter<T> : ModalComponentTyp
         }
     }
 
-    public override Task WriteAsync<TBuilder>(TBuilder builder, InputComponentInfo component, object value)
+    public override Task WriteAsync<TBuilder>(TBuilder builder, IDiscordInteraction interaction, InputComponentInfo component, object value)
     {
         var strValue = Convert.ToString(value);
 

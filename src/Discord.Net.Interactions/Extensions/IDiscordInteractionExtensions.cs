@@ -86,7 +86,7 @@ namespace Discord.Interactions
 
                             if (modalInstance != null)
                             {
-                                await textComponent.TypeConverter.WriteAsync(inputBuilder, textComponent, textComponent.Getter(modalInstance));
+                                await textComponent.TypeConverter.WriteAsync(inputBuilder, interaction, textComponent, textComponent.Getter(modalInstance));
                             }
 
                             var labelBuilder = new LabelBuilder(textComponent.Label, inputBuilder, textComponent.Description);
@@ -99,7 +99,7 @@ namespace Discord.Interactions
 
                             if (modalInstance != null)
                             {
-                                await selectMenuComponent.TypeConverter.WriteAsync(inputBuilder, selectMenuComponent, selectMenuComponent.Getter(modalInstance));
+                                await selectMenuComponent.TypeConverter.WriteAsync(inputBuilder, interaction, selectMenuComponent, selectMenuComponent.Getter(modalInstance));
                             }
 
                             var labelBuilder = new LabelBuilder(selectMenuComponent.Label, inputBuilder, selectMenuComponent.Description);
@@ -112,7 +112,7 @@ namespace Discord.Interactions
 
                             if (modalInstance != null)
                             {
-                                await snowflakeSelectComponent.TypeConverter.WriteAsync(inputBuilder, snowflakeSelectComponent, snowflakeSelectComponent.Getter(modalInstance));
+                                await snowflakeSelectComponent.TypeConverter.WriteAsync(inputBuilder, interaction, snowflakeSelectComponent, snowflakeSelectComponent.Getter(modalInstance));
                             }
 
                             var labelBuilder = new LabelBuilder(snowflakeSelectComponent.Label, inputBuilder, snowflakeSelectComponent.Description);
@@ -125,7 +125,7 @@ namespace Discord.Interactions
 
                             if (modalInstance != null)
                             {
-                                await fileUploadComponent.TypeConverter.WriteAsync(inputBuilder, fileUploadComponent, fileUploadComponent.Getter(modalInstance));
+                                await fileUploadComponent.TypeConverter.WriteAsync(inputBuilder, interaction, fileUploadComponent, fileUploadComponent.Getter(modalInstance));
                             }
 
                             var labelBuilder = new LabelBuilder(fileUploadComponent.Label, inputBuilder, fileUploadComponent.Description);

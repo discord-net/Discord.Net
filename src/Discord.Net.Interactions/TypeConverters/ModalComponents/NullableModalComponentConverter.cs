@@ -20,6 +20,6 @@ internal class NullableModalComponentConverter<T> : ModalComponentTypeConverter<
     public override Task<TypeConverterResult> ReadAsync(IInteractionContext context, IComponentInteractionData option, IServiceProvider services)
         => string.IsNullOrEmpty(option.Value) ? Task.FromResult(TypeConverterResult.FromSuccess(null)) : _typeConverter.ReadAsync(context, option, services);
 
-    public override Task WriteAsync<TBuilder>(TBuilder builder, InputComponentInfo component, object value)
-        => _typeConverter.WriteAsync(builder, component, value);
+    public override Task WriteAsync<TBuilder>(TBuilder builder, IDiscordInteraction interaction, InputComponentInfo component, object value)
+        => _typeConverter.WriteAsync(builder, interaction, component, value);
 }

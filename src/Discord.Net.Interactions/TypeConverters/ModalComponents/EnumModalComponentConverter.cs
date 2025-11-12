@@ -47,7 +47,7 @@ internal sealed class EnumModalComponentConverter<T> : ModalComponentTypeConvert
         return Task.FromResult(TypeConverterResult.FromError(InteractionCommandError.ConvertFailed, $"Value {option.Value} cannot be converted to {typeof(T).FullName}"));
     }
 
-    public override Task WriteAsync<TBuilder>(TBuilder builder, InputComponentInfo component, object value)
+    public override Task WriteAsync<TBuilder>(TBuilder builder, IDiscordInteraction interaction, InputComponentInfo component, object value)
     {
         if (builder is not SelectMenuBuilder selectMenu || component.ComponentType is not ComponentType.SelectMenu)
             throw new InvalidOperationException($"{nameof(EnumModalComponentConverter<T>)} can only write to select menu components.");

@@ -135,7 +135,7 @@ internal sealed class DefaultArrayModalComponentConverter<T> : ModalComponentTyp
         return TypeConverterResult.FromSuccess(destination);
     }
 
-    public override Task WriteAsync<TBuilder>(TBuilder builder, InputComponentInfo component, object value)
+    public override Task WriteAsync<TBuilder>(TBuilder builder, IDiscordInteraction interaction, InputComponentInfo component, object value)
     {
         if (builder is FileUploadComponentBuilder)
             return Task.CompletedTask;
