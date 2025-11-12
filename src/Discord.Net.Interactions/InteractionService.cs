@@ -1155,7 +1155,7 @@ namespace Discord.Interactions
         ///     Removing a <see cref="ModalComponentTypeConverter"/> from the <see cref="InteractionService"/> will not dereference the <see cref="ModalComponentTypeConverter"/> from the loaded module/command instances.
         ///     You need to reload the modules for the changes to take effect.
         /// </remarks>
-        /// <param name="type">The type to remove the converter from.</typeparam>
+        /// <param name="type">The type to remove the converter from.</param>
         /// <param name="converterType">The converter if the resulting remove operation was successful.</param>
         /// <returns><see langword="true"/> if the remove operation was successful; otherwise <see langword="false"/>.</returns>
         public bool TryRemoveGenericModalComponentTypeConverter(Type type, out Type converterType) =>
