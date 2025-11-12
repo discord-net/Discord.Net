@@ -37,48 +37,58 @@ public class ModalInfo
     /// <summary>
     ///     Gets a collection of the components of this modal.
     /// </summary>
-    public IReadOnlyCollection<InputComponentInfo> Components { get; }
+    public IReadOnlyCollection<ModalComponentInfo> Components { get; }
+
+    /// <summary>
+    ///     Gets a collection of the input components of this modal.
+    /// </summary>
+    public IReadOnlyCollection<InputComponentInfo> InputComponents { get; }
 
     /// <summary>
     ///     Gets a collection of the text components of this modal.
     /// </summary>
-    public IReadOnlyCollection<TextInputComponentInfo> TextComponents { get; }
+    public IReadOnlyCollection<TextInputComponentInfo> TextInputComponents { get; }
 
     /// <summary>
     ///     Get a collection of the select menu components of this modal.
     /// </summary>
-    public IReadOnlyCollection<SelectMenuInputComponentInfo> SelectMenuComponents { get; }
+    public IReadOnlyCollection<SelectMenuInputComponentInfo> SelectMenuInputComponents { get; }
 
     /// <summary>
     ///     Get a collection of the user select components of this modal.
     /// </summary>
-    public IReadOnlyCollection<UserSelectInputComponentInfo> UserSelectComponents { get; }
+    public IReadOnlyCollection<UserSelectInputComponentInfo> UserSelectInputComponents { get; }
 
     /// <summary>
     ///     Get a collection of the role select components of this modal.
     /// </summary>
-    public IReadOnlyCollection<RoleSelectInputComponentInfo> RoleSelectComponents { get; }
+    public IReadOnlyCollection<RoleSelectInputComponentInfo> RoleSelectInputComponents { get; }
 
     /// <summary>
     ///     Get a collection of the mentionable select components of this modal.
     /// </summary>
-    public IReadOnlyCollection<MentionableSelectInputComponentInfo> MentionableSelectComponents { get; }
+    public IReadOnlyCollection<MentionableSelectInputComponentInfo> MentionableSelectInputComponents { get; }
 
     /// <summary>
     ///     Get a collection of the channel select components of this modal.
     /// </summary>
-    public IReadOnlyCollection<ChannelSelectInputComponentInfo> ChannelSelectComponents { get; }
+    public IReadOnlyCollection<ChannelSelectInputComponentInfo> ChannelSelectInputComponents { get; }
 
     /// <summary>
     ///     Get a collection of the file upload components of this modal.
     /// </summary>
-    public IReadOnlyCollection<FileUploadInputComponentInfo> FileUploadComponents { get; }
+    public IReadOnlyCollection<FileUploadInputComponentInfo> FileUploadInputComponents { get; }
+
+    /// <summary>
+    ///     Gets a collection of the text display components of this modal.
+    /// </summary>
+    public IReadOnlyCollection<TextDisplayComponentInfo> TextDisplayComponents { get; }
 
     internal ModalInfo(Builders.ModalBuilder builder)
     {
         Title = builder.Title;
         Type = builder.Type;
-        Components = builder.Components.Select<IInputComponentBuilder, InputComponentInfo>(x => x switch
+        Components = builder.Components.Select<IModalComponentBuilder, ModalComponentInfo>(x => x switch
         {
             TextInputComponentBuilder textComponent => textComponent.Build(this),
             SelectMenuInputComponentBuilder selectMenuComponent => selectMenuComponent.Build(this),
@@ -87,16 +97,19 @@ public class ModalInfo
             UserSelectInputComponentBuilder userSelectComponent => userSelectComponent.Build(this),
             MentionableSelectInputComponentBuilder mentionableSelectComponent => mentionableSelectComponent.Build(this),
             FileUploadInputComponentBuilder fileUploadComponent => fileUploadComponent.Build(this),
+            TextDisplayComponentBuilder textDisplayComponent => textDisplayComponent.Build(this),
             _ => throw new InvalidOperationException($"{x.GetType().FullName} isn't a supported modal input component builder type.")
         }).ToImmutableArray();
 
-        TextComponents = Components.OfType<TextInputComponentInfo>().ToImmutableArray();
-        SelectMenuComponents = Components.OfType<SelectMenuInputComponentInfo>().ToImmutableArray();
-        UserSelectComponents = Components.OfType<UserSelectInputComponentInfo>().ToImmutableArray();
-        RoleSelectComponents = Components.OfType<RoleSelectInputComponentInfo>().ToImmutableArray();
-        MentionableSelectComponents = Components.OfType<MentionableSelectInputComponentInfo>().ToImmutableArray();
-        ChannelSelectComponents = Components.OfType<ChannelSelectInputComponentInfo>().ToImmutableArray();
-        FileUploadComponents = Components.OfType<FileUploadInputComponentInfo>().ToImmutableArray();
+        InputComponents = Components.OfType<InputComponentInfo>().ToImmutableArray();
+
+        TextInputComponents = Components.OfType<TextInputComponentInfo>().ToImmutableArray();
+        SelectMenuInputComponents = Components.OfType<SelectMenuInputComponentInfo>().ToImmutableArray();
+        UserSelectInputComponents = Components.OfType<UserSelectInputComponentInfo>().ToImmutableArray();
+        RoleSelectInputComponents = Components.OfType<RoleSelectInputComponentInfo>().ToImmutableArray();
+        MentionableSelectInputComponents = Components.OfType<MentionableSelectInputComponentInfo>().ToImmutableArray();
+        ChannelSelectInputComponents = Components.OfType<ChannelSelectInputComponentInfo>().ToImmutableArray();
+        FileUploadInputComponents = Components.OfType<FileUploadInputComponentInfo>().ToImmutableArray();
 
         _interactionService = builder._interactionService;
         _initializer = builder.ModalInitializer;
@@ -117,7 +130,7 @@ public class ModalInfo
 
         for (var i = 0; i < Components.Count; i++)
         {
-            var input = Components.ElementAt(i);
+            var input = InputComponents.ElementAt(i);
             var component = components.Find(x => x.CustomId == input.CustomId);
 
             if (component is null)
@@ -150,12 +163,12 @@ public class ModalInfo
 
         services ??= EmptyServiceProvider.Instance;
 
-        var args = new object[Components.Count];
+        var args = new object[InputComponents.Count];
         var components = modalInteraction.Data.Components.ToList();
 
-        for (var i = 0; i < Components.Count; i++)
+        for (var i = 0; i < InputComponents.Count; i++)
         {
-            var input = Components.ElementAt(i);
+            var input = InputComponents.ElementAt(i);
             var component = components.Find(x => x.CustomId == input.CustomId);
 
             if (component is null)

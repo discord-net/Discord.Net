@@ -613,25 +613,25 @@ internal static class ModuleClassBuilder
                 switch (componentType)
                 {
                     case ComponentType.TextInput:
-                        builder.AddTextComponent(x => BuildTextInput(x, prop, prop.GetValue(instance)));
+                        builder.AddTextInputComponent(x => BuildTextInput(x, prop, prop.GetValue(instance)));
                         break;
                     case ComponentType.SelectMenu:
-                        builder.AddSelectMenuComponent(x => BuildSelectMenuInput(x, prop, prop.GetValue(instance)));
+                        builder.AddSelectMenuInputComponent(x => BuildSelectMenuInput(x, prop, prop.GetValue(instance)));
                         break;
                     case ComponentType.UserSelect:
-                        builder.AddUserSelectComponent(x => BuildSnowflakeSelectInput(x, prop, prop.GetValue(instance)));
+                        builder.AddUserSelectInputComponent(x => BuildSnowflakeSelectInput(x, prop, prop.GetValue(instance)));
                         break;
                     case ComponentType.RoleSelect:
-                        builder.AddRoleSelectComponent(x => BuildSnowflakeSelectInput(x, prop, prop.GetValue(instance)));
+                        builder.AddRoleSelectInputComponent(x => BuildSnowflakeSelectInput(x, prop, prop.GetValue(instance)));
                         break;
                     case ComponentType.MentionableSelect:
-                        builder.AddMentionableSelectComponent(x => BuildSnowflakeSelectInput(x, prop, prop.GetValue(instance)));
+                        builder.AddMentionableSelectInputComponent(x => BuildSnowflakeSelectInput(x, prop, prop.GetValue(instance)));
                         break;
                     case ComponentType.ChannelSelect:
-                        builder.AddChannelSelectComponent(x => BuildSnowflakeSelectInput(x, prop, prop.GetValue(instance)));
+                        builder.AddChannelSelectInputComponent(x => BuildSnowflakeSelectInput(x, prop, prop.GetValue(instance)));
                         break;
                     case ComponentType.FileUpload:
-                        builder.AddFileUploadComponent(x => BuildFileUploadInput(x, prop, prop.GetValue(instance)));
+                        builder.AddFileUploadInputComponent(x => BuildFileUploadInput(x, prop, prop.GetValue(instance)));
                         break;
                     case ComponentType.TextDisplay:
                         throw new NotImplementedException();

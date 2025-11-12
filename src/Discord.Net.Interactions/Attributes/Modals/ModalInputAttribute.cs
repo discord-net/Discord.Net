@@ -1,3 +1,4 @@
+using Discord.Interactions.Attributes.Modals;
 using System;
 
 namespace Discord.Interactions;
@@ -6,17 +7,12 @@ namespace Discord.Interactions;
 ///     Mark an <see cref="IModal"/> property as a modal input field.
 /// </summary>
 [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
-public abstract class ModalInputAttribute : Attribute
+public abstract class ModalInputAttribute : ModalComponentAttribute
 {
     /// <summary>
     ///     Gets the custom id of the text input.
     /// </summary>
     public string CustomId { get; }
-
-    /// <summary>
-    ///     Gets the type of the component.
-    /// </summary>
-    public abstract ComponentType ComponentType { get; }
 
     /// <summary>
     ///     Create a new <see cref="ModalInputAttribute"/>.

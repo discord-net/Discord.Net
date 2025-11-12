@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Discord.Interactions.Builders;
 
@@ -9,7 +10,7 @@ namespace Discord.Interactions.Builders;
 public class ModalBuilder
 {
     internal readonly InteractionService _interactionService;
-    internal readonly List<IInputComponentBuilder> _components;
+    internal readonly List<IModalComponentBuilder> _components;
 
     /// <summary>
     ///     Gets the initialization delegate for this modal.
@@ -29,7 +30,7 @@ public class ModalBuilder
     /// <summary>
     ///     Gets a collection of the components of this modal.
     /// </summary>
-    public IReadOnlyCollection<IInputComponentBuilder> Components => _components;
+    public IReadOnlyCollection<IModalComponentBuilder> Components => _components.AsReadOnly();
 
     internal ModalBuilder(Type type, InteractionService interactionService)
     {
@@ -65,13 +66,13 @@ public class ModalBuilder
     }
 
     /// <summary>
-    ///     Adds text components to <see cref="Components"/>.
+    ///     Adds text components to <see cref="InputComponents"/>.
     /// </summary>
     /// <param name="configure">Text Component builder factory.</param>
     /// <returns>
     ///     The builder instance.
     /// </returns>
-    public ModalBuilder AddTextComponent(Action<TextInputComponentBuilder> configure)
+    public ModalBuilder AddTextInputComponent(Action<TextInputComponentBuilder> configure)
     {
         var builder = new TextInputComponentBuilder(this);
         configure(builder);
@@ -80,13 +81,13 @@ public class ModalBuilder
     }
 
     /// <summary>
-    ///     Adds a select menu component to <see cref="Components"/>.
+    ///     Adds a select menu component to <see cref="InputComponents"/>.
     /// </summary>
     /// <param name="configure">Select menu component builder factory.</param>
     /// <returns>
     ///     The builder instance.
     /// </returns>
-    public ModalBuilder AddSelectMenuComponent(Action<SelectMenuInputComponentBuilder> configure)
+    public ModalBuilder AddSelectMenuInputComponent(Action<SelectMenuInputComponentBuilder> configure)
     {
         var builder = new SelectMenuInputComponentBuilder(this);
         configure(builder);
@@ -95,13 +96,13 @@ public class ModalBuilder
     }
 
     /// <summary>
-    ///     Adds a user select component to <see cref="Components"/>.
+    ///     Adds a user select component to <see cref="InputComponents"/>.
     /// </summary>
     /// <param name="configure">User select component builder factory.</param>
     /// <returns>
     ///     The builder instance.
     /// </returns>
-    public ModalBuilder AddUserSelectComponent(Action<UserSelectInputComponentBuilder> configure)
+    public ModalBuilder AddUserSelectInputComponent(Action<UserSelectInputComponentBuilder> configure)
     {
         var builder = new UserSelectInputComponentBuilder(this);
         configure(builder);
@@ -110,13 +111,13 @@ public class ModalBuilder
     }
 
     /// <summary>
-    ///     Adds a role select component to <see cref="Components"/>.
+    ///     Adds a role select component to <see cref="InputComponents"/>.
     /// </summary>
     /// <param name="configure">Role select component builder factory.</param>
     /// <returns>
     ///     The builder instance.
     /// </returns>
-    public ModalBuilder AddRoleSelectComponent(Action<RoleSelectInputComponentBuilder> configure)
+    public ModalBuilder AddRoleSelectInputComponent(Action<RoleSelectInputComponentBuilder> configure)
     {
         var builder = new RoleSelectInputComponentBuilder(this);
         configure(builder);
@@ -125,13 +126,13 @@ public class ModalBuilder
     }
 
     /// <summary>
-    ///     Adds a mentionable select component to <see cref="Components"/>.
+    ///     Adds a mentionable select component to <see cref="InputComponents"/>.
     /// </summary>
     /// <param name="configure">Mentionable select component builder factory.</param>
     /// <returns>
     ///     The builder instance.
     /// </returns>
-    public ModalBuilder AddMentionableSelectComponent(Action<MentionableSelectInputComponentBuilder> configure)
+    public ModalBuilder AddMentionableSelectInputComponent(Action<MentionableSelectInputComponentBuilder> configure)
     {
         var builder = new MentionableSelectInputComponentBuilder(this);
         configure(builder);
@@ -140,13 +141,13 @@ public class ModalBuilder
     }
 
     /// <summary>
-    ///     Adds a channel select component to <see cref="Components"/>.
+    ///     Adds a channel select component to <see cref="InputComponents"/>.
     /// </summary>
     /// <param name="configure">Channel select component builder factory.</param>
     /// <returns>
     ///     The builder instance.
     /// </returns>
-    public ModalBuilder AddChannelSelectComponent(Action<ChannelSelectInputComponentBuilder> configure)
+    public ModalBuilder AddChannelSelectInputComponent(Action<ChannelSelectInputComponentBuilder> configure)
     {
         var builder = new ChannelSelectInputComponentBuilder(this);
         configure(builder);
@@ -155,15 +156,23 @@ public class ModalBuilder
     }
 
     /// <summary>
-    ///     Adds a file upload component to <see cref="Components"/>.
+    ///     Adds a file upload component to <see cref="InputComponents"/>.
     /// </summary>
     /// <param name="configure">File upload component builder factory.</param>
     /// <returns>
     ///     The builder instance.
     /// </returns>
-    public ModalBuilder AddFileUploadComponent(Action<FileUploadInputComponentBuilder> configure)
+    public ModalBuilder AddFileUploadInputComponent(Action<FileUploadInputComponentBuilder> configure)
     {
         var builder = new FileUploadInputComponentBuilder(this);
+        configure(builder);
+        _components.Add(builder);
+        return this;
+    }
+
+    public ModalBuilder AddTextDisplayComponent(Action<TextDisplayComponentBuilder> configure)
+    {
+        var builder = new TextDisplayComponentBuilder(this);
         configure(builder);
         _components.Add(builder);
         return this;

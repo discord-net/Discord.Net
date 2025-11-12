@@ -1,7 +1,5 @@
-using Discord.Interactions.TypeConverters.ModalInputs;
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 
 namespace Discord.Interactions.Builders;
 
@@ -10,15 +8,11 @@ namespace Discord.Interactions.Builders;
 /// </summary>
 /// <typeparam name="TInfo">The <see cref="InputComponentInfo"/> this builder yields when built.</typeparam>
 /// <typeparam name="TBuilder">Inherited <see cref="InputComponentBuilder{TInfo, TBuilder}"/> type.</typeparam>
-public abstract class InputComponentBuilder<TInfo, TBuilder> : IInputComponentBuilder
+public abstract class InputComponentBuilder<TInfo, TBuilder> : ModalComponentBuilder<TInfo, TBuilder>, IInputComponentBuilder
     where TInfo : InputComponentInfo
     where TBuilder : InputComponentBuilder<TInfo, TBuilder>
 {
     private readonly List<Attribute> _attributes;
-    protected abstract TBuilder Instance { get; }
-
-    /// <inheritdoc/>
-    public ModalBuilder Modal { get; }
 
     /// <inheritdoc/>
     public string CustomId { get; set; }
@@ -33,30 +27,14 @@ public abstract class InputComponentBuilder<TInfo, TBuilder> : IInputComponentBu
     public bool IsRequired { get; set; } = true;
 
     /// <inheritdoc/>
-    public ComponentType ComponentType { get; internal set; }
-
-    /// <inheritdoc/>
-    public Type Type { get; private set; }
-
-    /// <inheritdoc/>
-    public PropertyInfo PropertyInfo { get; internal set; }
-
-    /// <inheritdoc/>
     public ModalComponentTypeConverter TypeConverter { get; private set; }
-
-    /// <inheritdoc/>
-    public object DefaultValue { get; set; }
-
-    /// <inheritdoc/>
-    public IReadOnlyCollection<Attribute> Attributes => _attributes;
 
     /// <summary>
     ///     Creates an instance of <see cref="InputComponentBuilder{TInfo, TBuilder}"/>
     /// </summary>
     /// <param name="modal">Parent modal of this input component.</param>
-    public InputComponentBuilder(ModalBuilder modal)
+    internal InputComponentBuilder(ModalBuilder modal) : base(modal)
     {
-        Modal = modal;
         _attributes = new();
     }
 
@@ -113,78 +91,27 @@ public abstract class InputComponentBuilder<TInfo, TBuilder> : IInputComponentBu
     }
 
     /// <summary>
-    ///     Sets <see cref="ComponentType"/>.
-    /// </summary>
-    /// <param name="componentType">New value of the <see cref="ComponentType"/>.</param>
-    /// <returns>
-    ///     The builder instance.
-    /// </returns>
-    public virtual TBuilder WithComponentType(ComponentType componentType)
-    {
-        ComponentType = componentType;
-        return Instance;
-    }
-
-    /// <summary>
     ///     Sets <see cref="Type"/>.
     /// </summary>
     /// <param name="type">New value of the <see cref="Type"/>.</param>
     /// <returns>
     ///     The builder instance.
     /// </returns>
-    public TBuilder WithType(Type type)
+    public override TBuilder WithType(Type type)
     {
-        Type = type;
         TypeConverter = Modal._interactionService.GetModalInputTypeConverter(type);
-        return Instance;
+        return base.WithType(type);
     }
 
-    /// <summary>
-    ///     Sets <see cref="DefaultValue"/>.
-    /// </summary>
-    /// <param name="value">New value of the <see cref="DefaultValue"/>.</param>
-    /// <returns>
-    ///     The builder instance.
-    /// </returns>
-    public TBuilder SetDefaultValue(object value)
-    {
-        DefaultValue = value;
-        return Instance;
-    }
-
-    /// <summary>
-    ///     Adds attributes to <see cref="Attributes"/>.
-    /// </summary>
-    /// <param name="attributes">New attributes to be added to <see cref="Attributes"/>.</param>
-    /// <returns>
-    ///     The builder instance.
-    /// </returns>
-    public TBuilder WithAttributes(params Attribute[] attributes)
-    {
-        _attributes.AddRange(attributes);
-        return Instance;
-    }
-
-    internal abstract TInfo Build(ModalInfo modal);
-
-    //IInputComponentBuilder
     /// <inheritdoc/>
     IInputComponentBuilder IInputComponentBuilder.WithCustomId(string customId) => WithCustomId(customId);
 
     /// <inheritdoc/>
-    IInputComponentBuilder IInputComponentBuilder.WithLabel(string label) => WithCustomId(label);
+    IInputComponentBuilder IInputComponentBuilder.WithLabel(string label) => WithLabel(label);
 
     /// <inheritdoc/>
-    IInputComponentBuilder IInputComponentBuilder.WithType(Type type) => WithType(type);
-
-    /// <inheritdoc/>
-    IInputComponentBuilder IInputComponentBuilder.SetDefaultValue(object value) => SetDefaultValue(value);
-
-    /// <inheritdoc/>
-    IInputComponentBuilder IInputComponentBuilder.WithAttributes(params Attribute[] attributes) => WithAttributes(attributes);
+    IInputComponentBuilder IInputComponentBuilder.WithDescription(string description) => WithDescription(description);
 
     /// <inheritdoc/>
     IInputComponentBuilder IInputComponentBuilder.SetIsRequired(bool isRequired) => SetIsRequired(isRequired);
-
-    IInputComponentBuilder IInputComponentBuilder.WithDescription(string description) => WithDescription(description);
 }
