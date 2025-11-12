@@ -1,6 +1,4 @@
 using Discord.Interactions.Builders;
-using Discord.Interactions.TypeConverters.ModalComponents;
-using Discord.Interactions.TypeConverters.ModalInputs;
 using Discord.Logging;
 using Discord.Rest;
 using Discord.WebSocket;
@@ -238,8 +236,7 @@ public class InteractionService : IDisposable
             [typeof(IConvertible)] = typeof(DefaultValueModalComponentConverter<>),
             [typeof(Enum)] = typeof(EnumModalComponentConverter<>),
             [typeof(Nullable<>)] = typeof(NullableComponentConverter<>),
-            [typeof(Array)] = typeof(DefaultArrayModalComponentConverter<>),
-            [typeof(IAttachment)] = typeof(AttachmentModalComponentConverter<>)
+            [typeof(Array)] = typeof(DefaultArrayModalComponentConverter<>)
         });
     }
 

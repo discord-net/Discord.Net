@@ -1,11 +1,10 @@
-using Discord.Interactions.TypeConverters.ModalInputs;
 using System;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 
-namespace Discord.Interactions.TypeConverters.ModalComponents;
+namespace Discord.Interactions;
 
 internal sealed class EnumModalComponentConverter<T> : ModalComponentTypeConverter<T>
     where T : struct, Enum
@@ -32,7 +31,7 @@ internal sealed class EnumModalComponentConverter<T> : ModalComponentTypeConvert
 
     public override Task<TypeConverterResult> ReadAsync(IInteractionContext context, IComponentInteractionData option, IServiceProvider services)
     {
-        if(option.Type is not ComponentType.SelectMenu or ComponentType.TextInput)
+        if (option.Type is not ComponentType.SelectMenu or ComponentType.TextInput)
             return Task.FromResult(TypeConverterResult.FromError(InteractionCommandError.ConvertFailed, $"{option.Type} input type cannot be converted to {typeof(T).FullName}"));
 
         var value = option.Type switch
@@ -42,7 +41,7 @@ internal sealed class EnumModalComponentConverter<T> : ModalComponentTypeConvert
             _ => null
         };
 
-        if(Enum.TryParse<T>(value, out var result))
+        if (Enum.TryParse<T>(value, out var result))
             return Task.FromResult(TypeConverterResult.FromSuccess(result));
 
         return Task.FromResult(TypeConverterResult.FromError(InteractionCommandError.ConvertFailed, $"Value {option.Value} cannot be converted to {typeof(T).FullName}"));
@@ -53,7 +52,7 @@ internal sealed class EnumModalComponentConverter<T> : ModalComponentTypeConvert
         if (builder is not SelectMenuBuilder selectMenu || component.ComponentType is not ComponentType.SelectMenu)
             throw new InvalidOperationException($"{nameof(EnumModalComponentConverter<T>)} can only write to select menu components.");
 
-        if(selectMenu.MaxValues > 1 && !_isFlags)
+        if (selectMenu.MaxValues > 1 && !_isFlags)
             throw new InvalidOperationException($"Enum type {typeof(T).FullName} is not a [Flags] enum, so it cannot be used in a multi-select menu.");
 
         selectMenu.WithOptions(_options.ToList());

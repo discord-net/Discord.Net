@@ -1,9 +1,8 @@
-using Discord.Interactions.TypeConverters.ModalInputs;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Discord.Interactions.TypeConverters.ModalComponents;
+namespace Discord.Interactions;
 
 internal sealed class DefaultValueModalComponentConverter<T> : ModalComponentTypeConverter<T>
     where T : IConvertible
@@ -38,8 +37,9 @@ internal sealed class DefaultValueModalComponentConverter<T> : ModalComponentTyp
                 selectMenu.Options.FirstOrDefault(x => x.Value == strValue)?.IsDefault = true;
                 break;
             default:
-                throw new InvalidOperationException($"{nameof(IConvertible)}s cannot be used to populate components other than SelectMenu and TextInput.");
-        };
+                throw new InvalidOperationException($"{typeof(IConvertible).Name}s cannot be used to populate components other than SelectMenu and TextInput.");
+        }
+        ;
 
         return Task.CompletedTask;
     }

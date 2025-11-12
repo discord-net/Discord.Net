@@ -1,11 +1,10 @@
-using Discord.Interactions.TypeConverters.ModalInputs;
 using Discord.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Discord.Interactions.TypeConverters.ModalComponents;
+namespace Discord.Interactions;
 
 internal sealed class DefaultArrayModalComponentConverter<T> : ModalComponentTypeConverter<T>
 {
@@ -27,7 +26,8 @@ internal sealed class DefaultArrayModalComponentConverter<T> : ModalComponentTyp
             _ when typeof(IUser).IsAssignableFrom(_underlyingType)
                 || typeof(IChannel).IsAssignableFrom(_underlyingType)
                 || typeof(IMentionable).IsAssignableFrom(_underlyingType)
-                || typeof(IRole).IsAssignableFrom(_underlyingType) => null,
+                || typeof(IRole).IsAssignableFrom(_underlyingType)
+                || typeof(IAttachment).IsAssignableFrom(_underlyingType) => null,
             _ => interactionService.GetTypeReader(_underlyingType)
         };
 
@@ -71,6 +71,7 @@ internal sealed class DefaultArrayModalComponentConverter<T> : ModalComponentTyp
     {
         var objs = new List<object>();
 
+
         if (_typeReader is not null && option.Values.Count > 0)
             foreach (var value in option.Values)
             {
@@ -83,23 +84,47 @@ internal sealed class DefaultArrayModalComponentConverter<T> : ModalComponentTyp
             }
         else
         {
-            var users = new Dictionary<ulong, IUser>();
+            if (!TryGetModalInteractionData(context, out var modalData))
+            {
+                return TypeConverterResult.FromError(InteractionCommandError.ParseFailed, $"{typeof(IModalInteractionData).Name} cannot be accessed from the provided {typeof(IInteractionContext).Name} type.");
+            }
 
-            if (option.Users is not null)
-                foreach (var user in option.Users)
-                    users[user.Id] = user;
+            var resolvedSnowflakes = new Dictionary<ulong, ISnowflakeEntity>();
 
-            if (option.Members is not null)
-                foreach (var member in option.Members)
-                    users[member.Id] = member;
+            if (modalData.Users is not null)
+                foreach (var user in modalData.Users)
+                    resolvedSnowflakes[user.Id] = user;
 
-            objs.AddRange(users.Values);
+            if (modalData.Members is not null)
+                foreach (var member in modalData.Members)
+                    resolvedSnowflakes[member.Id] = member;
 
-            if (option.Roles is not null)
-                objs.AddRange(option.Roles);
+            if (modalData.Roles is not null)
+                foreach (var role in modalData.Roles)
+                    resolvedSnowflakes[role.Id] = role;
 
-            if (option.Channels is not null)
-                objs.AddRange(option.Channels);
+            if (modalData.Channels is not null)
+                foreach (var channel in modalData.Channels)
+                    resolvedSnowflakes[channel.Id] = channel;
+
+            if (modalData.Attachments is not null)
+                foreach (var attachment in modalData.Attachments)
+                    resolvedSnowflakes[attachment.Id] = attachment;
+
+            foreach (var value in option.Values)
+            {
+                if (!ulong.TryParse(value, out var id))
+                {
+                    return TypeConverterResult.FromError(InteractionCommandError.ParseFailed, $"{option.Type} contains invalid snowflake.");
+                }
+
+                if (!resolvedSnowflakes.TryGetValue(id, out var snowflakeEntity))
+                {
+                    return TypeConverterResult.FromError(InteractionCommandError.ParseFailed, $"Some snowflake entity references for the {option.Type} cannot be resolved.");
+                }
+
+                objs.Add(snowflakeEntity);
+            }
         }
 
         var destination = Array.CreateInstance(_underlyingType, objs.Count);
@@ -112,7 +137,7 @@ internal sealed class DefaultArrayModalComponentConverter<T> : ModalComponentTyp
 
     public override Task WriteAsync<TBuilder>(TBuilder builder, InputComponentInfo component, object value)
     {
-        if(builder is not SelectMenuBuilder selectMenu || !component.ComponentType.IsSelectType())
+        if (builder is not SelectMenuBuilder selectMenu || !component.ComponentType.IsSelectType())
             throw new InvalidOperationException($"Component type of the input {component.CustomId} of modal {component.Modal.Type.FullName} must be a select type.");
 
         switch (value)
@@ -136,13 +161,13 @@ internal sealed class DefaultArrayModalComponentConverter<T> : ModalComponentTyp
                 });
                 break;
             case IEnumerable<IUser> defaultUsers:
-                selectMenu.DefaultValues = defaultUsers.Select(x => SelectMenuDefaultValue.FromUser(x)).ToList();
+                selectMenu.DefaultValues = defaultUsers.Select(SelectMenuDefaultValue.FromUser).ToList();
                 break;
             case IEnumerable<IRole> defaultRoles:
-                selectMenu.DefaultValues = defaultRoles.Select(x => SelectMenuDefaultValue.FromRole(x)).ToList();
+                selectMenu.DefaultValues = defaultRoles.Select(SelectMenuDefaultValue.FromRole).ToList();
                 break;
             case IEnumerable<IChannel> defaultChannels:
-                selectMenu.DefaultValues = defaultChannels.Select(x => SelectMenuDefaultValue.FromChannel(x)).ToList();
+                selectMenu.DefaultValues = defaultChannels.Select(SelectMenuDefaultValue.FromChannel).ToList();
                 break;
             case IEnumerable<IMentionable> defaultMentionables:
                 selectMenu.DefaultValues = defaultMentionables.Where(x => x is IUser or IRole or IChannel)
@@ -158,11 +183,12 @@ internal sealed class DefaultArrayModalComponentConverter<T> : ModalComponentTyp
                     })
                     .ToList();
                 break;
-        };
+        }
+        ;
 
 
 
-        if(component.ComponentType == ComponentType.ChannelSelect && _channelTypes is not null)
+        if (component.ComponentType == ComponentType.ChannelSelect && _channelTypes is not null)
             selectMenu.WithChannelTypes(_channelTypes);
 
         return Task.CompletedTask;

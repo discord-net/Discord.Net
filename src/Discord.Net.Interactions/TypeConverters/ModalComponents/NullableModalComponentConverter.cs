@@ -1,8 +1,7 @@
-using Discord.Interactions.TypeConverters.ModalInputs;
 using System;
 using System.Threading.Tasks;
 
-namespace Discord.Interactions.TypeConverters.ModalComponents;
+namespace Discord.Interactions;
 
 internal class NullableModalComponentConverter<T> : ModalComponentTypeConverter<T>
 {
