@@ -28,6 +28,9 @@ internal sealed class DefaultValueModalComponentConverter<T> : ModalComponentTyp
     {
         var strValue = Convert.ToString(value);
 
+        if(string.IsNullOrEmpty(strValue))
+            return Task.CompletedTask;
+
         switch (builder)
         {
             case TextInputBuilder textInput:
