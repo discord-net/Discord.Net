@@ -717,12 +717,16 @@ namespace Discord.Interactions.Builders
                         builder.Description = inputLabel.Description;
                         break;
                     case ModalSelectMenuOptionAttribute selectMenuOption:
+
+                        if (!Emote.TryParse(selectMenuOption.Emote, out var emote) && !string.IsNullOrEmpty(selectMenuOption.Emote))
+                            throw new ArgumentException($"Invalid emote format on {propertyInfo.DeclaringType} modal, {propertyInfo.Name} property");
+
                         builder.AddOption(new SelectMenuOptionBuilder
                         {
                             Label = selectMenuOption.Label,
                             Description = selectMenuOption.Description,
                             Value = selectMenuOption.Value,
-                            Emote = Emote.Parse(selectMenuOption.Emote),
+                            Emote = emote,
                             IsDefault = selectMenuOption.IsDefault
                         });
                         break;
