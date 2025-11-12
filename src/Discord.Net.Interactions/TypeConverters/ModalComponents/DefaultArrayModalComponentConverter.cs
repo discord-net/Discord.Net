@@ -137,6 +137,9 @@ internal sealed class DefaultArrayModalComponentConverter<T> : ModalComponentTyp
 
     public override Task WriteAsync<TBuilder>(TBuilder builder, InputComponentInfo component, object value)
     {
+        if (builder is FileUploadComponentBuilder)
+            return Task.CompletedTask;
+
         if (builder is not SelectMenuBuilder selectMenu || !component.ComponentType.IsSelectType())
             throw new InvalidOperationException($"Component type of the input {component.CustomId} of modal {component.Modal.Type.FullName} must be a select type.");
 

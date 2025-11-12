@@ -110,6 +110,7 @@ public class ModalInfo
         MentionableSelectInputComponents = Components.OfType<MentionableSelectInputComponentInfo>().ToImmutableArray();
         ChannelSelectInputComponents = Components.OfType<ChannelSelectInputComponentInfo>().ToImmutableArray();
         FileUploadInputComponents = Components.OfType<FileUploadInputComponentInfo>().ToImmutableArray();
+        TextDisplayComponents = Components.OfType<TextDisplayComponentInfo>().ToImmutableArray();
 
         _interactionService = builder._interactionService;
         _initializer = builder.ModalInitializer;

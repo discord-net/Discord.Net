@@ -604,11 +604,11 @@ internal static class ModuleClassBuilder
                 Title = instance.Title
             };
 
-            var inputs = modalType.GetProperties().Where(IsValidModalInputDefinition);
+            var components = modalType.GetProperties().Where(IsValidModalComponentDefinition);
 
-            foreach (var prop in inputs)
+            foreach (var prop in components)
             {
-                var componentType = prop.GetCustomAttribute<ModalInputAttribute>()?.ComponentType;
+                var componentType = prop.GetCustomAttribute<ModalComponentAttribute>()?.ComponentType;
 
                 switch (componentType)
                 {
@@ -875,11 +875,11 @@ internal static class ModuleClassBuilder
             typeof(IModal).IsAssignableFrom(methodInfo.GetParameters().Last().ParameterType);
     }
 
-    private static bool IsValidModalInputDefinition(PropertyInfo propertyInfo)
+    private static bool IsValidModalComponentDefinition(PropertyInfo propertyInfo)
     {
         return propertyInfo.SetMethod?.IsPublic == true &&
             propertyInfo.SetMethod?.IsStatic == false &&
-            propertyInfo.IsDefined(typeof(ModalInputAttribute));
+            propertyInfo.IsDefined(typeof(ModalComponentAttribute));
     }
 
     private static ConstructorInfo GetComplexParameterConstructor(TypeInfo typeInfo, ComplexParameterAttribute complexParameter)

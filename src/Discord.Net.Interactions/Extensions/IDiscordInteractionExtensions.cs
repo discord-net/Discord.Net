@@ -134,7 +134,8 @@ public static class IDiscordInteractionExtentions
                     break;
                 case TextDisplayComponentInfo textDisplayComponent:
                     {
-                        var componentBuilder = new TextDisplayBuilder(textDisplayComponent.Content);
+                        var content = textDisplayComponent.Getter(modalInstance).ToString() ?? textDisplayComponent.Content;
+                        var componentBuilder = new TextDisplayBuilder(content);
                         builder.AddTextDisplay(componentBuilder);
                     }
                     break;

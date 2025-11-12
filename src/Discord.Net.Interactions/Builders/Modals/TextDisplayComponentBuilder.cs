@@ -7,7 +7,7 @@ namespace Discord.Interactions.Builders;
 /// </summary>
 public class TextDisplayComponentBuilder : ModalComponentBuilder<TextDisplayComponentInfo, TextDisplayComponentBuilder>
 {
-    protected override TextDisplayComponentBuilder Instance => throw new NotImplementedException();
+    protected override TextDisplayComponentBuilder Instance => this;
 
     /// <summary>
     ///     Gets and sets the content of the text display.

@@ -66,7 +66,7 @@ public class ModalBuilder
     }
 
     /// <summary>
-    ///     Adds text components to <see cref="InputComponents"/>.
+    ///     Adds text components to <see cref="Components"/>.
     /// </summary>
     /// <param name="configure">Text Component builder factory.</param>
     /// <returns>
@@ -81,7 +81,7 @@ public class ModalBuilder
     }
 
     /// <summary>
-    ///     Adds a select menu component to <see cref="InputComponents"/>.
+    ///     Adds a select menu component to <see cref="Components"/>.
     /// </summary>
     /// <param name="configure">Select menu component builder factory.</param>
     /// <returns>
@@ -96,7 +96,7 @@ public class ModalBuilder
     }
 
     /// <summary>
-    ///     Adds a user select component to <see cref="InputComponents"/>.
+    ///     Adds a user select component to <see cref="Components"/>.
     /// </summary>
     /// <param name="configure">User select component builder factory.</param>
     /// <returns>
@@ -111,7 +111,7 @@ public class ModalBuilder
     }
 
     /// <summary>
-    ///     Adds a role select component to <see cref="InputComponents"/>.
+    ///     Adds a role select component to <see cref="Components"/>.
     /// </summary>
     /// <param name="configure">Role select component builder factory.</param>
     /// <returns>
@@ -126,7 +126,7 @@ public class ModalBuilder
     }
 
     /// <summary>
-    ///     Adds a mentionable select component to <see cref="InputComponents"/>.
+    ///     Adds a mentionable select component to <see cref="Components"/>.
     /// </summary>
     /// <param name="configure">Mentionable select component builder factory.</param>
     /// <returns>
@@ -141,7 +141,7 @@ public class ModalBuilder
     }
 
     /// <summary>
-    ///     Adds a channel select component to <see cref="InputComponents"/>.
+    ///     Adds a channel select component to <see cref="Components"/>.
     /// </summary>
     /// <param name="configure">Channel select component builder factory.</param>
     /// <returns>
@@ -156,7 +156,7 @@ public class ModalBuilder
     }
 
     /// <summary>
-    ///     Adds a file upload component to <see cref="InputComponents"/>.
+    ///     Adds a file upload component to <see cref="Components"/>.
     /// </summary>
     /// <param name="configure">File upload component builder factory.</param>
     /// <returns>
@@ -170,6 +170,13 @@ public class ModalBuilder
         return this;
     }
 
+    /// <summary>
+    ///     Adds a text display component to <see cref="Components"/>.
+    /// </summary>
+    /// <param name="configure">Text display component builder factory.</param>
+    /// <returns>
+    ///     The builder instance.
+    /// </returns>
     public ModalBuilder AddTextDisplayComponent(Action<TextDisplayComponentBuilder> configure)
     {
         var builder = new TextDisplayComponentBuilder(this);
