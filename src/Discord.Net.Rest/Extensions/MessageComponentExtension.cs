@@ -102,6 +102,7 @@ internal static class MessageComponentExtension
                     parsed.Placeholder.GetValueOrDefault(),
                     parsed.MinValues,
                     parsed.MaxValues,
+                    parsed.Required,
                     parsed.Disabled,
                     parsed.Type,
                     parsed.Id.ToNullable(),

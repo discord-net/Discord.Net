@@ -165,7 +165,7 @@ namespace Discord
             return this;
         }
 
-        /// <inheritdoc cref="ModalComponentBuilder.WithSelectMenu(string, string, List{SelectMenuOptionBuilder}, string, int, int, bool, ComponentType, ChannelType[], int?, string, int?)"/>
+        /// <inheritdoc cref="ModalComponentBuilder.WithSelectMenu(string, string, List{SelectMenuOptionBuilder}, string, int, int, bool, bool, ComponentType, ChannelType[], SelectMenuDefaultValue[], int?, string, int?)"/>
         /// <returns>The current <see cref="ModalBuilder"/>.</returns>
         public ModalBuilder AddSelectMenu(
             string label,
@@ -174,9 +174,11 @@ namespace Discord
             string placeholder = null,
             int minValues = 1,
             int maxValues = 1,
+            bool required = true,
             bool disabled = false,
             ComponentType type = ComponentType.SelectMenu,
             ChannelType[] channelTypes = null,
+            SelectMenuDefaultValue[] defaultValues = null,
             int? id = null,
             string description = null,
             int? labelId = null
@@ -189,9 +191,11 @@ namespace Discord
                 placeholder,
                 minValues,
                 maxValues,
+                required,
                 disabled,
                 type,
                 channelTypes,
+                defaultValues,
                 id,
                 description,
                 labelId
@@ -624,9 +628,11 @@ namespace Discord
         /// <param name="placeholder">The placeholder of the <see cref="SelectMenuBuilder"/>.</param>
         /// <param name="minValues">The min values of the <see cref="SelectMenuBuilder"/>.</param>
         /// <param name="maxValues">The max values of the <see cref="SelectMenuBuilder"/>.</param>
+        /// <param name="required">Whether the <see cref="SelectMenuBuilder"/> is required to be answered.</param>
         /// <param name="disabled">Whether the <see cref="SelectMenuBuilder"/> is disabled.</param>
         /// <param name="type">The type of the <see cref="SelectMenuBuilder"/>.</param>
         /// <param name="channelTypes">The channel types of the <see cref="SelectMenuBuilder"/>.</param>
+        /// <param name="defaultValues">The default values of the <see cref="SelectMenuBuilder"/>.</param>
         /// <param name="id">The id of the <see cref="SelectMenuBuilder"/>.</param>
         /// <param name="description">The description around the <see cref="SelectMenuBuilder"/>.</param>
         /// <param name="labelId">
@@ -640,9 +646,11 @@ namespace Discord
             string placeholder = null,
             int minValues = 1,
             int maxValues = 1,
+            bool required = true,
             bool disabled = false,
             ComponentType type = ComponentType.SelectMenu,
             ChannelType[] channelTypes = null,
+            SelectMenuDefaultValue[] defaultValues = null,
             int? id = null,
             string description = null,
             int? labelId = null
@@ -655,9 +663,11 @@ namespace Discord
                 .WithPlaceholder(placeholder)
                 .WithMaxValues(maxValues)
                 .WithMinValues(minValues)
+                .WithRequired(required)
                 .WithDisabled(disabled)
                 .WithType(type)
-                .WithChannelTypes(channelTypes),
+                .WithChannelTypes(channelTypes)
+                .WithDefaultValues(defaultValues),
             description,
             labelId
         );
@@ -695,11 +705,11 @@ namespace Discord
         ///     Constructs and adds a <see cref="LabelBuilder"/> with the provided
         ///     <see cref="FileUploadComponentBuilder"/> to the current <see cref="ModalComponentBuilder"/>.
         /// </summary>
-        /// <param name="label">The label around the <see cref="SelectMenuBuilder"/>.</param>
+        /// <param name="label">The label around the <see cref="FileUploadComponentBuilder"/>.</param>
         /// <param name="fileUpload">The file upload to add.</param>
-        /// <param name="description">The description around the <see cref="SelectMenuBuilder"/>.</param>
+        /// <param name="description">The description around the <see cref="FileUploadComponentBuilder"/>.</param>
         /// <param name="labelId">
-        ///     The id of the <see cref="LabelBuilder"/> wrapping the <see cref="SelectMenuBuilder"/>.
+        ///     The id of the <see cref="LabelBuilder"/> wrapping the <see cref="FileUploadComponentBuilder"/>.
         /// </param>
         /// <returns>The current <see cref="ModalComponentBuilder"/>.</returns>
         public ModalComponentBuilder WithFileUpload(
@@ -713,15 +723,15 @@ namespace Discord
         ///     Constructs and adds a <see cref="LabelBuilder"/> with a <see cref="FileUploadComponentBuilder"/>
         ///     to the current <see cref="ModalComponentBuilder"/>.
         /// </summary>
-        /// <param name="label">The label around the <see cref="SelectMenuBuilder"/>.</param>
+        /// <param name="label">The label around the <see cref="FileUploadComponentBuilder"/>.</param>
         /// <param name="customId">The custom id of the <see cref="FileUploadComponentBuilder"/>.</param>
         /// <param name="minValues">The min values of the <see cref="FileUploadComponentBuilder"/>.</param>
         /// <param name="maxValues">The max values of the <see cref="FileUploadComponentBuilder"/>.</param>
         /// <param name="isRequired">Whether the <see cref="FileUploadComponentBuilder"/> is required.</param>
         /// <param name="id">The id of the <see cref="FileUploadComponentBuilder"/>.</param>
-        /// <param name="description">The description around the <see cref="SelectMenuBuilder"/>.</param>
+        /// <param name="description">The description around the <see cref="FileUploadComponentBuilder"/>.</param>
         /// <param name="labelId">
-        ///     The id of the <see cref="LabelBuilder"/> wrapping the <see cref="SelectMenuBuilder"/>.
+        ///     The id of the <see cref="LabelBuilder"/> wrapping the <see cref="FileUploadComponentBuilder"/>.
         /// </param>
         /// <returns>The current <see cref="ModalComponentBuilder"/>.</returns>
         public ModalComponentBuilder WithFileUpload(
@@ -767,11 +777,11 @@ namespace Discord
         ///     Constructs and adds a <see cref="LabelBuilder"/> with the provided <see cref="TextInputBuilder"/> to
         ///     the current <see cref="ModalComponentBuilder"/>.
         /// </summary>
-        /// <param name="label">The label around the <see cref="SelectMenuBuilder"/>.</param>
+        /// <param name="label">The label around the <see cref="TextInputBuilder"/>.</param>
         /// <param name="textInput">The text input to add.</param>
-        /// <param name="description">The description around the <see cref="SelectMenuBuilder"/>.</param>
+        /// <param name="description">The description around the <see cref="TextInputBuilder"/>.</param>
         /// <param name="labelId">
-        ///     The id of the <see cref="LabelBuilder"/> wrapping the <see cref="SelectMenuBuilder"/>.
+        ///     The id of the <see cref="LabelBuilder"/> wrapping the <see cref="TextInputBuilder"/>.
         /// </param>
         /// <returns>The current <see cref="ModalComponentBuilder"/>.</returns>
         public ModalComponentBuilder WithTextInput(
@@ -823,7 +833,7 @@ namespace Discord
         ///     Constructs and adds a <see cref="LabelBuilder"/> with a <see cref="TextInputBuilder"/>
         ///     to the current <see cref="ModalComponentBuilder"/>.
         /// </summary>
-        /// <param name="label">The label around the <see cref="SelectMenuBuilder"/>.</param>
+        /// <param name="label">The label around the <see cref="TextInputBuilder"/>.</param>
         /// <param name="customId">The custom id of the <see cref="TextInputBuilder"/>.</param>
         /// <param name="style">The style of the <see cref="TextInputBuilder"/>.</param>
         /// <param name="placeholder">The placeholder of the <see cref="TextInputBuilder"/>.</param>
@@ -833,9 +843,9 @@ namespace Discord
         /// <param name="required">Whether the <see cref="TextInputBuilder"/> is required.</param>
         /// <param name="value">The value of the <see cref="TextInputBuilder"/>.</param>
         /// <param name="id">The id of the <see cref="TextInputBuilder"/>.</param>
-        /// <param name="description">The description around the <see cref="SelectMenuBuilder"/>.</param>
+        /// <param name="description">The description around the <see cref="TextInputBuilder"/>.</param>
         /// <param name="labelId">
-        ///     The id of the <see cref="LabelBuilder"/> wrapping the <see cref="SelectMenuBuilder"/>.
+        ///     The id of the <see cref="LabelBuilder"/> wrapping the <see cref="TextInputBuilder"/>.
         /// </param>
         /// <returns>The current <see cref="ModalComponentBuilder"/>.</returns>
         public ModalComponentBuilder WithTextInput(
