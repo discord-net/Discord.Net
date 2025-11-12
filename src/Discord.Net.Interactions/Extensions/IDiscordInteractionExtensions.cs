@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Discord.Interactions;
@@ -66,7 +65,7 @@ public static class IDiscordInteractionExtentions
         if (!ModalUtils.TryGet<T>(out var modalInfo))
             throw new ArgumentException($"{typeof(T).FullName} isn't referenced by any registered Modal Interaction Command and doesn't have a cached {typeof(ModalInfo)}");
 
-        return SendModalResponseAsync<T>(interaction, customId, modalInfo, modal, options, modifyModal); 
+        return SendModalResponseAsync<T>(interaction, customId, modalInfo, modal, options, modifyModal);
     }
 
     private static async Task SendModalResponseAsync<T>(IDiscordInteraction interaction, string customId, ModalInfo modalInfo, T modalInstance = null, RequestOptions options = null, Action<ModalBuilder> modifyModal = null)
@@ -85,7 +84,7 @@ public static class IDiscordInteractionExtentions
                         var inputBuilder = new TextInputBuilder(textComponent.CustomId, textComponent.Style, textComponent.Placeholder, textComponent.IsRequired ? textComponent.MinLength : null,
                         textComponent.MaxLength, textComponent.IsRequired);
 
-                        if(modalInstance != null)
+                        if (modalInstance != null)
                         {
                             await textComponent.TypeConverter.WriteAsync(inputBuilder, textComponent, textComponent.Getter(modalInstance));
                         }
@@ -98,7 +97,7 @@ public static class IDiscordInteractionExtentions
                     {
                         var inputBuilder = new SelectMenuBuilder(selectMenuComponent.CustomId, selectMenuComponent.Options.Select(x => new SelectMenuOptionBuilder(x)).ToList(), selectMenuComponent.Placeholder, selectMenuComponent.MaxValues, selectMenuComponent.MinValues, false);
 
-                        if(modalInstance != null)
+                        if (modalInstance != null)
                         {
                             await selectMenuComponent.TypeConverter.WriteAsync(inputBuilder, selectMenuComponent, selectMenuComponent.Getter(modalInstance));
                         }
@@ -111,7 +110,7 @@ public static class IDiscordInteractionExtentions
                     {
                         var inputBuilder = new SelectMenuBuilder(snowflakeSelectComponent.CustomId, null, snowflakeSelectComponent.Placeholder, snowflakeSelectComponent.MaxValues, snowflakeSelectComponent.MinValues, false, snowflakeSelectComponent.ComponentType, null, snowflakeSelectComponent.DefaultValues.ToList());
 
-                        if(modalInstance != null)
+                        if (modalInstance != null)
                         {
                             await snowflakeSelectComponent.TypeConverter.WriteAsync(inputBuilder, snowflakeSelectComponent, snowflakeSelectComponent.Getter(modalInstance));
                         }
@@ -124,13 +123,19 @@ public static class IDiscordInteractionExtentions
                     {
                         var inputBuilder = new FileUploadComponentBuilder(fileUploadComponent.CustomId, fileUploadComponent.MinValues, fileUploadComponent.MaxValues, fileUploadComponent.IsRequired);
 
-                        if(modalInstance != null)
+                        if (modalInstance != null)
                         {
                             await fileUploadComponent.TypeConverter.WriteAsync(inputBuilder, fileUploadComponent, fileUploadComponent.Getter(modalInstance));
                         }
 
                         var labelBuilder = new LabelBuilder(fileUploadComponent.Label, inputBuilder, fileUploadComponent.Description);
                         builder.AddLabel(labelBuilder);
+                    }
+                    break;
+                case TextDisplayComponentInfo textDisplayComponent:
+                    {
+                        var componentBuilder = new TextDisplayBuilder(textDisplayComponent.Content);
+                        builder.AddTextDisplay(componentBuilder);
                     }
                     break;
                 default:

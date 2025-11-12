@@ -634,7 +634,8 @@ internal static class ModuleClassBuilder
                         builder.AddFileUploadInputComponent(x => BuildFileUploadInput(x, prop, prop.GetValue(instance)));
                         break;
                     case ComponentType.TextDisplay:
-                        throw new NotImplementedException();
+                        builder.AddTextDisplayComponent(x => BuildTextDisplayComponent(x, prop, prop.GetValue(instance)));
+                        break;
                     case null:
                         throw new InvalidOperationException($"{prop.Name} of {prop.DeclaringType.Name} isn't a valid modal input field.");
                     default:
@@ -715,6 +716,16 @@ internal static class ModuleClassBuilder
                     builder.Label = inputLabel.Label;
                     builder.Description = inputLabel.Description;
                     break;
+                case ModalSelectMenuOptionAttribute selectMenuOption:
+                    builder.AddOption(new SelectMenuOptionBuilder
+                    {
+                        Label = selectMenuOption.Label,
+                        Description = selectMenuOption.Description,
+                        Value = selectMenuOption.Value,
+                        Emote = Emote.Parse(selectMenuOption.Emote),
+                        IsDefault = selectMenuOption.IsDefault
+                    });
+                    break;
                 default:
                     builder.WithAttributes(attribute);
                     break;
@@ -789,12 +800,29 @@ internal static class ModuleClassBuilder
                     break;
             }
         }
-
     }
 
-    private static void BuildTextDisplayComponent()
+    private static void BuildTextDisplayComponent(TextDisplayComponentBuilder builder, PropertyInfo propertyInfo, object defaultValue)
     {
+        var attributes = propertyInfo.GetCustomAttributes();
 
+        builder.DefaultValue = defaultValue;
+        builder.WithType(propertyInfo.PropertyType);
+        builder.PropertyInfo = propertyInfo;
+
+        foreach (var attribute in attributes)
+        {
+            switch (attribute)
+            {
+                case ModalTextDisplayAttribute textDisplay:
+                    builder.ComponentType = textDisplay.ComponentType;
+                    builder.Content = textDisplay.Content;
+                    break;
+                default:
+                    builder.WithAttributes(attribute);
+                    break;
+            }
+        }
     }
     #endregion
 
