@@ -93,7 +93,7 @@ namespace Discord.Interactions
                             builder.AddLabel(labelBuilder);
                         }
                         break;
-                    case SelectMenuInputComponentInfo selectMenuComponent:
+                    case SelectMenuComponentInfo selectMenuComponent:
                         {
                             var inputBuilder = new SelectMenuBuilder(selectMenuComponent.CustomId, selectMenuComponent.Options.Select(x => new SelectMenuOptionBuilder(x)).ToList(), selectMenuComponent.Placeholder, selectMenuComponent.MaxValues, selectMenuComponent.MinValues, false, isRequired: selectMenuComponent.IsRequired);
 
@@ -106,7 +106,7 @@ namespace Discord.Interactions
                             builder.AddLabel(labelBuilder);
                         }
                         break;
-                    case SnowflakeSelectInputComponentInfo snowflakeSelectComponent:
+                    case SnowflakeSelectComponentInfo snowflakeSelectComponent:
                         {
                             var inputBuilder = new SelectMenuBuilder(snowflakeSelectComponent.CustomId, null, snowflakeSelectComponent.Placeholder, snowflakeSelectComponent.MaxValues, snowflakeSelectComponent.MinValues, false, snowflakeSelectComponent.ComponentType, null, snowflakeSelectComponent.DefaultValues.ToList(), null, snowflakeSelectComponent.IsRequired);
 
@@ -119,7 +119,7 @@ namespace Discord.Interactions
                             builder.AddLabel(labelBuilder);
                         }
                         break;
-                    case FileUploadInputComponentInfo fileUploadComponent:
+                    case FileUploadComponentInfo fileUploadComponent:
                         {
                             var inputBuilder = new FileUploadComponentBuilder(fileUploadComponent.CustomId, fileUploadComponent.MinValues, fileUploadComponent.MaxValues, fileUploadComponent.IsRequired);
 

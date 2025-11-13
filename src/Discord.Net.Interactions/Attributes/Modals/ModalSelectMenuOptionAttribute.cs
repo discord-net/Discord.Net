@@ -1,10 +1,13 @@
 using System;
 
-namespace Discord.Interactions.Attributes.Modals;
+namespace Discord.Interactions;
 
 /// <summary>
 ///     Adds a select menu option to the marked field.
 /// </summary>
+/// <remarks>
+///     To add additional metadata to enum fields, use <see cref="SelectMenuOptionAttribute"/> instead.
+/// </remarks>
 [AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
 public class ModalSelectMenuOptionAttribute : Attribute
 {
@@ -34,7 +37,7 @@ public class ModalSelectMenuOptionAttribute : Attribute
     public bool IsDefault { get; set; }
 
     /// <summary>
-    ///     Create a new <see cref="ModalSelectInputAttribute"/>.
+    ///     Create a new <see cref="ModalSelectComponentAttribute"/>.
     /// </summary>
     /// <param name="label">Label of the option.</param>
     /// <param name="value">Value of the option.</param>

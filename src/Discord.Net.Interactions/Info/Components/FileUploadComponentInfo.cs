@@ -3,7 +3,7 @@ namespace Discord.Interactions;
 /// <summary>
 ///     Represents the <see cref="InputComponentInfo"/> class for <see cref="ComponentType.FileUpload"/> type.
 /// </summary>
-public class FileUploadInputComponentInfo : InputComponentInfo
+public class FileUploadComponentInfo : InputComponentInfo
 {
     /// <summary>
     ///     Gets the minimum number of values that can be selected.
@@ -15,7 +15,7 @@ public class FileUploadInputComponentInfo : InputComponentInfo
     /// </summary>
     public int MaxValues { get; }
 
-    internal FileUploadInputComponentInfo(Builders.FileUploadInputComponentBuilder builder, ModalInfo modal) : base(builder, modal)
+    internal FileUploadComponentInfo(Builders.FileUploadComponentBuilder builder, ModalInfo modal) : base(builder, modal)
     {
         MinValues = builder.MinValues;
         MaxValues = builder.MaxValues;

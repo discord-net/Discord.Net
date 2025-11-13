@@ -7,7 +7,7 @@ namespace Discord.Interactions;
 /// <summary>
 ///     Represents the <see cref="InputComponentInfo"/> class for <see cref="ComponentType.SelectMenu"/> type.
 /// </summary>
-public class SelectMenuInputComponentInfo : InputComponentInfo
+public class SelectMenuComponentInfo : InputComponentInfo
 {
     /// <summary>
     ///     Gets the placeholder of the select menu input.
@@ -29,7 +29,7 @@ public class SelectMenuInputComponentInfo : InputComponentInfo
     /// </summary>
     public IReadOnlyCollection<SelectMenuOption> Options { get; }
 
-    internal SelectMenuInputComponentInfo(Builders.SelectMenuInputComponentBuilder builder, ModalInfo modal) : base(builder, modal)
+    internal SelectMenuComponentInfo(Builders.SelectMenuComponentBuilder builder, ModalInfo modal) : base(builder, modal)
     {
         Placeholder = builder.Placeholder;
         MinValues = builder.MinValues;

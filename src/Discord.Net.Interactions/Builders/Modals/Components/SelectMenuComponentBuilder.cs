@@ -4,13 +4,13 @@ using System.Collections.Generic;
 namespace Discord.Interactions.Builders;
 
 /// <summary>
-///     Represents a builder for creating <see cref="SelectMenuInputComponentInfo"/>.
+///     Represents a builder for creating <see cref="SelectMenuComponentInfo"/>.
 /// </summary>
-public class SelectMenuInputComponentBuilder : InputComponentBuilder<SelectMenuInputComponentInfo, SelectMenuInputComponentBuilder>
+public class SelectMenuComponentBuilder : InputComponentBuilder<SelectMenuComponentInfo, SelectMenuComponentBuilder>
 {
     private readonly List<SelectMenuOptionBuilder> _options;
 
-    protected override SelectMenuInputComponentBuilder Instance => this;
+    protected override SelectMenuComponentBuilder Instance => this;
 
     /// <summary>
     ///     Gets and sets the placeholder for the select menu iput.
@@ -33,10 +33,10 @@ public class SelectMenuInputComponentBuilder : InputComponentBuilder<SelectMenuI
     public IReadOnlyCollection<SelectMenuOptionBuilder> Options => _options;
 
     /// <summary>
-    ///     Initialize a new <see cref="SelectMenuInputComponentBuilder"/>.
+    ///     Initialize a new <see cref="SelectMenuComponentBuilder"/>.
     /// </summary>
     /// <param name="modal">Parent modal of this component.</param>
-    public SelectMenuInputComponentBuilder(ModalBuilder modal) : base(modal)
+    public SelectMenuComponentBuilder(ModalBuilder modal) : base(modal)
     {
         _options = new();
     }
@@ -46,7 +46,7 @@ public class SelectMenuInputComponentBuilder : InputComponentBuilder<SelectMenuI
     /// </summary>
     /// <param name="option">Option to be added to <see cref="Options"/>.</param>
     /// <returns>The builder instance.</returns>
-    public SelectMenuInputComponentBuilder AddOption(SelectMenuOptionBuilder option)
+    public SelectMenuComponentBuilder AddOption(SelectMenuOptionBuilder option)
     {
         _options.Add(option);
         return this;
@@ -57,7 +57,7 @@ public class SelectMenuInputComponentBuilder : InputComponentBuilder<SelectMenuI
     /// </summary>
     /// <param name="configure">Select menu option builder factory.</param>
     /// <returns>The builder instance.</returns>
-    public SelectMenuInputComponentBuilder AddOption(Action<SelectMenuOptionBuilder> configure)
+    public SelectMenuComponentBuilder AddOption(Action<SelectMenuOptionBuilder> configure)
     {
         var builder = new SelectMenuOptionBuilder();
         configure(builder);
@@ -65,6 +65,6 @@ public class SelectMenuInputComponentBuilder : InputComponentBuilder<SelectMenuI
         return this;
     }
 
-    internal override SelectMenuInputComponentInfo Build(ModalInfo modal)
+    internal override SelectMenuComponentInfo Build(ModalInfo modal)
         => new(this, modal);
 }

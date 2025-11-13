@@ -1,6 +1,6 @@
 using System;
 
-namespace Discord.Interactions.Attributes.Modals;
+namespace Discord.Interactions;
 
 /// <summary>
 ///     Mark an <see cref="IModal"/> property as a modal component field.

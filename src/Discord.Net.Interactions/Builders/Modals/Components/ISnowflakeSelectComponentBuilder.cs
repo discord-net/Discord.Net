@@ -3,9 +3,9 @@ using System.Collections.Generic;
 namespace Discord.Interactions.Builders;
 
 /// <summary>
-///     Represent a builder for creating <see cref="SnowflakeSelectInputComponentInfo"/>.
+///     Represent a builder for creating <see cref="SnowflakeSelectComponentInfo"/>.
 /// </summary>
-public interface ISnowflakeSelectInputComponentBuilder : IInputComponentBuilder
+public interface ISnowflakeSelectComponentBuilder : IInputComponentBuilder
 {
     /// <summary>
     ///     Gets the minimum number of values that can be selected.
@@ -37,26 +37,26 @@ public interface ISnowflakeSelectInputComponentBuilder : IInputComponentBuilder
     /// </summary>
     /// <param name="defaultValue">Default value to be added.</param>
     /// <returns>The builder instance.</returns>
-    ISnowflakeSelectInputComponentBuilder AddDefaultValue(SelectMenuDefaultValue defaultValue);
+    ISnowflakeSelectComponentBuilder AddDefaultValue(SelectMenuDefaultValue defaultValue);
 
     /// <summary>
     ///     Sets <see cref="MinValues"/>.
     /// </summary>
     /// <param name="minValues">New value of the <see cref="MinValues"/></param>
     /// <returns>The builder instance.</returns>
-    ISnowflakeSelectInputComponentBuilder WithMinValues(int minValues);
+    ISnowflakeSelectComponentBuilder WithMinValues(int minValues);
 
     /// <summary>
     ///     Sets <see cref="MaxValues"/>.
     /// </summary>
     /// <param name="maxValues">New value of the <see cref="MaxValues"/></param>
     /// <returns>The builder instance.</returns>
-    ISnowflakeSelectInputComponentBuilder WithMaxValues(int maxValues);
+    ISnowflakeSelectComponentBuilder WithMaxValues(int maxValues);
 
     /// <summary>
     ///     Sets <see cref="Placeholder"/>.
     /// </summary>
     /// <param name="placeholder">New value of the <see cref="Placeholder"/></param>
     /// <returns>The builder instance.</returns>
-    ISnowflakeSelectInputComponentBuilder WithPlaceholder(string placeholder);
+    ISnowflakeSelectComponentBuilder WithPlaceholder(string placeholder);
 }

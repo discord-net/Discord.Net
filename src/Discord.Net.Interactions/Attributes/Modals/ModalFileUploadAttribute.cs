@@ -3,7 +3,7 @@ namespace Discord.Interactions;
 /// <summary>
 ///     Marks a <see cref="IModal"/> property as a file upload input.
 /// </summary>
-public class ModalFileUploadInputAttribute : ModalInputAttribute
+public class ModalFileUploadAttribute : ModalInputAttribute
 {
     /// <inheritdoc/>
     public override ComponentType ComponentType => ComponentType.FileUpload;
@@ -19,12 +19,12 @@ public class ModalFileUploadInputAttribute : ModalInputAttribute
     public int MaxValues { get; set; } = 1;
 
     /// <summary>
-    ///     Create a new <see cref="ModalFileUploadInputAttribute"/>.
+    ///     Create a new <see cref="ModalFileUploadAttribute"/>.
     /// </summary>
     /// <param name="customId">Custom ID of the file upload component.</param>
     /// <param name="minValues">Minimum number of files that can be uploaded.</param>
     /// <param name="maxValues">Maximum number of files that can be uploaded.</param>
-    public ModalFileUploadInputAttribute(string customId, int minValues = 1, int maxValues = 1) : base(customId)
+    public ModalFileUploadAttribute(string customId, int minValues = 1, int maxValues = 1) : base(customId)
     {
         MinValues = minValues;
         MaxValues = maxValues;

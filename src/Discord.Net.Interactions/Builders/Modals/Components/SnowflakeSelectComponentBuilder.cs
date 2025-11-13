@@ -4,13 +4,13 @@ using System.Collections.Generic;
 namespace Discord.Interactions.Builders;
 
 /// <summary>
-///     Represents a builder for creating <see cref="SnowflakeSelectInputComponentInfo"/>.
+///     Represents a builder for creating <see cref="SnowflakeSelectComponentInfo"/>.
 /// </summary>
-/// <typeparam name="TInfo">The <see cref="SnowflakeSelectInputComponentInfo"/> this builder yields when built.</typeparam>
-/// <typeparam name="TBuilder">Inherited <see cref="SnowflakeSelectInputComponentBuilder{TInfo, TBuilder}"/> type.</typeparam>
-public abstract class SnowflakeSelectInputComponentBuilder<TInfo, TBuilder> : InputComponentBuilder<TInfo, TBuilder>, ISnowflakeSelectInputComponentBuilder
+/// <typeparam name="TInfo">The <see cref="SnowflakeSelectComponentInfo"/> this builder yields when built.</typeparam>
+/// <typeparam name="TBuilder">Inherited <see cref="SnowflakeSelectComponentBuilder{TInfo, TBuilder}"/> type.</typeparam>
+public abstract class SnowflakeSelectComponentBuilder<TInfo, TBuilder> : InputComponentBuilder<TInfo, TBuilder>, ISnowflakeSelectComponentBuilder
     where TInfo : InputComponentInfo
-    where TBuilder : InputComponentBuilder<TInfo, TBuilder>, ISnowflakeSelectInputComponentBuilder
+    where TBuilder : InputComponentBuilder<TInfo, TBuilder>, ISnowflakeSelectComponentBuilder
 {
     protected readonly List<SelectMenuDefaultValue> _defaultValues;
 
@@ -43,11 +43,11 @@ public abstract class SnowflakeSelectInputComponentBuilder<TInfo, TBuilder> : In
     }
 
     /// <summary>
-    ///     Initialize a new <see cref="SnowflakeSelectInputComponentBuilder{TInfo, TBuilder}"/>.
+    ///     Initialize a new <see cref="SnowflakeSelectComponentBuilder{TInfo, TBuilder}"/>.
     /// </summary>
     /// <param name="modal">Parent modal of this input component.</param>
     /// <param name="componentType">Type of this component.</param>
-    public SnowflakeSelectInputComponentBuilder(ModalBuilder modal, ComponentType componentType) : base(modal)
+    public SnowflakeSelectComponentBuilder(ModalBuilder modal, ComponentType componentType) : base(modal)
     {
         ValidateComponentType(componentType);
 
@@ -101,14 +101,14 @@ public abstract class SnowflakeSelectInputComponentBuilder<TInfo, TBuilder> : In
     }
 
     /// <inheritdoc/>
-    ISnowflakeSelectInputComponentBuilder ISnowflakeSelectInputComponentBuilder.AddDefaultValue(SelectMenuDefaultValue defaultValue) => AddDefaultValue(defaultValue);
+    ISnowflakeSelectComponentBuilder ISnowflakeSelectComponentBuilder.AddDefaultValue(SelectMenuDefaultValue defaultValue) => AddDefaultValue(defaultValue);
 
     /// <inheritdoc/>
-    ISnowflakeSelectInputComponentBuilder ISnowflakeSelectInputComponentBuilder.WithMinValues(int minValues) => WithMinValues(minValues);
+    ISnowflakeSelectComponentBuilder ISnowflakeSelectComponentBuilder.WithMinValues(int minValues) => WithMinValues(minValues);
 
     /// <inheritdoc/>
-    ISnowflakeSelectInputComponentBuilder ISnowflakeSelectInputComponentBuilder.WithMaxValues(int maxValues) => WithMaxValues(maxValues);
+    ISnowflakeSelectComponentBuilder ISnowflakeSelectComponentBuilder.WithMaxValues(int maxValues) => WithMaxValues(maxValues);
 
     /// <inheritdoc/>
-    ISnowflakeSelectInputComponentBuilder ISnowflakeSelectInputComponentBuilder.WithPlaceholder(string placeholder) => WithPlaceholder(placeholder);
+    ISnowflakeSelectComponentBuilder ISnowflakeSelectComponentBuilder.WithPlaceholder(string placeholder) => WithPlaceholder(placeholder);
 }

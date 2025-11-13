@@ -1,5 +1,3 @@
-using Discord.Interactions.Attributes.Modals;
-
 namespace Discord.Interactions;
 
 /// <summary>

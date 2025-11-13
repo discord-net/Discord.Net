@@ -52,32 +52,32 @@ namespace Discord.Interactions
         /// <summary>
         ///     Get a collection of the select menu components of this modal.
         /// </summary>
-        public IReadOnlyCollection<SelectMenuInputComponentInfo> SelectMenuInputComponents { get; }
+        public IReadOnlyCollection<SelectMenuComponentInfo> SelectMenuComponents { get; }
 
         /// <summary>
         ///     Get a collection of the user select components of this modal.
         /// </summary>
-        public IReadOnlyCollection<UserSelectInputComponentInfo> UserSelectInputComponents { get; }
+        public IReadOnlyCollection<UserSelectComponentInfo> UserSelectComponents { get; }
 
         /// <summary>
         ///     Get a collection of the role select components of this modal.
         /// </summary>
-        public IReadOnlyCollection<RoleSelectInputComponentInfo> RoleSelectInputComponents { get; }
+        public IReadOnlyCollection<RoleSelectComponentInfo> RoleSelectComponents { get; }
 
         /// <summary>
         ///     Get a collection of the mentionable select components of this modal.
         /// </summary>
-        public IReadOnlyCollection<MentionableSelectInputComponentInfo> MentionableSelectInputComponents { get; }
+        public IReadOnlyCollection<MentionableSelectComponentInfo> MentionableSelectComponents { get; }
 
         /// <summary>
         ///     Get a collection of the channel select components of this modal.
         /// </summary>
-        public IReadOnlyCollection<ChannelSelectInputComponentInfo> ChannelSelectInputComponents { get; }
+        public IReadOnlyCollection<ChannelSelectComponentInfo> ChannelSelectComponents { get; }
 
         /// <summary>
         ///     Get a collection of the file upload components of this modal.
         /// </summary>
-        public IReadOnlyCollection<FileUploadInputComponentInfo> FileUploadInputComponents { get; }
+        public IReadOnlyCollection<FileUploadComponentInfo> FileUploadComponents { get; }
 
         /// <summary>
         ///     Gets a collection of the text display components of this modal.
@@ -90,26 +90,26 @@ namespace Discord.Interactions
             Type = builder.Type;
             Components = builder.Components.Select<IModalComponentBuilder, ModalComponentInfo>(x => x switch
             {
-                TextInputComponentBuilder textComponent => textComponent.Build(this),
-                SelectMenuInputComponentBuilder selectMenuComponent => selectMenuComponent.Build(this),
-                RoleSelectInputComponentBuilder roleSelectComponent => roleSelectComponent.Build(this),
-                ChannelSelectInputComponentBuilder channelSelectComponent => channelSelectComponent.Build(this),
-                UserSelectInputComponentBuilder userSelectComponent => userSelectComponent.Build(this),
-                MentionableSelectInputComponentBuilder mentionableSelectComponent => mentionableSelectComponent.Build(this),
-                FileUploadInputComponentBuilder fileUploadComponent => fileUploadComponent.Build(this),
-                TextDisplayComponentBuilder textDisplayComponent => textDisplayComponent.Build(this),
+                Builders.TextInputComponentBuilder textComponent => textComponent.Build(this),
+                Builders.SelectMenuComponentBuilder selectMenuComponent => selectMenuComponent.Build(this),
+                Builders.RoleSelectComponentBuilder roleSelectComponent => roleSelectComponent.Build(this),
+                Builders.ChannelSelectComponentBuilder channelSelectComponent => channelSelectComponent.Build(this),
+                Builders.UserSelectComponentBuilder userSelectComponent => userSelectComponent.Build(this),
+                Builders.MentionableSelectComponentBuilder mentionableSelectComponent => mentionableSelectComponent.Build(this),
+                Builders.FileUploadComponentBuilder fileUploadComponent => fileUploadComponent.Build(this),
+                Builders.TextDisplayComponentBuilder textDisplayComponent => textDisplayComponent.Build(this),
                 _ => throw new InvalidOperationException($"{x.GetType().FullName} isn't a supported modal input component builder type.")
             }).ToImmutableArray();
 
             InputComponents = Components.OfType<InputComponentInfo>().ToImmutableArray();
 
             TextInputComponents = Components.OfType<TextInputComponentInfo>().ToImmutableArray();
-            SelectMenuInputComponents = Components.OfType<SelectMenuInputComponentInfo>().ToImmutableArray();
-            UserSelectInputComponents = Components.OfType<UserSelectInputComponentInfo>().ToImmutableArray();
-            RoleSelectInputComponents = Components.OfType<RoleSelectInputComponentInfo>().ToImmutableArray();
-            MentionableSelectInputComponents = Components.OfType<MentionableSelectInputComponentInfo>().ToImmutableArray();
-            ChannelSelectInputComponents = Components.OfType<ChannelSelectInputComponentInfo>().ToImmutableArray();
-            FileUploadInputComponents = Components.OfType<FileUploadInputComponentInfo>().ToImmutableArray();
+            SelectMenuComponents = Components.OfType<SelectMenuComponentInfo>().ToImmutableArray();
+            UserSelectComponents = Components.OfType<UserSelectComponentInfo>().ToImmutableArray();
+            RoleSelectComponents = Components.OfType<RoleSelectComponentInfo>().ToImmutableArray();
+            MentionableSelectComponents = Components.OfType<MentionableSelectComponentInfo>().ToImmutableArray();
+            ChannelSelectComponents = Components.OfType<ChannelSelectComponentInfo>().ToImmutableArray();
+            FileUploadComponents = Components.OfType<FileUploadComponentInfo>().ToImmutableArray();
             TextDisplayComponents = Components.OfType<TextDisplayComponentInfo>().ToImmutableArray();
 
             _interactionService = builder._interactionService;

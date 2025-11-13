@@ -3,7 +3,7 @@ namespace Discord.Interactions;
 /// <summary>
 ///     Base attribute for select-menu, user, channel, role, and mentionable select inputs in modals.
 /// </summary>
-public abstract class ModalSelectInputAttribute : ModalInputAttribute
+public abstract class ModalSelectComponentAttribute : ModalInputAttribute
 {
     /// <summary>
     ///     Gets or sets the minimum number of values that can be selected.
@@ -20,7 +20,7 @@ public abstract class ModalSelectInputAttribute : ModalInputAttribute
     /// </summary>
     public string Placeholder { get; set; }
 
-    internal ModalSelectInputAttribute(string customId, int minValues = 1, int maxValues = 1) : base(customId)
+    internal ModalSelectComponentAttribute(string customId, int minValues = 1, int maxValues = 1) : base(customId)
     {
         MinValues = minValues;
         MaxValues = maxValues;

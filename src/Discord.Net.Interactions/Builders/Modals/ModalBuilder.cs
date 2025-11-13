@@ -86,9 +86,9 @@ namespace Discord.Interactions.Builders
         /// <returns>
         ///     The builder instance.
         /// </returns>
-        public ModalBuilder AddSelectMenuInputComponent(Action<SelectMenuInputComponentBuilder> configure)
+        public ModalBuilder AddSelectMenuInputComponent(Action<SelectMenuComponentBuilder> configure)
         {
-            var builder = new SelectMenuInputComponentBuilder(this);
+            var builder = new SelectMenuComponentBuilder(this);
             configure(builder);
             _components.Add(builder);
             return this;
@@ -101,9 +101,9 @@ namespace Discord.Interactions.Builders
         /// <returns>
         ///     The builder instance.
         /// </returns>
-        public ModalBuilder AddUserSelectInputComponent(Action<UserSelectInputComponentBuilder> configure)
+        public ModalBuilder AddUserSelectInputComponent(Action<UserSelectComponentBuilder> configure)
         {
-            var builder = new UserSelectInputComponentBuilder(this);
+            var builder = new UserSelectComponentBuilder(this);
             configure(builder);
             _components.Add(builder);
             return this;
@@ -116,9 +116,9 @@ namespace Discord.Interactions.Builders
         /// <returns>
         ///     The builder instance.
         /// </returns>
-        public ModalBuilder AddRoleSelectInputComponent(Action<RoleSelectInputComponentBuilder> configure)
+        public ModalBuilder AddRoleSelectInputComponent(Action<RoleSelectComponentBuilder> configure)
         {
-            var builder = new RoleSelectInputComponentBuilder(this);
+            var builder = new RoleSelectComponentBuilder(this);
             configure(builder);
             _components.Add(builder);
             return this;
@@ -131,9 +131,9 @@ namespace Discord.Interactions.Builders
         /// <returns>
         ///     The builder instance.
         /// </returns>
-        public ModalBuilder AddMentionableSelectInputComponent(Action<MentionableSelectInputComponentBuilder> configure)
+        public ModalBuilder AddMentionableSelectInputComponent(Action<MentionableSelectComponentBuilder> configure)
         {
-            var builder = new MentionableSelectInputComponentBuilder(this);
+            var builder = new MentionableSelectComponentBuilder(this);
             configure(builder);
             _components.Add(builder);
             return this;
@@ -146,9 +146,9 @@ namespace Discord.Interactions.Builders
         /// <returns>
         ///     The builder instance.
         /// </returns>
-        public ModalBuilder AddChannelSelectInputComponent(Action<ChannelSelectInputComponentBuilder> configure)
+        public ModalBuilder AddChannelSelectInputComponent(Action<ChannelSelectComponentBuilder> configure)
         {
-            var builder = new ChannelSelectInputComponentBuilder(this);
+            var builder = new ChannelSelectComponentBuilder(this);
             configure(builder);
             _components.Add(builder);
             return this;
@@ -161,9 +161,9 @@ namespace Discord.Interactions.Builders
         /// <returns>
         ///     The builder instance.
         /// </returns>
-        public ModalBuilder AddFileUploadInputComponent(Action<FileUploadInputComponentBuilder> configure)
+        public ModalBuilder AddFileUploadInputComponent(Action<FileUploadComponentBuilder> configure)
         {
-            var builder = new FileUploadInputComponentBuilder(this);
+            var builder = new FileUploadComponentBuilder(this);
             configure(builder);
             _components.Add(builder);
             return this;

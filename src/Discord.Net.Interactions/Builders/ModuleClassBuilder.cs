@@ -613,25 +613,25 @@ namespace Discord.Interactions.Builders
                     switch (componentType)
                     {
                         case ComponentType.TextInput:
-                            builder.AddTextInputComponent(x => BuildTextInput(x, prop, prop.GetValue(instance)));
+                            builder.AddTextInputComponent(x => BuildTextInputComponent(x, prop, prop.GetValue(instance)));
                             break;
                         case ComponentType.SelectMenu:
-                            builder.AddSelectMenuInputComponent(x => BuildSelectMenuInput(x, prop, prop.GetValue(instance)));
+                            builder.AddSelectMenuInputComponent(x => BuildSelectMenuComponent(x, prop, prop.GetValue(instance)));
                             break;
                         case ComponentType.UserSelect:
-                            builder.AddUserSelectInputComponent(x => BuildSnowflakeSelectInput(x, prop, prop.GetValue(instance)));
+                            builder.AddUserSelectInputComponent(x => BuildSnowflakeSelectComponent(x, prop, prop.GetValue(instance)));
                             break;
                         case ComponentType.RoleSelect:
-                            builder.AddRoleSelectInputComponent(x => BuildSnowflakeSelectInput(x, prop, prop.GetValue(instance)));
+                            builder.AddRoleSelectInputComponent(x => BuildSnowflakeSelectComponent(x, prop, prop.GetValue(instance)));
                             break;
                         case ComponentType.MentionableSelect:
-                            builder.AddMentionableSelectInputComponent(x => BuildSnowflakeSelectInput(x, prop, prop.GetValue(instance)));
+                            builder.AddMentionableSelectInputComponent(x => BuildSnowflakeSelectComponent(x, prop, prop.GetValue(instance)));
                             break;
                         case ComponentType.ChannelSelect:
-                            builder.AddChannelSelectInputComponent(x => BuildSnowflakeSelectInput(x, prop, prop.GetValue(instance)));
+                            builder.AddChannelSelectInputComponent(x => BuildSnowflakeSelectComponent(x, prop, prop.GetValue(instance)));
                             break;
                         case ComponentType.FileUpload:
-                            builder.AddFileUploadInputComponent(x => BuildFileUploadInput(x, prop, prop.GetValue(instance)));
+                            builder.AddFileUploadInputComponent(x => BuildFileUploadComponent(x, prop, prop.GetValue(instance)));
                             break;
                         case ComponentType.TextDisplay:
                             builder.AddTextDisplayComponent(x => BuildTextDisplayComponent(x, prop, prop.GetValue(instance)));
@@ -653,7 +653,7 @@ namespace Discord.Interactions.Builders
             }
         }
 
-        private static void BuildTextInput(TextInputComponentBuilder builder, PropertyInfo propertyInfo, object defaultValue)
+        private static void BuildTextInputComponent(TextInputComponentBuilder builder, PropertyInfo propertyInfo, object defaultValue)
         {
             var attributes = propertyInfo.GetCustomAttributes();
 
@@ -689,7 +689,7 @@ namespace Discord.Interactions.Builders
             }
         }
 
-        private static void BuildSelectMenuInput(SelectMenuInputComponentBuilder builder, PropertyInfo propertyInfo, object defaultValue)
+        private static void BuildSelectMenuComponent(SelectMenuComponentBuilder builder, PropertyInfo propertyInfo, object defaultValue)
         {
             var attributes = propertyInfo.GetCustomAttributes();
 
@@ -702,7 +702,7 @@ namespace Discord.Interactions.Builders
             {
                 switch (attribute)
                 {
-                    case ModalSelectMenuInputAttribute selectMenuInput:
+                    case ModalSelectMenuAttribute selectMenuInput:
                         builder.CustomId = selectMenuInput.CustomId;
                         builder.ComponentType = selectMenuInput.ComponentType;
                         builder.MinValues = selectMenuInput.MinValues;
@@ -737,9 +737,9 @@ namespace Discord.Interactions.Builders
             }
         }
 
-        private static void BuildSnowflakeSelectInput<TInfo, TBuilder>(SnowflakeSelectInputComponentBuilder<TInfo, TBuilder> builder, PropertyInfo propertyInfo, object defaultValue)
-            where TInfo : SnowflakeSelectInputComponentInfo
-            where TBuilder : SnowflakeSelectInputComponentBuilder<TInfo, TBuilder>
+        private static void BuildSnowflakeSelectComponent<TInfo, TBuilder>(SnowflakeSelectComponentBuilder<TInfo, TBuilder> builder, PropertyInfo propertyInfo, object defaultValue)
+            where TInfo : SnowflakeSelectComponentInfo
+            where TBuilder : SnowflakeSelectComponentBuilder<TInfo, TBuilder>
         {
             var attributes = propertyInfo.GetCustomAttributes();
 
@@ -752,7 +752,7 @@ namespace Discord.Interactions.Builders
             {
                 switch (attribute)
                 {
-                    case ModalSelectInputAttribute selectInput:
+                    case ModalSelectComponentAttribute selectInput:
                         builder.CustomId = selectInput.CustomId;
                         builder.ComponentType = selectInput.ComponentType;
                         builder.MinValues = selectInput.MinValues;
@@ -773,7 +773,7 @@ namespace Discord.Interactions.Builders
             }
         }
 
-        private static void BuildFileUploadInput(FileUploadInputComponentBuilder builder, PropertyInfo propertyInfo, object defaultValue)
+        private static void BuildFileUploadComponent(FileUploadComponentBuilder builder, PropertyInfo propertyInfo, object defaultValue)
         {
             var attributes = propertyInfo.GetCustomAttributes();
 
@@ -786,7 +786,7 @@ namespace Discord.Interactions.Builders
             {
                 switch (attribute)
                 {
-                    case ModalFileUploadInputAttribute fileUploadInput:
+                    case ModalFileUploadAttribute fileUploadInput:
                         builder.CustomId = fileUploadInput.CustomId;
                         builder.ComponentType = fileUploadInput.ComponentType;
                         builder.MinValues = fileUploadInput.MinValues;

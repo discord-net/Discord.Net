@@ -6,7 +6,7 @@ namespace Discord.Interactions;
 /// <summary>
 ///     Represents the base <see cref="InputComponentInfo"/> class for <see cref="ComponentType.UserSelect"/>, <see cref="ComponentType.ChannelSelect"/>, <see cref="ComponentType.RoleSelect"/>, <see cref="ComponentType.MentionableSelect"/> type.
 /// </summary>
-public abstract class SnowflakeSelectInputComponentInfo : InputComponentInfo
+public abstract class SnowflakeSelectComponentInfo : InputComponentInfo
 {
     /// <summary>
     ///     Gets the minimum number of values that can be selected.
@@ -33,7 +33,7 @@ public abstract class SnowflakeSelectInputComponentInfo : InputComponentInfo
     /// </summary>
     public SelectDefaultValueType? DefaultValueType { get; }
 
-    internal SnowflakeSelectInputComponentInfo(Builders.ISnowflakeSelectInputComponentBuilder builder, ModalInfo modal) : base(builder, modal)
+    internal SnowflakeSelectComponentInfo(Builders.ISnowflakeSelectComponentBuilder builder, ModalInfo modal) : base(builder, modal)
     {
         MinValues = builder.MinValues;
         MaxValues = builder.MaxValues;

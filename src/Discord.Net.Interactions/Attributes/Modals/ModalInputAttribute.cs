@@ -1,4 +1,3 @@
-using Discord.Interactions.Attributes.Modals;
 using System;
 
 namespace Discord.Interactions

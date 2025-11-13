@@ -1,11 +1,11 @@
 namespace Discord.Interactions.Builders;
 
 /// <summary>
-///     Represents a builder for creating <see cref="FileUploadInputComponentInfo"/>.
+///     Represents a builder for creating <see cref="FileUploadComponentInfo"/>.
 /// </summary>
-public class FileUploadInputComponentBuilder : InputComponentBuilder<FileUploadInputComponentInfo, FileUploadInputComponentBuilder>
+public class FileUploadComponentBuilder : InputComponentBuilder<FileUploadComponentInfo, FileUploadComponentBuilder>
 {
-    protected override FileUploadInputComponentBuilder Instance => this;
+    protected override FileUploadComponentBuilder Instance => this;
 
     /// <summary>
     ///     Gets and sets the minimum number of files that can be uploaded.
@@ -18,10 +18,10 @@ public class FileUploadInputComponentBuilder : InputComponentBuilder<FileUploadI
     public int MaxValues { get; set; } = 1;
 
     /// <summary>
-    ///     Initializes a new <see cref="FileUploadInputComponentBuilder"/>.
+    ///     Initializes a new <see cref="FileUploadComponentBuilder"/>.
     /// </summary>
     /// <param name="modal"></param>
-    public FileUploadInputComponentBuilder(ModalBuilder modal) : base(modal) { }
+    public FileUploadComponentBuilder(ModalBuilder modal) : base(modal) { }
 
     /// <summary>
     ///     Sets <see cref="MinValues"/>.
@@ -30,7 +30,7 @@ public class FileUploadInputComponentBuilder : InputComponentBuilder<FileUploadI
     /// <returns>
     ///     The builder instance.
     /// </returns>
-    public FileUploadInputComponentBuilder WithMinValues(int minValues)
+    public FileUploadComponentBuilder WithMinValues(int minValues)
     {
         MinValues = minValues;
         return this;
@@ -43,12 +43,12 @@ public class FileUploadInputComponentBuilder : InputComponentBuilder<FileUploadI
     /// <returns>
     ///     The builder instance.
     /// </returns>
-    public FileUploadInputComponentBuilder WithMaxValues(int maxValues)
+    public FileUploadComponentBuilder WithMaxValues(int maxValues)
     {
         MaxValues = maxValues;
         return this;
     }
 
-    internal override FileUploadInputComponentInfo Build(ModalInfo modal)
+    internal override FileUploadComponentInfo Build(ModalInfo modal)
         => new (this, modal);
 }
