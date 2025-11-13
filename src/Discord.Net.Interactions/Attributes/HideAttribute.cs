@@ -19,7 +19,7 @@ public class HideAttribute : Attribute
     /// </remarks>
     /// <param name="interaction">Interaction that <see cref="IDiscordInteractionExtentions.RespondWithModalAsync{T}(IDiscordInteraction, string, T, RequestOptions, Action{ModalBuilder})"/> is called on.</param>
     /// <returns>
-    ///     <see cref="true"/> if the attribute should be active and hide the value.
+    ///     <see langword="true"/> if the attribute should be active and hide the value.
     /// </returns>
     public virtual bool Predicate(IDiscordInteraction interaction) => true;
 }
