@@ -1,6 +1,7 @@
 using Discord.Utils;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -10,7 +11,7 @@ internal sealed class DefaultArrayModalComponentConverter<T> : ModalComponentTyp
 {
     private readonly Type _underlyingType;
     private readonly TypeReader _typeReader;
-    private readonly List<ChannelType> _channelTypes;
+    private readonly ImmutableArray<ChannelType> _channelTypes;
 
     public DefaultArrayModalComponentConverter(InteractionService interactionService)
     {
@@ -33,37 +34,27 @@ internal sealed class DefaultArrayModalComponentConverter<T> : ModalComponentTyp
 
         _channelTypes = true switch
         {
-            _ when typeof(IStageChannel).IsAssignableFrom(type)
-                => new List<ChannelType> { ChannelType.Stage },
-
-            _ when typeof(IVoiceChannel).IsAssignableFrom(type)
-                => new List<ChannelType> { ChannelType.Voice },
-
-            _ when typeof(IDMChannel).IsAssignableFrom(type)
-                => new List<ChannelType> { ChannelType.DM },
-
-            _ when typeof(IGroupChannel).IsAssignableFrom(type)
-                => new List<ChannelType> { ChannelType.Group },
-
-            _ when typeof(ICategoryChannel).IsAssignableFrom(type)
-                => new List<ChannelType> { ChannelType.Category },
-
-            _ when typeof(INewsChannel).IsAssignableFrom(type)
-                => new List<ChannelType> { ChannelType.News },
-
-            _ when typeof(IThreadChannel).IsAssignableFrom(type)
-                => new List<ChannelType> { ChannelType.PublicThread, ChannelType.PrivateThread, ChannelType.NewsThread },
-
-            _ when typeof(ITextChannel).IsAssignableFrom(type)
-                => new List<ChannelType> { ChannelType.Text },
-
-            _ when typeof(IMediaChannel).IsAssignableFrom(type)
-                => new List<ChannelType> { ChannelType.Media },
-
-            _ when typeof(IForumChannel).IsAssignableFrom(type)
-                => new List<ChannelType> { ChannelType.Forum },
-
-            _ => null
+            _ when typeof(IStageChannel).IsAssignableFrom(_underlyingType)
+                => [ChannelType.Stage],
+            _ when typeof(IVoiceChannel).IsAssignableFrom(_underlyingType)
+                => [ChannelType.Voice],
+            _ when typeof(IDMChannel).IsAssignableFrom(_underlyingType)
+                => [ChannelType.DM],
+            _ when typeof(IGroupChannel).IsAssignableFrom(_underlyingType)
+                => [ChannelType.Group],
+            _ when typeof(ICategoryChannel).IsAssignableFrom(_underlyingType)
+                => [ChannelType.Category],
+            _ when typeof(INewsChannel).IsAssignableFrom(_underlyingType)
+                => [ChannelType.News],
+            _ when typeof(IThreadChannel).IsAssignableFrom(_underlyingType)
+                => [ChannelType.PublicThread, ChannelType.PrivateThread, ChannelType.NewsThread],
+            _ when typeof(ITextChannel).IsAssignableFrom(_underlyingType)
+                => [ChannelType.Text],
+            _ when typeof(IMediaChannel).IsAssignableFrom(_underlyingType)
+                => [ChannelType.Media],
+            _ when typeof(IForumChannel).IsAssignableFrom(_underlyingType)
+                => [ChannelType.Forum],
+            _ => []
         };
     }
 
@@ -186,13 +177,10 @@ internal sealed class DefaultArrayModalComponentConverter<T> : ModalComponentTyp
                     })
                     .ToList();
                 break;
-        }
-        ;
+        };
 
-
-
-        if (component.ComponentType == ComponentType.ChannelSelect && _channelTypes is not null)
-            selectMenu.WithChannelTypes(_channelTypes);
+        if (component.ComponentType == ComponentType.ChannelSelect && _channelTypes.Length > 0)
+            selectMenu.WithChannelTypes(_channelTypes.ToList());
 
         return Task.CompletedTask;
     }
