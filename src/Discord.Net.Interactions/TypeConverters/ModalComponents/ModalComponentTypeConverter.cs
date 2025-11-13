@@ -31,6 +31,12 @@ public abstract class ModalComponentTypeConverter : ITypeConverter<IComponentInt
         where TBuilder : class, IInteractableComponentBuilder
         => Task.CompletedTask;
 
+    /// <summary>
+    ///     Tries to get the <see cref="IModalInteractionData"/> from the provided <see cref="IInteractionContext"/>.
+    /// </summary>
+    /// <param name="context">Context containing the <see cref="IModalInteractionData"/>.</param>
+    /// <param name="modalData"><see cref="IModalInteractionData"/> found in the context if successful, <see langword="null"/> otherwise.</param>
+    /// <returns><see langword="true"/> when successful.</returns>
     protected bool TryGetModalInteractionData(IInteractionContext context, out IModalInteractionData modalData)
     {
         if(context.Interaction is IModalInteraction modalInteraction)
