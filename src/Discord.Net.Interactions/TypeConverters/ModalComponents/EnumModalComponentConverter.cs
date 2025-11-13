@@ -10,22 +10,21 @@ internal sealed class EnumModalComponentConverter<T> : ModalComponentTypeConvert
     where T : struct, Enum
 {
     private readonly bool _isFlags;
-    private readonly ImmutableArray<SelectMenuOptionBuilder> _options;
+    private readonly ImmutableArray<(SelectMenuOptionBuilder Option, Predicate<IDiscordInteraction> Predicate)> _options;
 
     public EnumModalComponentConverter()
     {
         var names = Enum.GetNames(typeof(T));
-        var members = names.SelectMany(x => typeof(T).GetMember(x)).Where(x => !x.IsDefined(typeof(HideAttribute), true));
-
-        if (members.Count() > SelectMenuBuilder.MaxOptionCount)
-            throw new InvalidOperationException($"Enum type {typeof(T).FullName} has too many visible members to be used in a select menu. Maximum visible members is {SelectMenuBuilder.MaxOptionCount}, but {members.Count()} are visible.");
+        var members = names.SelectMany(x => typeof(T).GetMember(x));
 
         _isFlags = typeof(T).GetCustomAttribute<FlagsAttribute>() is not null;
 
         _options = members.Select(x =>
         {
             var selectMenuOptionAttr = x.GetCustomAttribute<SelectMenuOptionAttribute>();
-            return new SelectMenuOptionBuilder(x.GetCustomAttribute<ChoiceDisplayAttribute>()?.Name ?? x.Name, x.Name, selectMenuOptionAttr?.Description, selectMenuOptionAttr?.Emote != null ? Emote.Parse(selectMenuOptionAttr?.Emote) : null, selectMenuOptionAttr?.IsDefault);
+            var hideAttr = x.GetCustomAttribute<HideAttribute>();
+            Predicate<IDiscordInteraction> predicate = hideAttr != null ? hideAttr.Predicate : null;
+            return (new SelectMenuOptionBuilder(x.GetCustomAttribute<ChoiceDisplayAttribute>()?.Name ?? x.Name, x.Name, selectMenuOptionAttr?.Description, selectMenuOptionAttr?.Emote != null ? Emote.Parse(selectMenuOptionAttr?.Emote) : null, selectMenuOptionAttr?.IsDefault), predicate);
         }).ToImmutableArray();
     }
 
@@ -55,7 +54,7 @@ internal sealed class EnumModalComponentConverter<T> : ModalComponentTypeConvert
         if (selectMenu.MaxValues > 1 && !_isFlags)
             throw new InvalidOperationException($"Enum type {typeof(T).FullName} is not a [Flags] enum, so it cannot be used in a multi-select menu.");
 
-        selectMenu.WithOptions(_options.ToList());
+        selectMenu.WithOptions([.. _options.Where(x => !x.Predicate?.Invoke(interaction) ?? true).Select(x => x.Option)]);
 
         return Task.CompletedTask;
     }
