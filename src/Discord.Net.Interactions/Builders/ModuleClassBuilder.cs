@@ -1,4 +1,3 @@
-using Discord.Interactions.Attributes.Modals;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -782,7 +781,7 @@ namespace Discord.Interactions.Builders
             builder.WithType(propertyInfo.PropertyType);
             builder.PropertyInfo = propertyInfo;
 
-            foreach(var attribute in attributes)
+            foreach (var attribute in attributes)
             {
                 switch (attribute)
                 {
