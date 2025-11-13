@@ -12,5 +12,5 @@ public class ModalChannelSelectAttribute : ModalSelectComponentAttribute
     ///     Create a new <see cref="ModalChannelSelectAttribute"/>.
     /// </summary>
     /// <param name="customId">Custom ID of the channel select component.</param>
-    public ModalChannelSelectAttribute(string customId) : base(customId) { }
+    public ModalChannelSelectAttribute(string customId, int minValues = 1, int maxValues = 1) : base(customId, minValues, maxValues) { }
 }
