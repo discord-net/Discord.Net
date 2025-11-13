@@ -12,4 +12,6 @@ public abstract class ModalComponentAttribute : Attribute
     ///     Gets the type of the component.
     /// </summary>
     public abstract ComponentType ComponentType { get; }
+
+    internal ModalComponentAttribute() { }
 }

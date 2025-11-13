@@ -18,7 +18,7 @@ namespace Discord.Interactions
         ///     Create a new <see cref="ModalInputAttribute"/>.
         /// </summary>
         /// <param name="customId">The custom id of the input.</param>
-        protected ModalInputAttribute(string customId)
+        internal ModalInputAttribute(string customId)
         {
             CustomId = customId;
         }
