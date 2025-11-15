@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using System.Linq;
+
 namespace Discord.Interactions.Builders;
 
 /// <summary>
@@ -28,41 +31,41 @@ public class MentionableSelectComponentBuilder : SnowflakeSelectComponentBuilder
     }
 
     /// <summary>
-    ///     Adds a user as a default value to <see cref="SnowflakeSelectComponentBuilder{TInfo, TBuilder}.DefaultValues"/>.
+    ///     Add users as a default value to <see cref="SnowflakeSelectComponentBuilder{TInfo, TBuilder}.DefaultValues"/>.
     /// </summary>
-    /// <param name="user">The user to add as a default value.</param>
+    /// <param name="users">The users to add as a default value.</param>
     /// <returns>
     ///     The builder instance.
     /// </returns>
-    public MentionableSelectComponentBuilder AddDefaultValue(IUser user)
+    public MentionableSelectComponentBuilder AddDefaultValue(params IEnumerable<IUser> users)
     {
-        _defaultValues.Add(new SelectMenuDefaultValue(user.Id, SelectDefaultValueType.User));
+        _defaultValues.AddRange(users.Select(x => new SelectMenuDefaultValue(x.Id, SelectDefaultValueType.User)));
         return this;
     }
 
     /// <summary>
-    ///     Adds a channel as a default value to <see cref="SnowflakeSelectComponentBuilder{TInfo, TBuilder}.DefaultValues"/>.
+    ///     Adds channels as a default value to <see cref="SnowflakeSelectComponentBuilder{TInfo, TBuilder}.DefaultValues"/>.
     /// </summary>
-    /// <param name="channel">The channel to add as a default value.</param>
+    /// <param name="channels">The channel to add as a default value.</param>
     /// <returns>
     ///     The builder instance.
     /// </returns>
-    public MentionableSelectComponentBuilder AddDefaultValue(IChannel channel)
+    public MentionableSelectComponentBuilder AddDefaultValue(params IEnumerable<IChannel> channels)
     {
-        _defaultValues.Add(new SelectMenuDefaultValue(channel.Id, SelectDefaultValueType.Channel));
+        _defaultValues.AddRange(channels.Select(x =>new SelectMenuDefaultValue(x.Id, SelectDefaultValueType.Channel)));
         return this;
     }
 
     /// <summary>
-    ///     Adds a role as a default value to <see cref="SnowflakeSelectComponentBuilder{TInfo, TBuilder}.DefaultValues"/>.
+    ///     Adds roles as a default value to <see cref="SnowflakeSelectComponentBuilder{TInfo, TBuilder}.DefaultValues"/>.
     /// </summary>
-    /// <param name="role">The role to add as a default value.</param>
+    /// <param name="roles">The role to add as a default value.</param>
     /// <returns>
     ///     The builder instance.
     /// </returns>
-    public MentionableSelectComponentBuilder AddDefaulValue(IRole role)
+    public MentionableSelectComponentBuilder AddDefaulValue(params IEnumerable<IRole> roles)
     {
-        _defaultValues.Add(new SelectMenuDefaultValue(role.Id, SelectDefaultValueType.Role));
+        _defaultValues.AddRange(roles.Select(x => new SelectMenuDefaultValue(x.Id, SelectDefaultValueType.Role)));
         return this;
     }
 

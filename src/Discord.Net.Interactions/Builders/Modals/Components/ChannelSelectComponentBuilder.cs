@@ -19,19 +19,6 @@ public class ChannelSelectComponentBuilder : SnowflakeSelectComponentBuilder<Cha
     /// <summary>
     ///     Adds a default value to <see cref="SnowflakeSelectComponentBuilder{TInfo, TBuilder}.DefaultValues"/>.
     /// </summary>
-    /// <param name="channel">The channel to add as a default value.</param>
-    /// <returns>
-    ///     The builder instance.
-    /// </returns>
-    public ChannelSelectComponentBuilder AddDefaulValue(IChannel channel)
-    {
-        _defaultValues.Add(new SelectMenuDefaultValue(channel.Id, SelectDefaultValueType.Channel));
-        return this;
-    }
-
-    /// <summary>
-    ///     Adds a default value to <see cref="SnowflakeSelectComponentBuilder{TInfo, TBuilder}.DefaultValues"/>.
-    /// </summary>
     /// <param name="channelId">The channel ID to add as a default value.</param>
     /// <returns>
     ///     The builder instance.
@@ -49,20 +36,7 @@ public class ChannelSelectComponentBuilder : SnowflakeSelectComponentBuilder<Cha
     /// <returns>
     ///     The builder instance.
     /// </returns>
-    public ChannelSelectComponentBuilder AddDefaultValues(params IChannel[] channels)
-    {
-        _defaultValues.AddRange(channels.Select(x => new SelectMenuDefaultValue(x.Id, SelectDefaultValueType.Channel)));
-        return this;
-    }
-
-    /// <summary>
-    ///     Adds default values to <see cref="SnowflakeSelectComponentBuilder{TInfo, TBuilder}.DefaultValues"/>.
-    /// </summary>
-    /// <param name="channels">The channels to add as a default value.</param>
-    /// <returns>
-    ///     The builder instance.
-    /// </returns>
-    public ChannelSelectComponentBuilder AddDefaultValues(IEnumerable<IChannel> channels)
+    public ChannelSelectComponentBuilder AddDefaultValues(params IEnumerable<IChannel> channels)
     {
         _defaultValues.AddRange(channels.Select(x => new SelectMenuDefaultValue(x.Id, SelectDefaultValueType.Channel)));
         return this;

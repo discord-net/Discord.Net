@@ -19,19 +19,6 @@ public class RoleSelectComponentBuilder : SnowflakeSelectComponentBuilder<RoleSe
     /// <summary>
     ///     Adds a default value to <see cref="SnowflakeSelectComponentBuilder{TInfo, TBuilder}.DefaultValues"/>.
     /// </summary>
-    /// <param name="role">The role to add as a default value.</param>
-    /// <returns>
-    ///     The builder instance.
-    /// </returns>
-    public RoleSelectComponentBuilder AddDefaulValue(IRole role)
-    {
-        _defaultValues.Add(new SelectMenuDefaultValue(role.Id, SelectDefaultValueType.Role));
-        return this;
-    }
-
-    /// <summary>
-    ///     Adds a default value to <see cref="SnowflakeSelectComponentBuilder{TInfo, TBuilder}.DefaultValues"/>.
-    /// </summary>
     /// <param name="roleId">The role ID to add as a default value.</param>
     /// <returns>
     ///     The builder instance.
@@ -49,20 +36,7 @@ public class RoleSelectComponentBuilder : SnowflakeSelectComponentBuilder<RoleSe
     /// <returns>
     ///     The builder instance.
     /// </returns>
-    public RoleSelectComponentBuilder AddDefaultValues(params IRole[] roles)
-    {
-        _defaultValues.AddRange(roles.Select(x => new SelectMenuDefaultValue(x.Id, SelectDefaultValueType.Role)));
-        return this;
-    }
-
-    /// <summary>
-    ///     Adds default values to <see cref="SnowflakeSelectComponentBuilder{TInfo, TBuilder}.DefaultValues"/>.
-    /// </summary>
-    /// <param name="roles">The roles to add as a default value.</param>
-    /// <returns>
-    ///     The builder instance.
-    /// </returns>
-    public RoleSelectComponentBuilder AddDefaultValues(IEnumerable<IRole> roles)
+    public RoleSelectComponentBuilder AddDefaultValues(params IEnumerable<IRole> roles)
     {
         _defaultValues.AddRange(roles.Select(x => new SelectMenuDefaultValue(x.Id, SelectDefaultValueType.Role)));
         return this;

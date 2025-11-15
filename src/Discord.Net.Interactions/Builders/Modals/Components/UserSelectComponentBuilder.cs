@@ -19,19 +19,6 @@ public class UserSelectComponentBuilder : SnowflakeSelectComponentBuilder<UserSe
     /// <summary>
     ///     Adds a default value to <see cref="SnowflakeSelectComponentBuilder{TInfo, TBuilder}.DefaultValues"/>.
     /// </summary>
-    /// <param name="user">The user to add as a default value.</param>
-    /// <returns>
-    ///     The builder instance.
-    /// </returns>
-    public UserSelectComponentBuilder AddDefaulValue(IUser user)
-    {
-        _defaultValues.Add(new SelectMenuDefaultValue(user.Id, SelectDefaultValueType.User));
-        return this;
-    }
-
-    /// <summary>
-    ///     Adds a default value to <see cref="SnowflakeSelectComponentBuilder{TInfo, TBuilder}.DefaultValues"/>.
-    /// </summary>
     /// <param name="userId">The user ID to add as a default value.</param>
     /// <returns>
     ///     The builder instance.
@@ -49,20 +36,7 @@ public class UserSelectComponentBuilder : SnowflakeSelectComponentBuilder<UserSe
     /// <returns>
     ///     The builder instance.
     /// </returns>
-    public UserSelectComponentBuilder AddDefaultValues(params IUser[] users)
-    {
-        _defaultValues.AddRange(users.Select(x => new SelectMenuDefaultValue(x.Id, SelectDefaultValueType.User)));
-        return this;
-    }
-
-    /// <summary>
-    ///     Adds default values to <see cref="SnowflakeSelectComponentBuilder{TInfo, TBuilder}.DefaultValues"/>.
-    /// </summary>
-    /// <param name="users">The users to add as a default value.</param>
-    /// <returns>
-    ///     The builder instance.
-    /// </returns>
-    public UserSelectComponentBuilder AddDefaultValues(IEnumerable<IUser> users)
+    public UserSelectComponentBuilder AddDefaultValues(params IEnumerable<IUser> users)
     {
         _defaultValues.AddRange(users.Select(x => new SelectMenuDefaultValue(x.Id, SelectDefaultValueType.User)));
         return this;
