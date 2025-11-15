@@ -29,6 +29,9 @@ public class ModalSelectMenuOptionAttribute : Attribute
     /// <summary>
     ///     Gets or sets the emote of the option.
     /// </summary>
+    /// <remarks>
+    ///     Can be either an <see cref="Emoji"/> or an <see cref="Discord.Emote"/>
+    /// </remarks>
     public string Emote { get; set; }
 
     /// <summary>
@@ -42,7 +45,7 @@ public class ModalSelectMenuOptionAttribute : Attribute
     /// <param name="label">Label of the option.</param>
     /// <param name="value">Value of the option.</param>
     /// <param name="description">Description of the option.</param>
-    /// <param name="emote">Emote of the option.</param>
+    /// <param name="emote">Emote of the option. Can be either an <see cref="Emoji"/> or an <see cref="Discord.Emote"/></param>
     /// <param name="isDefault">Whether the option is selected by default</param>
     public ModalSelectMenuOptionAttribute(string label, string value, string description = null, string emote = null, bool isDefault = false)
     {

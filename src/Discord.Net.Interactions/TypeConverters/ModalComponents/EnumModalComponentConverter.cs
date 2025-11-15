@@ -22,9 +22,17 @@ internal sealed class EnumModalComponentConverter<T> : ModalComponentTypeConvert
         _options = members.Select(x =>
         {
             var selectMenuOptionAttr = x.GetCustomAttribute<SelectMenuOptionAttribute>();
+
+            Emoji emoji = null;
+            Emote emote = null;
+
+            if (!string.IsNullOrEmpty(selectMenuOptionAttr?.Emote) && !(Emote.TryParse(selectMenuOptionAttr.Emote, out emote) || Emoji.TryParse(selectMenuOptionAttr.Emote, out emoji)))
+                throw new ArgumentException($"Unable to parse {selectMenuOptionAttr.Emote} of {x.DeclaringType.Name}.{x.Name} into an {typeof(Emote).Name} or an {typeof(Emoji).Name}");
+
+
             var hideAttr = x.GetCustomAttribute<HideAttribute>();
             Predicate<IDiscordInteraction> predicate = hideAttr != null ? hideAttr.Predicate : null;
-            return (new SelectMenuOptionBuilder(x.GetCustomAttribute<ChoiceDisplayAttribute>()?.Name ?? x.Name, x.Name, selectMenuOptionAttr?.Description, selectMenuOptionAttr?.Emote != null ? Emote.Parse(selectMenuOptionAttr?.Emote) : null, selectMenuOptionAttr?.IsDefault), predicate);
+            return (new SelectMenuOptionBuilder(x.GetCustomAttribute<ChoiceDisplayAttribute>()?.Name ?? x.Name, x.Name, selectMenuOptionAttr?.Description, emote != null ? emote : emoji, selectMenuOptionAttr?.IsDefault), predicate);
         }).ToImmutableArray();
     }
 
@@ -82,5 +90,8 @@ public class SelectMenuOptionAttribute : Attribute
     /// <summary>
     ///     Gets or sets the emote of the option.
     /// </summary>
+    /// <remarks>
+    ///     Can be either an <see cref="Emoji"/> or an <see cref="Discord.Emote"/>
+    /// </remarks>
     public string Emote { get; set; }
 }
