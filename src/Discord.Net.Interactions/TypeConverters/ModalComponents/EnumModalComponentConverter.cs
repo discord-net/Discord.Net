@@ -9,17 +9,19 @@ namespace Discord.Interactions;
 internal sealed class EnumModalComponentConverter<T> : ModalComponentTypeConverter<T>
     where T : struct, Enum
 {
+    private record Option(SelectMenuOptionBuilder OptionBuilder, Predicate<IDiscordInteraction> Predicate, T Value);
+
     private readonly bool _isFlags;
-    private readonly ImmutableArray<(SelectMenuOptionBuilder Option, Predicate<IDiscordInteraction> Predicate)> _options;
+    private readonly ImmutableArray<Option> _options;
 
     public EnumModalComponentConverter()
     {
         var names = Enum.GetNames(typeof(T));
         var members = names.SelectMany(x => typeof(T).GetMember(x));
 
-        _isFlags = typeof(T).GetCustomAttribute<FlagsAttribute>() is not null;
+        _isFlags = typeof(T).IsDefined(typeof(FlagsAttribute));
 
-        _options = members.Select(x =>
+        _options = members.Select<MemberInfo, Option>(x =>
         {
             var selectMenuOptionAttr = x.GetCustomAttribute<SelectMenuOptionAttribute>();
 
@@ -29,10 +31,13 @@ internal sealed class EnumModalComponentConverter<T> : ModalComponentTypeConvert
             if (!string.IsNullOrEmpty(selectMenuOptionAttr?.Emote) && !(Emote.TryParse(selectMenuOptionAttr.Emote, out emote) || Emoji.TryParse(selectMenuOptionAttr.Emote, out emoji)))
                 throw new ArgumentException($"Unable to parse {selectMenuOptionAttr.Emote} of {x.DeclaringType.Name}.{x.Name} into an {typeof(Emote).Name} or an {typeof(Emoji).Name}");
 
-
             var hideAttr = x.GetCustomAttribute<HideAttribute>();
             Predicate<IDiscordInteraction> predicate = hideAttr != null ? hideAttr.Predicate : null;
-            return (new SelectMenuOptionBuilder(x.GetCustomAttribute<ChoiceDisplayAttribute>()?.Name ?? x.Name, x.Name, selectMenuOptionAttr?.Description, emote != null ? emote : emoji, selectMenuOptionAttr?.IsDefault), predicate);
+
+            var value = Enum.Parse<T>(x.Name);
+            var optionBuilder = new SelectMenuOptionBuilder(x.GetCustomAttribute<ChoiceDisplayAttribute>()?.Name ?? x.Name, x.Name, selectMenuOptionAttr?.Description, emote != null ? emote : emoji, selectMenuOptionAttr?.IsDefault);
+
+            return new(optionBuilder, predicate, value);
         }).ToImmutableArray();
     }
 
@@ -62,7 +67,17 @@ internal sealed class EnumModalComponentConverter<T> : ModalComponentTypeConvert
         if (selectMenu.MaxValues > 1 && !_isFlags)
             throw new InvalidOperationException($"Enum type {typeof(T).FullName} is not a [Flags] enum, so it cannot be used in a multi-select menu.");
 
-        selectMenu.WithOptions([.. _options.Where(x => !x.Predicate?.Invoke(interaction) ?? true).Select(x => x.Option)]);
+        var visibleOptions = _options.Where(x => !x.Predicate?.Invoke(interaction) ?? true);
+
+        if (value is T enumValue)
+        {
+            foreach(var option in visibleOptions)
+            {
+                option.OptionBuilder.IsDefault = _isFlags ? enumValue.HasFlag(option.Value) : enumValue.Equals(option.Value);
+            }
+        }
+
+        selectMenu.WithOptions([.. visibleOptions.Select(x => x.OptionBuilder)]);
 
         return Task.CompletedTask;
     }
