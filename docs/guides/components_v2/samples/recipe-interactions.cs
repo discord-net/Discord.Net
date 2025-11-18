@@ -28,7 +28,7 @@ private async Task ClientOnInteractionCreatedAsync(SocketInteraction arg)
 
                     break;
                 default:
-                    // Ununsed here
+                    // Unused here
             }
 
             break;
