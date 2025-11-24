@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Discord.Interactions.Builders
 {
@@ -10,7 +9,7 @@ namespace Discord.Interactions.Builders
     public class ModalBuilder
     {
         internal readonly InteractionService _interactionService;
-        internal readonly List<IInputComponentBuilder> _components;
+        internal readonly List<IModalComponentBuilder> _components;
 
         /// <summary>
         ///     Gets the initialization delegate for this modal.
@@ -30,7 +29,7 @@ namespace Discord.Interactions.Builders
         /// <summary>
         ///     Gets a collection of the components of this modal.
         /// </summary>
-        public IReadOnlyCollection<IInputComponentBuilder> Components => _components;
+        public IReadOnlyCollection<IModalComponentBuilder> Components => _components.AsReadOnly();
 
         internal ModalBuilder(Type type, InteractionService interactionService)
         {
@@ -72,9 +71,114 @@ namespace Discord.Interactions.Builders
         /// <returns>
         ///     The builder instance.
         /// </returns>
-        public ModalBuilder AddTextComponent(Action<TextInputComponentBuilder> configure)
+        public ModalBuilder AddTextInputComponent(Action<TextInputComponentBuilder> configure)
         {
             var builder = new TextInputComponentBuilder(this);
+            configure(builder);
+            _components.Add(builder);
+            return this;
+        }
+
+        /// <summary>
+        ///     Adds a select menu component to <see cref="Components"/>.
+        /// </summary>
+        /// <param name="configure">Select menu component builder factory.</param>
+        /// <returns>
+        ///     The builder instance.
+        /// </returns>
+        public ModalBuilder AddSelectMenuInputComponent(Action<SelectMenuComponentBuilder> configure)
+        {
+            var builder = new SelectMenuComponentBuilder(this);
+            configure(builder);
+            _components.Add(builder);
+            return this;
+        }
+
+        /// <summary>
+        ///     Adds a user select component to <see cref="Components"/>.
+        /// </summary>
+        /// <param name="configure">User select component builder factory.</param>
+        /// <returns>
+        ///     The builder instance.
+        /// </returns>
+        public ModalBuilder AddUserSelectInputComponent(Action<UserSelectComponentBuilder> configure)
+        {
+            var builder = new UserSelectComponentBuilder(this);
+            configure(builder);
+            _components.Add(builder);
+            return this;
+        }
+
+        /// <summary>
+        ///     Adds a role select component to <see cref="Components"/>.
+        /// </summary>
+        /// <param name="configure">Role select component builder factory.</param>
+        /// <returns>
+        ///     The builder instance.
+        /// </returns>
+        public ModalBuilder AddRoleSelectInputComponent(Action<RoleSelectComponentBuilder> configure)
+        {
+            var builder = new RoleSelectComponentBuilder(this);
+            configure(builder);
+            _components.Add(builder);
+            return this;
+        }
+
+        /// <summary>
+        ///     Adds a mentionable select component to <see cref="Components"/>.
+        /// </summary>
+        /// <param name="configure">Mentionable select component builder factory.</param>
+        /// <returns>
+        ///     The builder instance.
+        /// </returns>
+        public ModalBuilder AddMentionableSelectInputComponent(Action<MentionableSelectComponentBuilder> configure)
+        {
+            var builder = new MentionableSelectComponentBuilder(this);
+            configure(builder);
+            _components.Add(builder);
+            return this;
+        }
+
+        /// <summary>
+        ///     Adds a channel select component to <see cref="Components"/>.
+        /// </summary>
+        /// <param name="configure">Channel select component builder factory.</param>
+        /// <returns>
+        ///     The builder instance.
+        /// </returns>
+        public ModalBuilder AddChannelSelectInputComponent(Action<ChannelSelectComponentBuilder> configure)
+        {
+            var builder = new ChannelSelectComponentBuilder(this);
+            configure(builder);
+            _components.Add(builder);
+            return this;
+        }
+
+        /// <summary>
+        ///     Adds a file upload component to <see cref="Components"/>.
+        /// </summary>
+        /// <param name="configure">File upload component builder factory.</param>
+        /// <returns>
+        ///     The builder instance.
+        /// </returns>
+        public ModalBuilder AddFileUploadInputComponent(Action<FileUploadComponentBuilder> configure)
+        {
+            var builder = new FileUploadComponentBuilder(this);
+            configure(builder);
+            _components.Add(builder);
+            return this;
+        }
+
+        /// <summary>
+        ///     Adds a text display component to <see cref="Components"/>.
+        /// </summary>
+        /// <param name="configure">Text display component builder factory.</param>
+        /// <returns>
+        ///     The builder instance.
+        /// </returns>
+        public ModalBuilder AddTextDisplayComponent(Action<TextDisplayComponentBuilder> configure)
+        {
+            var builder = new TextDisplayComponentBuilder(this);
             configure(builder);
             _components.Add(builder);
             return this;
