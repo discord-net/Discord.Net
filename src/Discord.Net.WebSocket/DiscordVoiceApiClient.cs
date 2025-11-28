@@ -164,12 +164,13 @@ namespace Discord.Audio
             });
         }
 
-        public Task SendSetSpeaking(bool value)
+        public Task SendSetSpeaking(bool value, uint ssrc)
         {
             return SendAsync(VoiceOpCode.Speaking, new SpeakingParams
             {
-                IsSpeaking = value,
-                Delay = 0
+                Speaking = value ? 1 : 0,
+                Delay = 0,
+                Ssrc = ssrc
             });
         }
 
