@@ -68,7 +68,7 @@ namespace Discord.Interactions
             return SendModalResponseAsync<T>(interaction, customId, modalInfo, modal, options, modifyModal);
         }
 
-        private static async Task SendModalResponseAsync<T>(IDiscordInteraction interaction, string customId, ModalInfo modalInfo, T modalInstance = null, RequestOptions options = null, Action<ModalBuilder> modifyModal = null)
+        public static async Task<Modal> ToModalAsync<T>(this IDiscordInteraction interaction, string customId, ModalInfo modalInfo, T modalInstance = null, RequestOptions options = null, Action<ModalBuilder> modifyModal = null)
             where T : class, IModal
         {
             if (!modalInfo.Type.IsAssignableFrom(typeof(T)))
@@ -145,7 +145,15 @@ namespace Discord.Interactions
 
             modifyModal?.Invoke(builder);
 
-            await interaction.RespondWithModalAsync(builder.Build(), options);
+            return builder.Build();
+        }
+
+        private static async Task SendModalResponseAsync<T>(IDiscordInteraction interaction, string customId, ModalInfo modalInfo, T modalInstance = null, RequestOptions options = null, Action<ModalBuilder> modifyModal = null)
+            where T : class, IModal
+        {
+            var modal = await interaction.ToModalAsync(customId, modalInfo, modalInstance, options, modifyModal);
+
+            await interaction.RespondWithModalAsync(modal, options);
         }
     }
 }
