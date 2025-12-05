@@ -12,7 +12,9 @@ namespace Discord.Rest
         /// <typeparam name="T">Type of the <see cref="IModal"/> implementation.</typeparam>
         /// <param name="interaction">The interaction to respond to.</param>
         /// <param name="options">The request options for this <see langword="async"/> request.</param>
-        /// <returns>Serialized payload to be used to create a HTTP response.</returns>
+        /// <returns>
+        ///     Task representing the asynchronous modal creation operation. The task result contains the serialized payload to be used to create a HTTP response.
+        /// </returns>
         public static async Task<string> RespondWithModal<T>(this RestInteraction interaction, string customId, RequestOptions options = null, Action<ModalBuilder> modifyModal = null)
             where T : class, IModal
         {
@@ -28,10 +30,12 @@ namespace Discord.Rest
         /// </summary>
         /// <typeparam name="T">Type of the <see cref="IModal"/> implementation.</typeparam>
         /// <param name="interaction">The interaction to respond to.</param>
-        /// <param name="modal">The <see cref="IModal"/> instance to get field values from.</param>
+        /// <param name="modalInstance">The <see cref="IModal"/> instance to get field values from.</param>
         /// <param name="options">The request options for this <see langword="async"/> request.</param>
         /// <param name="modifyModal">Delegate that can be used to modify the modal.</param>
-        /// <returns>Serialized payload to be used to create a HTTP response.</returns>
+        /// <returns>
+        ///     Task representing the asynchronous modal creation operation. The task result contains the serialized payload to be used to create a HTTP response.
+        /// </returns>
         public static async Task<string> RespondWithModalAsync<T>(this RestInteraction interaction, string customId, T modalInstance, RequestOptions options = null, Action<ModalBuilder> modifyModal = null)
             where T : class, IModal
         {
