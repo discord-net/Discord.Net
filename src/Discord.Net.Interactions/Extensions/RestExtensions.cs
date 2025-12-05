@@ -15,7 +15,7 @@ namespace Discord.Rest
         /// <returns>
         ///     Task representing the asynchronous modal creation operation. The task result contains the serialized payload to be used to create a HTTP response.
         /// </returns>
-        public static async Task<string> RespondWithModal<T>(this RestInteraction interaction, string customId, RequestOptions options = null, Action<ModalBuilder> modifyModal = null)
+        public static async Task<string> RespondWithModalAsync<T>(this RestInteraction interaction, string customId, RequestOptions options = null, Action<ModalBuilder> modifyModal = null)
             where T : class, IModal
         {
             if (!ModalUtils.TryGet<T>(out var modalInfo))
