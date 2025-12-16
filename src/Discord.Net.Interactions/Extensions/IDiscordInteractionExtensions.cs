@@ -65,7 +65,7 @@ namespace Discord.Interactions
             if (!ModalUtils.TryGet<T>(out var modalInfo))
                 throw new ArgumentException($"{typeof(T).FullName} isn't referenced by any registered Modal Interaction Command and doesn't have a cached {typeof(ModalInfo)}");
 
-            return SendModalResponseAsync<T>(interaction, customId, modalInfo, modal, options, modifyModal);
+            return SendModalResponseAsync(interaction, customId, modalInfo, modal, options, modifyModal);
         }
 
         public static async Task<Modal> ToModalAsync<T>(this IDiscordInteraction interaction, string customId, ModalInfo modalInfo, T modalInstance = null, RequestOptions options = null, Action<ModalBuilder> modifyModal = null)
