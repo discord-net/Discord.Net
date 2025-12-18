@@ -74,7 +74,7 @@ namespace Discord.Interactions
             if (!modalInfo.Type.IsAssignableFrom(typeof(T)))
                 throw new ArgumentException($"{modalInfo.Type.FullName} isn't assignable from {typeof(T).FullName}.");
 
-            var builder = new ModalBuilder(modalInstance.Title, customId);
+            var builder = new ModalBuilder(modalInstance?.Title ?? modalInfo.Title, customId);
 
             foreach (var input in modalInfo.Components)
                 switch (input)
@@ -134,7 +134,7 @@ namespace Discord.Interactions
                         break;
                     case TextDisplayComponentInfo textDisplayComponent:
                         {
-                            var content = textDisplayComponent.Getter(modalInstance).ToString() ?? textDisplayComponent.Content;
+                            var content = modalInstance is not null ? textDisplayComponent.Getter(modalInstance).ToString() : (textDisplayComponent.DefaultValue as string) ?? textDisplayComponent.Content;
                             var componentBuilder = new TextDisplayBuilder(content);
                             builder.AddTextDisplay(componentBuilder);
                         }
