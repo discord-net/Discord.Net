@@ -19,7 +19,7 @@ namespace Discord.Rest
         /// <summary>
         ///     Gets the data received with this interaction, contains the button that was clicked.
         /// </summary>
-        public new RestMessageComponentData Data { get; }
+        public new RestMessageComponentData Data { get; private set; }
 
         /// <inheritdoc cref="IComponentInteraction.Message"/>
         public RestUserMessage Message { get; private set; }
@@ -29,17 +29,18 @@ namespace Discord.Rest
         internal RestMessageComponent(BaseDiscordClient client, Model model)
             : base(client, model.Id)
         {
-            var dataModel = model.Data.IsSpecified
-                ? (DataModel)model.Data.Value
-                : null;
-
-            Data = new RestMessageComponentData(dataModel, client, Guild);
         }
 
         internal new static async Task<RestMessageComponent> CreateAsync(DiscordRestClient client, Model model, bool doApiCall)
         {
             var entity = new RestMessageComponent(client, model);
             await entity.UpdateAsync(client, model, doApiCall).ConfigureAwait(false);
+
+            var dataModel = model.Data.IsSpecified
+                ? (DataModel)model.Data.Value
+                : null;
+
+            entity.Data = new RestMessageComponentData(dataModel, client, entity.Guild);
             return entity;
         }
         internal override async Task UpdateAsync(DiscordRestClient discord, Model model, bool doApiCall)
