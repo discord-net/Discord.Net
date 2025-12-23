@@ -236,7 +236,12 @@ namespace Discord.Interactions
                 [typeof(IConvertible)] = typeof(DefaultValueModalComponentConverter<>),
                 [typeof(Enum)] = typeof(EnumModalComponentConverter<>),
                 [typeof(Nullable<>)] = typeof(NullableComponentConverter<>),
-                [typeof(Array)] = typeof(DefaultArrayModalComponentConverter<>)
+                [typeof(Array)] = typeof(DefaultArrayModalComponentConverter<>),
+                [typeof(IChannel)] = typeof(DefaultChannelModalComponentConverter<>),
+                [typeof(IUser)] = typeof(DefaultUserModalComponentConverter<>),
+                [typeof(IRole)] = typeof(DefaultRoleModalComponentConverter<>),
+                [typeof(IMentionable)] = typeof(DefaultMentionableModalComponentConverter<>),
+                [typeof(IAttachment)] = typeof(DefaultAttachmentModalComponentConverter<>)
             });
         }
 

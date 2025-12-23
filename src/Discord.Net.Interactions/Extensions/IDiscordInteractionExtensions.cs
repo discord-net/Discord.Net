@@ -65,16 +65,16 @@ namespace Discord.Interactions
             if (!ModalUtils.TryGet<T>(out var modalInfo))
                 throw new ArgumentException($"{typeof(T).FullName} isn't referenced by any registered Modal Interaction Command and doesn't have a cached {typeof(ModalInfo)}");
 
-            return SendModalResponseAsync<T>(interaction, customId, modalInfo, modal, options, modifyModal);
+            return SendModalResponseAsync(interaction, customId, modalInfo, modal, options, modifyModal);
         }
 
-        private static async Task SendModalResponseAsync<T>(IDiscordInteraction interaction, string customId, ModalInfo modalInfo, T modalInstance = null, RequestOptions options = null, Action<ModalBuilder> modifyModal = null)
+        public static async Task<Modal> ToModalAsync<T>(this IDiscordInteraction interaction, string customId, ModalInfo modalInfo, T modalInstance = null, RequestOptions options = null, Action<ModalBuilder> modifyModal = null)
             where T : class, IModal
         {
             if (!modalInfo.Type.IsAssignableFrom(typeof(T)))
                 throw new ArgumentException($"{modalInfo.Type.FullName} isn't assignable from {typeof(T).FullName}.");
 
-            var builder = new ModalBuilder(modalInstance.Title, customId);
+            var builder = new ModalBuilder(modalInstance?.Title ?? modalInfo.Title, customId);
 
             foreach (var input in modalInfo.Components)
                 switch (input)
@@ -134,7 +134,7 @@ namespace Discord.Interactions
                         break;
                     case TextDisplayComponentInfo textDisplayComponent:
                         {
-                            var content = textDisplayComponent.Getter(modalInstance).ToString() ?? textDisplayComponent.Content;
+                            var content = modalInstance is not null ? textDisplayComponent.Getter(modalInstance).ToString() : (textDisplayComponent.DefaultValue as string) ?? textDisplayComponent.Content;
                             var componentBuilder = new TextDisplayBuilder(content);
                             builder.AddTextDisplay(componentBuilder);
                         }
@@ -145,7 +145,15 @@ namespace Discord.Interactions
 
             modifyModal?.Invoke(builder);
 
-            await interaction.RespondWithModalAsync(builder.Build(), options);
+            return builder.Build();
+        }
+
+        private static async Task SendModalResponseAsync<T>(IDiscordInteraction interaction, string customId, ModalInfo modalInfo, T modalInstance = null, RequestOptions options = null, Action<ModalBuilder> modifyModal = null)
+            where T : class, IModal
+        {
+            var modal = await interaction.ToModalAsync(customId, modalInfo, modalInstance, options, modifyModal);
+
+            await interaction.RespondWithModalAsync(modal, options);
         }
     }
 }
