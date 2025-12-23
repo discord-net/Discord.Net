@@ -47,6 +47,9 @@ internal static class MessageComponentExtension
 
             case FileUploadComponent fileUpload:
                 return new API.FileUploadComponent(fileUpload);
+
+            case UnknownComponent unknown:
+                return new API.UnknownComponent { RawType = unknown.RawType, RawJson = unknown.RawJson, Id = unknown.Id ?? Optional<int>.Unspecified };
         }
 
         return null;
@@ -197,7 +200,11 @@ internal static class MessageComponentExtension
             }
 
             default:
+            {
+                if (component is API.UnknownComponent unknown)
+                    return new UnknownComponent(unknown.RawType, unknown.RawJson, unknown.Id.ToNullable());
                 return null;
+            }
         }
     }
 
