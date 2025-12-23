@@ -46,6 +46,9 @@ namespace Discord
                 if (value is not string && !value.IsNumericType())
                     throw new ArgumentException($"{nameof(value)} must be a numeric type or a string! Value: \"{value}\"");
 
+                if (value is string stringValue)
+                    Preconditions.AtMost(stringValue.Length, 100, nameof(Value));
+
                 _value = value;
             }
         }
