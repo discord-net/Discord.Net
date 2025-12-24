@@ -33,7 +33,7 @@ using unsafe EncryptorProtocolVersionChangedCallback = delegate* unmanaged[Cdecl
  */
 using unsafe LogSinkCallback = delegate* unmanaged[Cdecl]<LoggingSeverity, char*, int, char*, void>;
 
-public enum Codec
+internal enum Codec
 {
     Unknown = 0,
     Opus = 1,
@@ -44,13 +44,13 @@ public enum Codec
     AV1 = 6
 }
 
-public enum EncryptorResultCode
+internal enum EncryptorResultCode
 {
     Success = 0,
     EncryptionFailure = 1,
 }
 
-public enum DecryptorResultCode
+internal enum DecryptorResultCode
 {
     Success = 0,
     DecryptionFailure = 1,
@@ -59,7 +59,7 @@ public enum DecryptorResultCode
     MissingCryptor = 4,
 }
 
-public enum LoggingSeverity
+internal enum LoggingSeverity
 {
     Verbose = 0,
     Info = 1,
@@ -68,14 +68,14 @@ public enum LoggingSeverity
     None = 4,
 }
 
-public enum MediaType
+internal enum MediaType
 {
     Audio = 0,
     Video = 1
 }
 
 [StructLayout(LayoutKind.Sequential)]
-public readonly struct EncryptorStats
+internal readonly struct EncryptorStats
 {
     public readonly ulong PassThroughCount;
     public readonly ulong EncryptSuccessCount;
@@ -87,7 +87,7 @@ public readonly struct EncryptorStats
 }
 
 [StructLayout(LayoutKind.Sequential)]
-public readonly struct DecryptorStats
+internal readonly struct DecryptorStats
 {
     public readonly ulong PassThroughCount;
     public readonly ulong DecryptSuccessCount;
@@ -98,7 +98,7 @@ public readonly struct DecryptorStats
     public readonly ulong DecryptInvalidNonceCount;
 }
 
-public static unsafe partial class LibDave
+internal static unsafe partial class libdave
 {
     public const string LIBRARY_NAME = "libdave";
 
