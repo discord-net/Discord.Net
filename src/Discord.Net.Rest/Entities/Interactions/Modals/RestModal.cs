@@ -42,7 +42,11 @@ namespace Discord.Rest
             return entity;
         }
 
+#if NET9_0_OR_GREATER
         private readonly Lock _lock = new();
+#else
+        private readonly object _lock = new();
+#endif
 
         /// <summary>
         ///     Acknowledges this interaction with the <see cref="InteractionResponseType.DeferredUpdateMessage"/> if the modal was created
@@ -139,7 +143,7 @@ namespace Discord.Rest
             MessageComponent component = null,
             Embed embed = null,
             RequestOptions options = null,
-            PollProperties poll = null, 
+            PollProperties poll = null,
             MessageFlags flags = MessageFlags.None)
         {
             if (!IsValidToken)

@@ -32,7 +32,11 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         internal override SocketGlobalUser GlobalUser { get => this; set => throw new NotImplementedException(); }
 
+#if NET9_0_OR_GREATER
         private readonly Lock _lockObj = new();
+#else
+        private readonly object _lockObj = new();
+#endif
         private ushort _references;
 
         private SocketGlobalUser(DiscordSocketClient discord, ulong id)

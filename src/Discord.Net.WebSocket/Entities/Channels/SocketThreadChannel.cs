@@ -111,8 +111,13 @@ namespace Discord.WebSocket
 
         private bool _usersDownloaded;
 
+#if NET9_0_OR_GREATER
         private readonly Lock _downloadLock = new();
         private readonly Lock _ownerLock = new();
+#else
+        private readonly object _downloadLock = new();
+        private readonly object _ownerLock = new();
+#endif
 
         private ulong _ownerId;
 
