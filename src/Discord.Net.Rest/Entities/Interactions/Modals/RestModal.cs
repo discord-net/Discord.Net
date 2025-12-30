@@ -7,6 +7,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 
 using DataModel = Discord.API.ModalInteractionData;
@@ -41,7 +42,7 @@ namespace Discord.Rest
             return entity;
         }
 
-        private object _lock = new object();
+        private readonly Lock _lock = new();
 
         /// <summary>
         ///     Acknowledges this interaction with the <see cref="InteractionResponseType.DeferredUpdateMessage"/> if the modal was created

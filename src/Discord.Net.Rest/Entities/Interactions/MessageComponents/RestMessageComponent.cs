@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using DataModel = Discord.API.MessageComponentInteractionData;
 using Model = Discord.API.Interaction;
@@ -24,7 +25,7 @@ namespace Discord.Rest
         /// <inheritdoc cref="IComponentInteraction.Message"/>
         public RestUserMessage Message { get; private set; }
 
-        private object _lock = new object();
+        private readonly Lock _lock = new();
 
         internal RestMessageComponent(BaseDiscordClient client, Model model)
             : base(client, model.Id)
