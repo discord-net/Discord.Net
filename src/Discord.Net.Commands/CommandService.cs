@@ -1,3 +1,4 @@
+using AsyncKeyedLock;
 using Discord.Commands.Builders;
 using Discord.Logging;
 using System;
@@ -6,7 +7,6 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Discord.Commands
@@ -46,7 +46,7 @@ namespace Discord.Commands
         public event Func<Optional<CommandInfo>, ICommandContext, IResult, Task> CommandExecuted { add { _commandExecutedEvent.Add(value); } remove { _commandExecutedEvent.Remove(value); } }
         internal readonly AsyncEvent<Func<Optional<CommandInfo>, ICommandContext, IResult, Task>> _commandExecutedEvent = new AsyncEvent<Func<Optional<CommandInfo>, ICommandContext, IResult, Task>>();
 
-        private readonly SemaphoreSlim _moduleLock;
+        private readonly AsyncNonKeyedLocker _moduleLock;
         private readonly ConcurrentDictionary<Type, ModuleInfo> _typedModuleDefs;
         private readonly ConcurrentDictionary<Type, ConcurrentDictionary<Type, TypeReader>> _typeReaders;
         private readonly ConcurrentDictionary<Type, TypeReader> _defaultTypeReaders;
@@ -105,7 +105,7 @@ namespace Discord.Commands
             _logManager.Message += async msg => await _logEvent.InvokeAsync(msg).ConfigureAwait(false);
             _cmdLogger = _logManager.CreateLogger("Command");
 
-            _moduleLock = new SemaphoreSlim(1, 1);
+            _moduleLock = new();
             _typedModuleDefs = new ConcurrentDictionary<Type, ModuleInfo>();
             _moduleDefs = new HashSet<ModuleInfo>();
             _map = new CommandMap(this);
@@ -137,20 +137,13 @@ namespace Discord.Commands
         #region Modules
         public async Task<ModuleInfo> CreateModuleAsync(string primaryAlias, Action<ModuleBuilder> buildFunc)
         {
-            await _moduleLock.WaitAsync().ConfigureAwait(false);
-            try
-            {
-                var builder = new ModuleBuilder(this, null, primaryAlias);
-                buildFunc(builder);
+            using var _ = await _moduleLock.LockAsync().ConfigureAwait(false);
+            var builder = new ModuleBuilder(this, null, primaryAlias);
+            buildFunc(builder);
 
-                var module = builder.Build(this, null);
+            var module = builder.Build(this, null);
 
-                return LoadModuleInternal(module);
-            }
-            finally
-            {
-                _moduleLock.Release();
-            }
+            return LoadModuleInternal(module);
         }
 
         /// <summary>
@@ -191,27 +184,20 @@ namespace Discord.Commands
         {
             services ??= EmptyServiceProvider.Instance;
 
-            await _moduleLock.WaitAsync().ConfigureAwait(false);
-            try
-            {
-                var typeInfo = type.GetTypeInfo();
+            using var _ = await _moduleLock.LockAsync().ConfigureAwait(false);
+            var typeInfo = type.GetTypeInfo();
 
-                if (_typedModuleDefs.ContainsKey(type))
-                    throw new ArgumentException("This module has already been added.");
+            if (_typedModuleDefs.ContainsKey(type))
+                throw new ArgumentException("This module has already been added.");
 
-                var module = (await ModuleClassBuilder.BuildAsync(this, services, typeInfo).ConfigureAwait(false)).FirstOrDefault();
+            var module = (await ModuleClassBuilder.BuildAsync(this, services, typeInfo).ConfigureAwait(false)).FirstOrDefault();
 
-                if (module.Value == default(ModuleInfo))
-                    throw new InvalidOperationException($"Could not build the module {type.FullName}, did you pass an invalid type?");
+            if (module.Value == default(ModuleInfo))
+                throw new InvalidOperationException($"Could not build the module {type.FullName}, did you pass an invalid type?");
 
-                _typedModuleDefs[module.Key] = module.Value;
+            _typedModuleDefs[module.Key] = module.Value;
 
-                return LoadModuleInternal(module.Value);
-            }
-            finally
-            {
-                _moduleLock.Release();
-            }
+            return LoadModuleInternal(module.Value);
         }
         /// <summary>
         ///     Add command modules from an <see cref="Assembly"/>.
@@ -226,24 +212,17 @@ namespace Discord.Commands
         {
             services ??= EmptyServiceProvider.Instance;
 
-            await _moduleLock.WaitAsync().ConfigureAwait(false);
-            try
-            {
-                var types = await ModuleClassBuilder.SearchAsync(assembly, this).ConfigureAwait(false);
-                var moduleDefs = await ModuleClassBuilder.BuildAsync(types, this, services).ConfigureAwait(false);
+            using var _ = await _moduleLock.LockAsync().ConfigureAwait(false);
+            var types = await ModuleClassBuilder.SearchAsync(assembly, this).ConfigureAwait(false);
+            var moduleDefs = await ModuleClassBuilder.BuildAsync(types, this, services).ConfigureAwait(false);
 
-                foreach (var info in moduleDefs)
-                {
-                    _typedModuleDefs[info.Key] = info.Value;
-                    LoadModuleInternal(info.Value);
-                }
-
-                return moduleDefs.Select(x => x.Value).ToImmutableArray();
-            }
-            finally
+            foreach (var info in moduleDefs)
             {
-                _moduleLock.Release();
+                _typedModuleDefs[info.Key] = info.Value;
+                LoadModuleInternal(info.Value);
             }
+
+            return moduleDefs.Select(x => x.Value).ToImmutableArray();
         }
         private ModuleInfo LoadModuleInternal(ModuleInfo module)
         {
@@ -267,20 +246,13 @@ namespace Discord.Commands
         /// </returns>
         public async Task<bool> RemoveModuleAsync(ModuleInfo module)
         {
-            await _moduleLock.WaitAsync().ConfigureAwait(false);
-            try
-            {
-                var typeModulePair = _typedModuleDefs.FirstOrDefault(x => x.Value.Equals(module));
+            using var _ = await _moduleLock.LockAsync().ConfigureAwait(false);
+            var typeModulePair = _typedModuleDefs.FirstOrDefault(x => x.Value.Equals(module));
 
-                if (!typeModulePair.Equals(default(KeyValuePair<Type, ModuleInfo>)))
-                    _typedModuleDefs.TryRemove(typeModulePair.Key, out var _);
+            if (!typeModulePair.Equals(default(KeyValuePair<Type, ModuleInfo>)))
+                _typedModuleDefs.TryRemove(typeModulePair.Key, out var _);
 
-                return RemoveModuleInternal(module);
-            }
-            finally
-            {
-                _moduleLock.Release();
-            }
+            return RemoveModuleInternal(module);
         }
         /// <summary>
         ///     Removes the command module.
@@ -301,18 +273,11 @@ namespace Discord.Commands
         /// </returns>
         public async Task<bool> RemoveModuleAsync(Type type)
         {
-            await _moduleLock.WaitAsync().ConfigureAwait(false);
-            try
-            {
-                if (!_typedModuleDefs.TryRemove(type, out var module))
-                    return false;
+            using var _ = await _moduleLock.LockAsync().ConfigureAwait(false);
+            if (!_typedModuleDefs.TryRemove(type, out var module))
+                return false;
 
-                return RemoveModuleInternal(module);
-            }
-            finally
-            {
-                _moduleLock.Release();
-            }
+            return RemoveModuleInternal(module);
         }
         private bool RemoveModuleInternal(ModuleInfo module)
         {

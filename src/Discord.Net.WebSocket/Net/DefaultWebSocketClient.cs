@@ -1,3 +1,4 @@
+using AsyncKeyedLock;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -20,7 +21,7 @@ namespace Discord.Net.WebSockets
         public event Func<string, Task> TextMessage;
         public event Func<Exception, Task> Closed;
 
-        private readonly SemaphoreSlim _lock;
+        private readonly AsyncNonKeyedLocker _lock;
         private readonly Dictionary<string, string> _headers;
         private readonly IWebProxy _proxy;
         private ClientWebSocket _client;
@@ -31,7 +32,7 @@ namespace Discord.Net.WebSockets
 
         public DefaultWebSocketClient(IWebProxy proxy = null)
         {
-            _lock = new SemaphoreSlim(1, 1);
+            _lock = new();
             _disconnectTokenSource = new CancellationTokenSource();
             _cancelToken = CancellationToken.None;
             _parentToken = CancellationToken.None;
@@ -59,15 +60,8 @@ namespace Discord.Net.WebSockets
 
         public async Task ConnectAsync(string host)
         {
-            await _lock.WaitAsync().ConfigureAwait(false);
-            try
-            {
-                await ConnectInternalAsync(host).ConfigureAwait(false);
-            }
-            finally
-            {
-                _lock.Release();
-            }
+            using var _ = await _lock.LockAsync().ConfigureAwait(false);
+            await ConnectInternalAsync(host).ConfigureAwait(false);
         }
         private async Task ConnectInternalAsync(string host)
         {
@@ -96,20 +90,12 @@ namespace Discord.Net.WebSockets
 
         public async Task DisconnectAsync(int closeCode = 1000)
         {
-            await _lock.WaitAsync().ConfigureAwait(false);
-            try
-            {
-                await DisconnectInternalAsync(closeCode: closeCode).ConfigureAwait(false);
-            }
-            finally
-            {
-                _lock.Release();
-            }
+            using var _ = await _lock.LockAsync().ConfigureAwait(false);
+            await DisconnectInternalAsync(closeCode: closeCode).ConfigureAwait(false);
         }
         private async Task DisconnectInternalAsync(int closeCode = 1000, bool isDisposing = false)
         {
             _isDisconnecting = true;
-
 
             if (_client != null)
             {
@@ -150,14 +136,9 @@ namespace Discord.Net.WebSockets
             if (_isDisconnecting)
                 return; //Ignore, this disconnect was requested.
 
-            await _lock.WaitAsync().ConfigureAwait(false);
-            try
+            using (await _lock.LockAsync().ConfigureAwait(false))
             {
                 await DisconnectInternalAsync(isDisposing: false);
-            }
-            finally
-            {
-                _lock.Release();
             }
             await Closed(ex);
         }
@@ -179,14 +160,7 @@ namespace Discord.Net.WebSockets
         {
             try
             {
-                await _lock.WaitAsync(_cancelToken).ConfigureAwait(false);
-            }
-            catch (TaskCanceledException)
-            {
-                return;
-            }
-            try
-            {
+                using var _ = await _lock.LockAsync(_cancelToken).ConfigureAwait(false);
                 if (_client == null)
                     return;
 
@@ -206,9 +180,9 @@ namespace Discord.Net.WebSockets
                     await _client.SendAsync(new ArraySegment<byte>(data, index, count), type, isLast, _cancelToken).ConfigureAwait(false);
                 }
             }
-            finally
+            catch (TaskCanceledException)
             {
-                _lock.Release();
+                return;
             }
         }
 
