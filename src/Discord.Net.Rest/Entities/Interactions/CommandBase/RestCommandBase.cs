@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 using Model = Discord.API.Interaction;
@@ -32,7 +33,7 @@ namespace Discord.Rest
         /// </summary>
         internal new RestCommandBaseData Data { get; private set; }
 
-        private object _lock = new object();
+        private readonly Lock _lock = new();
 
         internal RestCommandBase(DiscordRestClient client, Model model)
             : base(client, model.Id)

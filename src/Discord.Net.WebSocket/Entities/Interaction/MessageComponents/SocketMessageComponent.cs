@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using DataModel = Discord.API.MessageComponentInteractionData;
 using Model = Discord.API.Interaction;
@@ -24,7 +25,7 @@ namespace Discord.WebSocket
         /// <inheritdoc cref="IComponentInteraction.Message"/>
         public SocketUserMessage Message { get; private set; }
 
-        private object _lock = new object();
+        private readonly Lock _lock = new();
         public override bool HasResponded { get; internal set; } = false;
 
         internal SocketMessageComponent(DiscordSocketClient client, Model model, ISocketMessageChannel channel, SocketUser user)
