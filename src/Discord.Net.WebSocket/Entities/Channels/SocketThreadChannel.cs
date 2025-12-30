@@ -6,6 +6,7 @@ using System.Collections.Immutable;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Model = Discord.API.Channel;
 using ThreadMember = Discord.API.ThreadMember;
@@ -110,8 +111,8 @@ namespace Discord.WebSocket
 
         private bool _usersDownloaded;
 
-        private readonly object _downloadLock = new object();
-        private readonly object _ownerLock = new object();
+        private readonly Lock _downloadLock = new();
+        private readonly Lock _ownerLock = new();
 
         private ulong _ownerId;
 

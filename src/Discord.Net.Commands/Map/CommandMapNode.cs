@@ -2,6 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Threading;
 
 namespace Discord.Commands
 {
@@ -11,7 +12,7 @@ namespace Discord.Commands
 
         private readonly ConcurrentDictionary<string, CommandMapNode> _nodes;
         private readonly string _name;
-        private readonly object _lockObj = new object();
+        private readonly Lock _lockObj = new();
         private ImmutableArray<CommandInfo> _commands;
 
         public bool IsEmpty => _commands.Length == 0 && _nodes.Count == 0;

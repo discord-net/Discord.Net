@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 
 using DataModel = Discord.API.ModalInteractionData;
@@ -66,7 +67,7 @@ namespace Discord.WebSocket
 
         /// <inheritdoc/>
         public override bool HasResponded { get; internal set; }
-        private object _lock = new object();
+        private readonly Lock _lock = new();
 
         /// <inheritdoc/>
         public override async Task RespondWithFilesAsync(
