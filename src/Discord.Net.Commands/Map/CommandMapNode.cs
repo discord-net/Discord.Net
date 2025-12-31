@@ -12,7 +12,11 @@ namespace Discord.Commands
 
         private readonly ConcurrentDictionary<string, CommandMapNode> _nodes;
         private readonly string _name;
+#if NET9_0_OR_GREATER
         private readonly Lock _lockObj = new();
+#else
+        private readonly object _lockObj = new();
+#endif
         private ImmutableArray<CommandInfo> _commands;
 
         public bool IsEmpty => _commands.Length == 0 && _nodes.Count == 0;

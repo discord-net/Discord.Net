@@ -25,7 +25,11 @@ namespace Discord.Rest
         /// <inheritdoc cref="IComponentInteraction.Message"/>
         public RestUserMessage Message { get; private set; }
 
+#if NET9_0_OR_GREATER
         private readonly Lock _lock = new();
+#else
+        private readonly object _lock = new();
+#endif
 
         internal RestMessageComponent(BaseDiscordClient client, Model model)
             : base(client, model.Id)
@@ -457,7 +461,7 @@ namespace Discord.Rest
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="ephemeral"></param>
         /// <param name="options"></param>
