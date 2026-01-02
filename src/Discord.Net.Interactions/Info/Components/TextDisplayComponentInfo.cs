@@ -14,6 +14,6 @@ public class TextDisplayComponentInfo : ModalComponentInfo
 
     internal TextDisplayComponentInfo(TextDisplayComponentBuilder builder, ModalInfo modal) : base(builder, modal)
     {
-        Content = Content;
+        Content = builder.Content;
     }
 }
