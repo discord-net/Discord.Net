@@ -133,10 +133,11 @@ namespace Discord.Interactions
                         }
                         break;
                     case TextDisplayComponentInfo textDisplayComponent:
-                        {
-                            var content = modalInstance is not null ? textDisplayComponent.Getter(modalInstance).ToString() : (textDisplayComponent.DefaultValue as string) ?? textDisplayComponent.Content;
-                            var componentBuilder = new TextDisplayBuilder(content);
-                            builder.AddTextDisplay(componentBuilder);
+                    {
+                        var instanceValue = modalInstance is not null ? textDisplayComponent.Getter(modalInstance).ToString() : null;
+                        var content = instanceValue ?? (textDisplayComponent.DefaultValue as string) ?? textDisplayComponent.Content;
+                        var componentBuilder = new TextDisplayBuilder(content);
+                        builder.AddTextDisplay(componentBuilder);
                         }
                         break;
                     default:
