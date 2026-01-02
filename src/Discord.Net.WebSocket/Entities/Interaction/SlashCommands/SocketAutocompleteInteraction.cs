@@ -22,7 +22,11 @@ namespace Discord.WebSocket
         /// <inheritdoc/>
         public override bool HasResponded { get; internal set; }
 
+#if NET9_0_OR_GREATER
         private readonly Lock _lock = new();
+#else
+        private readonly object _lock = new();
+#endif
 
         internal SocketAutocompleteInteraction(DiscordSocketClient client, Model model, ISocketMessageChannel channel, SocketUser user)
             : base(client, model.Id, channel, user)

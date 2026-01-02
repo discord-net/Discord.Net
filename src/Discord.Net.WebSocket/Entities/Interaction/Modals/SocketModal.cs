@@ -67,7 +67,11 @@ namespace Discord.WebSocket
 
         /// <inheritdoc/>
         public override bool HasResponded { get; internal set; }
+#if NET9_0_OR_GREATER
         private readonly Lock _lock = new();
+#else
+        private readonly object _lock = new();
+#endif
 
         /// <inheritdoc/>
         public override async Task RespondWithFilesAsync(
@@ -440,7 +444,7 @@ namespace Discord.WebSocket
         }
 
         /// <inheritdoc/>
-        /// <remarks>     
+        /// <remarks>
         ///     Acknowledges this interaction with the <see cref="InteractionResponseType.DeferredUpdateMessage"/> if the modal was created
         ///     in a response to a message component interaction, <see cref="InteractionResponseType.DeferredChannelMessageWithSource"/> otherwise.
         /// </remarks>

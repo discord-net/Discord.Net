@@ -33,7 +33,11 @@ namespace Discord.Rest
         /// </summary>
         internal new RestCommandBaseData Data { get; private set; }
 
+#if NET9_0_OR_GREATER
         private readonly Lock _lock = new();
+#else
+        private readonly object _lock = new();
+#endif
 
         internal RestCommandBase(DiscordRestClient client, Model model)
             : base(client, model.Id)

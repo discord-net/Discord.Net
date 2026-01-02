@@ -496,7 +496,7 @@ namespace Discord.WebSocket
             client.AuditLogCreated += (arg1, arg2) => _auditLogCreated.InvokeAsync(arg1, arg2);
 
             client.VoiceChannelStatusUpdated += (arg1, arg2, arg3) => _voiceChannelStatusUpdated.InvokeAsync(arg1, arg2, arg3);
-            
+
             client.EntitlementCreated += (arg1) => _entitlementCreated.InvokeAsync(arg1);
             client.EntitlementUpdated += (arg1, arg2) => _entitlementUpdated.InvokeAsync(arg1, arg2);
             client.EntitlementDeleted += (arg1) => _entitlementDeleted.InvokeAsync(arg1);
