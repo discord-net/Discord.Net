@@ -1,5 +1,42 @@
 # Changelog
 
+## [3.19.0-beta.1] - 2026-01-03
+### Added
+- #3172 Modal refactoring & select menu support (a476014)
+- #3178 Add  `PinMessages` permission (5273f1d)
+- #3183 Update voice API to version 8 (927c905)
+- #3189 Modal Select Components Support for IF (e8c5436)
+- #3196 Add modify current guild member support (80fbbc2)
+- #3198 Get Archived thread calls on text channels (ca6c9bc)
+- #3199 Add select menu `IsRequired` property and fix usage of `DefaultValues` (0aff637)
+- #3200 Add net10.0 build target, update deps (f205bba)
+- #3193 Remove unsupported SDK targets (5ca29fd))
+- #3195 Add `GetRoleUserCounts` REST method (dade9b2)
+- #3207 Added UnknownComponent classes, and support to MessageComponentConverter and MessageComponentExtensions (ad8182f)
+- #3209 Modal Components v2 Single-select Typeconverters, Rest, and Patches (1e27c99)
+  
+### Fixed
+- #3167 Incorrect casts in the legacy component builder (958d286)
+- #3173 Remove voice gateway port stripping (0b078d7)
+- #3174 Fix duplicated flag value in ActivityProperties enum (ebc7db8)
+- #3186 Fix missing SelectMenu Type, ChannelTypes, DefaultValues in ComponentBuilder.AddComponent (8883596)
+- #3190 Fix voice receiving (a468e18)
+- #3192 fixed error on changing role icon/emoji to an image. (06510e1)
+- #3204 Fix user status update when speaking (11a56bc)
+- #3206 Fix AutocompleteResult.Value having no length limit (161a91e)
+- #3210 Fix NRE in Rest Interaction Guild User Resolution (fd6e3ad)
+- #3218 fix modal text display constructor initialization (86b885b)
+- #3197 Correct `IUserMessage.ModifyAsync` precondition expression (8668092)
+
+### Misc
+- #3169 Make ParameterChoice constructor public (9cb6ffd)
+- #3171 Bump guild batch limit to 200 (fc0712d)
+- #3176 Add better json type exception (ae6e7d5)
+- #3177 Make Cacheable constructors public (e61eb51
+- #3216 Improve .NET 9.0+ locking performance (4e95dd7)
+- #3217 Switch lock backport package to #if defs instead (b386a0e)
+
+
 ## [3.18.0] - 2025-07-19
 ### Added
 - #3145 add `ApproximateUserAuthorizationCount` (6e1f9c1)
