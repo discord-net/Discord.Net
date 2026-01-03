@@ -8,6 +8,9 @@ namespace Discord.Interactions;
 /// </summary>
 public class ChannelSelectComponentInfo : SnowflakeSelectComponentInfo
 {
+    /// <summary>
+    ///     Gets the presented channel types for this Channel Select.
+    /// </summary>
     public IReadOnlyCollection<ChannelType> ChannelTypes { get; }
 
     internal ChannelSelectComponentInfo(Builders.ChannelSelectComponentBuilder builder, ModalInfo modal)

@@ -12,6 +12,9 @@ public class ChannelSelectComponentBuilder : SnowflakeSelectComponentBuilder<Cha
 
     protected override ChannelSelectComponentBuilder Instance => this;
 
+    /// <summary>
+    ///     Gets the presented channel types for this Channel Select.
+    /// </summary>
     public IReadOnlyCollection<ChannelType> ChannelTypes => _channelTypes.AsReadOnly();
 
     /// <summary>
@@ -46,6 +49,13 @@ public class ChannelSelectComponentBuilder : SnowflakeSelectComponentBuilder<Cha
         return this;
     }
 
+    /// <summary>
+    ///     Sets the value of <see cref="ChannelTypes"/>.
+    /// </summary>
+    /// <param name="channelTypes">the new value of <see cref="ChannelTypes"/>.</param>
+    /// <returns>
+    ///     The builder instance.
+    /// </returns>
     public ChannelSelectComponentBuilder WithChannelTypes(params IEnumerable<ChannelType> channelTypes)
     {
         _channelTypes.AddRange(channelTypes);
