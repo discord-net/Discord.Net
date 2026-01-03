@@ -82,8 +82,8 @@ Select menus allow users to select one or more options from a dropdown list.
 ### Text Selects
 Text selects allow users to select one or more options from a predefined list of text options.
 The select menu is defined using the `ModalSelectMenu` attribute. The attribute can be used on a property of type `string`, `string[]` or an `enum` (annotated with `[Flags]` for multi-selects).
-
-In the case of `string` and `string[]`, the options must be provided using the `ModalSelectMenuOption` attribute.
+In string selects, the default Modal TypeConverter discovers the most suitable TypeReader registered in the active `InteractionService` instance and converts `string` values to the underlying CLR type of the array property using that TypeReader. Out of the box, you can use any `IConvertible` array as the backing field of a Text Select component. 
+In the case of `string`,  `string[]` or any other array, the options must be provided using the `ModalSelectMenuOption` attribute.
 
 ```csharp
 [ModalSelectMenu("custom-id")]
@@ -93,14 +93,18 @@ public string[] TextSelectMenu { get; set; }
 ```
 
 ![Text select](images/modals/text-select.png)
+In case of `enum`, the enum values are automatically converted into options. `Hide` attribute can be used to declaratively remove options from the select menu. Custom attributes can be created by inheriting the `Hide` attribute and overriding the `Predicate` method to apply the attribute selectively during runtime.
 
+Option properties (like description, isDefault, and emote) can be configured by adding a `SelectMenuOption` attribute to the enum fields. Emote property accepts identifier strings for both unicode emojis and discord emotes. 
+
+Enum selects are the recommended way of implementing select menus in modals. It provides a reusable and type-safe way of accepting user inputs, as it is also possible to create generic modal classes and swap select menus in-and-out by simply changing the generic parameter on instantiation. 
 ### User, Role, Mentionable and Channel Selects
 User, Role, Mentionable and Channel selects allow users to select one or more entities of a specific type from a prefilled select menu. 
-`ModalUserSelect`, `ModalRoleSelect`, `ModalMentionableSelect` and `ModalChannelSelect` attributes can be used on properties of type `IUser`, `IRole`, `IMentionable`, `IChannel` for single-selects, or arrays of respective types for multi-selects.
+`ModalUserSelect`, `ModalRoleSelect`, `ModalMentionableSelect` and `ModalChannelSelect` attributes can be used on properties of type `IUser`, `IRole`, `IMentionable`, `IChannel`, or any other implementation of the aforementioned interfaces(as long as the received entity type can be up-cast into it) for single-selects, or arrays of respective types for multi-selects.
 
 [!code-csharp[Example modal](samples/modals/prefilled-selects.cs)]
 ![Prefilled selects](images/modals/prefilled-selects.png)
-
+For Channel selects in particular, the property type (if single entity), or the underlying type of the array can be used to restrict the type of channels available to the user. Implementations like `IStageChannel`, `IVoiceChannel`, `IDMChannel`, `IGroupChannel`, `ICategoryChannel`, `INewsChannel`, `IThreadChannel`, `ITextChannel`, `IMediaChannel`, or `IForumChannel` can be used.
 ## File Uploads
 File upload components allow users to upload files as part of their modal submission. A single file upload can take up to 10 attachments. The size limit for the uploaded files is determined by Discord's limits for the current context (e.g., server boost level, user's nitro status). 
 The file upload component is defined using the `ModalFileUpload` attribute. The attribute can be used on a property of type `IAttachment` or `IAttachment[]`.
@@ -125,3 +129,6 @@ The text display component is defined using the `ModalTextDisplay` attribute. Th
                                               """;
 ```
 ![Text display](images/modals/text-display.png)
+
+## Modal TypeConverters
+Modal TypeConverters use the same principle as Slash Command TypeConverters and Component TypeConverters to convert CLR type values to and from API entities and values. They are assigned to modal component properties by their respective CLR types (with the exception being Text Display components). Every default behaviour mentioned in this document regarding value conversions and property values can be overridden by implementing custom generic or concrete Modal TypeConverters by inheriting `ModalComponentTypeConverter` class and registering the TypeConveter to the `InteractionService` instance in use. `WriteAsync` method is invoked after the regular the component building flow is done executing with the component builder instance being used.  
