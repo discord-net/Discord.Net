@@ -108,7 +108,8 @@ namespace Discord.Interactions
                         break;
                     case SnowflakeSelectComponentInfo snowflakeSelectComponent:
                         {
-                            var inputBuilder = new SelectMenuBuilder(snowflakeSelectComponent.CustomId, null, snowflakeSelectComponent.Placeholder, snowflakeSelectComponent.MaxValues, snowflakeSelectComponent.MinValues, false, snowflakeSelectComponent.ComponentType, null, snowflakeSelectComponent.DefaultValues.ToList(), null, snowflakeSelectComponent.IsRequired);
+                            var channelTypes = snowflakeSelectComponent is ChannelSelectComponentInfo channelSelectComponent ? channelSelectComponent.ChannelTypes : null;
+                            var inputBuilder = new SelectMenuBuilder(snowflakeSelectComponent.CustomId, null, snowflakeSelectComponent.Placeholder, snowflakeSelectComponent.MaxValues, snowflakeSelectComponent.MinValues, false, snowflakeSelectComponent.ComponentType, [..channelTypes], snowflakeSelectComponent.DefaultValues.ToList(), null, snowflakeSelectComponent.IsRequired);
 
                             if (modalInstance != null)
                             {
