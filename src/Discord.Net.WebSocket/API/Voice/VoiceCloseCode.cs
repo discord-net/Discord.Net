@@ -71,10 +71,20 @@ namespace Discord.WebSocket
         /// </summary>
         UnknownEncryptionMode = 4016,
 
+        /// <summary>
+        ///     You sent a malformed request.
+        /// </summary>
         BadRequest = 4020,
 
+        /// <summary>
+        ///     Disconnect due to rate limit exceeded. Should not reconnect.
+        /// </summary>
         RateLimited = 4021,
 
+        /// <summary>
+        ///     Disconnect all clients due to call terminated (channel deleted, voice server changed, etc.). Should not
+        ///     reconnect.
+        /// </summary>
         CallTerminated = 4022
     }
 }
