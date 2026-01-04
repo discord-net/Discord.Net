@@ -2,7 +2,7 @@
 
 namespace Discord.API.Voice;
 
-public class DaveMLSTransitionParams
+internal class DaveMLSTransitionParams
 {
     [JsonProperty("transition_id")]
     public ushort TransitionId { get; set; }
