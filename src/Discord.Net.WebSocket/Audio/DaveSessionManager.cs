@@ -15,7 +15,7 @@ internal sealed class DaveSessionManager : IDisposable
 {
     public ushort MaxProtocolVersion => Dave.MaxSupportedProtocolVersion;
 
-    public bool IsDisabled => _session.Version is Dave.DISABELD_PROTOCOL_VERSION;
+    public bool IsDisabled => _session.ProtocolVersion is Dave.DISABELD_PROTOCOL_VERSION;
 
     public ulong SelfUserId => _client.Discord.CurrentUser.Id;
 
@@ -125,7 +125,7 @@ internal sealed class DaveSessionManager : IDisposable
         }
         else
         {
-            await PrepareProtocolTransitionAsync(transitionId, _session.Version);
+            await PrepareProtocolTransitionAsync(transitionId, _session.ProtocolVersion);
         }
     }
 
@@ -168,7 +168,7 @@ internal sealed class DaveSessionManager : IDisposable
         }
         else
         {
-            await PrepareProtocolTransitionAsync(transitionId, _session.Version);
+            await PrepareProtocolTransitionAsync(transitionId, _session.ProtocolVersion);
         }
     }
 
@@ -224,7 +224,7 @@ internal sealed class DaveSessionManager : IDisposable
 
         await _logger.DebugAsync($"Initializing dave session: epoch {epoch}, protocol version {protocolVersion}");
 
-        _session.Init(
+        _session.Initialize(
             protocolVersion,
             _client.ChannelId,
             SelfUserId
@@ -264,7 +264,7 @@ internal sealed class DaveSessionManager : IDisposable
             new DaveMLSTransitionParams() { TransitionId = transitionId }
         );
 
-    private Task SendMLSKeyPackageAsync(AllocBuffer<byte> mlsKeyPackage)
+    private Task SendMLSKeyPackageAsync(ManuallyAllocatedHeapSpan<byte> mlsKeyPackage)
         => _client.ApiClient.SendBinaryAsync(
             VoiceOpCode.DaveMLSKeyPackage,
             mlsKeyPackage.ToArray()

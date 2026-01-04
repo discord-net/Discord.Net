@@ -4,56 +4,71 @@ using System.Runtime.InteropServices;
 
 namespace Discord.LibDave;
 
-public sealed class DaveSession : IDisposable
+/// <summary>
+///     Represents a session within the <see cref="libdave"/> library.
+/// </summary>
+/// <param name="handle">The underlying handle to the session object within the <see cref="libdave"/> library.</param>
+public sealed class DaveSession(SessionHandle handle) : IDisposable
 {
-    public ushort Version
+    /// <summary>
+    ///     Gets or sets the protocol version of this session.
+    /// </summary>
+    public ushort ProtocolVersion
     {
-        get => libdave.SessionGetProtocolVersion(_handle);
-        set => libdave.SessionSetProtocolVersion(_handle, value);
-    }
-
-    private readonly SessionHandle _handle;
-    private bool _isAlive;
-
-    public DaveSession(SessionHandle handle)
-    {
-        _isAlive = true;
-        _handle = handle;
+        get => libdave.SessionGetProtocolVersion(handle);
+        set => libdave.SessionSetProtocolVersion(handle, value);
     }
 
     internal void HandleMLSFailure(string? source, string? reason)
     {
-
+        // TODO
     }
 
-    public void Init(ushort version, ulong groupId, ulong selfUserId)
+    /// <summary>
+    ///     Initializes this session.
+    /// </summary>
+    /// <param name="protocolVersion">The protocol version of the session.</param>
+    /// <param name="groupId">The group ID (channel ID) of the session.</param>
+    /// <param name="selfUserId">The ID of the current user.</param>
+    public void Initialize(ushort protocolVersion, ulong groupId, ulong selfUserId)
     {
         using var _ = Utils.ToCString(selfUserId, out var selfUserIdStr);
 
         libdave.SessionInit(
-            _handle,
-            version,
+            handle,
+            protocolVersion,
             groupId,
             selfUserIdStr
         );
     }
 
-    public void Reset() => libdave.SessionReset(_handle);
+    /// <summary>
+    ///     Resets the current session.
+    /// </summary>
+    public void Reset() => libdave.SessionReset(handle);
 
-    public unsafe AllocBuffer<byte> GetLastEpochAuthenticator()
+    /// <summary>
+    ///     Gets the last epoch authenticator of this session.
+    /// </summary>
+    /// <returns>The last epoch authenticator.</returns>
+    public unsafe ManuallyAllocatedHeapSpan<byte> GetLastEpochAuthenticator()
     {
         byte* authenticator;
         nint length;
 
         libdave.SessionGetLastEpochAuthenticator(
-            _handle,
+            handle,
             &authenticator,
             &length
         );
 
-        return new AllocBuffer<byte>(authenticator, (int)length);
+        return new ManuallyAllocatedHeapSpan<byte>(authenticator, (int)length);
     }
 
+    /// <summary>
+    ///     Sets the external sender of this session.
+    /// </summary>
+    /// <param name="externalSender">The external sender.</param>
     public unsafe void SetExternalSender(
         ReadOnlyMemory<byte> externalSender
     )
@@ -61,14 +76,20 @@ public sealed class DaveSession : IDisposable
         fixed (byte* ptr = externalSender.Span)
         {
             libdave.SessionSetExternalSender(
-                _handle,
+                handle,
                 ptr,
                 externalSender.Length
             );
         }
     }
 
-    public unsafe AllocBuffer<byte> ProcessProposals(
+    /// <summary>
+    ///     Processes proposals for this session.
+    /// </summary>
+    /// <param name="proposals">The proposals to process.</param>
+    /// <param name="recognizedUserIds">The snowflake identifiers of any recognized users.</param>
+    /// <returns>The result of the proposal.</returns>
+    public unsafe ManuallyAllocatedHeapSpan<byte> ProcessProposals(
         ReadOnlyMemory<byte> proposals,
         ICollection<ulong> recognizedUserIds
     )
@@ -80,7 +101,7 @@ public sealed class DaveSession : IDisposable
         fixed (byte* proposalsPtr = proposals.Span)
         {
             libdave.SessionProcessProposals(
-                _handle,
+                handle,
                 proposalsPtr,
                 proposals.Length,
                 ids.Pointer,
@@ -93,6 +114,11 @@ public sealed class DaveSession : IDisposable
         return new(welcomePtr, (int)welcomeLength);
     }
 
+    /// <summary>
+    ///     Processes a commit message for this session.
+    /// </summary>
+    /// <param name="commit">The commit to process.</param>
+    /// <returns>The result of processing the commit.</returns>
     public unsafe DaveCommitResult ProcessCommit(
         ReadOnlyMemory<byte> commit
     )
@@ -101,7 +127,7 @@ public sealed class DaveSession : IDisposable
         {
             return new(
                 libdave.SessionProcessCommit(
-                    _handle,
+                    handle,
                     commitPtr,
                     commit.Length
                 )
@@ -109,6 +135,12 @@ public sealed class DaveSession : IDisposable
         }
     }
 
+    /// <summary>
+    ///     Processes a welcome message for this session.
+    /// </summary>
+    /// <param name="welcome">The welcome message to process.</param>
+    /// <param name="recognizedUserIds">The snowflake identifiers of any recognized users.</param>
+    /// <returns>The result of processing the welcome message.</returns>
     public unsafe DaveWelcomeResult ProcessWelcome(
         ReadOnlyMemory<byte> welcome,
         ICollection<ulong> recognizedUserIds
@@ -120,7 +152,7 @@ public sealed class DaveSession : IDisposable
         {
             return new(
                 libdave.SessionProcessWelcome(
-                    _handle,
+                    handle,
                     welcomePtr,
                     welcome.Length,
                     ids.Pointer,
@@ -130,13 +162,17 @@ public sealed class DaveSession : IDisposable
         }
     }
 
-    public unsafe AllocBuffer<byte> GetMarshalledKeyPackage()
+    /// <summary>
+    ///     Gets the sessions marshalled key package.
+    /// </summary>
+    /// <returns>The marshalled key package.</returns>
+    public unsafe ManuallyAllocatedHeapSpan<byte> GetMarshalledKeyPackage()
     {
         byte* ptr;
         nint length;
 
         libdave.SessionGetMarshalledKeyPackage(
-            _handle,
+            handle,
             &ptr,
             &length
         );
@@ -144,27 +180,42 @@ public sealed class DaveSession : IDisposable
         return new(ptr, (int)length);
     }
 
+    /// <summary>
+    ///     Gets the key ratchet for a user based on their snowflake identifier.
+    /// </summary>
+    /// <param name="userId">The snowflake identifier of the user.</param>
+    /// <returns>The key ratchet for the given user.</returns>
     public unsafe DaveKeyRatchet GetKeyRatchet(ulong userId)
     {
         using var strHandle = Utils.ToCString(userId, out _);
 
-        var handle = libdave.SessionGetKeyRatchet(
-            _handle,
-            (CChar*)strHandle.Pointer
+        return new(
+            libdave.SessionGetKeyRatchet(
+                handle,
+                (CChar*)strHandle.Pointer
+            )
         );
-
-        return new(handle);
     }
 
-    public Task<AllocBuffer<byte>> GetPairwiseFingerprintAsync(
+    /// <summary>
+    ///     Gets a users pairwise fingerprint.
+    /// </summary>
+    /// <param name="userId">The users snowflake identifier.</param>
+    /// <param name="protocolVersion">The current protocol version.</param>
+    /// <param name="token">A <see cref="CancellationToken"/> used to cancel the asynchronous operation.</param>
+    /// <returns>
+    ///     A task representing the asynchronous operation of getting a users pairwise fingerprint. The result of
+    ///     the task is the fingerprint.
+    /// </returns>
+    public Task<ManuallyAllocatedHeapSpan<byte>> GetPairwiseFingerprintAsync(
         ulong userId,
-        ushort? version = null,
+        ushort? protocolVersion = null,
         CancellationToken token = default
     )
     {
-        version ??= Version;
+        protocolVersion ??= ProtocolVersion;
 
-        var tcs = new TaskCompletionSource<AllocBuffer<byte>>();
+        var tcs = new TaskCompletionSource<ManuallyAllocatedHeapSpan<byte>>();
 
         token.Register(() => tcs.SetCanceled(token));
 
@@ -173,8 +224,8 @@ public sealed class DaveSession : IDisposable
         unsafe
         {
             libdave.SessionGetPairwiseFingerprint(
-                _handle,
-                version.Value,
+                handle,
+                protocolVersion.Value,
                 (CChar*)userIdStr.Pointer,
                 (PairwiseFingerprintCallback)Marshal.GetFunctionPointerForDelegate(Callback)
             );
@@ -186,9 +237,7 @@ public sealed class DaveSession : IDisposable
             => tcs.TrySetResult(new(ptr, (int)length));
     }
 
+    /// <inheritdoc/>
     public void Dispose()
-    {
-        if (_isAlive) libdave.SessionDestroy(_handle);
-        _isAlive = false;
-    }
+        => libdave.SessionDestroy(handle);
 }

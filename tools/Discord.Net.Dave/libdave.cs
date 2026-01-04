@@ -38,73 +38,237 @@ using System.Runtime.InteropServices;
 
 namespace Discord.LibDave.Binding;
 
+/// <summary>
+///     An enum representing the different codes within the <see cref="libdave"/> library.
+/// </summary>
 public enum Codec
 {
+    /// <summary>
+    ///     An unknown codec.
+    /// </summary>
     Unknown = 0,
+
+    /// <summary>
+    ///     The opus codec.
+    /// </summary>
     Opus = 1,
+
+    /// <summary>
+    ///     The VP8 codec.
+    /// </summary>
     VP8 = 2,
+
+    /// <summary>
+    ///     The VP9 codec.
+    /// </summary>
     VP9 = 3,
+
+    /// <summary>
+    ///     The H264 codec.
+    /// </summary>
     H264 = 4,
+
+    /// <summary>
+    ///     The H265 codec.
+    /// </summary>
     H265 = 5,
+
+    /// <summary>
+    ///     The AV1 codec.
+    /// </summary>
     AV1 = 6
 }
 
+/// <summary>
+///     Represents the result of encrypting.
+/// </summary>
 public enum EncryptorResultCode
 {
+    /// <summary>
+    ///     The encryption was a success.
+    /// </summary>
     Success = 0,
+
+    /// <summary>
+    ///     The encryption failed.
+    /// </summary>
     EncryptionFailure = 1,
 }
 
+/// <summary>
+///     Represents the result of decrypting.
+/// </summary>
 public enum DecryptorResultCode
 {
+    /// <summary>
+    ///     The decryption was a success.
+    /// </summary>
     Success = 0,
+
+    /// <summary>
+    ///     The decryption failed.
+    /// </summary>
     DecryptionFailure = 1,
+
+    /// <summary>
+    ///     The decryption failed because of a missing key ratchet.
+    /// </summary>
     MissingKeyRatchet = 2,
+
+    /// <summary>
+    ///     The decryption failed because of an invalid nonce.
+    /// </summary>
     InvalidNonce = 3,
+
+    /// <summary>
+    ///     The decryption failed because of a missing cryptor.
+    /// </summary>
     MissingCryptor = 4,
 }
 
+/// <summary>
+///     Represents the logging severity within the <see cref="libdave"/> library.
+/// </summary>
 public enum LoggingSeverity
 {
+    /// <summary>
+    ///     A verbose log.
+    /// </summary>
     Verbose = 0,
+
+    /// <summary>
+    ///     An informative log.
+    /// </summary>
     Info = 1,
+
+    /// <summary>
+    ///     A warning log.
+    /// </summary>
     Warning = 2,
+
+    /// <summary>
+    ///     An error log.
+    /// </summary>
     Error = 3,
+
+    /// <summary>
+    ///     No severity.
+    /// </summary>
     None = 4,
 }
 
+/// <summary>
+///     Represents media type within the <see cref="libdave"/> library.
+/// </summary>
 public enum MediaType
 {
+    /// <summary>
+    ///     Audio media.
+    /// </summary>
     Audio = 0,
+
+    /// <summary>
+    ///     Video media.
+    /// </summary>
     Video = 1
 }
 
+/// <summary>
+///     A struct containing statistics related to an encryptor within the <see cref="libdave"/> library.
+/// </summary>
 [StructLayout(LayoutKind.Sequential)]
 public readonly struct EncryptorStats
 {
+    /// <summary>
+    ///     The number of pass through frames.
+    /// </summary>
     public readonly ulong PassThroughCount;
+
+    /// <summary>
+    ///     The number of successful encryptions.
+    /// </summary>
     public readonly ulong EncryptSuccessCount;
+
+    /// <summary>
+    ///     The number of failed encryptions.
+    /// </summary>
     public readonly ulong EncryptFailureCount;
+
+    /// <summary>
+    ///     The duration of encryption.
+    /// </summary>
     public readonly ulong EncryptDuration;
+
+    /// <summary>
+    ///     The number of encryption attempts.
+    /// </summary>
     public readonly ulong EncryptAttempts;
+
+    /// <summary>
+    ///     The max number of encryption attempts.
+    /// </summary>
     public readonly ulong EncryptMaxAttempts;
+
+    /// <summary>
+    ///     The number of missing keys.
+    /// </summary>
     public readonly ulong EncryptMissingKeyCount;
 }
 
+/// <summary>
+///     A struct containing statistics related to a decryptor within the <see cref="libdave"/> library.
+/// </summary>
 [StructLayout(LayoutKind.Sequential)]
 public readonly struct DecryptorStats
 {
+    /// <summary>
+    ///     The number of pass through frames.
+    /// </summary>
     public readonly ulong PassThroughCount;
+
+    /// <summary>
+    ///     The number of successful decryptions.
+    /// </summary>
     public readonly ulong DecryptSuccessCount;
+
+    /// <summary>
+    ///     The number of failed decryptions.
+    /// </summary>
     public readonly ulong DecryptFailureCount;
+
+    /// <summary>
+    ///     The duration of decryption.
+    /// </summary>
     public readonly ulong DecryptDuration;
+
+    /// <summary>
+    ///     The number of decryption attempts.
+    /// </summary>
     public readonly ulong DecryptAttempts;
+
+    /// <summary>
+    ///     The number failed decryptions due to missing keys.
+    /// </summary>
     public readonly ulong DecryptMissingKeyCount;
+
+    /// <summary>
+    ///     The number of failed decryptions due to invalid nonces
+    /// </summary>
     public readonly ulong DecryptInvalidNonceCount;
 }
 
+/// <summary>
+///     A class providing the raw interop with the <c>libdave</c> binding.
+/// </summary>
+/// <remarks>
+///     It's recommended to use <see cref="Dave"/> to interact with <c>libdave</c> in a safe mannar, only use this
+///     class if you know what you're doing!!!
+/// </remarks>
 public static unsafe partial class libdave
 {
+    /// <summary>
+    ///     The name of the <see cref="libdave"/> library file.
+    /// </summary>
     public const string LIBRARY_NAME = "libdave";
 
     // uint16_t daveMaxSupportedProtocolVersion(void)

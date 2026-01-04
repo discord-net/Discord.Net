@@ -3,62 +3,23 @@ using System.Runtime.InteropServices;
 
 namespace Discord.LibDave;
 
-internal readonly unsafe ref struct AllocHandle(void* ptr) : IDisposable
-{
-    public readonly void* Pointer = ptr;
-
-    public void Dispose() => NativeMemory.Free(Pointer);
-}
-
-public readonly unsafe struct AllocBuffer<T>(
-    T* ptr,
-    int length
-) : IDisposable
-    where T : unmanaged
-{
-    public readonly int Length = length;
-    public bool HasData => !IsEmpty && !IsNull;
-
-    public bool IsEmpty => Length is 0;
-    public bool IsNull => ptr is null;
-
-    public ReadOnlySpan<T> AsSpan => new(ptr, Length);
-
-    public T[] ToArray() => AsSpan.ToArray();
-
-    public ReadOnlyMemory<T> ToMemory() => new(ToArray(), 0, Length);
-
-    public void Dispose() => NativeMemory.Free(ptr);
-}
-
-internal readonly unsafe ref struct IdsHandle : IDisposable
-{
-    public readonly byte** Pointer;
-    public readonly int Length;
-
-    public IdsHandle(void* array, int length)
-    {
-        Length = length;
-        Pointer = (byte**)array;
-    }
-
-    public void Dispose()
-    {
-        var span = new Span<nuint>(Pointer, Length);
-
-        for (var i = 0; i < span.Length; i++)
-        {
-            NativeMemory.Free((void*)span[i]);
-        }
-
-        NativeMemory.Free(Pointer);
-    }
-}
-
+/// <summary>
+///     A class containing utilities related to <c>libdave</c>
+/// </summary>
 internal static class Utils
 {
+    /// <summary>
+    ///     The max size in bytes of a c-string for a snowflake identifier.
+    /// </summary>
     public const int SNOWFLAKE_MAX_CSTRING_LENGTH = 21;
 
+    /// <summary>
+    ///     Converts a snowflake to a C string.
+    /// </summary>
+    /// <param name="id">The snowflake to convert.</param>
+    /// <param name="str">The span containing the C string of the snowflake.</param>
+    /// <returns>A handle used to free the C string.</returns>
+    /// <exception cref="InvalidOperationException">The ID couldn't be formatted.</exception>
     public static unsafe AllocHandle ToCString(ulong id, out ReadOnlySpan<CChar> str)
     {
         var ptr = (CChar*)NativeMemory.Alloc(SNOWFLAKE_MAX_CSTRING_LENGTH);
@@ -72,9 +33,13 @@ internal static class Utils
         return new(ptr);
     }
 
+    /// <summary>
+    ///     Converts a collection of snowflake identifiers into the C-ABI format used by <c>libdave</c>.
+    /// </summary>
+    /// <param name="ids">The ids to convert.</param>
+    /// <returns>The converted ids.</returns>
     public static unsafe IdsHandle GetIds(ICollection<ulong> ids)
     {
-
         var arr = NativeMemory.Alloc((nuint)(ids.Count * sizeof(nuint)));
         var result = new Span<nuint>(arr, ids.Count);
         var i = 0;
