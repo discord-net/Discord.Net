@@ -143,7 +143,11 @@
 - name: Bearer Tokens
   topicUid: Guides.BearerToken
 - name: Voice
-  topicUid: Guides.Voice.SendingVoice
+  items:
+    - name: Connecting and Sending
+      topicUid: Guides.Voice.SendingVoice
+    - name: libdave Support
+      topicUid: Guides.Voice.LibDave
 - name: Polls
   topicUid: Guides.Polls
 - name: Deployment
