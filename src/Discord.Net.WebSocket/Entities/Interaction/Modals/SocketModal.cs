@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 
 using DataModel = Discord.API.ModalInteractionData;
@@ -66,7 +67,11 @@ namespace Discord.WebSocket
 
         /// <inheritdoc/>
         public override bool HasResponded { get; internal set; }
-        private object _lock = new object();
+#if NET9_0_OR_GREATER
+        private readonly Lock _lock = new();
+#else
+        private readonly object _lock = new();
+#endif
 
         /// <inheritdoc/>
         public override async Task RespondWithFilesAsync(
@@ -439,7 +444,7 @@ namespace Discord.WebSocket
         }
 
         /// <inheritdoc/>
-        /// <remarks>     
+        /// <remarks>
         ///     Acknowledges this interaction with the <see cref="InteractionResponseType.DeferredUpdateMessage"/> if the modal was created
         ///     in a response to a message component interaction, <see cref="InteractionResponseType.DeferredChannelMessageWithSource"/> otherwise.
         /// </remarks>
