@@ -1,6 +1,7 @@
 ﻿using Discord.LibDave;
 using Discord.LibDave.Binding;
 using Discord.Logging;
+using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,6 +15,12 @@ public sealed class DaveDecryptStream : AudioOutStream
     private readonly AudioOutStream _next;
     private readonly Logger _logger;
     private readonly ulong _userId;
+
+    private ushort _seq;
+    private uint _timestamp;
+    private bool _missed;
+
+    private bool _hasHeader;
 
     internal DaveDecryptStream(
         IAudioClient client,
@@ -30,15 +37,33 @@ public sealed class DaveDecryptStream : AudioOutStream
         _userId = userId;
     }
 
+    public override void WriteHeader(ushort seq, uint timestamp, bool missed)
+    {
+        _seq = seq;
+        _timestamp = timestamp;
+        _missed = missed;
+        _hasHeader = true;
+    }
+
     public override async Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
     {
-        var result = _decryptor.Decrypt(buffer, MediaType.Audio, out var decryptedBuffer);
+        var result = _decryptor.Decrypt(
+            new ReadOnlyMemory<byte>(buffer, offset, count),
+            MediaType.Audio,
+            out var decryptedBuffer
+        );
 
         if (result is not DecryptorResultCode.Success)
         {
             await _logger.WarningAsync($"Failed to decrypt audio packet for {_userId}: {result}");
             decryptedBuffer.Dispose();
             return;
+        }
+
+        if (_hasHeader)
+        {
+            _next.WriteHeader(_seq, _timestamp, _missed);
+            _hasHeader = false;
         }
 
         try

@@ -117,7 +117,7 @@ namespace Discord.Audio
             await _sentGatewayMessageEvent.InvokeAsync(opCode).ConfigureAwait(false);
         }
 
-        public Task SendBinaryAsync(VoiceOpCode opCode, ReadOnlyMemory<byte> payload)
+        public async Task SendBinaryAsync(VoiceOpCode opCode, ReadOnlyMemory<byte> payload)
         {
             var payloadArr = ArrayPool<byte>.Shared.Rent(payload.Length + 1);
 
@@ -125,7 +125,8 @@ namespace Discord.Audio
 
             payload.CopyTo(payloadArr.AsMemory()[1..]);
 
-            return WebSocketClient.SendAsync(payloadArr, 0, payload.Length + 1, isText: false);
+            await WebSocketClient.SendAsync(payloadArr, 0, payload.Length + 1, isText: false);
+            await _sentGatewayMessageEvent.InvokeAsync(opCode).ConfigureAwait(false);
         }
 
         public async Task SendAsync(byte[] data, int offset, int bytes)

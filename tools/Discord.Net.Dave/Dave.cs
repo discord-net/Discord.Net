@@ -3,6 +3,13 @@ using System.Runtime.InteropServices;
 
 namespace Discord.LibDave;
 
+public delegate void DaveLogSinkDelegate(
+    LoggingSeverity severity,
+    string file,
+    int line,
+    string message
+);
+
 public static class Dave
 {
     public const int INIT_TRANSITION_ID = 0;
@@ -10,6 +17,27 @@ public static class Dave
     public const ulong MLS_NEW_GROUP_EXPECTED_EPOCH = 1;
 
     public static ushort MaxSupportedProtocolVersion => libdave.MaxSupportedProtocolVersion();
+
+    public static unsafe void SetLogSink(DaveLogSinkDelegate logSink)
+    {
+        libdave.SetLogSinkCallback(
+            (LogSinkCallback)Marshal.GetFunctionPointerForDelegate(WrapperSink)
+        );
+
+
+        void WrapperSink(
+            LoggingSeverity severity,
+            byte* filePtr,
+            int line,
+            byte* messagePtr
+        )
+        {
+            var file = Marshal.PtrToStringAnsi((IntPtr)filePtr) ?? string.Empty;
+            var message = Marshal.PtrToStringAnsi((IntPtr)messagePtr) ?? string.Empty;
+
+            logSink(severity, file, line, message);
+        }
+    }
 
     public static unsafe DaveSession CreateSession(
         string? context = null,

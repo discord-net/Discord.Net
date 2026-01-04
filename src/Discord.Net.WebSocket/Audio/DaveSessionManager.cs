@@ -3,6 +3,7 @@ using Discord.LibDave;
 using Discord.LibDave.Binding;
 using Discord.Logging;
 using System;
+using System.Buffers.Binary;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
@@ -37,7 +38,7 @@ internal sealed class DaveSessionManager : IDisposable
 
         Encryptor = Dave.CreateEncryptor();
 
-        _logger = client.Discord.LogManager.CreateLogger($"Dave #{client}");
+        _logger = client.Discord.LogManager.CreateLogger($"Dave #{clientId}");
     }
 
     public DaveDecryptor GetDecryptor(ulong userId)
@@ -76,14 +77,16 @@ internal sealed class DaveSessionManager : IDisposable
     {
         var span = message.Span;
 
-        var seq = BitConverter.ToUInt16(span[..2]);
+        var seq = BinaryPrimitives.ReadUInt16BigEndian(span[..2]);
         var opCode = (VoiceOpCode)span[2];
-        var data = message[2..];
+        var data = message[3..];
+
+        await _logger.DebugAsync($"-> [{opCode} : seq #{seq}] {data.Length} bytes");
 
         switch (opCode)
         {
             case VoiceOpCode.DaveMLSExternalSender:
-                OnMLSExternalSender(data);
+                await OnMLSExternalSenderAsync(data);
                 break;
             case VoiceOpCode.DaveMLSProposals:
                 await OnDaveMLSProposalsAsync(data);
@@ -123,14 +126,15 @@ internal sealed class DaveSessionManager : IDisposable
         else
         {
             await PrepareProtocolTransitionAsync(transitionId, _session.Version);
-
-            if (transitionId is not Dave.INIT_TRANSITION_ID)
-                await SendDaveProtocolReadyForTransitionAsync(transitionId);
         }
     }
 
-    private void OnMLSExternalSender(ReadOnlyMemory<byte> payload)
-        => _session.SetExternalSender(payload);
+    private async Task OnMLSExternalSenderAsync(ReadOnlyMemory<byte> payload)
+    {
+        await _logger.DebugAsync("Handling external sender package");
+
+        _session.SetExternalSender(payload);
+    }
 
     private async ValueTask OnDaveMLSProposalsAsync(ReadOnlyMemory<byte> payload)
     {
@@ -139,15 +143,9 @@ internal sealed class DaveSessionManager : IDisposable
             _decryptors.Keys
         );
 
-        if (result.HasData)
-        {
-            await _client.ApiClient.WebSocketClient.SendAsync(
-                result.ToArray(),
-                0,
-                result.Length,
-                isText: false
-            );
-        }
+        await _logger.DebugAsync($"Processed dave MLS proposals, has data?: {result.HasData}");
+
+        if (result.HasData) await SendMLSCommitWelcomeAsync(result.ToMemory());
     }
 
     private async ValueTask OnDaveMLSAnnounceCommitTransactionAsync(ushort transitionId, ReadOnlyMemory<byte> payload)
@@ -171,9 +169,6 @@ internal sealed class DaveSessionManager : IDisposable
         else
         {
             await PrepareProtocolTransitionAsync(transitionId, _session.Version);
-
-            if (transitionId is not Dave.INIT_TRANSITION_ID)
-                await SendDaveProtocolReadyForTransitionAsync(transitionId);
         }
     }
 
@@ -187,16 +182,22 @@ internal sealed class DaveSessionManager : IDisposable
         {
             if (id == SelfUserId) continue;
 
-            decryptor.PrepareTransition(_session, SelfUserId, protocolVersion);
+            decryptor.PrepareTransition(_session, id, protocolVersion);
         }
 
-        if (transitionId is Dave.INIT_TRANSITION_ID && protocolVersion is not Dave.DISABELD_PROTOCOL_VERSION)
+        if (transitionId is Dave.INIT_TRANSITION_ID)
         {
-            Encryptor.Ratchet = _session.GetKeyRatchet(SelfUserId);
+            var ratchet = _session.GetKeyRatchet(SelfUserId);
+
+            Encryptor.SetPassthroughMode(passthroughMode: protocolVersion is Dave.DISABELD_PROTOCOL_VERSION || ratchet.IsNull);
+
+            if(protocolVersion is not Dave.DISABELD_PROTOCOL_VERSION && !ratchet.IsNull)
+                Encryptor.Ratchet = ratchet;
         }
         else
         {
             _preparedTransitions[transitionId] = protocolVersion;
+            await SendDaveProtocolReadyForTransitionAsync(transitionId);
         }
     }
 
@@ -206,7 +207,7 @@ internal sealed class DaveSessionManager : IDisposable
 
         if (protocolVersion > Dave.DISABELD_PROTOCOL_VERSION)
         {
-            HandlePrepareEpoch(Dave.MLS_NEW_GROUP_EXPECTED_EPOCH, protocolVersion);
+            await HandlePrepareEpochAsync(Dave.MLS_NEW_GROUP_EXPECTED_EPOCH, protocolVersion);
             using var keyPackage = _session.GetMarshalledKeyPackage();
             await SendMLSKeyPackageAsync(keyPackage);
         }
@@ -217,9 +218,11 @@ internal sealed class DaveSessionManager : IDisposable
         }
     }
 
-    public void HandlePrepareEpoch(ulong epoch, ushort protocolVersion)
+    public async Task HandlePrepareEpochAsync(ulong epoch, ushort protocolVersion)
     {
         if (epoch is not Dave.MLS_NEW_GROUP_EXPECTED_EPOCH) return;
+
+        await _logger.DebugAsync($"Initializing dave session: epoch {epoch}, protocol version {protocolVersion}");
 
         _session.Init(
             protocolVersion,
@@ -248,6 +251,12 @@ internal sealed class DaveSessionManager : IDisposable
             Encryptor.SetPassthroughMode(true);
         }
     }
+
+    private Task SendMLSCommitWelcomeAsync(ReadOnlyMemory<byte> welcomeMessage)
+        => _client.ApiClient.SendBinaryAsync(
+            VoiceOpCode.DaveMLSWelcome,
+            welcomeMessage
+        );
 
     private Task SendMLSInvalidCommitWelcomeAsync(ushort transitionId)
         => _client.ApiClient.SendAsync(

@@ -264,14 +264,13 @@ namespace Discord.Audio
             var outputStream = new OutputStream(ApiClient); //Ignores header
             var sodiumEncrypter = new SodiumEncryptStream(outputStream, this); //Passes header
             var rtpWriter = new RTPWriteStream(sodiumEncrypter, _ssrc); //Consumes header, passes
-            var buffered = new BufferedWriteStream(
-                rtpWriter,
+            return new BufferedWriteStream(
+                AddDaveEncryptStream(rtpWriter),
                 this,
                 bufferMillis,
                 _connection.CancelToken,
                 _audioLogger
             ); //Generates header
-            return AddDaveEncryptStream(buffered);
         }
 
         public AudioOutStream CreateDirectOpusStream()
@@ -290,16 +289,14 @@ namespace Discord.Audio
             var sodiumEncrypter = new SodiumEncryptStream(outputStream, this); //Passes header
             var rtpWriter = new RTPWriteStream(sodiumEncrypter, _ssrc); //Consumes header, passes
             var bufferedStream = new BufferedWriteStream(
-                rtpWriter,
+                AddDaveEncryptStream(rtpWriter),
                 this,
                 bufferMillis,
                 _connection.CancelToken,
                 _audioLogger
             ); //Ignores header, generates header
-            var opus = new OpusEncodeStream(bufferedStream, bitrate ?? (96 * 1024), application,
-                packetLoss); //Generates header
 
-            return AddDaveEncryptStream(opus);
+            return new OpusEncodeStream(bufferedStream, bitrate ?? (96 * 1024), application, packetLoss); //Generates header
         }
 
         public AudioOutStream CreateDirectPCMStream(AudioApplication application, int? bitrate, int packetLoss)
@@ -307,14 +304,12 @@ namespace Discord.Audio
             var outputStream = new OutputStream(ApiClient); //Ignores header
             var sodiumEncrypter = new SodiumEncryptStream(outputStream, this); //Passes header
             var rtpWriter = new RTPWriteStream(sodiumEncrypter, _ssrc); //Consumes header, passes
-            var opus = new OpusEncodeStream(
-                rtpWriter,
+            return new OpusEncodeStream(
+                AddDaveEncryptStream(rtpWriter),
                 bitrate ?? (96 * 1024),
                 application,
                 packetLoss
             ); //Generates header
-
-            return AddDaveEncryptStream(opus);
         }
 
         private AudioOutStream AddDaveEncryptStream(AudioOutStream stream)
@@ -336,21 +331,22 @@ namespace Discord.Audio
             {
                 var readerStream = new InputStream(); //Consumes header
 
-                var opusDecoder = new OpusDecodeStream(readerStream); //Passes header
-                //var jitterBuffer = new JitterBuffer(opusDecoder, _audioLogger);
-                var rtpReader = new RTPReadStream(opusDecoder); //Generates header
-                AudioOutStream decryptStream = new SodiumDecryptStream(rtpReader, this); //No header
+                AudioOutStream opusDecoder = new OpusDecodeStream(readerStream); //Passes header
 
                 if (_dave is not null)
                 {
-                    decryptStream = new DaveDecryptStream(
+                    opusDecoder = new DaveDecryptStream(
                         this,
                         _dave.GetDecryptor(userId),
-                        decryptStream,
+                        opusDecoder,
                         Discord.LogManager.CreateLogger($"Dave decrypt stream {userId}"),
                         userId
                     );
                 }
+
+                //var jitterBuffer = new JitterBuffer(opusDecoder, _audioLogger);
+                var rtpReader = new RTPReadStream(opusDecoder); //Generates header
+                var decryptStream = new SodiumDecryptStream(rtpReader, this); //No header
 
                 _streams.TryAdd(userId, new StreamPair(readerStream, decryptStream));
 
@@ -393,13 +389,14 @@ namespace Discord.Audio
         {
             _lastMessageTime = Environment.TickCount;
 
+            await _audioLogger.DebugAsync($"Received {opCode}").ConfigureAwait(false);
+
             try
             {
                 switch (opCode)
                 {
                     case VoiceOpCode.Ready:
                     {
-                        await _audioLogger.DebugAsync("Received Ready").ConfigureAwait(false);
                         var data = (payload as JToken).ToObject<ReadyEvent>(_serializer);
 
                         _ssrc = data.SSRC;
@@ -419,27 +416,25 @@ namespace Discord.Audio
                     }
                     case VoiceOpCode.SessionDescription:
                     {
-                        await _audioLogger.DebugAsync("Received SessionDescription").ConfigureAwait(false);
                         var data = (payload as JToken).ToObject<SessionDescriptionEvent>(_serializer);
 
                         if (data.Mode != DiscordVoiceAPIClient.Mode)
                             throw new InvalidOperationException($"Discord selected an unexpected mode: {data.Mode}");
 
                         SecretKey = data.SecretKey;
-                        await SetSpeakingAsync(false);
+                        //await SetSpeakingAsync(false);
 
                         _keepaliveTask = RunKeepaliveAsync(_connection.CancelToken);
 
-                        _ = _connection.CompleteAsync();
+                        if(_dave is not null)
+                            await _dave.HandleDaveProtocolInitAsync(data.DaveProtocolVersion);
 
-                        await _dave.HandleDaveProtocolInitAsync(data.DaveProtocolVersion);
+                        _ = _connection.CompleteAsync();
 
                         break;
                     }
                     case VoiceOpCode.HeartbeatAck:
                     {
-                        await _audioLogger.DebugAsync("Received HeartbeatAck").ConfigureAwait(false);
-
                         if (_heartbeatTimes.TryDequeue(out long time))
                         {
                             int latency = (int)(Environment.TickCount - time);
@@ -453,7 +448,6 @@ namespace Discord.Audio
                     }
                     case VoiceOpCode.Hello:
                     {
-                        await _audioLogger.DebugAsync("Received Hello").ConfigureAwait(false);
                         var data = (payload as JToken).ToObject<HelloEvent>(_serializer);
 
                         _heartbeatInterval = data.HeartbeatInterval;
@@ -461,8 +455,6 @@ namespace Discord.Audio
                     }
                     case VoiceOpCode.Speaking:
                     {
-                        await _audioLogger.DebugAsync("Received Speaking").ConfigureAwait(false);
-
                         var data = (payload as JToken).ToObject<SpeakingEvent>(_serializer);
                         _ssrcMap.AddClient(data.Ssrc, data.UserId, data.Speaking);
                         _dave?.AddUser(data.UserId);
@@ -472,8 +464,6 @@ namespace Discord.Audio
                     }
                     case VoiceOpCode.ClientConnect:
                     {
-                        await _audioLogger.DebugAsync("Received ClientConnect").ConfigureAwait(false);
-
                         // only processed for dave
                         if (_dave is null) break;
 
@@ -489,8 +479,6 @@ namespace Discord.Audio
                     }
                     case VoiceOpCode.ClientDisconnect:
                     {
-                        await _audioLogger.DebugAsync("Received ClientDisconnect").ConfigureAwait(false);
-
                         var data = (payload as JToken).ToObject<ClientDisconnectEvent>(_serializer);
 
                         _dave?.RemoveUser(data.UserId);
@@ -516,8 +504,6 @@ namespace Discord.Audio
                         break;
                     case VoiceOpCode.DavePrepareTransition:
                     {
-                        await _audioLogger.DebugAsync($"Received DavePrepareTransition");
-
                         if (_dave is null) break;
 
                         var data = (payload as JToken).ToObject<DavePrepareTransition>(_serializer);
@@ -527,8 +513,6 @@ namespace Discord.Audio
                     }
                     case VoiceOpCode.DaveExecuteTransition:
                     {
-                        await _audioLogger.DebugAsync($"Received DaveExecuteTransition");
-
                         if (_dave is null) break;
 
                         var data = (payload as JToken).ToObject<DaveMLSTransitionParams>(_serializer);
@@ -538,13 +522,11 @@ namespace Discord.Audio
                     }
                     case VoiceOpCode.DavePrepareEpoc:
                     {
-                        await _audioLogger.DebugAsync($"Received DavePrepareEpoc");
-
                         if (_dave is null) break;
 
                         var data = (payload as JToken).ToObject<DavePrepareEpoch>(_serializer);
 
-                        _dave.HandlePrepareEpoch(data.Epoch, data.ProtocolVersion);
+                        await _dave.HandlePrepareEpochAsync(data.Epoch, data.ProtocolVersion);
                         break;
                     }
                     default:

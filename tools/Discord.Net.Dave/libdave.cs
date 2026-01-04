@@ -30,7 +30,7 @@ global using unsafe EncryptorProtocolVersionChangedCallback = delegate* unmanage
  *                                     int line,
  *                                     const char* message);
  */
-global using unsafe LogSinkCallback = delegate* unmanaged[Cdecl]<Discord.LibDave.Binding.LoggingSeverity, byte*, int, char*, void>;
+global using unsafe LogSinkCallback = delegate* unmanaged[Cdecl]<Discord.LibDave.Binding.LoggingSeverity, byte*, int, byte*, void>;
 
 using System.Runtime.InteropServices;
 

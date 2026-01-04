@@ -4,6 +4,8 @@ namespace Discord.LibDave;
 
 public sealed class DaveKeyRatchet(KeyRatchetHandle handle) : IDisposable
 {
+    public bool IsNull => Handle is 0;
+
     public KeyRatchetHandle Handle { get; } = handle;
 
     public void Dispose()

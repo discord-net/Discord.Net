@@ -27,6 +27,9 @@ public sealed class DaveEncryptStream : AudioOutStream
         _ssrc = ssrc;
     }
 
+    public override void WriteHeader(ushort seq, uint timestamp, bool missed) =>
+        _next.WriteHeader(seq, timestamp, missed);
+
     public override async Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
     {
         var result = _encryptor.Encrypt(
