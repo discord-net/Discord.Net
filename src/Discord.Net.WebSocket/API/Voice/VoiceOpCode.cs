@@ -30,5 +30,17 @@ namespace Discord.API.Voice
         ClientFlags = 18,
         /// <summary> C←S - Contains the platform type of a user that connected to voice, also sent on initial connection for each existing user. </summary>
         ClientPlatform = 20,
+
+        DavePrepareTransition = 21,
+        DaveExecuteTransition = 22,
+        DaveTransitionReady = 23,
+        DavePrepareEpoc = 24,
+        DaveMLSExternalSender = 25,
+        DaveMLSKeyPackage= 26,
+        DaveMLSProposals = 27,
+        DaveMLSCommitWelcome = 28,
+        DaveAnnounceCommitTransaction = 29,
+        DaveMLSWelcome = 30,
+        DaveMLSInvalidCommitWelcome = 31
     }
 }

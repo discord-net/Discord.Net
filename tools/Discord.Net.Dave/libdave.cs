@@ -1,39 +1,44 @@
-﻿using System.Runtime.InteropServices;
-
-// ReSharper disable UseSymbolAlias
-
-namespace Discord.Net.LibdaveBinding;
+﻿
 
 /*
  * dave_interfaces.h
  * typedef const char* KeyPairContextType;
  */
-using KeyPairContextType = ReadOnlySpan<char>;
-using SessionHandle = nuint;
-using CommitResultHandle = nuint;
-using WelcomeResultHandle = nuint;
-using KeyRatchetHandle = nuint;
-using SignaturePrivateKeyHandle = nuint;
-using EncryptorHandle = nuint;
-using DecryptorHandle = nuint;
+global using unsafe KeyPairContextType = byte*;
+
+global using CChar = byte;
+
+global using SessionHandle = nuint;
+global using CommitResultHandle = nuint;
+global using WelcomeResultHandle = nuint;
+global using KeyRatchetHandle = nuint;
+global using SignaturePrivateKeyHandle = nuint;
+global using EncryptorHandle = nuint;
+global using DecryptorHandle = nuint;
 
 // typedef void (*DAVEMLSFailureCallback)(const char* source, const char* reason)
-using unsafe MLSFailureCallback = delegate* unmanaged[Cdecl]<char*, char*, void>;
+global using unsafe MLSFailureCallback = delegate* unmanaged[Cdecl]<byte*, byte*, void>;
 
 // typedef void (*DAVEPairwiseFingerprintCallback)(const uint8_t* fingerprint, size_t length);
-using unsafe PairwiseFingerprintCallback = delegate* unmanaged[Cdecl]<byte*, nuint, void>;
+global using unsafe PairwiseFingerprintCallback = delegate* unmanaged[Cdecl]<byte*, nuint, void>;
 
 // typedef void (*DAVEEncryptorProtocolVersionChangedCallback)(void);
-using unsafe EncryptorProtocolVersionChangedCallback = delegate* unmanaged[Cdecl]<void>;
+global using unsafe EncryptorProtocolVersionChangedCallback = delegate* unmanaged[Cdecl]<void>;
 /*
  * typedef void (*DAVELogSinkCallback)(DAVELoggingSeverity severity,
  *                                     const char* file,
  *                                     int line,
  *                                     const char* message);
  */
-using unsafe LogSinkCallback = delegate* unmanaged[Cdecl]<LoggingSeverity, char*, int, char*, void>;
+global using unsafe LogSinkCallback = delegate* unmanaged[Cdecl]<Discord.LibDave.Binding.LoggingSeverity, byte*, int, char*, void>;
 
-internal enum Codec
+using System.Runtime.InteropServices;
+
+// ReSharper disable UseSymbolAlias
+
+namespace Discord.LibDave.Binding;
+
+public enum Codec
 {
     Unknown = 0,
     Opus = 1,
@@ -44,13 +49,13 @@ internal enum Codec
     AV1 = 6
 }
 
-internal enum EncryptorResultCode
+public enum EncryptorResultCode
 {
     Success = 0,
     EncryptionFailure = 1,
 }
 
-internal enum DecryptorResultCode
+public enum DecryptorResultCode
 {
     Success = 0,
     DecryptionFailure = 1,
@@ -59,7 +64,7 @@ internal enum DecryptorResultCode
     MissingCryptor = 4,
 }
 
-internal enum LoggingSeverity
+public enum LoggingSeverity
 {
     Verbose = 0,
     Info = 1,
@@ -68,14 +73,14 @@ internal enum LoggingSeverity
     None = 4,
 }
 
-internal enum MediaType
+public enum MediaType
 {
     Audio = 0,
     Video = 1
 }
 
 [StructLayout(LayoutKind.Sequential)]
-internal readonly struct EncryptorStats
+public readonly struct EncryptorStats
 {
     public readonly ulong PassThroughCount;
     public readonly ulong EncryptSuccessCount;
@@ -87,7 +92,7 @@ internal readonly struct EncryptorStats
 }
 
 [StructLayout(LayoutKind.Sequential)]
-internal readonly struct DecryptorStats
+public readonly struct DecryptorStats
 {
     public readonly ulong PassThroughCount;
     public readonly ulong DecryptSuccessCount;
@@ -98,7 +103,7 @@ internal readonly struct DecryptorStats
     public readonly ulong DecryptInvalidNonceCount;
 }
 
-internal static unsafe partial class libdave
+public static unsafe partial class libdave
 {
     public const string LIBRARY_NAME = "libdave";
 
@@ -106,17 +111,16 @@ internal static unsafe partial class libdave
     [LibraryImport(LIBRARY_NAME, EntryPoint = "daveMaxSupportedProtocolVersion")]
     public static partial ushort MaxSupportedProtocolVersion();
 
-    /*
-     * DAVESessionHandle daveSessionCreate(
-     *   void* context,
-     *   const char* authSessionId,
-     *   DAVEMLSFailureCallback callback
+    /* DAVESessionHandle daveSessionCreate(
+     *     void* context,
+     *     const char* authSessionId,
+     *     DAVEMLSFailureCallback callback
      * )
      */
     [LibraryImport(LIBRARY_NAME, EntryPoint = "daveSessionCreate")]
     public static partial SessionHandle SessionCreate(
         KeyPairContextType context,
-        char* authSessionId,
+        CChar* authSessionId,
         MLSFailureCallback callback
     );
 
@@ -139,7 +143,7 @@ internal static unsafe partial class libdave
         SessionHandle session,
         ushort version,
         ulong groupId,
-        char* selfUserId
+        ReadOnlySpan<CChar> selfUserId
     );
 
     // void daveSessionReset(DAVESessionHandle session)
@@ -198,8 +202,8 @@ internal static unsafe partial class libdave
         SessionHandle session,
         byte* proposals,
         nint length,
-        char** reconizedUserIds,
-        nint reconizedUserIdsLength,
+        CChar** recognizedUserIds,
+        nint recognizedUserIdsLength,
         byte** commitWelcomeBytes,
         nint* commitWelcomeBytesLength
     );
@@ -232,8 +236,8 @@ internal static unsafe partial class libdave
         SessionHandle session,
         byte* welcome,
         nint length,
-        byte** reconizedUserIds,
-        nuint reconizedUserIdsLength
+        byte** recognizedUserIds,
+        nuint recognizedUserIdsLength
     );
 
     /*
@@ -259,7 +263,7 @@ internal static unsafe partial class libdave
     [LibraryImport(LIBRARY_NAME, EntryPoint = "daveSessionGetKeyRatchet")]
     public static partial KeyRatchetHandle SessionGetKeyRatchet(
         SessionHandle session,
-        char* userId
+        CChar* userId
     );
 
     /*
@@ -271,10 +275,10 @@ internal static unsafe partial class libdave
      * )
      */
     [LibraryImport(LIBRARY_NAME, EntryPoint = "daveSessionGetPairwiseFingerprint")]
-    public static partial KeyRatchetHandle SessionGetPairwiseFingerprint(
+    public static partial void SessionGetPairwiseFingerprint(
         SessionHandle session,
         ushort version,
-        char* userId,
+        CChar* userId,
         PairwiseFingerprintCallback callback
     );
 
@@ -541,7 +545,7 @@ internal static unsafe partial class libdave
         nint encryptedFrameLength,
         byte* frame,
         nint frameCapacity,
-        nint bytesWritten
+        nint* bytesWritten
     );
 
     /*

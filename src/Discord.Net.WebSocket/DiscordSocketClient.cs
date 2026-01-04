@@ -85,6 +85,7 @@ namespace Discord.WebSocket
         internal bool SuppressUnknownDispatchWarnings { get; private set; }
         internal bool IncludeRawPayloadOnGatewayErrors { get; private set; }
         internal int AuditLogCacheSize { get; private set; }
+        internal bool LibDaveEnabled { get; private set; }
 
         internal new DiscordSocketApiClient ApiClient => base.ApiClient;
         /// <inheritdoc />
@@ -161,6 +162,7 @@ namespace Discord.WebSocket
             SuppressUnknownDispatchWarnings = config.SuppressUnknownDispatchWarnings;
             IncludeRawPayloadOnGatewayErrors = config.IncludeRawPayloadOnGatewayErrors;
             HandlerTimeout = config.HandlerTimeout;
+            LibDaveEnabled = config.EnableVoiceDaveEncryption;
             State = new ClientState(0, 0);
             Rest = new DiscordSocketRestClient(config, ApiClient);
             _heartbeatTimes = new ConcurrentQueue<long>();

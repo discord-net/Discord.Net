@@ -209,6 +209,16 @@ namespace Discord.WebSocket
         public bool SuppressUnknownDispatchWarnings { get; set; } = true;
 
         /// <summary>
+        ///     Gets or sets whether
+        ///     <a href="https://discord.com/developers/docs/topics/voice-connections#endtoend-encryption-dave-protocol">libdave</a>
+        ///     is used for voice encryption.
+        /// </summary>
+        /// <remarks>
+        ///     This requires you to have a build of <c>libdave</c> in your apps' executing directory.
+        /// </remarks>
+        public bool EnableVoiceDaveEncryption { get; set; } = false;
+
+        /// <summary>
         ///     Initializes a new instance of the <see cref="DiscordSocketConfig"/> class with the default configuration.
         /// </summary>
         public DiscordSocketConfig()

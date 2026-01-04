@@ -5,6 +5,7 @@ using Discord.Net.Udp;
 using Discord.Net.WebSockets;
 using Newtonsoft.Json;
 using System;
+using System.Buffers;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -32,6 +33,8 @@ namespace Discord.Audio
 
         public event Func<VoiceOpCode, object, Task> ReceivedEvent { add { _receivedEvent.Add(value); } remove { _receivedEvent.Remove(value); } }
         private readonly AsyncEvent<Func<VoiceOpCode, object, Task>> _receivedEvent = new AsyncEvent<Func<VoiceOpCode, object, Task>>();
+        public event Func<ReadOnlyMemory<byte>, Task> ReceivedBinaryEvent { add { _receivedBinaryEvent.Add(value); } remove { _receivedBinaryEvent.Remove(value); } }
+        private readonly AsyncEvent<Func<ReadOnlyMemory<byte>, Task>> _receivedBinaryEvent = new AsyncEvent<Func<ReadOnlyMemory<byte>, Task>>();
         public event Func<byte[], Task> ReceivedPacket { add { _receivedPacketEvent.Add(value); } remove { _receivedPacketEvent.Remove(value); } }
         private readonly AsyncEvent<Func<byte[], Task>> _receivedPacketEvent = new AsyncEvent<Func<byte[], Task>>();
         public event Func<Exception, Task> Disconnected { add { _disconnectedEvent.Add(value); } remove { _disconnectedEvent.Remove(value); } }
@@ -68,21 +71,7 @@ namespace Discord.Audio
 
             WebSocketClient = webSocketProvider();
             //_gatewayClient.SetHeader("user-agent", DiscordConfig.UserAgent); //(Causes issues in .Net 4.6+)
-            WebSocketClient.BinaryMessage += async (data, index, count) =>
-            {
-                using (var compressed = new MemoryStream(data, index + 2, count - 2))
-                using (var decompressed = new MemoryStream())
-                {
-                    using (var zlib = new DeflateStream(compressed, CompressionMode.Decompress))
-                        zlib.CopyTo(decompressed);
-                    decompressed.Position = 0;
-                    using (var reader = new StreamReader(decompressed))
-                    {
-                        var msg = JsonConvert.DeserializeObject<SocketFrame>(reader.ReadToEnd());
-                        await _receivedEvent.InvokeAsync((VoiceOpCode)msg.Operation, msg.Payload).ConfigureAwait(false);
-                    }
-                }
-            };
+            WebSocketClient.BinaryMessage += OnBinaryMessage;
             WebSocketClient.TextMessage += text =>
             {
                 var msg = JsonConvert.DeserializeObject<SocketFrame>(text);
@@ -96,6 +85,12 @@ namespace Discord.Audio
 
             _serializer = serializer ?? new JsonSerializer { ContractResolver = new DiscordContractResolver() };
         }
+
+        private Task OnBinaryMessage(byte[] data, int index, int count)
+            => _receivedBinaryEvent.InvokeAsync(
+                new ReadOnlyMemory<byte>(data, index, count)
+            );
+
         private void Dispose(bool disposing)
         {
             if (!_isDisposed)
@@ -121,6 +116,18 @@ namespace Discord.Audio
             await WebSocketClient.SendAsync(bytes, 0, bytes.Length, true).ConfigureAwait(false);
             await _sentGatewayMessageEvent.InvokeAsync(opCode).ConfigureAwait(false);
         }
+
+        public Task SendBinaryAsync(VoiceOpCode opCode, ReadOnlyMemory<byte> payload)
+        {
+            var payloadArr = ArrayPool<byte>.Shared.Rent(payload.Length + 1);
+
+            payloadArr[0] = (byte)opCode;
+
+            payload.CopyTo(payloadArr.AsMemory()[1..]);
+
+            return WebSocketClient.SendAsync(payloadArr, 0, payload.Length + 1, isText: false);
+        }
+
         public async Task SendAsync(byte[] data, int offset, int bytes)
         {
             await _udp.SendAsync(data, offset, bytes).ConfigureAwait(false);
@@ -139,14 +146,17 @@ namespace Discord.Audio
             options: options);
         }
 
-        public Task SendIdentityAsync(ulong userId, string sessionId, string token)
+        public Task SendIdentityAsync(ulong userId, string sessionId, string token, ushort? maxDaveProtocolVersion = null)
         {
             return SendAsync(VoiceOpCode.Identify, new IdentifyParams
             {
                 GuildId = GuildId,
                 UserId = userId,
                 SessionId = sessionId,
-                Token = token
+                Token = token,
+                MaxDaveProtocolVersion = maxDaveProtocolVersion.HasValue
+                    ? Optional.Create(maxDaveProtocolVersion.Value)
+                    : Optional<ushort>.Unspecified
             });
         }
 
