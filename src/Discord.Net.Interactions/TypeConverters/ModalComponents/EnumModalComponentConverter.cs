@@ -45,7 +45,7 @@ internal sealed class EnumModalComponentConverter<T> : ModalComponentTypeConvert
         if (selectMenu.MaxValues > 1 && !_isFlags)
             throw new InvalidOperationException($"Enum type {typeof(T).FullName} is not a [Flags] enum, so it cannot be used in a multi-select menu.");
 
-        var visibleOptions = _options.Where(x => !x.Predicate?.Invoke(interaction) ?? true).ToList();
+        var visibleOptions = _options.Where(x => !x.Predicate?.Invoke(interaction) ?? true);
 
         foreach (var option in visibleOptions)
         {
