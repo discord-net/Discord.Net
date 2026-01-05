@@ -105,6 +105,8 @@ User, Role, Mentionable and Channel selects allow users to select one or more en
 [!code-csharp[Example modal](samples/modals/prefilled-selects.cs)]
 ![Prefilled selects](images/modals/prefilled-selects.png)
 For Channel selects in particular, the property type (if single entity), or the underlying type of the array can be used to restrict the type of channels available to the user. Implementations like `IStageChannel`, `IVoiceChannel`, `IDMChannel`, `IGroupChannel`, `ICategoryChannel`, `INewsChannel`, `IThreadChannel`, `ITextChannel`, `IMediaChannel`, or `IForumChannel` can be used.
+
+Additionally for Channel Select components, channel type constraints can be defined by annotating the property with a `ChannelTypes` attribute. 
 ## File Uploads
 File upload components allow users to upload files as part of their modal submission. A single file upload can take up to 10 attachments. The size limit for the uploaded files is determined by Discord's limits for the current context (e.g., server boost level, user's nitro status). 
 The file upload component is defined using the `ModalFileUpload` attribute. The attribute can be used on a property of type `IAttachment` or `IAttachment[]`.
