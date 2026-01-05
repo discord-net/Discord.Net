@@ -5,7 +5,7 @@ title: Using libdave e2ee
 
 # Setup
 
-You'll first need a build of Discords' [libdave](https://github.com/discord/libdave) library as either `libdave.dll`, `libdave.so` or `libdave.o` in your apps executing directory.
+You'll first need a build of Discords' [libdave](https://github.com/discord/libdave) library as either `libdave.dll`, `libdave.so` or `libdave.o` in your apps executing directory or `PATH`.
 
 Then, enable dave voice encryption in your socket config:
 
