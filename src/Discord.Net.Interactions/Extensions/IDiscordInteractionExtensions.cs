@@ -105,7 +105,7 @@ namespace Discord.Interactions
                     case SnowflakeSelectComponentInfo snowflakeSelectComponent:
                         {
                             var channelTypes = snowflakeSelectComponent is ChannelSelectComponentInfo channelSelectComponent ? channelSelectComponent.ChannelTypes : null;
-                            var inputBuilder = new SelectMenuBuilder(snowflakeSelectComponent.CustomId, null, snowflakeSelectComponent.Placeholder, snowflakeSelectComponent.MaxValues, snowflakeSelectComponent.MinValues, false, snowflakeSelectComponent.ComponentType, [..channelTypes], snowflakeSelectComponent.DefaultValues.ToList(), null, snowflakeSelectComponent.IsRequired);
+                            var inputBuilder = new SelectMenuBuilder(snowflakeSelectComponent.CustomId, null, snowflakeSelectComponent.Placeholder, snowflakeSelectComponent.MaxValues, snowflakeSelectComponent.MinValues, false, snowflakeSelectComponent.ComponentType, channelTypes?.ToList(), snowflakeSelectComponent.DefaultValues.ToList(), null, snowflakeSelectComponent.IsRequired);
 
                             var instanceValue = modalInstance is not null ? snowflakeSelectComponent.Getter(modalInstance) : null;
                             await snowflakeSelectComponent.TypeConverter.WriteAsync(inputBuilder, interaction, snowflakeSelectComponent, instanceValue);
