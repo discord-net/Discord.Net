@@ -35,10 +35,17 @@ internal sealed class DaveSessionManager : IDisposable
         _decryptors = [];
         _preparedTransitions = [];
         _session = Dave.CreateSession();
-
         Encryptor = Dave.CreateEncryptor();
-
         _logger = client.Discord.LogManager.CreateLogger($"Dave #{clientId}");
+
+        _session.OnMLSFailure += (source, reason) =>
+        {
+            // I don't like this :/
+            _ = Task.Run(async () =>
+            {
+                await _logger.DebugAsync($"MLS Failure: {source} -> {reason}");
+            });
+        };
     }
 
     public DaveDecryptor GetDecryptor(ulong userId)
