@@ -1,5 +1,7 @@
+using Discord.Interactions.Utilities;
 using Discord.Utils;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -12,6 +14,7 @@ internal sealed class DefaultArrayModalComponentConverter<T> : ModalComponentTyp
     private readonly Type _underlyingType;
     private readonly TypeReader _typeReader;
     private readonly ImmutableArray<ChannelType> _channelTypes;
+    private readonly ImmutableArray<EnumSelectMenuOption> _enumOptions;
 
     public DefaultArrayModalComponentConverter(InteractionService interactionService)
     {
@@ -56,12 +59,13 @@ internal sealed class DefaultArrayModalComponentConverter<T> : ModalComponentTyp
                 => [ChannelType.Forum],
             _ => []
         };
+
+        _enumOptions = _underlyingType!.IsEnum ? EnumUtils.BuildSelectMenuOptions(_underlyingType).ToImmutableArray() : ImmutableArray<EnumSelectMenuOption>.Empty;
     }
 
     public override async Task<TypeConverterResult> ReadAsync(IInteractionContext context, IComponentInteractionData option, IServiceProvider services)
     {
         var objs = new List<object>();
-
 
         if (_typeReader is not null && option.Values.Count > 0)
             foreach (var value in option.Values)
@@ -77,7 +81,7 @@ internal sealed class DefaultArrayModalComponentConverter<T> : ModalComponentTyp
         {
             if (!TryGetModalInteractionData(context, out var modalData))
             {
-                return TypeConverterResult.FromError(InteractionCommandError.ParseFailed, $"{typeof(IModalInteractionData).Name} cannot be accessed from the provided {typeof(IInteractionContext).Name} type.");
+                return TypeConverterResult.FromError(InteractionCommandError.ParseFailed, $"{nameof(IModalInteractionData)} cannot be accessed from the provided {nameof(IInteractionContext)} type.");
             }
 
             var resolvedSnowflakes = new Dictionary<ulong, ISnowflakeEntity>();
@@ -134,49 +138,46 @@ internal sealed class DefaultArrayModalComponentConverter<T> : ModalComponentTyp
         if (builder is not SelectMenuBuilder selectMenu || !component.ComponentType.IsSelectType())
             throw new InvalidOperationException($"Component type of the input {component.CustomId} of modal {component.Modal.Type.FullName} must be a select type.");
 
-        switch (value)
+        if (!_enumOptions.IsEmpty)
         {
-            case IUser user:
-                selectMenu.WithDefaultValues(SelectMenuDefaultValue.FromUser(user));
-                break;
-            case IRole role:
-                selectMenu.WithDefaultValues(SelectMenuDefaultValue.FromRole(role));
-                break;
-            case IChannel channel:
-                selectMenu.WithDefaultValues(SelectMenuDefaultValue.FromChannel(channel));
-                break;
-            case IMentionable mentionable:
-                selectMenu.WithDefaultValues(mentionable switch
+            var visibleOptions = _enumOptions.Where(x => !x.Predicate?.Invoke(interaction) ?? true);
+
+            var enumValues = value is IEnumerable valueArr ? valueArr.Cast<Enum>().ToArray() : null;
+
+            foreach (var option in visibleOptions)
+            {
+                var optionBuilder = new SelectMenuOptionBuilder(option.MenuOption);
+
+                if (enumValues is not null)
+                    optionBuilder.IsDefault = enumValues.Contains(option.Value);
+
+                selectMenu.AddOption(optionBuilder);
+            }
+
+            return Task.CompletedTask;
+        }
+
+        selectMenu.DefaultValues = value switch
+        {
+            IEnumerable<IUser> defaultUsers => defaultUsers.Select(SelectMenuDefaultValue.FromUser).ToList(),
+            IEnumerable<IRole> defaultRoles => defaultRoles.Select(SelectMenuDefaultValue.FromRole).ToList(),
+            IEnumerable<IChannel> defaultChannels =>
+                defaultChannels.Select(SelectMenuDefaultValue.FromChannel).ToList(),
+            IEnumerable<IMentionable> defaultMentionables => defaultMentionables
+                .Where(x => x is IUser or IRole or IChannel)
+                .Select(x =>
                 {
-                    IUser user => SelectMenuDefaultValue.FromUser(user),
-                    IRole role => SelectMenuDefaultValue.FromRole(role),
-                    IChannel channel => SelectMenuDefaultValue.FromChannel(channel),
-                    _ => throw new InvalidOperationException($"Mentionable select cannot be populated using an entity with type: {mentionable.GetType().FullName}")
-                });
-                break;
-            case IEnumerable<IUser> defaultUsers:
-                selectMenu.DefaultValues = defaultUsers.Select(SelectMenuDefaultValue.FromUser).ToList();
-                break;
-            case IEnumerable<IRole> defaultRoles:
-                selectMenu.DefaultValues = defaultRoles.Select(SelectMenuDefaultValue.FromRole).ToList();
-                break;
-            case IEnumerable<IChannel> defaultChannels:
-                selectMenu.DefaultValues = defaultChannels.Select(SelectMenuDefaultValue.FromChannel).ToList();
-                break;
-            case IEnumerable<IMentionable> defaultMentionables:
-                selectMenu.DefaultValues = defaultMentionables.Where(x => x is IUser or IRole or IChannel)
-                    .Select(x =>
+                    return x switch
                     {
-                        return x switch
-                        {
-                            IUser user => SelectMenuDefaultValue.FromUser(user),
-                            IRole role => SelectMenuDefaultValue.FromRole(role),
-                            IChannel channel => SelectMenuDefaultValue.FromChannel(channel),
-                            _ => throw new InvalidOperationException($"Mentionable select cannot be populated using an entity with type: {x.GetType().FullName}")
-                        };
-                    })
-                    .ToList();
-                break;
+                        IUser user => SelectMenuDefaultValue.FromUser(user),
+                        IRole role => SelectMenuDefaultValue.FromRole(role),
+                        IChannel channel => SelectMenuDefaultValue.FromChannel(channel),
+                        _ => throw new InvalidOperationException(
+                            $"Mentionable select cannot be populated using an entity with type: {x.GetType().FullName}")
+                    };
+                })
+                .ToList(),
+            _ => selectMenu.DefaultValues
         };
 
         if (component.ComponentType == ComponentType.ChannelSelect && _channelTypes.Length > 0)
