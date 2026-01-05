@@ -42,14 +42,21 @@ public static class Dave
     /// </summary>
     public static ushort MaxSupportedProtocolVersion => libdave.MaxSupportedProtocolVersion();
 
+    // used to keep the log sink delegate alive.
+    private static Delegate? _logSink;
+
     /// <summary>
     ///     Sets the global log sink for the <see cref="libdave"/> binding.
     /// </summary>
     /// <param name="logSink">The delegate to handle logs.</param>
     public static unsafe void SetLogSink(DaveLogSinkDelegate logSink)
     {
+        // keep the wrapper delegate alive so it doesn't get GC collected. 'logSink' parameter is implicitly kept
+        // alive due to the captured reference
+        _logSink = WrapperSink;
+
         libdave.SetLogSinkCallback(
-            (LogSinkCallback)Marshal.GetFunctionPointerForDelegate(WrapperSink)
+            (LogSinkCallback)Marshal.GetFunctionPointerForDelegate(_logSink)
         );
 
 
