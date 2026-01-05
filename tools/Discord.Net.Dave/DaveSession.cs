@@ -5,23 +5,60 @@ using System.Runtime.InteropServices;
 namespace Discord.LibDave;
 
 /// <summary>
+///     A delegate representing a handler for MLS failure events.
+/// </summary>
+public delegate void MLSFailureEventHandler(string? source, string? reason);
+
+/// <summary>
 ///     Represents a session within the <see cref="libdave"/> library.
 /// </summary>
 /// <param name="handle">The underlying handle to the session object within the <see cref="libdave"/> library.</param>
-public sealed class DaveSession(SessionHandle handle) : IDisposable
+public sealed class DaveSession(SessionHandle handle) : INativeHandle
 {
+    /// <inheritdoc/>
+    public SessionHandle UnderlyingHandle { get; } = handle;
+
+    /// <inheritdoc/>
+    public bool IsAlive { get; private set; } = handle is not 0;
+
+    /// <summary>
+    ///     Gets or sets the event handler for MLS failures.
+    /// </summary>
+    public event MLSFailureEventHandler? OnMLSFailure;
+
     /// <summary>
     ///     Gets or sets the protocol version of this session.
     /// </summary>
     public ushort ProtocolVersion
     {
-        get => libdave.SessionGetProtocolVersion(handle);
-        set => libdave.SessionSetProtocolVersion(handle, value);
+        get
+        {
+            lock (_lock)
+            {
+                this.ThrowIfNotAlive();
+
+                return libdave.SessionGetProtocolVersion(UnderlyingHandle);
+            }
+        }
+        set
+        {
+            lock (_lock)
+            {
+                this.ThrowIfNotAlive();
+
+                libdave.SessionSetProtocolVersion(UnderlyingHandle, value);
+            }
+        }
     }
+
+    // used to keep the underlying delegate passed to libdave alive
+    internal Delegate? MLSFailureCallbackDelegate;
+
+    private readonly Lock _lock = new();
 
     internal void HandleMLSFailure(string? source, string? reason)
     {
-        // TODO
+        OnMLSFailure?.Invoke(source, reason);
     }
 
     /// <summary>
@@ -32,20 +69,33 @@ public sealed class DaveSession(SessionHandle handle) : IDisposable
     /// <param name="selfUserId">The ID of the current user.</param>
     public void Initialize(ushort protocolVersion, ulong groupId, ulong selfUserId)
     {
-        using var _ = Utils.ToCString(selfUserId, out var selfUserIdStr);
+        lock (_lock)
+        {
+            this.ThrowIfNotAlive();
 
-        libdave.SessionInit(
-            handle,
-            protocolVersion,
-            groupId,
-            selfUserIdStr
-        );
+            using var _ = Utils.ToCString(selfUserId, out var selfUserIdStr);
+
+            libdave.SessionInit(
+                UnderlyingHandle,
+                protocolVersion,
+                groupId,
+                selfUserIdStr
+            );
+        }
     }
 
     /// <summary>
     ///     Resets the current session.
     /// </summary>
-    public void Reset() => libdave.SessionReset(handle);
+    public void Reset()
+    {
+        lock (_lock)
+        {
+            this.ThrowIfNotAlive();
+
+            libdave.SessionReset(UnderlyingHandle);
+        }
+    }
 
     /// <summary>
     ///     Gets the last epoch authenticator of this session.
@@ -53,16 +103,21 @@ public sealed class DaveSession(SessionHandle handle) : IDisposable
     /// <returns>The last epoch authenticator.</returns>
     public unsafe ManuallyAllocatedHeapSpan<byte> GetLastEpochAuthenticator()
     {
-        byte* authenticator;
-        nint length;
+        lock (_lock)
+        {
+            this.ThrowIfNotAlive();
 
-        libdave.SessionGetLastEpochAuthenticator(
-            handle,
-            &authenticator,
-            &length
-        );
+            byte* authenticator;
+            nint length;
 
-        return new ManuallyAllocatedHeapSpan<byte>(authenticator, (int)length);
+            libdave.SessionGetLastEpochAuthenticator(
+                UnderlyingHandle,
+                &authenticator,
+                &length
+            );
+
+            return new ManuallyAllocatedHeapSpan<byte>(authenticator, (int)length);
+        }
     }
 
     /// <summary>
@@ -73,13 +128,18 @@ public sealed class DaveSession(SessionHandle handle) : IDisposable
         ReadOnlyMemory<byte> externalSender
     )
     {
-        fixed (byte* ptr = externalSender.Span)
+        lock (_lock)
         {
-            libdave.SessionSetExternalSender(
-                handle,
-                ptr,
-                externalSender.Length
-            );
+            this.ThrowIfNotAlive();
+
+            fixed (byte* ptr = externalSender.Span)
+            {
+                libdave.SessionSetExternalSender(
+                    UnderlyingHandle,
+                    ptr,
+                    externalSender.Length
+                );
+            }
         }
     }
 
@@ -94,24 +154,29 @@ public sealed class DaveSession(SessionHandle handle) : IDisposable
         ICollection<ulong> recognizedUserIds
     )
     {
-        using var ids = Utils.GetIds(recognizedUserIds);
-
-        byte* welcomePtr;
-        nint welcomeLength;
-        fixed (byte* proposalsPtr = proposals.Span)
+        lock (_lock)
         {
-            libdave.SessionProcessProposals(
-                handle,
-                proposalsPtr,
-                proposals.Length,
-                ids.Pointer,
-                ids.Length,
-                &welcomePtr,
-                &welcomeLength
-            );
-        }
+            this.ThrowIfNotAlive();
 
-        return new(welcomePtr, (int)welcomeLength);
+            using var ids = Utils.GetIds(recognizedUserIds);
+
+            byte* welcomePtr;
+            nint welcomeLength;
+            fixed (byte* proposalsPtr = proposals.Span)
+            {
+                libdave.SessionProcessProposals(
+                    UnderlyingHandle,
+                    proposalsPtr,
+                    proposals.Length,
+                    ids.Pointer,
+                    ids.Length,
+                    &welcomePtr,
+                    &welcomeLength
+                );
+            }
+
+            return new(welcomePtr, (int)welcomeLength);
+        }
     }
 
     /// <summary>
@@ -123,15 +188,20 @@ public sealed class DaveSession(SessionHandle handle) : IDisposable
         ReadOnlyMemory<byte> commit
     )
     {
-        fixed (byte* commitPtr = commit.Span)
+        lock (_lock)
         {
-            return new(
-                libdave.SessionProcessCommit(
-                    handle,
-                    commitPtr,
-                    commit.Length
-                )
-            );
+            this.ThrowIfNotAlive();
+
+            fixed (byte* commitPtr = commit.Span)
+            {
+                return new(
+                    libdave.SessionProcessCommit(
+                        UnderlyingHandle,
+                        commitPtr,
+                        commit.Length
+                    )
+                );
+            }
         }
     }
 
@@ -146,19 +216,24 @@ public sealed class DaveSession(SessionHandle handle) : IDisposable
         ICollection<ulong> recognizedUserIds
     )
     {
-        using var ids = Utils.GetIds(recognizedUserIds);
-
-        fixed (byte* welcomePtr = welcome.Span)
+        lock (_lock)
         {
-            return new(
-                libdave.SessionProcessWelcome(
-                    handle,
-                    welcomePtr,
-                    welcome.Length,
-                    ids.Pointer,
-                    (nuint)ids.Length
-                )
-            );
+            this.ThrowIfNotAlive();
+
+            using var ids = Utils.GetIds(recognizedUserIds);
+
+            fixed (byte* welcomePtr = welcome.Span)
+            {
+                return new(
+                    libdave.SessionProcessWelcome(
+                        UnderlyingHandle,
+                        welcomePtr,
+                        welcome.Length,
+                        ids.Pointer,
+                        (nuint)ids.Length
+                    )
+                );
+            }
         }
     }
 
@@ -168,16 +243,21 @@ public sealed class DaveSession(SessionHandle handle) : IDisposable
     /// <returns>The marshalled key package.</returns>
     public unsafe ManuallyAllocatedHeapSpan<byte> GetMarshalledKeyPackage()
     {
-        byte* ptr;
-        nint length;
+        lock (_lock)
+        {
+            this.ThrowIfNotAlive();
 
-        libdave.SessionGetMarshalledKeyPackage(
-            handle,
-            &ptr,
-            &length
-        );
+            byte* ptr;
+            nint length;
 
-        return new(ptr, (int)length);
+            libdave.SessionGetMarshalledKeyPackage(
+                UnderlyingHandle,
+                &ptr,
+                &length
+            );
+
+            return new(ptr, (int)length);
+        }
     }
 
     /// <summary>
@@ -187,14 +267,19 @@ public sealed class DaveSession(SessionHandle handle) : IDisposable
     /// <returns>The key ratchet for the given user.</returns>
     public unsafe DaveKeyRatchet GetKeyRatchet(ulong userId)
     {
-        using var strHandle = Utils.ToCString(userId, out _);
+        lock (_lock)
+        {
+            this.ThrowIfNotAlive();
 
-        return new(
-            libdave.SessionGetKeyRatchet(
-                handle,
-                (CChar*)strHandle.Pointer
-            )
-        );
+            using var strHandle = Utils.ToCString(userId, out _);
+
+            return new(
+                libdave.SessionGetKeyRatchet(
+                    UnderlyingHandle,
+                    (CChar*)strHandle.Pointer
+                )
+            );
+        }
     }
 
     /// <summary>
@@ -207,37 +292,64 @@ public sealed class DaveSession(SessionHandle handle) : IDisposable
     ///     A task representing the asynchronous operation of getting a users pairwise fingerprint. The result of
     ///     the task is the fingerprint.
     /// </returns>
-    public Task<ManuallyAllocatedHeapSpan<byte>> GetPairwiseFingerprintAsync(
+    public async Task<ManuallyAllocatedHeapSpan<byte>> GetPairwiseFingerprintAsync(
         ulong userId,
         ushort? protocolVersion = null,
         CancellationToken token = default
     )
     {
-        protocolVersion ??= ProtocolVersion;
+        LockUtils.Enter(_lock);
 
-        var tcs = new TaskCompletionSource<ManuallyAllocatedHeapSpan<byte>>();
-
-        token.Register(() => tcs.SetCanceled(token));
-
-        using var userIdStr = Utils.ToCString(userId, out _);
-
-        unsafe
+        try
         {
-            libdave.SessionGetPairwiseFingerprint(
-                handle,
-                protocolVersion.Value,
-                (CChar*)userIdStr.Pointer,
-                (PairwiseFingerprintCallback)Marshal.GetFunctionPointerForDelegate(Callback)
-            );
+            this.ThrowIfNotAlive();
+
+            protocolVersion ??= ProtocolVersion;
+
+            var tcs = new TaskCompletionSource<ManuallyAllocatedHeapSpan<byte>>();
+            token.Register(() => tcs.SetCanceled(token));
+
+            Delegate callback;
+
+            using (var userIdStr = Utils.ToCString(userId, out _))
+            {
+                unsafe
+                {
+                    callback = Callback;
+
+                    libdave.SessionGetPairwiseFingerprint(
+                        UnderlyingHandle,
+                        protocolVersion.Value,
+                        (CChar*)userIdStr.Pointer,
+                        (PairwiseFingerprintCallback)Marshal.GetFunctionPointerForDelegate(callback)
+                    );
+                }
+            }
+
+            var result = await tcs.Task;
+
+            GC.KeepAlive(callback);
+
+            return result;
+
+            unsafe void Callback(byte* ptr, nint length)
+                => tcs.TrySetResult(new(ptr, (int)length));
         }
-
-        return tcs.Task;
-
-        unsafe void Callback(byte* ptr, nint length)
-            => tcs.TrySetResult(new(ptr, (int)length));
+        finally
+        {
+            LockUtils.Exit(_lock);
+        }
     }
 
     /// <inheritdoc/>
     public void Dispose()
-        => libdave.SessionDestroy(handle);
+    {
+        lock (_lock)
+        {
+            if (!IsAlive) return;
+
+            libdave.SessionDestroy(UnderlyingHandle);
+            IsAlive = true;
+        }
+    }
 }

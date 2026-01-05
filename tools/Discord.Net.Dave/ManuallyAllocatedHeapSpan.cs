@@ -8,7 +8,7 @@ namespace Discord.LibDave;
 /// <param name="ptr">The pointer to the first element.</param>
 /// <param name="length">The number of elements.</param>
 /// <typeparam name="T">The underlying type of the span.</typeparam>
-public readonly unsafe struct ManuallyAllocatedHeapSpan<T>(
+public unsafe struct ManuallyAllocatedHeapSpan<T>(
     T* ptr,
     int length
 ) : IDisposable
@@ -34,6 +34,8 @@ public readonly unsafe struct ManuallyAllocatedHeapSpan<T>(
     /// </summary>
     public bool IsNull => ptr is null;
 
+    private int _freed;
+
     /// <summary>
     ///     Creates a <see cref="ReadOnlySpan{T}"/> wrapping the underlying pointer.
     /// </summary>
@@ -54,5 +56,11 @@ public readonly unsafe struct ManuallyAllocatedHeapSpan<T>(
     /// <summary>
     ///     Frees the underlying allocated memory.
     /// </summary>
-    public void Dispose() => NativeMemory.Free(ptr);
+    public void Dispose()
+    {
+        if (Interlocked.CompareExchange(ref _freed, 1, 0) is 0)
+        {
+            NativeMemory.Free(ptr);
+        }
+    }
 }

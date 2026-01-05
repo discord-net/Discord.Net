@@ -6,45 +6,65 @@ namespace Discord.LibDave;
 ///     A class representing the result of processing a welcome message within the <see cref="libdave"/> library.
 /// </summary>
 /// <param name="handle">The underlying handle to the welcome result within the <see cref="libdave"/> library.</param>
-public sealed class DaveWelcomeResult(WelcomeResultHandle handle) :  IRosterProvider
+public sealed class DaveWelcomeResult(WelcomeResultHandle handle) : IRosterProvider, INativeHandle
 {
-    /// <summary>
-    ///     Gets whether the result is null.
-    /// </summary>
-    public bool IsNull => handle is 0;
+    public UIntPtr UnderlyingHandle { get; } = handle;
+
+    public bool IsAlive { get; private set; } = handle is not 0;
+
+    private readonly Lock _lock = new();
 
     /// <inheritdoc/>
     public unsafe ManuallyAllocatedHeapSpan<ulong> GetRosterMemberIds()
     {
-        ulong* ptr;
-        nint length;
+        lock (_lock)
+        {
+            this.ThrowIfNotAlive();
 
-        libdave.WelcomeResultGetRosterMemberIds(
-            handle,
-            &ptr,
-            &length
-        );
+            ulong* ptr;
+            nint length;
 
-        return new(ptr, (int)length);
+            libdave.WelcomeResultGetRosterMemberIds(
+                UnderlyingHandle,
+                &ptr,
+                &length
+            );
+
+            return new(ptr, (int)length);
+        }
     }
 
     /// <inheritdoc/>
     public unsafe ManuallyAllocatedHeapSpan<byte> GetRosterMemberSignature(ulong userId)
     {
-        byte* ptr;
-        nint length;
+        lock (_lock)
+        {
+            this.ThrowIfNotAlive();
 
-        libdave.WelcomeResultGetRosterMemberSignature(
-            handle,
-            userId,
-            &ptr,
-            &length
-        );
+            byte* ptr;
+            nint length;
 
-        return new(ptr, (int)length);
+            libdave.WelcomeResultGetRosterMemberSignature(
+                UnderlyingHandle,
+                userId,
+                &ptr,
+                &length
+            );
+
+            return new(ptr, (int)length);
+        }
     }
 
     /// <inheritdoc/>
     public void Dispose()
-        => libdave.WelcomeResultDestroy(handle);
+    {
+        lock (_lock)
+        {
+            if (!IsAlive) return;
+
+            libdave.WelcomeResultDestroy(UnderlyingHandle);
+
+            IsAlive = false;
+        }
+    }
 }

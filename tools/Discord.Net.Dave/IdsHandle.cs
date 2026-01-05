@@ -6,7 +6,7 @@ namespace Discord.LibDave;
 ///     A <see langword="ref"/> <see langword="struct"/> representing an array of snowflakes, encoded as strings,
 ///     allocated in native memory.
 /// </summary>
-internal readonly unsafe ref struct IdsHandle : IDisposable
+internal unsafe ref struct IdsHandle : IDisposable
 {
     /// <summary>
     ///     The pointer of the first id.
@@ -17,6 +17,8 @@ internal readonly unsafe ref struct IdsHandle : IDisposable
     ///     The number of ids.
     /// </summary>
     public readonly int Length;
+
+    private int _freed;
 
     /// <summary>
     ///     Creates a new <see cref="IdsHandle"/>.
@@ -34,13 +36,16 @@ internal readonly unsafe ref struct IdsHandle : IDisposable
     /// </summary>
     public void Dispose()
     {
-        var span = new Span<nuint>(Pointer, Length);
-
-        for (var i = 0; i < span.Length; i++)
+        if (Interlocked.CompareExchange(ref _freed, 1, 0) is 0)
         {
-            NativeMemory.Free((void*)span[i]);
-        }
+            var span = new Span<nuint>(Pointer, Length);
 
-        NativeMemory.Free(Pointer);
+            for (var i = 0; i < span.Length; i++)
+            {
+                NativeMemory.Free((void*)span[i]);
+            }
+
+            NativeMemory.Free(Pointer);
+        }
     }
 }

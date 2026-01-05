@@ -8,8 +8,14 @@ namespace Discord.LibDave;
 ///     Represents a decryptor within the <see cref="libdave"/> library.
 /// </summary>
 /// <param name="handle">The underlying handle to the decryptor.</param>
-public sealed class DaveDecryptor(DecryptorHandle handle) : IDisposable
+public sealed class DaveDecryptor(DecryptorHandle handle) : IDisposable, INativeHandle
 {
+    /// <inheritdoc/>
+    public bool IsAlive { get; private set; } = handle is not 0;
+
+    /// <inheritdoc/>
+    public CommitResultHandle UnderlyingHandle { get; } = handle;
+
     /// <summary>
     ///     Gets or sets the ratchet used by this decryptor.
     /// </summary>
@@ -18,15 +24,24 @@ public sealed class DaveDecryptor(DecryptorHandle handle) : IDisposable
         get;
         set
         {
-            if (field is not null && (value is null || field.Handle != value.Handle))
+            if (field is not null && (value is null || field.UnderlyingHandle != value.UnderlyingHandle))
                 field.Dispose();
 
             if (value is not null)
-                libdave.DecryptorTransitionToKeyRatchet(handle, value.Handle);
+            {
+                lock (_lock)
+                {
+                    this.ThrowIfNotAlive();
+
+                    libdave.DecryptorTransitionToKeyRatchet(UnderlyingHandle, value.UnderlyingHandle);
+                }
+            }
 
             field = value;
         }
     }
+
+    private readonly Lock _lock = new();
 
     /// <summary>
     ///     Prepares this decryptor for transitioning to a new protocol version.
@@ -56,7 +71,14 @@ public sealed class DaveDecryptor(DecryptorHandle handle) : IDisposable
     ///     decrypt data.
     /// </param>
     public void TransitionToPassthroughMode(bool passthroughMode)
-        => libdave.DecryptorTransitionToPassthroughMode(handle, passthroughMode);
+    {
+        lock (_lock)
+        {
+            this.ThrowIfNotAlive();
+
+            libdave.DecryptorTransitionToPassthroughMode(UnderlyingHandle, passthroughMode);
+        }
+    }
 
     /// <summary>
     ///     Decrypts a given frame.
@@ -71,27 +93,40 @@ public sealed class DaveDecryptor(DecryptorHandle handle) : IDisposable
         out ManuallyAllocatedHeapSpan<byte> frame
     )
     {
-        var plaintextSize = GetMaxPlaintextByteSize(mediaType, encryptedFrame.Length);
-        var framePtr = (byte*)NativeMemory.Alloc((nuint)plaintextSize);
-
-        nint bytesWritten;
-        DecryptorResultCode resultCode;
-
-        fixed (byte* encryptedFramePtr = encryptedFrame.Span)
+        lock (_lock)
         {
-            resultCode = libdave.DecryptorDecrypt(
-                handle,
-                mediaType,
-                encryptedFramePtr,
-                encryptedFrame.Length,
-                framePtr,
-                plaintextSize,
-                &bytesWritten
-            );
-        }
+            this.ThrowIfNotAlive();
 
-        frame = new(framePtr, (int)bytesWritten);
-        return resultCode;
+            var plaintextSize = GetMaxPlaintextByteSize(mediaType, encryptedFrame.Length);
+            var framePtr = (byte*)NativeMemory.Alloc((nuint)plaintextSize);
+
+            try
+            {
+                nint bytesWritten;
+                DecryptorResultCode resultCode;
+
+                fixed (byte* encryptedFramePtr = encryptedFrame.Span)
+                {
+                    resultCode = libdave.DecryptorDecrypt(
+                        UnderlyingHandle,
+                        mediaType,
+                        encryptedFramePtr,
+                        encryptedFrame.Length,
+                        framePtr,
+                        plaintextSize,
+                        &bytesWritten
+                    );
+                }
+
+                frame = new(framePtr, (int)bytesWritten);
+                return resultCode;
+            }
+            catch
+            {
+                NativeMemory.Free(framePtr);
+                throw;
+            }
+        }
     }
 
     /// <summary>
@@ -103,7 +138,15 @@ public sealed class DaveDecryptor(DecryptorHandle handle) : IDisposable
     public int GetMaxPlaintextByteSize(
         MediaType mediaType,
         int encryptedFrameSize
-    ) => (int)libdave.DecryptorGetMaxPlaintextByteSize(handle, mediaType, encryptedFrameSize);
+    )
+    {
+        lock (_lock)
+        {
+            this.ThrowIfNotAlive();
+
+            return (int)libdave.DecryptorGetMaxPlaintextByteSize(UnderlyingHandle, mediaType, encryptedFrameSize);
+        }
+    }
 
     /// <summary>
     ///     Gets statistics about this decryptor.
@@ -114,21 +157,32 @@ public sealed class DaveDecryptor(DecryptorHandle handle) : IDisposable
         MediaType mediaType
     )
     {
-        DecryptorStats stats;
+        lock (_lock)
+        {
+            this.ThrowIfNotAlive();
 
-        libdave.DecryptorGetStats(
-            handle,
-            mediaType,
-            &stats
-        );
+            DecryptorStats stats;
 
-        return stats;
+            libdave.DecryptorGetStats(
+                UnderlyingHandle,
+                mediaType,
+                &stats
+            );
+
+            return stats;
+        }
     }
 
     /// <inheritdoc/>
     public void Dispose()
     {
-        Ratchet?.Dispose();
-        libdave.DecryptorDestroy(handle);
+        lock (_lock)
+        {
+            if (!IsAlive) return;
+
+            Ratchet?.Dispose();
+            libdave.DecryptorDestroy(UnderlyingHandle);
+            IsAlive = false;
+        }
     }
 }

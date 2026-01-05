@@ -7,8 +7,10 @@ namespace Discord.LibDave;
 ///     a disposable.
 /// </summary>
 /// <param name="ptr">The underlying pointer to native memory.</param>
-internal readonly unsafe ref struct AllocHandle(void* ptr) : IDisposable
+internal unsafe ref struct AllocHandle(void* ptr) : IDisposable
 {
+    private int _freed = ptr is null ? 1 : 0;
+
     /// <summary>
     ///     The underlying pointer.
     /// </summary>
@@ -17,5 +19,9 @@ internal readonly unsafe ref struct AllocHandle(void* ptr) : IDisposable
     /// <summary>
     ///     Frees the underlying pointer.
     /// </summary>
-    public void Dispose() => NativeMemory.Free(Pointer);
+    public void Dispose()
+    {
+        if (Interlocked.CompareExchange(ref _freed, 1, 0) is 0)
+            NativeMemory.Free(Pointer);
+    }
 }

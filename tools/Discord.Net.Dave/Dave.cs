@@ -88,17 +88,21 @@ public static class Dave
     )
     {
         var contextPtr = Marshal.StringToCoTaskMemAuto(context);
-        var authSessionIdPtr =Marshal.StringToCoTaskMemAuto(authSessionId);
+        var authSessionIdPtr = Marshal.StringToCoTaskMemAuto(authSessionId);
 
         DaveSession? session = null;
+
+        Delegate mlsFailureCallback = OnMLSFailure;
 
         session = new(
             libdave.SessionCreate(
                 (byte*) contextPtr,
                 (byte*) authSessionIdPtr,
-                (MLSFailureCallback)Marshal.GetFunctionPointerForDelegate(OnMLSFailure)
+                (MLSFailureCallback)Marshal.GetFunctionPointerForDelegate(mlsFailureCallback)
             )
         );
+
+        session.MLSFailureCallbackDelegate = mlsFailureCallback;
 
         Marshal.FreeCoTaskMem(contextPtr);
         Marshal.FreeCoTaskMem(authSessionIdPtr);
