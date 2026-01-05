@@ -11,7 +11,7 @@ internal static class Utils
     /// <summary>
     ///     The max size in bytes of a c-string for a snowflake identifier.
     /// </summary>
-    public const int SNOWFLAKE_MAX_CSTRING_LENGTH = 21;
+    public const int SnowflakeMaxCStringLength = 21;
 
     /// <summary>
     ///     Converts a snowflake to a C string.
@@ -22,8 +22,8 @@ internal static class Utils
     /// <exception cref="InvalidOperationException">The ID couldn't be formatted.</exception>
     public static unsafe AllocHandle ToCString(ulong id, out ReadOnlySpan<CChar> str)
     {
-        var ptr = (CChar*)NativeMemory.Alloc(SNOWFLAKE_MAX_CSTRING_LENGTH);
-        var span = new Span<byte>(ptr, SNOWFLAKE_MAX_CSTRING_LENGTH);
+        var ptr = (CChar*)NativeMemory.Alloc(SnowflakeMaxCStringLength);
+        var span = new Span<byte>(ptr, SnowflakeMaxCStringLength);
 
         if (!id.TryFormat(span, out var sz))
             throw new InvalidOperationException();
