@@ -31,7 +31,7 @@ public sealed class DaveCommitResult(CommitResultHandle handle) : IRosterProvide
     {
         lock (_lock)
         {
-            if (!IsAlive) throw new ObjectDisposedException(nameof(DaveCommitResult));
+            this.ThrowIfNotAlive();
 
             nuint length;
             ulong* ptr;
@@ -51,7 +51,7 @@ public sealed class DaveCommitResult(CommitResultHandle handle) : IRosterProvide
     {
         lock (_lock)
         {
-            if (!IsAlive) throw new ObjectDisposedException(nameof(DaveCommitResult));
+            this.ThrowIfNotAlive();
 
             nint length;
             byte* ptr;
