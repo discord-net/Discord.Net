@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 namespace Discord.LibDave;
 
 /// <summary>
-///     A class containing utilities related to <c>libdave</c>
+///     A class containing utilities related to <c>libdave</c>.
 /// </summary>
 internal static class Utils
 {
