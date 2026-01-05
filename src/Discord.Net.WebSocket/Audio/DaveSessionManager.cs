@@ -15,7 +15,7 @@ internal sealed class DaveSessionManager : IDisposable
 {
     public ushort MaxProtocolVersion => Dave.MaxSupportedProtocolVersion;
 
-    public bool IsDisabled => _session.ProtocolVersion is Dave.DISABELD_PROTOCOL_VERSION;
+    public bool IsDisabled => _session.ProtocolVersion is Dave.DisabledProtocolVersion;
 
     public ulong SelfUserId => _client.Discord.CurrentUser.Id;
 
@@ -185,13 +185,13 @@ internal sealed class DaveSessionManager : IDisposable
             decryptor.PrepareTransition(_session, id, protocolVersion);
         }
 
-        if (transitionId is Dave.INIT_TRANSITION_ID)
+        if (transitionId is Dave.InitTransitionId)
         {
             var ratchet = _session.GetKeyRatchet(SelfUserId);
 
-            Encryptor.SetPassthroughMode(passthroughMode: protocolVersion is Dave.DISABELD_PROTOCOL_VERSION || ratchet.IsNull);
+            Encryptor.SetPassthroughMode(passthroughMode: protocolVersion is Dave.DisabledProtocolVersion || ratchet.IsNull);
 
-            if(protocolVersion is not Dave.DISABELD_PROTOCOL_VERSION && !ratchet.IsNull)
+            if(protocolVersion is not Dave.DisabledProtocolVersion && !ratchet.IsNull)
                 Encryptor.Ratchet = ratchet;
         }
         else
@@ -205,22 +205,22 @@ internal sealed class DaveSessionManager : IDisposable
     {
         await _logger.DebugAsync($"Init dave protocol session, version {protocolVersion}");
 
-        if (protocolVersion > Dave.DISABELD_PROTOCOL_VERSION)
+        if (protocolVersion > Dave.DisabledProtocolVersion)
         {
-            await HandlePrepareEpochAsync(Dave.MLS_NEW_GROUP_EXPECTED_EPOCH, protocolVersion);
+            await HandlePrepareEpochAsync(Dave.MLSNewGroupExpectedEpoch, protocolVersion);
             using var keyPackage = _session.GetMarshalledKeyPackage();
             await SendMLSKeyPackageAsync(keyPackage);
         }
         else
         {
-            await PrepareProtocolTransitionAsync(Dave.INIT_TRANSITION_ID, protocolVersion);
-            await ExecuteProtocolTransitionAsync(Dave.INIT_TRANSITION_ID);
+            await PrepareProtocolTransitionAsync(Dave.InitTransitionId, protocolVersion);
+            await ExecuteProtocolTransitionAsync(Dave.InitTransitionId);
         }
     }
 
     public async Task HandlePrepareEpochAsync(ulong epoch, ushort protocolVersion)
     {
-        if (epoch is not Dave.MLS_NEW_GROUP_EXPECTED_EPOCH) return;
+        if (epoch is not Dave.MLSNewGroupExpectedEpoch) return;
 
         await _logger.DebugAsync($"Initializing dave session: epoch {epoch}, protocol version {protocolVersion}");
 
@@ -245,7 +245,7 @@ internal sealed class DaveSessionManager : IDisposable
             $"Executing tranisition to protocol version {protocolVersion} (transition #{transitionId})"
         );
 
-        if (protocolVersion is Dave.DISABELD_PROTOCOL_VERSION)
+        if (protocolVersion is Dave.DisabledProtocolVersion)
         {
             _session.Reset();
             Encryptor.SetPassthroughMode(true);

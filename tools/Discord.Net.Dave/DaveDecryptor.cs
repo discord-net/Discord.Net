@@ -38,7 +38,7 @@ public sealed class DaveDecryptor(DecryptorHandle handle) : IDisposable
     {
         protocolVersion ??= session.ProtocolVersion;
 
-        var isDisabled = protocolVersion is Dave.DISABELD_PROTOCOL_VERSION;
+        var isDisabled = protocolVersion is Dave.DisabledProtocolVersion;
 
         TransitionToPassthroughMode(isDisabled);
 

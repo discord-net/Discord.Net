@@ -25,17 +25,17 @@ public static class Dave
     /// <summary>
     ///     The initial transition id.
     /// </summary>
-    public const int INIT_TRANSITION_ID = 0;
+    public const int InitTransitionId = 0;
 
     /// <summary>
     ///     The protocol version representing dave e2ee being disabled.
     /// </summary>
-    public const int DISABELD_PROTOCOL_VERSION = 0;
+    public const int DisabledProtocolVersion = 0;
 
     /// <summary>
     ///     The expected epoch of a new MLS group.
     /// </summary>
-    public const ulong MLS_NEW_GROUP_EXPECTED_EPOCH = 1;
+    public const ulong MLSNewGroupExpectedEpoch = 1;
 
     /// <summary>
     ///     Gets the max supported protocol version of the <see cref="libdave"/> library.
