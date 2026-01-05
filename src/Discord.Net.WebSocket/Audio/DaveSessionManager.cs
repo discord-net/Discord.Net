@@ -254,7 +254,7 @@ internal sealed class DaveSessionManager : IDisposable
 
     private Task SendMLSCommitWelcomeAsync(ReadOnlyMemory<byte> welcomeMessage)
         => _client.ApiClient.SendBinaryAsync(
-            VoiceOpCode.DaveMLSWelcome,
+            VoiceOpCode.DaveMLSCommitWelcome,
             welcomeMessage
         );
 
