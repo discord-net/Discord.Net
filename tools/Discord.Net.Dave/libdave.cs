@@ -6,8 +6,6 @@
  */
 global using unsafe KeyPairContextType = byte*;
 
-global using CChar = byte;
-
 global using SessionHandle = nuint;
 global using CommitResultHandle = nuint;
 global using WelcomeResultHandle = nuint;
@@ -284,7 +282,7 @@ public static unsafe partial class libdave
     [LibraryImport(LIBRARY_NAME, EntryPoint = "daveSessionCreate")]
     public static partial SessionHandle SessionCreate(
         KeyPairContextType context,
-        CChar* authSessionId,
+        byte* authSessionId,
         MLSFailureCallback callback
     );
 
@@ -307,7 +305,7 @@ public static unsafe partial class libdave
         SessionHandle session,
         ushort version,
         ulong groupId,
-        ReadOnlySpan<CChar> selfUserId
+        ReadOnlySpan<byte> selfUserId
     );
 
     // void daveSessionReset(DAVESessionHandle session)
@@ -366,7 +364,7 @@ public static unsafe partial class libdave
         SessionHandle session,
         byte* proposals,
         nint length,
-        CChar** recognizedUserIds,
+        byte** recognizedUserIds,
         nint recognizedUserIdsLength,
         byte** commitWelcomeBytes,
         nint* commitWelcomeBytesLength
@@ -427,7 +425,7 @@ public static unsafe partial class libdave
     [LibraryImport(LIBRARY_NAME, EntryPoint = "daveSessionGetKeyRatchet")]
     public static partial KeyRatchetHandle SessionGetKeyRatchet(
         SessionHandle session,
-        CChar* userId
+        byte* userId
     );
 
     /*
@@ -442,7 +440,7 @@ public static unsafe partial class libdave
     public static partial void SessionGetPairwiseFingerprint(
         SessionHandle session,
         ushort version,
-        CChar* userId,
+        byte* userId,
         PairwiseFingerprintCallback callback
     );
 

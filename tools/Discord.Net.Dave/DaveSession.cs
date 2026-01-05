@@ -276,7 +276,7 @@ public sealed class DaveSession(SessionHandle handle) : INativeHandle
             return new(
                 libdave.SessionGetKeyRatchet(
                     UnderlyingHandle,
-                    (CChar*)strHandle.Pointer
+                    (byte*)strHandle.Pointer
                 )
             );
         }
@@ -320,7 +320,7 @@ public sealed class DaveSession(SessionHandle handle) : INativeHandle
                     libdave.SessionGetPairwiseFingerprint(
                         UnderlyingHandle,
                         protocolVersion.Value,
-                        (CChar*)userIdStr.Pointer,
+                        (byte*)userIdStr.Pointer,
                         (PairwiseFingerprintCallback)Marshal.GetFunctionPointerForDelegate(callback)
                     );
                 }

@@ -20,9 +20,9 @@ internal static class Utils
     /// <param name="str">The span containing the C string of the snowflake.</param>
     /// <returns>A handle used to free the C string.</returns>
     /// <exception cref="InvalidOperationException">The ID couldn't be formatted.</exception>
-    public static unsafe AllocHandle ToCString(ulong id, out ReadOnlySpan<CChar> str)
+    public static unsafe AllocHandle ToCString(ulong id, out ReadOnlySpan<byte> str)
     {
-        var ptr = (CChar*)NativeMemory.Alloc(SnowflakeMaxCStringLength);
+        var ptr = (byte*)NativeMemory.Alloc(SnowflakeMaxCStringLength);
         var span = new Span<byte>(ptr, SnowflakeMaxCStringLength);
 
         if (!id.TryFormat(span, out var sz))
