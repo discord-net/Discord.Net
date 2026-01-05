@@ -1,3 +1,4 @@
+using Discord.Interactions.Utilities;
 using System;
 using System.Collections.Immutable;
 using System.Linq;
@@ -9,36 +10,13 @@ namespace Discord.Interactions;
 internal sealed class EnumModalComponentConverter<T> : ModalComponentTypeConverter<T>
     where T : struct, Enum
 {
-    private record Option(SelectMenuOptionBuilder OptionBuilder, Predicate<IDiscordInteraction> Predicate, T Value);
-
     private readonly bool _isFlags;
-    private readonly ImmutableArray<Option> _options;
+    private readonly ImmutableArray<EnumSelectMenuOption> _options;
 
     public EnumModalComponentConverter()
     {
-        var names = Enum.GetNames(typeof(T));
-        var members = names.SelectMany(x => typeof(T).GetMember(x));
-
         _isFlags = typeof(T).IsDefined(typeof(FlagsAttribute));
-
-        _options = members.Select<MemberInfo, Option>(x =>
-        {
-            var selectMenuOptionAttr = x.GetCustomAttribute<SelectMenuOptionAttribute>();
-
-            Emoji emoji = null;
-            Emote emote = null;
-
-            if (!string.IsNullOrEmpty(selectMenuOptionAttr?.Emote) && !(Emote.TryParse(selectMenuOptionAttr.Emote, out emote) || Emoji.TryParse(selectMenuOptionAttr.Emote, out emoji)))
-                throw new ArgumentException($"Unable to parse {selectMenuOptionAttr.Emote} of {x.DeclaringType.Name}.{x.Name} into an {typeof(Emote).Name} or an {typeof(Emoji).Name}");
-
-            var hideAttr = x.GetCustomAttribute<HideAttribute>();
-            Predicate<IDiscordInteraction> predicate = hideAttr != null ? hideAttr.Predicate : null;
-
-            var value = Enum.Parse<T>(x.Name);
-            var optionBuilder = new SelectMenuOptionBuilder(x.GetCustomAttribute<ChoiceDisplayAttribute>()?.Name ?? x.Name, x.Name, selectMenuOptionAttr?.Description, emote != null ? emote : emoji, selectMenuOptionAttr?.IsDefault);
-
-            return new(optionBuilder, predicate, value);
-        }).ToImmutableArray();
+        _options = EnumUtils.BuildSelectMenuOptions(typeof(T)).ToImmutableArray();
     }
 
     public override Task<TypeConverterResult> ReadAsync(IInteractionContext context, IComponentInteractionData option, IServiceProvider services)
@@ -67,46 +45,18 @@ internal sealed class EnumModalComponentConverter<T> : ModalComponentTypeConvert
         if (selectMenu.MaxValues > 1 && !_isFlags)
             throw new InvalidOperationException($"Enum type {typeof(T).FullName} is not a [Flags] enum, so it cannot be used in a multi-select menu.");
 
-        var visibleOptions = _options.Where(x => !x.Predicate?.Invoke(interaction) ?? true);
+        var visibleOptions = _options.Where(x => !x.Predicate?.Invoke(interaction) ?? true).ToList();
 
-        if (value is T enumValue)
+        foreach (var option in visibleOptions)
         {
-            foreach(var option in visibleOptions)
-            {
-                option.OptionBuilder.IsDefault = _isFlags ? enumValue.HasFlag(option.Value) : enumValue.Equals(option.Value);
-            }
-        }
+            var optionBuilder = new SelectMenuOptionBuilder(option.MenuOption);
 
-        selectMenu.WithOptions([.. visibleOptions.Select(x => x.OptionBuilder)]);
+            if(value is T enumValue && option.Value is T optionValue)
+                optionBuilder.IsDefault = _isFlags ? enumValue.HasFlag(optionValue) : enumValue.Equals(option.Value);
+
+            selectMenu.AddOption(optionBuilder);
+        }
 
         return Task.CompletedTask;
     }
-}
-
-/// <summary>
-///     Adds additional metadata to enum fields that are used for select-menus.
-/// </summary>
-/// <remarks>
-///     To manually add select menu options to modal components, use <see cref="ModalSelectMenuOptionAttribute"/> instead.
-/// </remarks>
-[AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
-public class SelectMenuOptionAttribute : Attribute
-{
-    /// <summary>
-    ///     Gets or sets the desription of the option.
-    /// </summary>
-    public string Description { get; set; }
-
-    /// <summary>
-    ///     Gets or sets whether the option is selected by default.
-    /// </summary>
-    public bool IsDefault { get; set; }
-
-    /// <summary>
-    ///     Gets or sets the emote of the option.
-    /// </summary>
-    /// <remarks>
-    ///     Can be either an <see cref="Emoji"/> or an <see cref="Discord.Emote"/>
-    /// </remarks>
-    public string Emote { get; set; }
 }
