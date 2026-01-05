@@ -60,7 +60,7 @@ internal sealed class DefaultArrayModalComponentConverter<T> : ModalComponentTyp
             _ => []
         };
 
-        _enumOptions = _underlyingType!.IsEnum ? EnumUtils.BuildSelectMenuOptions(_underlyingType).ToImmutableArray() : ImmutableArray<EnumSelectMenuOption>.Empty;
+        _enumOptions = _underlyingType!.IsEnum ? [..EnumUtils.BuildSelectMenuOptions(_underlyingType)] : ImmutableArray<EnumSelectMenuOption>.Empty;
     }
 
     public override async Task<TypeConverterResult> ReadAsync(IInteractionContext context, IComponentInteractionData option, IServiceProvider services)
@@ -164,14 +164,12 @@ internal sealed class DefaultArrayModalComponentConverter<T> : ModalComponentTyp
             IEnumerable<IChannel> defaultChannels =>
                 defaultChannels.Select(SelectMenuDefaultValue.FromChannel).ToList(),
             IEnumerable<IMentionable> defaultMentionables => defaultMentionables
-                .Where(x => x is IUser or IRole or IChannel)
                 .Select(x =>
                 {
                     return x switch
                     {
                         IUser user => SelectMenuDefaultValue.FromUser(user),
                         IRole role => SelectMenuDefaultValue.FromRole(role),
-                        IChannel channel => SelectMenuDefaultValue.FromChannel(channel),
                         _ => throw new InvalidOperationException(
                             $"Mentionable select cannot be populated using an entity with type: {x.GetType().FullName}")
                     };
