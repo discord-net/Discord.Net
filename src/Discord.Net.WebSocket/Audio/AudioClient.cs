@@ -397,7 +397,7 @@ namespace Discord.Audio
                 {
                     case VoiceOpCode.Ready:
                     {
-                        var data = (payload as JToken).ToObject<ReadyEvent>(_serializer);
+                        var data = ((JToken)payload).ToObject<ReadyEvent>(_serializer);
 
                         _ssrc = data.SSRC;
 
@@ -416,7 +416,7 @@ namespace Discord.Audio
                     }
                     case VoiceOpCode.SessionDescription:
                     {
-                        var data = (payload as JToken).ToObject<SessionDescriptionEvent>(_serializer);
+                        var data = ((JToken)payload).ToObject<SessionDescriptionEvent>(_serializer);
 
                         if (data.Mode != DiscordVoiceAPIClient.Mode)
                             throw new InvalidOperationException($"Discord selected an unexpected mode: {data.Mode}");
@@ -448,14 +448,14 @@ namespace Discord.Audio
                     }
                     case VoiceOpCode.Hello:
                     {
-                        var data = (payload as JToken).ToObject<HelloEvent>(_serializer);
+                        var data = ((JToken)payload).ToObject<HelloEvent>(_serializer);
 
                         _heartbeatInterval = data.HeartbeatInterval;
                         break;
                     }
                     case VoiceOpCode.Speaking:
                     {
-                        var data = (payload as JToken).ToObject<SpeakingEvent>(_serializer);
+                        var data = ((JToken)payload).ToObject<SpeakingEvent>(_serializer);
                         _ssrcMap.AddClient(data.Ssrc, data.UserId, data.Speaking);
                         _dave?.AddUser(data.UserId);
 
@@ -467,7 +467,7 @@ namespace Discord.Audio
                         // only processed for dave
                         if (_dave is null) break;
 
-                        var data = (payload as JToken).ToObject<ClientsConnect>(_serializer);
+                        var data = ((JToken)payload).ToObject<ClientsConnect>(_serializer);
 
                         if (data?.UserIds is not null)
                         {
@@ -479,7 +479,7 @@ namespace Discord.Audio
                     }
                     case VoiceOpCode.ClientDisconnect:
                     {
-                        var data = (payload as JToken).ToObject<ClientDisconnectEvent>(_serializer);
+                        var data = ((JToken)payload).ToObject<ClientDisconnectEvent>(_serializer);
 
                         _dave?.RemoveUser(data.UserId);
 
@@ -506,7 +506,7 @@ namespace Discord.Audio
                     {
                         if (_dave is null) break;
 
-                        var data = (payload as JToken).ToObject<DavePrepareTransition>(_serializer);
+                        var data = ((JToken)payload).ToObject<DavePrepareTransition>(_serializer);
 
                         await _dave.PrepareProtocolTransitionAsync(data.TransitionId, data.ProtocolVersion);
                         break;
@@ -515,7 +515,7 @@ namespace Discord.Audio
                     {
                         if (_dave is null) break;
 
-                        var data = (payload as JToken).ToObject<DaveMLSTransitionParams>(_serializer);
+                        var data = ((JToken)payload).ToObject<DaveMLSTransitionParams>(_serializer);
 
                         await _dave.ExecuteProtocolTransitionAsync(data.TransitionId);
                         break;
@@ -524,7 +524,7 @@ namespace Discord.Audio
                     {
                         if (_dave is null) break;
 
-                        var data = (payload as JToken).ToObject<DavePrepareEpoch>(_serializer);
+                        var data = ((JToken)payload).ToObject<DavePrepareEpoch>(_serializer);
 
                         await _dave.HandlePrepareEpochAsync(data.Epoch, data.ProtocolVersion);
                         break;
