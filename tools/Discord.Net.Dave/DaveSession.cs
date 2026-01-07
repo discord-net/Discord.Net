@@ -321,7 +321,8 @@ public sealed class DaveSession(SessionHandle handle) : INativeHandle
                         UnderlyingHandle,
                         protocolVersion.Value,
                         (byte*)userIdStr.Pointer,
-                        (PairwiseFingerprintCallback)Marshal.GetFunctionPointerForDelegate(callback)
+                        (PairwiseFingerprintCallback)Marshal.GetFunctionPointerForDelegate(callback),
+                        null
                     );
                 }
             }

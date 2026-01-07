@@ -98,7 +98,8 @@ public static class Dave
             libdave.SessionCreate(
                 (byte*) contextPtr,
                 (byte*) authSessionIdPtr,
-                (MLSFailureCallback)Marshal.GetFunctionPointerForDelegate(mlsFailureCallback)
+                (MLSFailureCallback)Marshal.GetFunctionPointerForDelegate(mlsFailureCallback),
+                null
             )
         );
 
