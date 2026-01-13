@@ -112,6 +112,11 @@ namespace Discord.Rest
             return null;
         }
 
+        public static async Task<IReadOnlyCollection<ulong>> GetInviteTargetUsersAsync(BaseDiscordClient client, string inviteCode, RequestOptions options)
+        {
+            return [.. await client.ApiClient.GetInviteTargetUsersAsync(inviteCode).ConfigureAwait(false)];
+        }
+
         public static async Task<RestGuild> GetGuildAsync(BaseDiscordClient client,
             ulong id, bool withCounts, RequestOptions options)
         {

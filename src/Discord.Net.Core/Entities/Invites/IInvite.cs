@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Discord
 {
@@ -121,5 +123,20 @@ namespace Discord
         ///     Gets the expiration date of this invite. <see langword="null" /> if the invite never expires.
         /// </summary>
         DateTimeOffset? ExpiresAt { get; }
+
+        /// <summary>
+        ///     Gets tge users who will be able to use this invite.
+        /// </summary>
+        Task<IReadOnlyCollection<ulong>> GetTargetUsersAsync(RequestOptions options = null);
+
+        /// <summary>
+        ///     Sets the users who will be able to use this invite.
+        /// </summary>
+        Task ModifyTargetUsersAsync(IEnumerable<ulong> userIds, RequestOptions options = null);
+
+        /// <summary>
+        ///     Gets the status of the asynchronous processing of target users.
+        /// </summary>
+        Task<TargetUsersJobStatus> GetTargetUsersJobStatus(RequestOptions options = null);
     }
 }

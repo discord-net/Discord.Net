@@ -203,6 +203,8 @@ namespace Discord.Rest
         public Task<RestInviteMetadata> GetInviteAsync(string inviteId, RequestOptions options = null, ulong? scheduledEventId = null)
             => ClientHelper.GetInviteAsync(this, inviteId, options, scheduledEventId);
 
+        public Task<IReadOnlyCollection<ulong>> GetInviteTargetUsersAsync(string inviteId, RequestOptions options = null)
+            => ClientHelper.GetInviteTargetUsersAsync(this, inviteId, options);
         public Task<RestGuild> GetGuildAsync(ulong id, RequestOptions options = null)
             => ClientHelper.GetGuildAsync(this, id, false, options);
         public Task<RestGuild> GetGuildAsync(ulong id, bool withCounts, RequestOptions options = null)
