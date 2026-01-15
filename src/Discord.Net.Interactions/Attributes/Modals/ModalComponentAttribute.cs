@@ -13,5 +13,13 @@ public abstract class ModalComponentAttribute : Attribute
     /// </summary>
     public abstract ComponentType ComponentType { get; }
 
-    internal ModalComponentAttribute() { }
+    /// <summary>
+    ///     Gets the optional identifier for component.
+    /// </summary>
+    public int? Id { get; }
+
+    internal ModalComponentAttribute(int? id)
+    {
+        Id = id;
+    }
 }

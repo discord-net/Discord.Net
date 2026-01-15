@@ -82,7 +82,7 @@ namespace Discord.Interactions
                     case TextInputComponentInfo textComponent:
                         {
                             var inputBuilder = new TextInputBuilder(textComponent.CustomId, textComponent.Style, textComponent.Placeholder, textComponent.IsRequired ? textComponent.MinLength : null,
-                            textComponent.MaxLength, textComponent.IsRequired);
+                            textComponent.MaxLength, textComponent.IsRequired, id: textComponent.Id);
 
                             var instanceValue = modalInstance is not null ? textComponent.Getter(modalInstance) : null;
                             await textComponent.TypeConverter.WriteAsync(inputBuilder, interaction, textComponent, instanceValue);
@@ -93,7 +93,7 @@ namespace Discord.Interactions
                         break;
                     case SelectMenuComponentInfo selectMenuComponent:
                         {
-                            var inputBuilder = new SelectMenuBuilder(selectMenuComponent.CustomId, selectMenuComponent.Options.Select(x => new SelectMenuOptionBuilder(x)).ToList(), selectMenuComponent.Placeholder, selectMenuComponent.MaxValues, selectMenuComponent.MinValues, false, isRequired: selectMenuComponent.IsRequired);
+                            var inputBuilder = new SelectMenuBuilder(selectMenuComponent.CustomId, selectMenuComponent.Options.Select(x => new SelectMenuOptionBuilder(x)).ToList(), selectMenuComponent.Placeholder, selectMenuComponent.MaxValues, selectMenuComponent.MinValues, false, isRequired: selectMenuComponent.IsRequired, id: selectMenuComponent.Id);
 
                             var instanceValue = modalInstance is not null ? selectMenuComponent.Getter(modalInstance) : null;
                             await selectMenuComponent.TypeConverter.WriteAsync(inputBuilder, interaction, selectMenuComponent, instanceValue);
@@ -105,7 +105,7 @@ namespace Discord.Interactions
                     case SnowflakeSelectComponentInfo snowflakeSelectComponent:
                         {
                             var channelTypes = snowflakeSelectComponent is ChannelSelectComponentInfo channelSelectComponent ? channelSelectComponent.ChannelTypes : null;
-                            var inputBuilder = new SelectMenuBuilder(snowflakeSelectComponent.CustomId, null, snowflakeSelectComponent.Placeholder, snowflakeSelectComponent.MaxValues, snowflakeSelectComponent.MinValues, false, snowflakeSelectComponent.ComponentType, channelTypes?.ToList(), snowflakeSelectComponent.DefaultValues.ToList(), null, snowflakeSelectComponent.IsRequired);
+                            var inputBuilder = new SelectMenuBuilder(snowflakeSelectComponent.CustomId, null, snowflakeSelectComponent.Placeholder, snowflakeSelectComponent.MaxValues, snowflakeSelectComponent.MinValues, false, snowflakeSelectComponent.ComponentType, channelTypes?.ToList(), snowflakeSelectComponent.DefaultValues.ToList(), snowflakeSelectComponent.Id, snowflakeSelectComponent.IsRequired);
 
                             var instanceValue = modalInstance is not null ? snowflakeSelectComponent.Getter(modalInstance) : null;
                             await snowflakeSelectComponent.TypeConverter.WriteAsync(inputBuilder, interaction, snowflakeSelectComponent, instanceValue);
@@ -116,7 +116,7 @@ namespace Discord.Interactions
                         break;
                     case FileUploadComponentInfo fileUploadComponent:
                         {
-                            var inputBuilder = new FileUploadComponentBuilder(fileUploadComponent.CustomId, fileUploadComponent.MinValues, fileUploadComponent.MaxValues, fileUploadComponent.IsRequired);
+                            var inputBuilder = new FileUploadComponentBuilder(fileUploadComponent.CustomId, fileUploadComponent.MinValues, fileUploadComponent.MaxValues, fileUploadComponent.IsRequired, fileUploadComponent.Id);
 
                             var instanceValue = modalInstance is not null ? fileUploadComponent.Getter(modalInstance) : null;
                             await fileUploadComponent.TypeConverter.WriteAsync(inputBuilder, interaction, fileUploadComponent, instanceValue);
@@ -130,7 +130,7 @@ namespace Discord.Interactions
                             var instanceValue = modalInstance is not null ? textDisplayComponent.Getter(modalInstance).ToString() : null;
                             var content = instanceValue ?? (textDisplayComponent.DefaultValue as string) ?? textDisplayComponent.Content;
 
-                            var componentBuilder = new TextDisplayBuilder(content);
+                            var componentBuilder = new TextDisplayBuilder(content, textDisplayComponent.Id);
                             builder.AddTextDisplay(componentBuilder);
                         }
                         break;

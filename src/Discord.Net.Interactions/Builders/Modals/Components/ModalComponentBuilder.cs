@@ -27,6 +27,9 @@ public abstract class ModalComponentBuilder<TInfo, TBuilder> : IModalComponentBu
     public object DefaultValue { get; set; }
 
     /// <inheritdoc/>
+    public int? Id { get; set; }
+
+    /// <inheritdoc/>
     public IReadOnlyCollection<Attribute> Attributes => _attributes;
 
     internal ModalComponentBuilder(ModalBuilder modal)
@@ -87,6 +90,19 @@ public abstract class ModalComponentBuilder<TInfo, TBuilder> : IModalComponentBu
         return Instance;
     }
 
+    /// <summary>
+    ///     Sets <see cref="Id"/>.
+    /// </summary>
+    /// <param name="id">New value of the <see cref="Id"/>.</param>
+    /// <returns>
+    ///     The builder instance.
+    /// </returns>
+    public virtual TBuilder WithId(int? id)
+    {
+        Id = id;
+        return Instance;
+    }
+
     internal abstract TInfo Build(ModalInfo modal);
 
     /// <inheritdoc/>
@@ -97,4 +113,7 @@ public abstract class ModalComponentBuilder<TInfo, TBuilder> : IModalComponentBu
 
     /// <inheritdoc/>
     IModalComponentBuilder IModalComponentBuilder.WithAttributes(params Attribute[] attributes) => WithAttributes(attributes);
+
+    /// <inheritdoc/>
+    IModalComponentBuilder IModalComponentBuilder.WithId(int? id) => WithId(id);
 }
