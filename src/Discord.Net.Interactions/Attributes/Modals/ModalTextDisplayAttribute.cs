@@ -17,7 +17,9 @@ public class ModalTextDisplayAttribute : ModalComponentAttribute
     ///     Create a new <see cref="ModalTextInputAttribute"/>.
     /// </summary>
     /// <param name="content">Content of the text display.</param>
-    public ModalTextDisplayAttribute(string content = null)
+    /// <param name="id">Optional identifier for component.</param>
+    public ModalTextDisplayAttribute(string content = null, int? id = null)
+        : base(id)
     {
         Content = content;
     }

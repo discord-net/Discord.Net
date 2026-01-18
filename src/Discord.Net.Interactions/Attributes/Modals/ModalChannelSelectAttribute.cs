@@ -12,5 +12,9 @@ public class ModalChannelSelectAttribute : ModalSelectComponentAttribute
     ///     Create a new <see cref="ModalChannelSelectAttribute"/>.
     /// </summary>
     /// <param name="customId">Custom ID of the channel select component.</param>
-    public ModalChannelSelectAttribute(string customId, int minValues = 1, int maxValues = 1) : base(customId, minValues, maxValues) { }
+    /// <param name="minValues">The minimum number of values that can be selected.</param>
+    /// <param name="maxValues">The maximum number of values that can be selected.</param>
+    /// <param name="id">Optional identifier for the component.</param>
+    public ModalChannelSelectAttribute(string customId, int minValues = 1, int maxValues = 1, int? id = null)
+        : base(customId, minValues, maxValues, id) { }
 }
