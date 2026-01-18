@@ -21,7 +21,7 @@ internal sealed class EnumModalComponentConverter<T> : ModalComponentTypeConvert
 
     public override Task<TypeConverterResult> ReadAsync(IInteractionContext context, IComponentInteractionData option, IServiceProvider services)
     {
-        if (option.Type is not ComponentType.SelectMenu or ComponentType.TextInput)
+        if (option.Type is not ComponentType.SelectMenu and not ComponentType.TextInput)
             return Task.FromResult(TypeConverterResult.FromError(InteractionCommandError.ConvertFailed, $"{option.Type} input type cannot be converted to {typeof(T).FullName}"));
 
         var value = option.Type switch
