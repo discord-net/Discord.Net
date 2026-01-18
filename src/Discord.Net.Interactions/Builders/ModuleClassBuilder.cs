@@ -675,6 +675,7 @@ namespace Discord.Interactions.Builders
                         builder.MaxLength = textInput.MaxLength;
                         builder.MinLength = textInput.MinLength;
                         builder.InitialValue = textInput.InitialValue;
+                        builder.Id = textInput.Id;
                         break;
                     case RequiredInputAttribute requiredInput:
                         builder.IsRequired = requiredInput.IsRequired;
@@ -711,6 +712,7 @@ namespace Discord.Interactions.Builders
                         builder.MinValues = selectMenuInput.MinValues;
                         builder.MaxValues = selectMenuInput.MaxValues;
                         builder.Placeholder = selectMenuInput.Placeholder;
+                        builder.Id = selectMenuInput.Id;
                         break;
                     case RequiredInputAttribute requiredInput:
                         builder.IsRequired = requiredInput.IsRequired;
@@ -765,6 +767,7 @@ namespace Discord.Interactions.Builders
                         builder.MinValues = selectInput.MinValues;
                         builder.MaxValues = selectInput.MaxValues;
                         builder.Placeholder = selectInput.Placeholder;
+                        builder.Id = selectInput.Id;
                         break;
                     case RequiredInputAttribute requiredInput:
                         builder.IsRequired = requiredInput.IsRequired;
@@ -803,6 +806,7 @@ namespace Discord.Interactions.Builders
                         builder.ComponentType = fileUploadInput.ComponentType;
                         builder.MinValues = fileUploadInput.MinValues;
                         builder.MaxValues = fileUploadInput.MaxValues;
+                        builder.Id = fileUploadInput.Id;
                         break;
                     case RequiredInputAttribute requiredInput:
                         builder.IsRequired = requiredInput.IsRequired;
@@ -833,6 +837,7 @@ namespace Discord.Interactions.Builders
                     case ModalTextDisplayAttribute textDisplay:
                         builder.ComponentType = textDisplay.ComponentType;
                         builder.Content = textDisplay.Content;
+                        builder.Id = textDisplay.Id;
                         break;
                     default:
                         builder.WithAttributes(attribute);
