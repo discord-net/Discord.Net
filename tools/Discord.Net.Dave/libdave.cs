@@ -109,6 +109,21 @@ public enum EncryptorResultCode
     ///     The encryption failed.
     /// </summary>
     EncryptionFailure = 1,
+
+    /// <summary>
+    ///     No key ratchet available.
+    /// </summary>
+    MissingKeyRatchet = 2,
+
+    /// <summary>
+    ///     Missing cryptographic context.
+    /// </summary>
+    MissingCryptor = 3,
+
+    /// <summary>
+    ///     Too many attempts to encrypt the frame failed.
+    /// </summary>
+    TooManyAttempts = 4
 }
 
 /// <summary>
@@ -806,6 +821,30 @@ public static unsafe partial class libdave
         MediaType mediaType,
         nint frameSize
     );
+
+    // bool daveEncryptorHasKeyRatchet(DAVEEncryptorHandle encryptor);
+    /// <summary>
+    ///     Checks if the encryptor has a key ratchet.
+    /// </summary>
+    /// <param name="encryptor">The encryptor handle.</param>
+    /// <returns>
+    ///     <see langword="true"/> if the encryptor has the given key ratchet; otherwise <see langword="false"/>.
+    /// </returns>
+    [return: MarshalAs(UnmanagedType.Bool)]
+    [LibraryImport(LIBRARY_NAME, EntryPoint = "daveEncryptorHasKeyRatchet")]
+    public static partial bool EncryptorHasKeyRatchet(EncryptorHandle encryptor);
+
+    //bool daveEncryptorIsPassthroughMode(DAVEEncryptorHandle encryptor);
+    /// <summary>
+    ///     Checks if the encryptor is in passthrough mode.
+    /// </summary>
+    /// <param name="encryptor">The encryptor handle.</param>
+    /// <returns>
+    ///     <see langword="true"/> if the encryptor is in passthrough mode; otherwise <see langword="false"/>.
+    /// </returns>
+    [return: MarshalAs(UnmanagedType.Bool)]
+    [LibraryImport(LIBRARY_NAME, EntryPoint = "daveEncryptorIsPassthroughMode")]
+    public static partial bool EncryptorIsPassthroughMode(EncryptorHandle encryptor);
 
     /*
      * DAVEEncryptorResultCode daveEncryptorEncrypt(

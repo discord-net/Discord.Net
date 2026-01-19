@@ -56,24 +56,30 @@ public sealed class DaveEncryptor(EncryptorHandle handle) : INativeHandle
         }
     }
 
-    private readonly Lock _lock = new();
-
     /// <summary>
-    ///     Sets the pass through mode of this encryptor.
+    ///     Gets or sets the pass through mode of this encryptor.
     /// </summary>
-    /// <param name="passthroughMode">
-    ///     <see langword="true"/> if this encryptor should pass though data unencrypted; <see langword="false"/> to
-    ///     encrypt data.
-    /// </param>
-    public void SetPassthroughMode(bool passthroughMode)
+    public bool IsInPassthroughMode
     {
-        lock (_lock)
+        get
         {
-            this.ThrowIfNotAlive();
-
-            libdave.EncryptorSetPassthroughMode(UnderlyingHandle, passthroughMode);
+            lock (_lock)
+            {
+                this.ThrowIfNotAlive();
+                return libdave.EncryptorIsPassthroughMode(UnderlyingHandle);
+            }
+        }
+        set
+        {
+            lock (_lock)
+            {
+                this.ThrowIfNotAlive();
+                libdave.EncryptorSetPassthroughMode(UnderlyingHandle, value);
+            }
         }
     }
+
+    private readonly Lock _lock = new();
 
     /// <summary>
     ///     Assigns a SSRC to a codec used by this encryptor.
