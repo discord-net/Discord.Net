@@ -40,6 +40,14 @@ public abstract class ModalComponentInfo
     public object DefaultValue { get; }
 
     /// <summary>
+    ///     Gets the optional identifier for component.
+    /// </summary>
+    /// <remarks>
+    ///     Sending components with an id of 0 is allowed but will be treated as empty and replaced by the API.
+    /// </remarks>
+    public int Id { get; }
+
+    /// <summary>
     ///     Gets a collection of the attributes of this command.
     /// </summary>
     public IReadOnlyCollection<Attribute> Attributes { get; }
@@ -51,6 +59,7 @@ public abstract class ModalComponentInfo
         Type = builder.Type;
         PropertyInfo = builder.PropertyInfo;
         DefaultValue = builder.DefaultValue;
+        Id = builder.Id;
         Attributes = builder.Attributes.ToImmutableArray();
 
         _getter = new(() => ReflectionUtils<object>.CreateLambdaPropertyGetter(Modal.Type, PropertyInfo));

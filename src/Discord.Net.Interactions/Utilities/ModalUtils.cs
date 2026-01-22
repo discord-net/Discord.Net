@@ -44,6 +44,9 @@ namespace Discord.Interactions
         public static bool TryRemove<T>(out ModalInfo modalInfo) where T : class, IModal
             => TryRemove(typeof(T), out modalInfo);
 
+        public static bool Contains(Type type)
+            => _modalInfos.ContainsKey(type);
+
         public static void Clear() => _modalInfos.Clear();
 
         public static int Count() => _modalInfos.Count;

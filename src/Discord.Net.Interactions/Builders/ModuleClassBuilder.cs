@@ -654,6 +654,8 @@ namespace Discord.Interactions.Builders
 
         private static void BuildTextInputComponent(TextInputComponentBuilder builder, PropertyInfo propertyInfo, object defaultValue)
         {
+            EnsurePubliclySettable(propertyInfo);
+
             var attributes = propertyInfo.GetCustomAttributes();
 
             builder.Label = propertyInfo.Name;
@@ -673,6 +675,7 @@ namespace Discord.Interactions.Builders
                         builder.MaxLength = textInput.MaxLength;
                         builder.MinLength = textInput.MinLength;
                         builder.InitialValue = textInput.InitialValue;
+                        builder.Id = textInput.Id;
                         break;
                     case RequiredInputAttribute requiredInput:
                         builder.IsRequired = requiredInput.IsRequired;
@@ -690,6 +693,8 @@ namespace Discord.Interactions.Builders
 
         private static void BuildSelectMenuComponent(SelectMenuComponentBuilder builder, PropertyInfo propertyInfo, object defaultValue)
         {
+            EnsurePubliclySettable(propertyInfo);
+
             var attributes = propertyInfo.GetCustomAttributes();
 
             builder.Label = propertyInfo.Name;
@@ -707,6 +712,7 @@ namespace Discord.Interactions.Builders
                         builder.MinValues = selectMenuInput.MinValues;
                         builder.MaxValues = selectMenuInput.MaxValues;
                         builder.Placeholder = selectMenuInput.Placeholder;
+                        builder.Id = selectMenuInput.Id;
                         break;
                     case RequiredInputAttribute requiredInput:
                         builder.IsRequired = requiredInput.IsRequired;
@@ -742,6 +748,8 @@ namespace Discord.Interactions.Builders
             where TInfo : SnowflakeSelectComponentInfo
             where TBuilder : SnowflakeSelectComponentBuilder<TInfo, TBuilder>
         {
+            EnsurePubliclySettable(propertyInfo);
+
             var attributes = propertyInfo.GetCustomAttributes();
 
             builder.Label = propertyInfo.Name;
@@ -759,6 +767,7 @@ namespace Discord.Interactions.Builders
                         builder.MinValues = selectInput.MinValues;
                         builder.MaxValues = selectInput.MaxValues;
                         builder.Placeholder = selectInput.Placeholder;
+                        builder.Id = selectInput.Id;
                         break;
                     case RequiredInputAttribute requiredInput:
                         builder.IsRequired = requiredInput.IsRequired;
@@ -766,6 +775,9 @@ namespace Discord.Interactions.Builders
                     case InputLabelAttribute inputLabel:
                         builder.Label = inputLabel.Label;
                         builder.Description = inputLabel.Description;
+                        break;
+                    case ChannelTypesAttribute channelTypes when builder is ChannelSelectComponentBuilder channelSelectBuilder:
+                        channelSelectBuilder.WithChannelTypes(channelTypes.ChannelTypes);
                         break;
                     default:
                         builder.WithAttributes(attribute);
@@ -776,6 +788,8 @@ namespace Discord.Interactions.Builders
 
         private static void BuildFileUploadComponent(FileUploadComponentBuilder builder, PropertyInfo propertyInfo, object defaultValue)
         {
+            EnsurePubliclySettable(propertyInfo);
+
             var attributes = propertyInfo.GetCustomAttributes();
 
             builder.Label = propertyInfo.Name;
@@ -792,6 +806,7 @@ namespace Discord.Interactions.Builders
                         builder.ComponentType = fileUploadInput.ComponentType;
                         builder.MinValues = fileUploadInput.MinValues;
                         builder.MaxValues = fileUploadInput.MaxValues;
+                        builder.Id = fileUploadInput.Id;
                         break;
                     case RequiredInputAttribute requiredInput:
                         builder.IsRequired = requiredInput.IsRequired;
@@ -822,6 +837,7 @@ namespace Discord.Interactions.Builders
                     case ModalTextDisplayAttribute textDisplay:
                         builder.ComponentType = textDisplay.ComponentType;
                         builder.Content = textDisplay.Content;
+                        builder.Id = textDisplay.Id;
                         break;
                     default:
                         builder.WithAttributes(attribute);
@@ -882,9 +898,18 @@ namespace Discord.Interactions.Builders
 
         private static bool IsValidModalComponentDefinition(PropertyInfo propertyInfo)
         {
-            return propertyInfo.SetMethod?.IsPublic == true &&
-                propertyInfo.SetMethod?.IsStatic == false &&
-                propertyInfo.IsDefined(typeof(ModalComponentAttribute));
+            return propertyInfo.IsDefined(typeof(ModalComponentAttribute));
+        }
+
+        private static bool IsPubliclySettable(PropertyInfo propertyInfo)
+        {
+            return propertyInfo.SetMethod is { IsPublic: true, IsStatic: false };
+        }
+
+        private static void EnsurePubliclySettable(PropertyInfo propertyInfo)
+        {
+            if(!IsPubliclySettable(propertyInfo))
+                throw new InvalidOperationException($"The property {propertyInfo.Name} must be publicly settable.");
         }
 
         private static ConstructorInfo GetComplexParameterConstructor(TypeInfo typeInfo, ComplexParameterAttribute complexParameter)

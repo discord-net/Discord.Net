@@ -8,7 +8,14 @@ namespace Discord.Interactions.Builders;
 /// </summary>
 public class ChannelSelectComponentBuilder : SnowflakeSelectComponentBuilder<ChannelSelectComponentInfo, ChannelSelectComponentBuilder>
 {
+    private readonly List<ChannelType> _channelTypes = new();
+
     protected override ChannelSelectComponentBuilder Instance => this;
+
+    /// <summary>
+    ///     Gets the presented channel types for this Channel Select.
+    /// </summary>
+    public IReadOnlyCollection<ChannelType> ChannelTypes => _channelTypes.AsReadOnly();
 
     /// <summary>
     ///     Initializes a new <see cref="ChannelSelectComponentBuilder"/>.
@@ -39,6 +46,19 @@ public class ChannelSelectComponentBuilder : SnowflakeSelectComponentBuilder<Cha
     public ChannelSelectComponentBuilder AddDefaultValues(params IEnumerable<IChannel> channels)
     {
         _defaultValues.AddRange(channels.Select(x => new SelectMenuDefaultValue(x.Id, SelectDefaultValueType.Channel)));
+        return this;
+    }
+
+    /// <summary>
+    ///     Sets the value of <see cref="ChannelTypes"/>.
+    /// </summary>
+    /// <param name="channelTypes">the new value of <see cref="ChannelTypes"/>.</param>
+    /// <returns>
+    ///     The builder instance.
+    /// </returns>
+    public ChannelSelectComponentBuilder WithChannelTypes(params IEnumerable<ChannelType> channelTypes)
+    {
+        _channelTypes.AddRange(channelTypes);
         return this;
     }
 

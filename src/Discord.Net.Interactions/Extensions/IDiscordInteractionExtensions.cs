@@ -82,12 +82,10 @@ namespace Discord.Interactions
                     case TextInputComponentInfo textComponent:
                         {
                             var inputBuilder = new TextInputBuilder(textComponent.CustomId, textComponent.Style, textComponent.Placeholder, textComponent.IsRequired ? textComponent.MinLength : null,
-                            textComponent.MaxLength, textComponent.IsRequired);
+                            textComponent.MaxLength, textComponent.IsRequired, id: textComponent.Id);
 
-                            if (modalInstance != null)
-                            {
-                                await textComponent.TypeConverter.WriteAsync(inputBuilder, interaction, textComponent, textComponent.Getter(modalInstance));
-                            }
+                            var instanceValue = modalInstance is not null ? textComponent.Getter(modalInstance) : null;
+                            await textComponent.TypeConverter.WriteAsync(inputBuilder, interaction, textComponent, instanceValue);
 
                             var labelBuilder = new LabelBuilder(textComponent.Label, inputBuilder, textComponent.Description);
                             builder.AddLabel(labelBuilder);
@@ -95,12 +93,10 @@ namespace Discord.Interactions
                         break;
                     case SelectMenuComponentInfo selectMenuComponent:
                         {
-                            var inputBuilder = new SelectMenuBuilder(selectMenuComponent.CustomId, selectMenuComponent.Options.Select(x => new SelectMenuOptionBuilder(x)).ToList(), selectMenuComponent.Placeholder, selectMenuComponent.MaxValues, selectMenuComponent.MinValues, false, isRequired: selectMenuComponent.IsRequired);
+                            var inputBuilder = new SelectMenuBuilder(selectMenuComponent.CustomId, selectMenuComponent.Options.Select(x => new SelectMenuOptionBuilder(x)).ToList(), selectMenuComponent.Placeholder, selectMenuComponent.MaxValues, selectMenuComponent.MinValues, false, isRequired: selectMenuComponent.IsRequired, id: selectMenuComponent.Id);
 
-                            if (modalInstance != null)
-                            {
-                                await selectMenuComponent.TypeConverter.WriteAsync(inputBuilder, interaction, selectMenuComponent, selectMenuComponent.Getter(modalInstance));
-                            }
+                            var instanceValue = modalInstance is not null ? selectMenuComponent.Getter(modalInstance) : null;
+                            await selectMenuComponent.TypeConverter.WriteAsync(inputBuilder, interaction, selectMenuComponent, instanceValue);
 
                             var labelBuilder = new LabelBuilder(selectMenuComponent.Label, inputBuilder, selectMenuComponent.Description);
                             builder.AddLabel(labelBuilder);
@@ -108,12 +104,11 @@ namespace Discord.Interactions
                         break;
                     case SnowflakeSelectComponentInfo snowflakeSelectComponent:
                         {
-                            var inputBuilder = new SelectMenuBuilder(snowflakeSelectComponent.CustomId, null, snowflakeSelectComponent.Placeholder, snowflakeSelectComponent.MaxValues, snowflakeSelectComponent.MinValues, false, snowflakeSelectComponent.ComponentType, null, snowflakeSelectComponent.DefaultValues.ToList(), null, snowflakeSelectComponent.IsRequired);
+                            var channelTypes = snowflakeSelectComponent is ChannelSelectComponentInfo channelSelectComponent ? channelSelectComponent.ChannelTypes : null;
+                            var inputBuilder = new SelectMenuBuilder(snowflakeSelectComponent.CustomId, null, snowflakeSelectComponent.Placeholder, snowflakeSelectComponent.MaxValues, snowflakeSelectComponent.MinValues, false, snowflakeSelectComponent.ComponentType, channelTypes?.ToList(), snowflakeSelectComponent.DefaultValues.ToList(), snowflakeSelectComponent.Id, snowflakeSelectComponent.IsRequired);
 
-                            if (modalInstance != null)
-                            {
-                                await snowflakeSelectComponent.TypeConverter.WriteAsync(inputBuilder, interaction, snowflakeSelectComponent, snowflakeSelectComponent.Getter(modalInstance));
-                            }
+                            var instanceValue = modalInstance is not null ? snowflakeSelectComponent.Getter(modalInstance) : null;
+                            await snowflakeSelectComponent.TypeConverter.WriteAsync(inputBuilder, interaction, snowflakeSelectComponent, instanceValue);
 
                             var labelBuilder = new LabelBuilder(snowflakeSelectComponent.Label, inputBuilder, snowflakeSelectComponent.Description);
                             builder.AddLabel(labelBuilder);
@@ -121,23 +116,22 @@ namespace Discord.Interactions
                         break;
                     case FileUploadComponentInfo fileUploadComponent:
                         {
-                            var inputBuilder = new FileUploadComponentBuilder(fileUploadComponent.CustomId, fileUploadComponent.MinValues, fileUploadComponent.MaxValues, fileUploadComponent.IsRequired);
+                            var inputBuilder = new FileUploadComponentBuilder(fileUploadComponent.CustomId, fileUploadComponent.MinValues, fileUploadComponent.MaxValues, fileUploadComponent.IsRequired, fileUploadComponent.Id);
 
-                            if (modalInstance != null)
-                            {
-                                await fileUploadComponent.TypeConverter.WriteAsync(inputBuilder, interaction, fileUploadComponent, fileUploadComponent.Getter(modalInstance));
-                            }
+                            var instanceValue = modalInstance is not null ? fileUploadComponent.Getter(modalInstance) : null;
+                            await fileUploadComponent.TypeConverter.WriteAsync(inputBuilder, interaction, fileUploadComponent, instanceValue);
 
                             var labelBuilder = new LabelBuilder(fileUploadComponent.Label, inputBuilder, fileUploadComponent.Description);
                             builder.AddLabel(labelBuilder);
                         }
                         break;
                     case TextDisplayComponentInfo textDisplayComponent:
-                    {
-                        var instanceValue = modalInstance is not null ? textDisplayComponent.Getter(modalInstance).ToString() : null;
-                        var content = instanceValue ?? (textDisplayComponent.DefaultValue as string) ?? textDisplayComponent.Content;
-                        var componentBuilder = new TextDisplayBuilder(content);
-                        builder.AddTextDisplay(componentBuilder);
+                        {
+                            var instanceValue = modalInstance is not null ? textDisplayComponent.Getter(modalInstance).ToString() : null;
+                            var content = instanceValue ?? (textDisplayComponent.DefaultValue as string) ?? textDisplayComponent.Content;
+
+                            var componentBuilder = new TextDisplayBuilder(content, textDisplayComponent.Id);
+                            builder.AddTextDisplay(componentBuilder);
                         }
                         break;
                     default:

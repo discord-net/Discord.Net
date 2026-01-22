@@ -32,6 +32,14 @@ public interface IModalComponentBuilder
     object DefaultValue { get; }
 
     /// <summary>
+    ///     Gets the optional identifier for component.
+    /// </summary>
+    /// <remarks>
+    ///     Sending components with an id of 0 is allowed but will be treated as empty and replaced by the API.
+    /// </remarks>
+    int Id { get; }
+
+    /// <summary>
     ///     Gets a collection of the attributes of this component.
     /// </summary>
     IReadOnlyCollection<Attribute> Attributes { get; }
@@ -62,4 +70,13 @@ public interface IModalComponentBuilder
     ///     The builder instance.
     /// </returns>
     IModalComponentBuilder WithAttributes(params Attribute[] attributes);
+
+    /// <summary>
+    ///     Sets <see cref="Id"/>.
+    /// </summary>
+    /// <param name="id">New value of the <see cref="Id"/>.</param>
+    /// <returns>
+    ///     The builder instance.
+    /// </returns>
+    IModalComponentBuilder WithId(int id);
 }

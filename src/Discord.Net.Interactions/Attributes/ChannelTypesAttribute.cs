@@ -7,7 +7,7 @@ namespace Discord.Interactions
     /// <summary>
     ///     Specify the target channel types for a <see cref="ApplicationCommandOptionType.Channel"/> option.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Parameter, AllowMultiple = false, Inherited = true)]
+    [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
     public sealed class ChannelTypesAttribute : Attribute
     {
         /// <summary>
