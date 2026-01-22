@@ -15,6 +15,6 @@ public class ModalChannelSelectAttribute : ModalSelectComponentAttribute
     /// <param name="minValues">The minimum number of values that can be selected.</param>
     /// <param name="maxValues">The maximum number of values that can be selected.</param>
     /// <param name="id">Optional identifier for the component.</param>
-    public ModalChannelSelectAttribute(string customId, int minValues = 1, int maxValues = 1, int? id = null)
+    public ModalChannelSelectAttribute(string customId, int minValues = 1, int maxValues = 1, int id = 0)
         : base(customId, minValues, maxValues, id) { }
 }

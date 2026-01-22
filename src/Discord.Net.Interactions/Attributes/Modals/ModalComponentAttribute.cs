@@ -16,9 +16,12 @@ public abstract class ModalComponentAttribute : Attribute
     /// <summary>
     ///     Gets the optional identifier for component.
     /// </summary>
-    public int? Id { get; set; }
+    /// <remarks>
+    ///     Sending components with an id of 0 is allowed but will be treated as empty and replaced by the API.
+    /// </remarks>
+    public int Id { get; set; }
 
-    internal ModalComponentAttribute(int? id)
+    internal ModalComponentAttribute(int id = 0)
     {
         Id = id;
     }

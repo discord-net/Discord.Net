@@ -34,7 +34,10 @@ public interface IModalComponentBuilder
     /// <summary>
     ///     Gets the optional identifier for component.
     /// </summary>
-    int? Id { get; }
+    /// <remarks>
+    ///     Sending components with an id of 0 is allowed but will be treated as empty and replaced by the API.
+    /// </remarks>
+    int Id { get; }
 
     /// <summary>
     ///     Gets a collection of the attributes of this component.
@@ -75,5 +78,5 @@ public interface IModalComponentBuilder
     /// <returns>
     ///     The builder instance.
     /// </returns>
-    IModalComponentBuilder WithId(int? id);
+    IModalComponentBuilder WithId(int id);
 }

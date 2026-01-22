@@ -42,7 +42,10 @@ public abstract class ModalComponentInfo
     /// <summary>
     ///     Gets the optional identifier for component.
     /// </summary>
-    public int? Id { get; }
+    /// <remarks>
+    ///     Sending components with an id of 0 is allowed but will be treated as empty and replaced by the API.
+    /// </remarks>
+    public int Id { get; }
 
     /// <summary>
     ///     Gets a collection of the attributes of this command.

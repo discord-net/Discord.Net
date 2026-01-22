@@ -1219,7 +1219,7 @@ namespace Discord.Interactions
         {
             var type = typeof(T);
 
-            if (_modalInfos.ContainsKey(type))
+            if (ModalUtils.Contains(type))
                 throw new InvalidOperationException($"Modal type {type.FullName} already exists.");
 
             return ModalUtils.GetOrAdd(type, this);

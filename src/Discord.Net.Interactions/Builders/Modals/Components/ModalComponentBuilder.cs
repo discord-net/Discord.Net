@@ -27,7 +27,7 @@ public abstract class ModalComponentBuilder<TInfo, TBuilder> : IModalComponentBu
     public object DefaultValue { get; set; }
 
     /// <inheritdoc/>
-    public int? Id { get; set; }
+    public int Id { get; set; }
 
     /// <inheritdoc/>
     public IReadOnlyCollection<Attribute> Attributes => _attributes;
@@ -97,7 +97,7 @@ public abstract class ModalComponentBuilder<TInfo, TBuilder> : IModalComponentBu
     /// <returns>
     ///     The builder instance.
     /// </returns>
-    public virtual TBuilder WithId(int? id)
+    public virtual TBuilder WithId(int id)
     {
         Id = id;
         return Instance;
@@ -115,5 +115,5 @@ public abstract class ModalComponentBuilder<TInfo, TBuilder> : IModalComponentBu
     IModalComponentBuilder IModalComponentBuilder.WithAttributes(params Attribute[] attributes) => WithAttributes(attributes);
 
     /// <inheritdoc/>
-    IModalComponentBuilder IModalComponentBuilder.WithId(int? id) => WithId(id);
+    IModalComponentBuilder IModalComponentBuilder.WithId(int id) => WithId(id);
 }

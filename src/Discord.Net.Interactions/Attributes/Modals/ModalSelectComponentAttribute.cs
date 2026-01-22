@@ -20,7 +20,7 @@ public abstract class ModalSelectComponentAttribute : ModalInputAttribute
     /// </summary>
     public string Placeholder { get; set; }
 
-    internal ModalSelectComponentAttribute(string customId, int minValues = 1, int maxValues = 1, int? id = null)
+    internal ModalSelectComponentAttribute(string customId, int minValues = 1, int maxValues = 1, int id = 0)
         : base(customId, id)
     {
         MinValues = minValues;

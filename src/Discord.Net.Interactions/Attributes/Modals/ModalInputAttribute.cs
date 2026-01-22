@@ -18,7 +18,7 @@ namespace Discord.Interactions
         /// </summary>
         /// <param name="customId">The custom id of the input.</param>
         /// <param name="id">Optional identifier for component.</param>
-        internal ModalInputAttribute(string customId, int? id) : base(id)
+        internal ModalInputAttribute(string customId, int id) : base(id)
         {
             CustomId = customId;
         }

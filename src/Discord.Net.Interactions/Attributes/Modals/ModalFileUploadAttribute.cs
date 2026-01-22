@@ -25,7 +25,7 @@ public class ModalFileUploadAttribute : ModalInputAttribute
     /// <param name="minValues">Minimum number of files that can be uploaded.</param>
     /// <param name="maxValues">Maximum number of files that can be uploaded.</param>
     /// <param name="id">The optional identifier for the component.</param>
-    public ModalFileUploadAttribute(string customId, int minValues = 1, int maxValues = 1, int? id = null)
+    public ModalFileUploadAttribute(string customId, int minValues = 1, int maxValues = 1, int id = 0)
         : base(customId, id)
     {
         MinValues = minValues;

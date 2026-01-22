@@ -18,7 +18,7 @@ public class ModalTextDisplayAttribute : ModalComponentAttribute
     /// </summary>
     /// <param name="content">Content of the text display.</param>
     /// <param name="id">Optional identifier for component.</param>
-    public ModalTextDisplayAttribute(string content = null, int? id = null)
+    public ModalTextDisplayAttribute(string content = null, int id = 0)
         : base(id)
     {
         Content = content;

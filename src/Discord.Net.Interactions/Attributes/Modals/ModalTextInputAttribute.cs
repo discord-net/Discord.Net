@@ -43,7 +43,7 @@ namespace Discord.Interactions
         /// <param name="maxLength">The maximum length of the text input's content.</param>
         /// <param name="initValue">The initial value to be displayed by this input.</param>
         /// <param name="id">The optional identifier for the component.</param>
-        public ModalTextInputAttribute(string customId, TextInputStyle style = TextInputStyle.Short, string placeholder = null, int minLength = 1, int maxLength = 4000, string initValue = null, int? id = null)
+        public ModalTextInputAttribute(string customId, TextInputStyle style = TextInputStyle.Short, string placeholder = null, int minLength = 1, int maxLength = 4000, string initValue = null, int id = 0)
             : base(customId, id)
         {
             Style = style;
