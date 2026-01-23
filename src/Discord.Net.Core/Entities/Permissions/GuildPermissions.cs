@@ -126,6 +126,8 @@ namespace Discord
         public bool CreateEvents => Permissions.GetValue(RawValue, GuildPermission.CreateEvents);
         /// <summary> If <see langword="true"/>, a user can ping and unpin messages.</summary>
         public bool PinMessages => Permissions.GetValue(RawValue, GuildPermission.PinMessages);
+        /// <summary> If <see langword="true"/>, a user may bypass slowmode restrictions. </summary>
+        public bool BypassSlowmode => Permissions.GetValue(RawValue, GuildPermission.BypassSlowmode);
 
         /// <summary> Creates a new <see cref="GuildPermissions"/> with the provided packed value. </summary>
         public GuildPermissions(ulong rawValue) { RawValue = rawValue; }
@@ -185,7 +187,8 @@ namespace Discord
             bool? useExternalApps = null,
             bool? useExternalSounds = null,
             bool? createEvents = null,
-            bool? pinMessages = null)
+            bool? pinMessages = null,
+            bool? bypassSlowmode = null)
         {
             ulong value = initialValue;
 
@@ -241,6 +244,7 @@ namespace Discord
             Permissions.SetValue(ref value, useExternalSounds, GuildPermission.UseExternalSounds);
             Permissions.SetValue(ref value, createEvents, GuildPermission.CreateEvents);
             Permissions.SetValue(ref value, pinMessages, GuildPermission.PinMessages);
+            Permissions.SetValue(ref value, bypassSlowmode, GuildPermission.BypassSlowmode);
 
             RawValue = value;
         }
@@ -298,7 +302,8 @@ namespace Discord
             bool useExternalApps = false,
             bool useExternalSounds = false,
             bool createEvents = false,
-            bool pinMessages = false)
+            bool pinMessages = false,
+            bool bypassSlowmode = false)
             : this(0,
                 createInstantInvite: createInstantInvite,
                 manageRoles: manageRoles,
@@ -351,7 +356,8 @@ namespace Discord
                 useExternalApps: useExternalApps,
                 useExternalSounds: useExternalSounds,
                 createEvents: createEvents,
-                pinMessages: pinMessages)
+                pinMessages: pinMessages,
+                bypassSlowmode: bypassSlowmode)
         { }
 
         /// <summary> Creates a new <see cref="GuildPermissions"/> from this one, changing the provided non-null permissions. </summary>
@@ -407,14 +413,15 @@ namespace Discord
             bool? useExternalApps = null,
             bool? useExternalSounds = null,
             bool? createEvents = null,
-            bool? pinMessages = null)
+            bool? pinMessages = null,
+            bool? bypassSlowmode = null)
             => new GuildPermissions(RawValue, createInstantInvite, kickMembers, banMembers, administrator, manageChannels, manageGuild, addReactions,
                 viewAuditLog, viewGuildInsights, viewChannel, sendMessages, sendTTSMessages, manageMessages, embedLinks, attachFiles,
                 readMessageHistory, mentionEveryone, useExternalEmojis, connect, speak, muteMembers, deafenMembers, moveMembers,
                 useVoiceActivation, prioritySpeaker, stream, changeNickname, manageNicknames, manageRoles, manageWebhooks, manageEmojisAndStickers,
                 useApplicationCommands, requestToSpeak, manageEvents, manageThreads, createPublicThreads, createPrivateThreads, useExternalStickers, sendMessagesInThreads,
                 startEmbeddedActivities, moderateMembers, useSoundboard, viewMonetizationAnalytics, sendVoiceMessages, useClydeAI, createGuildExpressions, setVoiceChannelStatus,
-                sendPolls, useExternalApps, useExternalSounds, createEvents, pinMessages);
+                sendPolls, useExternalApps, useExternalSounds, createEvents, pinMessages, bypassSlowmode);
 
         /// <summary>
         ///     Returns a value that indicates if a specific <see cref="GuildPermission"/> is enabled
