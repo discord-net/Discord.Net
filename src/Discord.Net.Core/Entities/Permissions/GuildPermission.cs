@@ -307,5 +307,10 @@ namespace Discord
         ///     Allows pinning and unpinning messages.
         /// </summary>
         PinMessages = 1L << 51,
+
+        /// <summary>
+        ///     	Allows bypassing slowmode restrictions.
+        /// </summary>
+        BypassSlowmode = 1L << 52,
     }
 }
