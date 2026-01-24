@@ -48,6 +48,15 @@ internal static class MessageComponentExtension
             case FileUploadComponent fileUpload:
                 return new API.FileUploadComponent(fileUpload);
 
+            case RadioGroupComponent radioGroup:
+                return new API.RadioGroupComponent(radioGroup);
+
+            case CheckboxGroupComponent checkboxGroup:
+                return new API.CheckboxGroupComponent(checkboxGroup);
+
+            case CheckboxComponent checkbox:
+                return new API.CheckboxComponent(checkbox);
+
             case UnknownComponent unknown:
                 return new API.UnknownComponent { RawType = unknown.RawType, RawJson = unknown.RawJson, Id = unknown.Id ?? Optional<int>.Unspecified };
         }
@@ -197,6 +206,34 @@ internal static class MessageComponentExtension
                     parsed.MaxValues.ToNullable(),
                     parsed.MaxValues.ToNullable(),
                     parsed.IsRequired.GetValueOrDefault(false));
+            }
+
+            case ComponentType.RadioGroup:
+            {
+                var parsed = (API.RadioGroupComponent)component;
+                return new RadioGroupComponent(parsed.Id.ToNullable(),
+                    parsed.CustomId,
+                    parsed.Options.Select(x => new RadioGroupOption(x.Value, x.Label, x.Description.GetValueOrDefault(), x.IsDefault.GetValueOrDefault(false))).ToImmutableArray(),
+                    parsed.IsRequired.GetValueOrDefault());
+            }
+
+            case ComponentType.CheckboxGroup:
+            {
+                var parsed = (API.CheckboxGroupComponent)component;
+                return new CheckboxGroupComponent(parsed.Id.ToNullable(),
+                    parsed.CustomId,
+                    parsed.Options.Select(x => new CheckboxGroupOption(x.Value, x.Label, x.Description.GetValueOrDefault(), x.DefaultState.GetValueOrDefault(false))).ToImmutableArray(),
+                    parsed.MinValues.ToNullable(),
+                    parsed.MaxValues.ToNullable(),
+                    parsed.IsRequired.GetValueOrDefault());
+            }
+
+            case ComponentType.Checkbox:
+            {
+                var parsed = (API.CheckboxComponent)component;
+                return  new CheckboxComponent(parsed.Id.ToNullable(),
+                    parsed.CustomId,
+                    parsed.DefaultState.GetValueOrDefault(false));
             }
 
             default:
