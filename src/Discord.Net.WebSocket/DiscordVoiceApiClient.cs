@@ -19,7 +19,41 @@ namespace Discord.Audio
     {
         #region DiscordVoiceAPIClient
         public const int MaxBitrate = 128 * 1024;
-        public const string Mode = "aead_xchacha20_poly1305_rtpsize";
+
+        /// <summary>
+        ///     The currently selected encryption mode.
+        /// </summary>
+        public VoiceEncryptionMode EncryptionMode { get; private set; } = VoiceEncryptionMode.XChaCha20Poly1305;
+
+        /// <summary>
+        ///     Gets the mode string for the current encryption mode.
+        /// </summary>
+        public string Mode => SecretBox.GetModeString(EncryptionMode);
+
+        /// <summary>
+        ///     Selects the best encryption mode from the available modes.
+        ///     Prefers AES256-GCM when hardware acceleration is available.
+        /// </summary>
+        public void SelectEncryptionMode(string[] availableModes)
+        {
+            // Prefer AES256-GCM if hardware acceleration is available
+            if (SecretBox.IsAes256GcmAvailable() &&
+                Array.Exists(availableModes, m => m == "aead_aes256_gcm_rtpsize"))
+            {
+                EncryptionMode = VoiceEncryptionMode.Aes256Gcm;
+                return;
+            }
+
+            // Fall back to XChaCha20-Poly1305 (always available)
+            if (Array.Exists(availableModes, m => m == "aead_xchacha20_poly1305_rtpsize"))
+            {
+                EncryptionMode = VoiceEncryptionMode.XChaCha20Poly1305;
+                return;
+            }
+
+            throw new InvalidOperationException(
+                $"Discord does not support any compatible encryption modes. Available modes: {string.Join(", ", availableModes)}");
+        }
 
         public event Func<string, string, double, Task> SentRequest { add { _sentRequestEvent.Add(value); } remove { _sentRequestEvent.Remove(value); } }
         private readonly AsyncEvent<Func<string, string, double, Task>> _sentRequestEvent = new AsyncEvent<Func<string, string, double, Task>>();

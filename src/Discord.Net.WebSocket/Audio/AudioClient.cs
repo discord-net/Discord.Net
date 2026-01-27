@@ -63,6 +63,7 @@ namespace Discord.Audio
         public int UdpLatency { get; private set; }
         public ulong ChannelId { get; internal set; }
         internal byte[] SecretKey { get; private set; }
+        internal VoiceEncryptionMode EncryptionMode => ApiClient.EncryptionMode;
         internal bool IsFinished { get; private set; }
 
         private DiscordSocketClient Discord => Guild.Discord;
@@ -321,8 +322,9 @@ namespace Discord.Audio
 
                             _ssrc = data.SSRC;
 
-                            if (!data.Modes.Contains(DiscordVoiceAPIClient.Mode))
-                                throw new InvalidOperationException($"Discord does not support {DiscordVoiceAPIClient.Mode}. Available modes: {string.Join(", ", data.Modes)}");
+                            // Select the best encryption mode from available modes
+                            ApiClient.SelectEncryptionMode(data.Modes);
+                            await _audioLogger.DebugAsync($"Selected encryption mode: {ApiClient.Mode}").ConfigureAwait(false);
 
                             ApiClient.SetUdpEndpoint(data.Ip, data.Port);
                             await ApiClient.SendDiscoveryAsync(_ssrc).ConfigureAwait(false);

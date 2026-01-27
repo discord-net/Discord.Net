@@ -10,12 +10,11 @@ namespace Discord.Audio.Streams
     public class SodiumEncryptStream : AudioOutStream
     {
         private const int RtpHeaderSize = 12;
-        private const int NonceSize = 24;
 
         private readonly AudioClient _client;
         private readonly AudioStream _next;
         private readonly byte[] _rtpHeader;
-        private readonly byte[] _nonce;
+        private byte[] _nonce;
         private bool _hasHeader;
         private ushort _nextSeq;
         private uint _nextTimestamp;
@@ -26,7 +25,8 @@ namespace Discord.Audio.Streams
             _next = next;
             _client = (AudioClient)client;
             _rtpHeader = new byte[RtpHeaderSize];
-            _nonce = new byte[NonceSize];
+            // Nonce will be initialized on first write based on encryption mode
+            _nonce = null;
             _nonceCounter = 0;
         }
 
@@ -53,11 +53,19 @@ namespace Discord.Audio.Streams
             if (_client.SecretKey == null)
                 return;
 
+            var encryptionMode = _client.EncryptionMode;
+
+            // Initialize nonce buffer based on encryption mode (lazy initialization)
+            if (_nonce == null || _nonce.Length != SecretBox.GetNonceSize(encryptionMode))
+            {
+                _nonce = new byte[SecretBox.GetNonceSize(encryptionMode)];
+            }
+
             // The first bytes of the nonce are the counter in big-endian.
             byte[] counterBytes = BitConverter.GetBytes(_nonceCounter);
             if (BitConverter.IsLittleEndian)
                 Array.Reverse(counterBytes); // big-endian
-            Buffer.BlockCopy(counterBytes, offset, _nonce, 0, counterBytes.Length);
+            Buffer.BlockCopy(counterBytes, 0, _nonce, 0, counterBytes.Length);
             if (++_nonceCounter >= uint.MaxValue)
                 _nonceCounter = 0;
 
@@ -73,9 +81,10 @@ namespace Discord.Audio.Streams
                 payloadOffset,
                 _rtpHeader,
                 _nonce,
-                _client.SecretKey);
+                _client.SecretKey,
+                encryptionMode);
 
-            // Append nonce to encripted payload
+            // Append nonce counter to encrypted payload
             Buffer.BlockCopy(counterBytes, 0, buffer, payloadOffset + encryptedLength, counterBytes.Length);
             int packageLength = _rtpHeader.Length + encryptedLength + counterBytes.Length;
 

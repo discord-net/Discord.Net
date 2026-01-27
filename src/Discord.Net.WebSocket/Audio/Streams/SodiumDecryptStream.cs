@@ -11,13 +11,11 @@ namespace Discord.Audio.Streams
     {
         private const int RtpHeaderSize = 12;
         private const int ExtendedRtpHeaderSize = RtpHeaderSize + 4;
-        private const int NonceSize = 24;
-        private const int NonceCounterSize = 4;
 
         private readonly AudioClient _client;
         private readonly AudioStream _next;
         private readonly byte[] _rtpHeader;
-        private readonly byte[] _nonce;
+        private byte[] _nonce;
 
         public override bool CanRead => true;
         public override bool CanSeek => false;
@@ -28,7 +26,8 @@ namespace Discord.Audio.Streams
             _next = next;
             _client = (AudioClient)client;
             _rtpHeader = new byte[ExtendedRtpHeaderSize];
-            _nonce = new byte[NonceSize];
+            // Nonce will be initialized on first write based on encryption mode
+            _nonce = null;
         }
 
         public override Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancelToken)
@@ -38,9 +37,22 @@ namespace Discord.Audio.Streams
             if (_client.SecretKey == null)
                 return Task.CompletedTask;
 
+            var encryptionMode = _client.EncryptionMode;
+
+            // Initialize nonce buffer based on encryption mode (lazy initialization)
+            if (_nonce == null || _nonce.Length != SecretBox.GetNonceSize(encryptionMode))
+            {
+                _nonce = new byte[SecretBox.GetNonceSize(encryptionMode)];
+            }
+            else
+            {
+                // Clear the nonce buffer
+                Array.Clear(_nonce, 0, _nonce.Length);
+            }
+
             // Extract nonce counter from the end of the payload.
-            for (int i = 0; i < NonceCounterSize; i++)
-                _nonce[i] = buffer[offset + count - NonceCounterSize + i];
+            for (int i = 0; i < SecretBox.NonceCounterSize; i++)
+                _nonce[i] = buffer[offset + count - SecretBox.NonceCounterSize + i];
 
             // Extract RTP header
             bool hasExtendedHeader = (buffer[0] & 0x10) != 0;
@@ -49,7 +61,7 @@ namespace Discord.Audio.Streams
 
             // Decrypt payload
             int payloadOffset = offset + rtpHeaderSize;
-            int payloadLength = count - offset - rtpHeaderSize - NonceCounterSize;
+            int payloadLength = count - offset - rtpHeaderSize - SecretBox.NonceCounterSize;
             int decryptedLength = SecretBox.Decrypt(
                 buffer,
                 payloadOffset,
@@ -59,7 +71,8 @@ namespace Discord.Audio.Streams
                 _rtpHeader,
                 rtpHeaderSize,
                 _nonce,
-                _client.SecretKey);
+                _client.SecretKey,
+                encryptionMode);
 
             int packageLength = rtpHeaderSize + decryptedLength;
             return _next.WriteAsync(buffer, offset, packageLength, cancelToken);
