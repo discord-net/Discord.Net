@@ -16,7 +16,8 @@ namespace Discord.Interactions
         ///     Register a method as a Message Context Command.
         /// </summary>
         /// <param name="name">Name of the context command.</param>
-        public MessageCommandAttribute(string name) : base(name, ApplicationCommandType.Message) { }
+        /// <param name="runMode">Run mode this command gets executed with.</param>
+        public MessageCommandAttribute(string name, RunMode runMode = RunMode.Default) : base(name, ApplicationCommandType.Message, runMode) { }
 
         internal override void CheckMethodDefinition(MethodInfo methodInfo)
         {

@@ -16,7 +16,8 @@ namespace Discord.Interactions
         ///     Register a command as a User Context Command.
         /// </summary>
         /// <param name="name">Name of this User Context Command.</param>
-        public UserCommandAttribute(string name) : base(name, ApplicationCommandType.User) { }
+        /// <param name="runMode">Run mode this command gets executed with.</param>
+        public UserCommandAttribute(string name, RunMode runMode = RunMode.Default) : base(name, ApplicationCommandType.User, runMode) { }
 
         internal override void CheckMethodDefinition(MethodInfo methodInfo)
         {
