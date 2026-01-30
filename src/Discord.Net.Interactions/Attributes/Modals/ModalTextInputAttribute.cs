@@ -1,8 +1,11 @@
+using System;
+
 namespace Discord.Interactions
 {
     /// <summary>
     ///     Marks a <see cref="IModal"/> property as a text input.
     /// </summary>
+    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
     public sealed class ModalTextInputAttribute : ModalInputAttribute
     {
         /// <inheritdoc/>
