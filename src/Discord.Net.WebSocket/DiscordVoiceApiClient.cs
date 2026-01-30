@@ -126,6 +126,9 @@ namespace Discord.Audio
             payload.CopyTo(payloadArr.AsMemory()[1..]);
 
             await WebSocketClient.SendAsync(payloadArr, 0, payload.Length + 1, isText: false);
+
+            ArrayPool<byte>.Shared.Return(payloadArr);
+
             await _sentGatewayMessageEvent.InvokeAsync(opCode).ConfigureAwait(false);
         }
 
