@@ -141,6 +141,10 @@ namespace Discord.Audio
 
         private async ValueTask SetupLibDave()
         {
+            // ensure any previous sessions are gone
+            _dave?.Dispose();
+            _dave = null;
+
             var isAvailable = Dave.CheckAvailability();
             switch (Discord.LibDaveEnabled, isAvailable)
             {
@@ -151,7 +155,6 @@ namespace Discord.Audio
                     );
                     return;
                 case (not false, true):
-                    _dave?.Dispose();
                     _dave = new(this, _clientId);
                     await _audioLogger.DebugAsync("libdave enabled");
                     return;
