@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace Discord.Audio.Streams;
 
+/// <summary>
+///     Encrypts audio using <c>libdave</c>.
+/// </summary>
 public sealed class DaveEncryptStream : AudioOutStream
 {
     private readonly DaveEncryptor _encryptor;

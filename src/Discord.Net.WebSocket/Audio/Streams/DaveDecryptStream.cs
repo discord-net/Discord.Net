@@ -8,6 +8,10 @@ using System.Threading.Tasks;
 
 namespace Discord.Audio.Streams;
 
+/// <summary>
+///     Decrypts audio using <c>libdave</c>.
+/// </summary>
+
 public sealed class DaveDecryptStream : AudioOutStream
 {
     private readonly IAudioClient _client;

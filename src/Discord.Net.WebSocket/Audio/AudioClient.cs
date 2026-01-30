@@ -151,7 +151,7 @@ namespace Discord.Audio
                 case (null, false):
                     await _audioLogger.WarningAsync(
                         "libdave will be required for receiving and transmitting audio by March 1st, 2026, please" +
-                        " checkout the documentation for enabling libdave support: https://docs.discordnet.dev/guides/voice/libdave.html"
+                        " check out the documentation for enabling libdave support: https://docs.discordnet.dev/guides/voice/libdave.html"
                     );
                     return;
                 case (not false, true):
