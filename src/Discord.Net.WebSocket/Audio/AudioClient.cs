@@ -331,7 +331,7 @@ namespace Discord.Audio
             int? bitrate,
             int bufferMillis,
             int packetLoss
-        )
+            )
         {
             var outputStream = new OutputStream(ApiClient); //Ignores header
             var sodiumEncrypter = new SodiumEncryptStream(outputStream, this); //Passes header
@@ -420,7 +420,7 @@ namespace Discord.Audio
             if (_streams.TryRemove(userId, out StreamPair pair))
             {
                 await _streamDestroyedEvent.InvokeAsync(userId).ConfigureAwait(false);
-                pair.Reader.Dispose();
+                await pair.Reader.DisposeAsync();
             }
         }
 
@@ -429,7 +429,7 @@ namespace Discord.Audio
             foreach (var pair in _streams)
             {
                 await _streamDestroyedEvent.InvokeAsync(pair.Key).ConfigureAwait(false);
-                pair.Value.Reader.Dispose();
+                await pair.Value.Reader.DisposeAsync();
             }
 
             _ssrcMap.Clear();

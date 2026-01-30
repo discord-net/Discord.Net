@@ -18,7 +18,7 @@ global using unsafe MLSFailureCallback = delegate* unmanaged[Cdecl]<
     byte*,
     void*,
     void
->;
+    >;
 
 // typedef void (*DAVEPairwiseFingerprintCallback)(const uint8_t* fingerprint, size_t length);
 global using unsafe PairwiseFingerprintCallback = delegate* unmanaged[Cdecl]<
@@ -26,14 +26,13 @@ global using unsafe PairwiseFingerprintCallback = delegate* unmanaged[Cdecl]<
     nuint,
     void*,
     void
->;
+    >;
 
 // typedef void (*DAVEEncryptorProtocolVersionChangedCallback)(void);
 global using unsafe EncryptorProtocolVersionChangedCallback = delegate* unmanaged[Cdecl]<
     void*,
     void
->;
-
+    >;
 /*
  * typedef void (*DAVELogSinkCallback)(DAVELoggingSeverity severity,
  *                                     const char* file,
@@ -46,9 +45,9 @@ global using unsafe LogSinkCallback = delegate* unmanaged[Cdecl]<
     int,
     byte*,
     void
->;
-
+    >;
 using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.Marshalling;
 
 // ReSharper disable UseSymbolAlias
 
@@ -286,6 +285,19 @@ public readonly struct DecryptorStats
     ///     The number of failed decryptions due to invalid nonces
     /// </summary>
     public readonly ulong DecryptInvalidNonceCount;
+}
+
+/// <summary>
+///     Marshals to/from the stdbool.h type.
+/// </summary>
+[CustomMarshaller(typeof(bool), MarshalMode.Default, typeof(BoolMarshaller))]
+internal static class BoolMarshaller
+{
+    public static bool ConvertToManaged(byte unmanaged)
+        =>  unmanaged is not 0;
+
+    public static byte ConvertToUnmanaged(bool managed)
+        => managed ? (byte)1 : (byte)0;
 }
 
 /// <summary>
@@ -609,7 +621,7 @@ public static unsafe partial class libdave
     /// <param name="commitResultHandle">The commit result handle.</param>
     /// <returns><see langword="true"/> if the commit processing failed; otherwise <see langword="false"/>.</returns>
     [LibraryImport(LIBRARY_NAME, EntryPoint = "daveCommitResultIsFailed")]
-    [return: MarshalAs(UnmanagedType.Bool)]
+    [return: MarshalUsing(typeof(BoolMarshaller))]
     public static partial bool CommitResultIsFailed(
         CommitResultHandle commitResultHandle
     );
@@ -621,7 +633,7 @@ public static unsafe partial class libdave
     /// <param name="commitResultHandle">The commit result handle.</param>
     /// <returns><see langword="true"/> if the commit should be ignored; otherwise <see langword="false"/>.</returns>
     [LibraryImport(LIBRARY_NAME, EntryPoint = "daveCommitResultIsIgnored")]
-    [return: MarshalAs(UnmanagedType.Bool)]
+    [return: MarshalUsing(typeof(BoolMarshaller))]
     public static partial bool CommitResultIsIgnored(
         CommitResultHandle commitResultHandle
     );
@@ -783,7 +795,7 @@ public static unsafe partial class libdave
     [LibraryImport(LIBRARY_NAME, EntryPoint = "daveEncryptorSetPassthroughMode")]
     public static partial void EncryptorSetPassthroughMode(
         EncryptorHandle encryptor,
-        [MarshalAs(UnmanagedType.Bool)] bool passthroughMode
+        [MarshalUsing(typeof(BoolMarshaller))] bool passthroughMode
     );
 
     /*
@@ -846,7 +858,7 @@ public static unsafe partial class libdave
     /// <returns>
     ///     <see langword="true"/> if the encryptor has the given key ratchet; otherwise <see langword="false"/>.
     /// </returns>
-    [return: MarshalAs(UnmanagedType.Bool)]
+    [return: MarshalUsing(typeof(BoolMarshaller))]
     [LibraryImport(LIBRARY_NAME, EntryPoint = "daveEncryptorHasKeyRatchet")]
     public static partial bool EncryptorHasKeyRatchet(EncryptorHandle encryptor);
 
@@ -858,7 +870,7 @@ public static unsafe partial class libdave
     /// <returns>
     ///     <see langword="true"/> if the encryptor is in passthrough mode; otherwise <see langword="false"/>.
     /// </returns>
-    [return: MarshalAs(UnmanagedType.Bool)]
+    [return: MarshalUsing(typeof(BoolMarshaller))]
     [LibraryImport(LIBRARY_NAME, EntryPoint = "daveEncryptorIsPassthroughMode")]
     public static partial bool EncryptorIsPassthroughMode(EncryptorHandle encryptor);
 
@@ -991,7 +1003,7 @@ public static unsafe partial class libdave
     [LibraryImport(LIBRARY_NAME, EntryPoint = "daveDecryptorTransitionToPassthroughMode")]
     public static partial void DecryptorTransitionToPassthroughMode(
         DecryptorHandle decryptor,
-        [MarshalAs(UnmanagedType.Bool)] bool passthroughMode
+        [MarshalUsing(typeof(BoolMarshaller))] bool passthroughMode
     );
 
     /*

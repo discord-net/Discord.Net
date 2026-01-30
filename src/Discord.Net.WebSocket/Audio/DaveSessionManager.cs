@@ -161,12 +161,19 @@ internal sealed class DaveSessionManager : IDisposable
 
         if (commit.IsIgnored)
         {
-            _preparedTransitions.TryRemove(transitionId, out _);
+            var wasRemoved = _preparedTransitions.TryRemove(transitionId, out _);
+            await _logger.DebugAsync(
+                $"Commit result ignored, transaction id: {transitionId}, was prepared and removed? {wasRemoved}"
+            );
             return;
         }
 
         if (commit.IsFailed)
         {
+            await _logger.DebugAsync(
+                $"Commit result failed, transaction id: {transitionId}, getting new key package..."
+            );
+
             await SendMLSInvalidCommitWelcomeAsync(transitionId);
             using var keyPackage = _session.GetMarshalledKeyPackage();
             await SendMLSKeyPackageAsync(keyPackage.ToMemory());
@@ -175,6 +182,9 @@ internal sealed class DaveSessionManager : IDisposable
         }
         else
         {
+            await _logger.DebugAsync(
+                $"Commit result succeeded, preparing protocol transition for id {transitionId}..."
+            );
             await PrepareProtocolTransitionAsync(transitionId, _session.ProtocolVersion);
         }
     }
@@ -182,7 +192,7 @@ internal sealed class DaveSessionManager : IDisposable
     public async Task PrepareProtocolTransitionAsync(ushort transitionId, ushort protocolVersion)
     {
         await _logger.DebugAsync(
-            $"Preparing to transition to protocol version {protocolVersion} (tranisition #{transitionId})"
+            $"Preparing to transition to protocol version {protocolVersion} (transition #{transitionId})"
         );
 
         foreach (var (id, decryptor) in _decryptors)
@@ -198,7 +208,7 @@ internal sealed class DaveSessionManager : IDisposable
 
             Encryptor.IsInPassthroughMode = protocolVersion is Dave.DisabledProtocolVersion || ratchet.IsNull;
 
-            if(protocolVersion is not Dave.DisabledProtocolVersion && !ratchet.IsNull)
+            if (protocolVersion is not Dave.DisabledProtocolVersion && !ratchet.IsNull)
                 Encryptor.Ratchet = ratchet;
         }
         else
