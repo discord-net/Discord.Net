@@ -468,7 +468,7 @@ namespace Discord.Audio
                             throw new InvalidOperationException($"Discord selected an unexpected mode: {data.Mode}");
 
                         SecretKey = data.SecretKey;
-                        //await SetSpeakingAsync(false);
+                        await SetSpeakingAsync(false);
 
                         _keepaliveTask = RunKeepaliveAsync(_connection.CancelToken);
 
