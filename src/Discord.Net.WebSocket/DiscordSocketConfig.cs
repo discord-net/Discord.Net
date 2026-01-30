@@ -214,7 +214,7 @@ namespace Discord.WebSocket
         ///     is used for voice encryption.
         /// </summary>
         /// <remarks>
-        ///     This requires you to have a build of <c>libdave</c> in your apps' executing directory.
+        ///     This requires you to have a build of <c>libdave</c> in your apps executing directory.
         /// </remarks>
         public bool? EnableVoiceDaveEncryption { get; set; } = null;
 
