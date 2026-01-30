@@ -184,6 +184,30 @@ namespace Discord.Interactions.Builders
             return this;
         }
 
+        public ModalBuilder AddCheckboxComponent(Action<CheckboxComponentBuilder> configure)
+        {
+            var builder = new CheckboxComponentBuilder(this);
+            configure(builder);
+            _components.Add(builder);
+            return this;
+        }
+
+        public ModalBuilder AddCheckboxGroupComponent(Action<CheckboxGroupComponentBuilder> configure)
+        {
+            var builder = new CheckboxGroupComponentBuilder(this);
+            configure(builder);
+            _components.Add(builder);
+            return this;
+        }
+
+        public ModalBuilder AddRadioGroupComponent(Action<RadioGroupComponentBuilder> configure)
+        {
+            var builder = new RadioGroupComponentBuilder(this);
+            configure(builder);
+            _components.Add(builder);
+            return this;
+        }
+
         internal ModalInfo Build() => new(this);
     }
 }
