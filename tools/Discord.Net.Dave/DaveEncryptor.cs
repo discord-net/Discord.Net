@@ -1,4 +1,5 @@
 ﻿using Discord.LibDave.Binding;
+using System.Buffers;
 using System.Runtime.InteropServices;
 
 namespace Discord.LibDave;
@@ -119,21 +120,23 @@ public sealed class DaveEncryptor(EncryptorHandle handle) : INativeHandle
     /// <param name="mediaType">The media type of the frame.</param>
     /// <param name="ssrc">The SSRC of the frame.</param>
     /// <param name="encrypted">The encrypted frame.</param>
+    /// <param name="encryptedLength">The length of the encrypted frame.</param>
     /// <returns>The result of encrypting.</returns>
     public unsafe EncryptorResultCode Encrypt(
         ReadOnlyMemory<byte> frame,
         MediaType mediaType,
         uint ssrc,
-        out ManuallyAllocatedHeapSpan<byte> encrypted
+        out IMemoryOwner<byte> encrypted,
+        out int encryptedLength
     )
     {
         lock (_lock)
         {
             this.ThrowIfNotAlive();
 
-            var outLength = GetMaxCiphertextByteSize(mediaType, frame.Length);
+            encryptedLength = GetMaxCiphertextByteSize(mediaType, frame.Length);
 
-            var encryptedFramePtr = (byte*)NativeMemory.Alloc((nuint)outLength);
+            encrypted = MemoryPool<byte>.Shared.Rent(encryptedLength);
 
             try
             {
@@ -141,6 +144,7 @@ public sealed class DaveEncryptor(EncryptorHandle handle) : INativeHandle
                 EncryptorResultCode result;
 
                 fixed (byte* framePtr = frame.Span)
+                fixed (byte* encryptedFramePtr = encrypted.Memory.Span)
                 {
                     result = libdave.EncryptorEncrypt(
                         UnderlyingHandle,
@@ -149,17 +153,18 @@ public sealed class DaveEncryptor(EncryptorHandle handle) : INativeHandle
                         framePtr,
                         frame.Length,
                         encryptedFramePtr,
-                        outLength,
+                        encryptedLength,
                         &bytesWritten
                     );
                 }
 
-                encrypted = new(encryptedFramePtr, (int)bytesWritten);
                 return result;
             }
             catch
             {
-                NativeMemory.Free(encryptedFramePtr);
+                encrypted.Dispose();
+                encrypted = null!;
+                encryptedLength = 0;
                 throw;
             }
         }

@@ -15,7 +15,7 @@ public sealed class DaveWelcomeResult(WelcomeResultHandle handle) : IRosterProvi
     private readonly Lock _lock = new();
 
     /// <inheritdoc/>
-    public unsafe ManuallyAllocatedHeapSpan<ulong> GetRosterMemberIds()
+    public unsafe DaveAllocatedSpan<ulong> GetRosterMemberIds()
     {
         lock (_lock)
         {
@@ -35,7 +35,7 @@ public sealed class DaveWelcomeResult(WelcomeResultHandle handle) : IRosterProvi
     }
 
     /// <inheritdoc/>
-    public unsafe ManuallyAllocatedHeapSpan<byte> GetRosterMemberSignature(ulong userId)
+    public unsafe DaveAllocatedSpan<byte> GetRosterMemberSignature(ulong userId)
     {
         lock (_lock)
         {

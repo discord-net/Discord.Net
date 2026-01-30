@@ -169,7 +169,7 @@ internal sealed class DaveSessionManager : IDisposable
         {
             await SendMLSInvalidCommitWelcomeAsync(transitionId);
             using var keyPackage = _session.GetMarshalledKeyPackage();
-            await SendMLSKeyPackageAsync(keyPackage);
+            await SendMLSKeyPackageAsync(keyPackage.ToMemory());
 
             await HandleDaveProtocolInitAsync(transitionId);
         }
@@ -196,7 +196,7 @@ internal sealed class DaveSessionManager : IDisposable
         {
             var ratchet = _session.GetKeyRatchet(SelfUserId);
 
-            Encryptor.SetPassthroughMode(passthroughMode: protocolVersion is Dave.DisabledProtocolVersion || ratchet.IsNull);
+            Encryptor.IsInPassthroughMode = protocolVersion is Dave.DisabledProtocolVersion || ratchet.IsNull;
 
             if(protocolVersion is not Dave.DisabledProtocolVersion && !ratchet.IsNull)
                 Encryptor.Ratchet = ratchet;
@@ -216,7 +216,7 @@ internal sealed class DaveSessionManager : IDisposable
         {
             await HandlePrepareEpochAsync(Dave.MLSNewGroupExpectedEpoch, protocolVersion);
             using var keyPackage = _session.GetMarshalledKeyPackage();
-            await SendMLSKeyPackageAsync(keyPackage);
+            await SendMLSKeyPackageAsync(keyPackage.ToMemory());
         }
         else
         {
@@ -255,7 +255,7 @@ internal sealed class DaveSessionManager : IDisposable
         if (protocolVersion is Dave.DisabledProtocolVersion)
         {
             _session.Reset();
-            Encryptor.SetPassthroughMode(true);
+            Encryptor.IsInPassthroughMode = true;
         }
     }
 
@@ -271,10 +271,10 @@ internal sealed class DaveSessionManager : IDisposable
             new DaveMLSTransitionParams() { TransitionId = transitionId }
         );
 
-    private Task SendMLSKeyPackageAsync(ManuallyAllocatedHeapSpan<byte> mlsKeyPackage)
+    private Task SendMLSKeyPackageAsync(ReadOnlyMemory<byte> mlsKeyPackage)
         => _client.ApiClient.SendBinaryAsync(
             VoiceOpCode.DaveMLSKeyPackage,
-            mlsKeyPackage.ToArray()
+            mlsKeyPackage
         );
 
     private Task SendDaveProtocolReadyForTransitionAsync(ushort transitionId)

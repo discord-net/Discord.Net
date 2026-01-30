@@ -310,6 +310,22 @@ public static unsafe partial class libdave
     [LibraryImport(LIBRARY_NAME, EntryPoint = "daveMaxSupportedProtocolVersion")]
     public static partial ushort MaxSupportedProtocolVersion();
 
+    /// <summary>
+    ///     Frees memory allocated by the DAVE library
+    /// </summary>
+    /// <remarks>
+    ///     This function should be used to free output byte arrays from functions like
+    ///     <see cref="SessionGetLastEpochAuthenticator"/>, <see cref="SessionGetMarshalledKeyPackage"/>,
+    ///     <see cref="CommitResultGetRosterMemberIds"/>, etc. Do NOT use this to destroy handles; use the corresponding
+    ///     *Destroy functions instead.
+    /// </remarks>
+    /// <param name="ptr">
+    ///     Pointer to memory previously allocated by a DAVE API function; If <see langword="null"/>, this function does
+    ///     nothing.
+    /// </param>
+    [LibraryImport(LIBRARY_NAME, EntryPoint = "daveFree")]
+    public static partial void Free(void* ptr);
+
     /* DAVESessionHandle daveSessionCreate(
      *     void* context,
      *     const char* authSessionId,

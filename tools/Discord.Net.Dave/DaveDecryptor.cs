@@ -1,5 +1,6 @@
 ﻿using Discord.LibDave.Binding;
 using System;
+using System.Buffers;
 using System.Runtime.InteropServices;
 
 namespace Discord.LibDave;
@@ -86,19 +87,21 @@ public sealed class DaveDecryptor(DecryptorHandle handle) : IDisposable, INative
     /// <param name="encryptedFrame">The encrypted frame to decrypt.</param>
     /// <param name="mediaType">The type of media within the provided encrypted frame.</param>
     /// <param name="frame">The unencrypted frame.</param>
+    /// <param name="frameSize">The length of the unencrypted frame.</param>
     /// <returns>The result of decrypting.</returns>
     public unsafe DecryptorResultCode Decrypt(
         ReadOnlyMemory<byte> encryptedFrame,
         MediaType mediaType,
-        out ManuallyAllocatedHeapSpan<byte> frame
+        out IMemoryOwner<byte> frame,
+        out int frameSize
     )
     {
         lock (_lock)
         {
             this.ThrowIfNotAlive();
 
-            var plaintextSize = GetMaxPlaintextByteSize(mediaType, encryptedFrame.Length);
-            var framePtr = (byte*)NativeMemory.Alloc((nuint)plaintextSize);
+            frameSize = GetMaxPlaintextByteSize(mediaType, encryptedFrame.Length);
+            frame = MemoryPool<byte>.Shared.Rent(frameSize);
 
             try
             {
@@ -106,6 +109,7 @@ public sealed class DaveDecryptor(DecryptorHandle handle) : IDisposable, INative
                 DecryptorResultCode resultCode;
 
                 fixed (byte* encryptedFramePtr = encryptedFrame.Span)
+                fixed (byte* framePtr = frame.Memory.Span)
                 {
                     resultCode = libdave.DecryptorDecrypt(
                         UnderlyingHandle,
@@ -113,17 +117,18 @@ public sealed class DaveDecryptor(DecryptorHandle handle) : IDisposable, INative
                         encryptedFramePtr,
                         encryptedFrame.Length,
                         framePtr,
-                        plaintextSize,
+                        frameSize,
                         &bytesWritten
                     );
                 }
 
-                frame = new(framePtr, (int)bytesWritten);
                 return resultCode;
             }
             catch
             {
-                NativeMemory.Free(framePtr);
+                frame.Dispose();
+                frame = null!;
+                frameSize = 0;
                 throw;
             }
         }

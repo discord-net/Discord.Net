@@ -36,7 +36,8 @@ public sealed class DaveEncryptStream : AudioOutStream
             new ReadOnlyMemory<byte>(buffer, offset, count),
             MediaType.Audio,
             _ssrc,
-            out var encrypted
+            out var encrypted,
+            out var encryptedLength
         );
 
         if (result is not EncryptorResultCode.Success)
@@ -49,7 +50,7 @@ public sealed class DaveEncryptStream : AudioOutStream
         try
         {
             await _next.WriteAsync(
-                encrypted.ToMemory(),
+                encrypted.Memory[..encryptedLength],
                 cancellationToken
             );
         }

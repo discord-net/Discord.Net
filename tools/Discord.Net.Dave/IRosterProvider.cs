@@ -10,11 +10,11 @@ public interface IRosterProvider : IDisposable
     /// </summary>
     /// <param name="userId">The snowflake identifier of the user whose signature to get.</param>
     /// <returns>The signature of the given user.</returns>
-    ManuallyAllocatedHeapSpan<byte> GetRosterMemberSignature(ulong userId);
+    DaveAllocatedSpan<byte> GetRosterMemberSignature(ulong userId);
 
     /// <summary>
     ///     Gets the user ids within this roster.
     /// </summary>
     /// <returns>The snowflake identifiers of the users within this roster.</returns>
-    ManuallyAllocatedHeapSpan<ulong> GetRosterMemberIds();
+    DaveAllocatedSpan<ulong> GetRosterMemberIds();
 }

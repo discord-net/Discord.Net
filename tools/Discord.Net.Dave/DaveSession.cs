@@ -101,7 +101,7 @@ public sealed class DaveSession(SessionHandle handle) : INativeHandle
     ///     Gets the last epoch authenticator of this session.
     /// </summary>
     /// <returns>The last epoch authenticator.</returns>
-    public unsafe ManuallyAllocatedHeapSpan<byte> GetLastEpochAuthenticator()
+    public unsafe DaveAllocatedSpan<byte> GetLastEpochAuthenticator()
     {
         lock (_lock)
         {
@@ -116,7 +116,7 @@ public sealed class DaveSession(SessionHandle handle) : INativeHandle
                 &length
             );
 
-            return new ManuallyAllocatedHeapSpan<byte>(authenticator, (int)length);
+            return new DaveAllocatedSpan<byte>(authenticator, (int)length);
         }
     }
 
@@ -149,7 +149,7 @@ public sealed class DaveSession(SessionHandle handle) : INativeHandle
     /// <param name="proposals">The proposals to process.</param>
     /// <param name="recognizedUserIds">The snowflake identifiers of any recognized users.</param>
     /// <returns>The result of the proposal.</returns>
-    public unsafe ManuallyAllocatedHeapSpan<byte> ProcessProposals(
+    public unsafe DaveAllocatedSpan<byte> ProcessProposals(
         ReadOnlyMemory<byte> proposals,
         ICollection<ulong> recognizedUserIds
     )
@@ -241,7 +241,7 @@ public sealed class DaveSession(SessionHandle handle) : INativeHandle
     ///     Gets the sessions marshalled key package.
     /// </summary>
     /// <returns>The marshalled key package.</returns>
-    public unsafe ManuallyAllocatedHeapSpan<byte> GetMarshalledKeyPackage()
+    public unsafe DaveAllocatedSpan<byte> GetMarshalledKeyPackage()
     {
         lock (_lock)
         {
@@ -292,7 +292,7 @@ public sealed class DaveSession(SessionHandle handle) : INativeHandle
     ///     A task representing the asynchronous operation of getting a users pairwise fingerprint. The result of
     ///     the task is the fingerprint.
     /// </returns>
-    public async Task<ManuallyAllocatedHeapSpan<byte>> GetPairwiseFingerprintAsync(
+    public async Task<ReadOnlyMemory<byte>> GetPairwiseFingerprintAsync(
         ulong userId,
         ushort? protocolVersion = null,
         CancellationToken token = default
@@ -306,7 +306,7 @@ public sealed class DaveSession(SessionHandle handle) : INativeHandle
 
             protocolVersion ??= ProtocolVersion;
 
-            var tcs = new TaskCompletionSource<ManuallyAllocatedHeapSpan<byte>>();
+            var tcs = new TaskCompletionSource<ReadOnlyMemory<byte>>();
             token.Register(() => tcs.SetCanceled(token));
 
             Delegate callback;
@@ -334,7 +334,7 @@ public sealed class DaveSession(SessionHandle handle) : INativeHandle
             return result;
 
             unsafe void Callback(byte* ptr, nint length)
-                => tcs.TrySetResult(new(ptr, (int)length));
+                => tcs.TrySetResult(new Span<byte>(ptr, (int)length).ToArray());
         }
         finally
         {

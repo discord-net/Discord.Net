@@ -27,7 +27,7 @@ public sealed class DaveCommitResult(CommitResultHandle handle) : IRosterProvide
     private readonly Lock _lock = new();
 
     /// <inheritdoc/>
-    public unsafe ManuallyAllocatedHeapSpan<ulong> GetRosterMemberIds()
+    public unsafe DaveAllocatedSpan<ulong> GetRosterMemberIds()
     {
         lock (_lock)
         {
@@ -47,7 +47,7 @@ public sealed class DaveCommitResult(CommitResultHandle handle) : IRosterProvide
     }
 
     /// <inheritdoc/>
-    public unsafe ManuallyAllocatedHeapSpan<byte> GetRosterMemberSignature(ulong userId)
+    public unsafe DaveAllocatedSpan<byte> GetRosterMemberSignature(ulong userId)
     {
         lock (_lock)
         {

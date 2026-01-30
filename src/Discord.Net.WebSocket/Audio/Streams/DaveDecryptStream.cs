@@ -50,7 +50,8 @@ public sealed class DaveDecryptStream : AudioOutStream
         var result = _decryptor.Decrypt(
             new ReadOnlyMemory<byte>(buffer, offset, count),
             MediaType.Audio,
-            out var decryptedBuffer
+            out var decryptedBuffer,
+            out var decryptedLength
         );
 
         if (result is not DecryptorResultCode.Success)
@@ -68,7 +69,7 @@ public sealed class DaveDecryptStream : AudioOutStream
 
         try
         {
-            await _next.WriteAsync(decryptedBuffer.ToMemory(), cancellationToken);
+            await _next.WriteAsync(decryptedBuffer.Memory[..decryptedLength], cancellationToken);
         }
         finally
         {
