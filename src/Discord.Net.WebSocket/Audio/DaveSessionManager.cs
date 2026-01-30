@@ -40,11 +40,14 @@ internal sealed class DaveSessionManager : IDisposable
 
         _session.OnMLSFailure += (source, reason) =>
         {
-            // I don't like this :/
-            _ = Task.Run(async () =>
+            try
             {
-                await _logger.DebugAsync($"MLS Failure: {source} -> {reason}");
-            });
+                _logger.DebugAsync($"MLS Failure: {source} -> {reason}").GetAwaiter().GetResult();
+            }
+            catch
+            {
+                // ignored
+            }
         };
     }
 
