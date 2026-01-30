@@ -925,7 +925,7 @@ namespace Discord.Interactions
                 matchContainer.SetSegmentMatches(Array.Empty<RouteSegmentMatch>());
         }
 
-        internal TypeConverter GetTypeConverter(Type type, IServiceProvider services = null)
+        public TypeConverter GetTypeConverter(Type type, IServiceProvider services = null)
             => _typeConverterMap.Get(type, services);
 
         /// <summary>
@@ -961,7 +961,7 @@ namespace Discord.Interactions
         public void AddGenericTypeConverter(Type targetType, Type converterType) =>
             _typeConverterMap.AddGeneric(targetType, converterType);
 
-        internal ComponentTypeConverter GetComponentTypeConverter(Type type, IServiceProvider services = null) =>
+        public ComponentTypeConverter GetComponentTypeConverter(Type type, IServiceProvider services = null) =>
             _compTypeConverterMap.Get(type, services);
 
         /// <summary>
@@ -996,7 +996,7 @@ namespace Discord.Interactions
         public void AddGenericComponentTypeConverter(Type targetType, Type converterType) =>
             _compTypeConverterMap.AddGeneric(targetType, converterType);
 
-        internal TypeReader GetTypeReader(Type type, IServiceProvider services = null) =>
+        public TypeReader GetTypeReader(Type type, IServiceProvider services = null) =>
             _typeReaderMap.Get(type, services);
 
         /// <summary>
@@ -1079,7 +1079,7 @@ namespace Discord.Interactions
         public bool TryRemoveGenericTypeReader(Type type, out Type readerType)
             => _typeReaderMap.TryRemoveGeneric(type, out readerType);
 
-        internal ModalComponentTypeConverter GetModalInputTypeConverter(Type type, IServiceProvider services = null) =>
+        public ModalComponentTypeConverter GetModalComponentTypeConverter(Type type, IServiceProvider services = null) =>
             _modalInputTypeConverterMap.Get(type, services);
 
         /// <summary>
