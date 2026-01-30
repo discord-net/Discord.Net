@@ -122,6 +122,8 @@ public sealed class DaveDecryptor(DecryptorHandle handle) : IDisposable, INative
                     );
                 }
 
+                frameSize = (int)bytesWritten;
+
                 return resultCode;
             }
             catch

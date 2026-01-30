@@ -30,7 +30,7 @@ public unsafe struct DaveAllocatedSpan<T>(
     {
         get
         {
-            if (index >= length || index < 0) throw new IndexOutOfRangeException();
+            if (index >= Length || index < 0) throw new IndexOutOfRangeException();
 
             return ref Unsafe.AsRef<T>(Unsafe.Add<T>(ptr, index));
         }

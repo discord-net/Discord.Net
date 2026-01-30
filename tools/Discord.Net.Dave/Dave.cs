@@ -46,6 +46,25 @@ public static class Dave
     private static Delegate? _logSink;
 
     /// <summary>
+    ///     Checks if <see cref="libdave"/> is available in the host environment.
+    /// </summary>
+    /// <returns>
+    ///     <see langword="true"/> if <see cref="libdave"/> is available to use; otherwise <see langword="false"/>.
+    /// </returns>
+    public static bool CheckAvailability()
+    {
+        try
+        {
+            libdave.MaxSupportedProtocolVersion();
+            return true;
+        }
+        catch (Exception x) when (x is EntryPointNotFoundException or DllNotFoundException)
+        {
+            return false;
+        }
+    }
+
+    /// <summary>
     ///     Sets the global log sink for the <see cref="libdave"/> binding.
     /// </summary>
     /// <param name="logSink">The delegate to handle logs.</param>
@@ -114,8 +133,8 @@ public static class Dave
         {
             if (session is null) return;
 
-            var source = Marshal.PtrToStringAuto((IntPtr)sourcePtr);
-            var reason = Marshal.PtrToStringAuto((IntPtr)reasonPtr);
+            var source = Marshal.PtrToStringAnsi((IntPtr)sourcePtr);
+            var reason = Marshal.PtrToStringAnsi((IntPtr)reasonPtr);
 
             session.HandleMLSFailure(source, reason);
         }

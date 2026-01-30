@@ -1,5 +1,6 @@
 using Discord.API.Voice;
 using Discord.Audio.Streams;
+using Discord.LibDave;
 using Discord.Logging;
 using Discord.Net.Converters;
 using Discord.WebSocket;
@@ -68,11 +69,13 @@ namespace Discord.Audio
         internal DiscordSocketClient Discord => Guild.Discord;
         public ConnectionState ConnectionState => _connection.State;
 
-        private readonly DaveSessionManager _dave;
+        private DaveSessionManager _dave;
+        private readonly int _clientId;
 
         /// <summary> Creates a new REST/WebSocket discord client. </summary>
         internal AudioClient(SocketGuild guild, int clientId, ulong channelId)
         {
+            _clientId = clientId;
             Guild = guild;
             ChannelId = channelId;
             _audioLogger = Discord.LogManager.CreateLogger($"Audio #{clientId}");
@@ -109,8 +112,15 @@ namespace Discord.Audio
             UdpLatencyUpdated += async (old, val) =>
                 await _audioLogger.DebugAsync($"UDP Latency = {val} ms").ConfigureAwait(false);
 
-            if (Discord.LibDaveEnabled)
-                _dave = new(this, clientId);
+            _dave = null;
+
+            // if (Discord.LibDaveEnabled is null)
+            // {
+            //     if()
+            // }
+
+            // if (Discord.LibDaveEnabled)
+            //     _dave = new(this, clientId);
         }
 
         private Task ProcessBinaryEvent(ReadOnlyMemory<byte> payload)
@@ -139,9 +149,43 @@ namespace Discord.Audio
             return _connection.StopAsync();
         }
 
+        private async ValueTask SetupLibDave()
+        {
+            var isAvailable = Dave.CheckAvailability();
+            switch (Discord.LibDaveEnabled, isAvailable)
+            {
+                case (null, false):
+                    await _audioLogger.WarningAsync(
+                        "libdave will be required for receiving and transmitting audio by March 1st, 2026, please" +
+                        " checkout the documentation for enabling libdave support: https://docs.discordnet.dev/guides/voice/libdave.html"
+                    );
+                    return;
+                case (not false, true):
+                    _dave?.Dispose();
+                    _dave = new(this, _clientId);
+                    await _audioLogger.DebugAsync("libdave enabled");
+                    return;
+                case (false, _):
+                    await _audioLogger.DebugAsync("libdave disabled");
+                    return;
+                case (true, false):
+                    await _audioLogger.ErrorAsync(
+                        "libdave couldn't be found in your environment, please ensure you've setup the library " +
+                        "correctly; refer to the documentation for help: https://docs.discordnet.dev/guides/voice/libdave.html"
+                    );
+                    throw new DllNotFoundException(
+                        "libdave couldn't be found in your environment, please ensure you've setup the library " +
+                        "correctly; refer to the documentation for help: https://docs.discordnet.dev/guides/voice/libdave.html"
+                    );
+            }
+        }
+
         private async Task OnConnectingAsync()
         {
             await _audioLogger.DebugAsync($"Connecting ApiClient. Voice server: wss://{_url}").ConfigureAwait(false);
+
+            await SetupLibDave();
+
             await ApiClient.ConnectAsync($"wss://{_url}?v={DiscordConfig.VoiceAPIVersion}").ConfigureAwait(false);
             await _audioLogger.DebugAsync($"Listening on port {ApiClient.UdpPort}").ConfigureAwait(false);
 
@@ -282,8 +326,12 @@ namespace Discord.Audio
             return AddDaveEncryptStream(rtp);
         }
 
-        public AudioOutStream CreatePCMStream(AudioApplication application, int? bitrate, int bufferMillis,
-            int packetLoss)
+        public AudioOutStream CreatePCMStream(
+            AudioApplication application,
+            int? bitrate,
+            int bufferMillis,
+            int packetLoss
+        )
         {
             var outputStream = new OutputStream(ApiClient); //Ignores header
             var sodiumEncrypter = new SodiumEncryptStream(outputStream, this); //Passes header
@@ -296,7 +344,12 @@ namespace Discord.Audio
                 _audioLogger
             ); //Ignores header, generates header
 
-            return new OpusEncodeStream(bufferedStream, bitrate ?? (96 * 1024), application, packetLoss); //Generates header
+            return new OpusEncodeStream(
+                bufferedStream,
+                bitrate ?? (96 * 1024),
+                application,
+                packetLoss
+            ); //Generates header
         }
 
         public AudioOutStream CreateDirectPCMStream(AudioApplication application, int? bitrate, int packetLoss)
@@ -426,7 +479,7 @@ namespace Discord.Audio
 
                         _keepaliveTask = RunKeepaliveAsync(_connection.CancelToken);
 
-                        if(_dave is not null)
+                        if (_dave is not null)
                             await _dave.HandleDaveProtocolInitAsync(data.DaveProtocolVersion);
 
                         _ = _connection.CompleteAsync();

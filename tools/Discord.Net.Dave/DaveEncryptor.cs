@@ -158,6 +158,8 @@ public sealed class DaveEncryptor(EncryptorHandle handle) : INativeHandle
                     );
                 }
 
+                encryptedLength = (int)bytesWritten;
+
                 return result;
             }
             catch

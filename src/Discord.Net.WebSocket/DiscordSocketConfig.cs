@@ -216,7 +216,7 @@ namespace Discord.WebSocket
         /// <remarks>
         ///     This requires you to have a build of <c>libdave</c> in your apps' executing directory.
         /// </remarks>
-        public bool EnableVoiceDaveEncryption { get; set; } = false;
+        public bool? EnableVoiceDaveEncryption { get; set; } = null;
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="DiscordSocketConfig"/> class with the default configuration.

@@ -88,7 +88,7 @@ internal sealed class DaveSessionManager : IDisposable
         var opCode = (VoiceOpCode)span[2];
         var data = message[3..];
 
-        await _logger.DebugAsync($"-> [{opCode} : seq #{seq}] {data.Length} bytes");
+        await _logger.DebugAsync($"Received Binary {opCode} | {data.Length} bytes, sequence #{seq}");
 
         switch (opCode)
         {

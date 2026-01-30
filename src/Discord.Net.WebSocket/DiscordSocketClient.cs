@@ -85,7 +85,7 @@ namespace Discord.WebSocket
         internal bool SuppressUnknownDispatchWarnings { get; private set; }
         internal bool IncludeRawPayloadOnGatewayErrors { get; private set; }
         internal int AuditLogCacheSize { get; private set; }
-        internal bool LibDaveEnabled { get; private set; }
+        internal bool? LibDaveEnabled { get; private set; }
 
         internal new DiscordSocketApiClient ApiClient => base.ApiClient;
         /// <inheritdoc />
