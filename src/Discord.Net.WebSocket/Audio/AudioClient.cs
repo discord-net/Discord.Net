@@ -111,16 +111,6 @@ namespace Discord.Audio
                 await _audioLogger.DebugAsync($"Latency = {val} ms").ConfigureAwait(false);
             UdpLatencyUpdated += async (old, val) =>
                 await _audioLogger.DebugAsync($"UDP Latency = {val} ms").ConfigureAwait(false);
-
-            _dave = null;
-
-            // if (Discord.LibDaveEnabled is null)
-            // {
-            //     if()
-            // }
-
-            // if (Discord.LibDaveEnabled)
-            //     _dave = new(this, clientId);
         }
 
         private Task ProcessBinaryEvent(ReadOnlyMemory<byte> payload)
