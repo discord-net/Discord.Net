@@ -3,11 +3,13 @@ using Discord.Audio.Streams;
 using Discord.Logging;
 using Discord.Net.Converters;
 using Discord.WebSocket;
+using Discord.WebSocket.Diagnostics;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net.WebSockets;
 using System.Text;
@@ -57,6 +59,7 @@ namespace Discord.Audio
         private StopReason _stopReason;
         private bool _resuming;
 
+        public int ClientId { get; }
         public SocketGuild Guild { get; }
         public DiscordVoiceAPIClient ApiClient { get; private set; }
         public int Latency { get; private set; }
@@ -72,13 +75,24 @@ namespace Discord.Audio
         internal AudioClient(SocketGuild guild, int clientId, ulong channelId)
         {
             Guild = guild;
+            ClientId = clientId;
             ChannelId = channelId;
             _audioLogger = Discord.LogManager.CreateLogger($"Audio #{clientId}");
 
             ApiClient = new DiscordVoiceAPIClient(guild.Id, Discord.WebSocketProvider, Discord.UdpSocketProvider);
-            ApiClient.SentGatewayMessage += async opCode => await _audioLogger.DebugAsync($"Sent {opCode}").ConfigureAwait(false);
+            ApiClient.SentGatewayMessage += async opCode =>
+            {
+                AudioMeter.RecordSocketEventSent(opCode, this);
+                await _audioLogger.DebugAsync($"Sent {opCode}").ConfigureAwait(false);
+            };
             ApiClient.SentDiscovery += async () => await _audioLogger.DebugAsync("Sent Discovery").ConfigureAwait(false);
-            //ApiClient.SentData += async bytes => await _audioLogger.DebugAsync($"Sent {bytes} Bytes").ConfigureAwait(false);
+            ApiClient.SentData += bytes =>
+            {
+                //await _audioLogger.DebugAsync($"Sent {bytes} Bytes").ConfigureAwait(false);
+                AudioMeter.RecordBytesSent(bytes, this);
+                return Task.CompletedTask;
+            };
+
             ApiClient.ReceivedEvent += ProcessMessageAsync;
             ApiClient.ReceivedPacket += ProcessPacketAsync;
 
@@ -86,7 +100,12 @@ namespace Discord.Audio
             _connection = new ConnectionManager(_stateLock, _audioLogger, ConnectionTimeoutMs,
                 OnConnectingAsync, OnDisconnectingAsync, x => ApiClient.Disconnected += x);
             _connection.Connected += () => _connectedEvent.InvokeAsync();
-            _connection.Disconnected += (exception, _) => _disconnectedEvent.InvokeAsync(exception);
+            _connection.Disconnected += (exception, reconnect) =>
+            {
+                if (reconnect)
+                    AudioMeter.AddAudioReconnect(this);
+                return _disconnectedEvent.InvokeAsync(exception);
+            };
             _heartbeatTimes = new ConcurrentQueue<long>();
             _keepaliveTimes = new ConcurrentQueue<KeyValuePair<ulong, int>>();
             _ssrcMap = new SsrcMap();
@@ -99,8 +118,16 @@ namespace Discord.Audio
                 e.ErrorContext.Handled = true;
             };
 
-            LatencyUpdated += async (old, val) => await _audioLogger.DebugAsync($"Latency = {val} ms").ConfigureAwait(false);
-            UdpLatencyUpdated += async (old, val) => await _audioLogger.DebugAsync($"UDP Latency = {val} ms").ConfigureAwait(false);
+            LatencyUpdated += async (old, val) =>
+            {
+                AudioMeter.RecordSocketLatency((double)val / 1000, this);
+                await _audioLogger.DebugAsync($"Latency = {val} ms").ConfigureAwait(false);
+            };
+            UdpLatencyUpdated += async (old, val) =>
+            {
+                await _audioLogger.DebugAsync($"UDP Latency = {val} ms").ConfigureAwait(false);
+                AudioMeter.RecordUdpLatency((double)val / 1000, this);
+            };
         }
 
         internal Task StartAsync(string url, ulong userId, string sessionId, string token)
@@ -131,6 +158,7 @@ namespace Discord.Audio
             await _audioLogger.DebugAsync($"Connecting ApiClient. Voice server: wss://{_url}").ConfigureAwait(false);
             await ApiClient.ConnectAsync($"wss://{_url}?v={DiscordConfig.VoiceAPIVersion}").ConfigureAwait(false);
             await _audioLogger.DebugAsync($"Listening on port {ApiClient.UdpPort}").ConfigureAwait(false);
+            AudioMeter.AddAudioConnections(1, this);
 
             if (!_resuming)
             {
@@ -151,6 +179,7 @@ namespace Discord.Audio
         {
             await _audioLogger.DebugAsync("Disconnecting ApiClient").ConfigureAwait(false);
             await ApiClient.DisconnectAsync().ConfigureAwait(false);
+            AudioMeter.AddAudioConnections(-1, this);
 
             _ssrcMap.UserSpeakingChanged -= OnUserSpeakingChanged;
 
@@ -310,6 +339,9 @@ namespace Discord.Audio
         {
             _lastMessageTime = Environment.TickCount;
 
+            var activity = AudioActivity.StartEventReceivedActivity(opCode, this);
+            var watch = Stopwatch.StartNew();
+
             try
             {
                 switch (opCode)
@@ -397,7 +429,7 @@ namespace Discord.Audio
                             _heartbeatTask = RunHeartbeatAsync(_heartbeatInterval, _connection.CancelToken);
                             _keepaliveTask = RunKeepaliveAsync(_connection.CancelToken);
 
-                            _ = _connection.CompleteAsync();
+                        _ = _connection.CompleteAsync();
                         }
                         break;
                     // Client flags and platform should be ignored: https://docs.discord.food/topics/voice-connections#client-connections
@@ -411,11 +443,22 @@ namespace Discord.Audio
             }
             catch (Exception ex)
             {
+                activity?.AddExceptionToActivity(ex);
+                AudioMeter.RecordSocketEventException(ex, opCode, this);
+
                 await _audioLogger.ErrorAsync($"Error handling {opCode}", ex).ConfigureAwait(false);
+            }
+            finally
+            {
+                watch.Stop();
+                AudioMeter.RecordSocketEventReceived(watch.Elapsed, opCode, this);
+
+                activity?.Dispose();
             }
         }
         private async Task ProcessPacketAsync(byte[] packet)
         {
+            AudioMeter.RecordBytesReceived(packet.Length, this);
             try
             {
                 if (_connection.State == ConnectionState.Connecting)

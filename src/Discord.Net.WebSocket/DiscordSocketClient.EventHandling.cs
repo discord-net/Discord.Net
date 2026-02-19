@@ -2,25 +2,28 @@ using Discord.API;
 using Discord.API.Gateway;
 using Discord.Rest;
 using Discord.Utils;
+using Discord.WebSocket.Diagnostics;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 using System;
-
-using GameModel = Discord.API.Game;
+using System.Diagnostics;
 
 namespace Discord.WebSocket;
 
 public partial class DiscordSocketClient
 {
-
     private async Task ProcessMessageAsync(GatewayOpCode opCode, int? seq, string type, object payload)
     {
         if (seq != null)
             _lastSeq = seq.Value;
         _lastMessageTime = Environment.TickCount;
+
+        // An extra Stopwatch is required due to `activity.Duration` cannot be used because its only usable when its stopped but then the metrics won't be associated with this trace when stopped.
+        var activity = SocketActivity.StartSocketEventActivity(opCode, type, this);
+        var watch =  Stopwatch.StartNew();
 
         try
         {
@@ -159,7 +162,7 @@ public partial class DiscordSocketClient
                                 });
                             _ = _connection.CompleteAsync();
                         }
-                        break;
+                            break;
                         case "RESUMED":
                         {
                             await _gatewayLogger.DebugAsync("Received Dispatch (RESUMED)").ConfigureAwait(false);
@@ -178,7 +181,7 @@ public partial class DiscordSocketClient
 
                             await _gatewayLogger.InfoAsync("Resumed previous session").ConfigureAwait(false);
                         }
-                        break;
+                            break;
                         #endregion
 
                         #region Guilds
@@ -230,7 +233,7 @@ public partial class DiscordSocketClient
                                 }
                             }
                         }
-                        break;
+                            break;
                         case "GUILD_UPDATE":
                         {
                             await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_UPDATE)").ConfigureAwait(false);
@@ -249,7 +252,7 @@ public partial class DiscordSocketClient
                                 return;
                             }
                         }
-                        break;
+                            break;
                         case "GUILD_EMOJIS_UPDATE":
                         {
                             await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_EMOJIS_UPDATE)").ConfigureAwait(false);
@@ -268,7 +271,7 @@ public partial class DiscordSocketClient
                                 return;
                             }
                         }
-                        break;
+                            break;
                         case "GUILD_SYNC":
                         {
                             await _gatewayLogger.DebugAsync("Ignored Dispatch (GUILD_SYNC)").ConfigureAwait(false);
@@ -291,7 +294,7 @@ public partial class DiscordSocketClient
                                 return;
                             }*/
                         }
-                        break;
+                            break;
                         case "GUILD_DELETE":
                         {
                             var data = (payload as JToken).ToObject<ExtendedGuild>(_serializer);
@@ -330,7 +333,7 @@ public partial class DiscordSocketClient
                                 }
                             }
                         }
-                        break;
+                            break;
                         case "GUILD_STICKERS_UPDATE":
                         {
                             await _gatewayLogger.DebugAsync($"Received Dispatch (GUILD_STICKERS_UPDATE)").ConfigureAwait(false);
@@ -383,7 +386,7 @@ public partial class DiscordSocketClient
                                 await TimedInvokeAsync(_guildStickerUpdated, nameof(GuildStickerUpdated), before, entityModelPair.Entity);
                             }
                         }
-                        break;
+                            break;
                         #endregion
 
                         #region Channels
@@ -423,7 +426,7 @@ public partial class DiscordSocketClient
                             if (channel != null)
                                 await TimedInvokeAsync(_channelCreatedEvent, nameof(ChannelCreated), channel).ConfigureAwait(false);
                         }
-                        break;
+                            break;
                         case "CHANNEL_UPDATE":
                         {
                             await _gatewayLogger.DebugAsync("Received Dispatch (CHANNEL_UPDATE)").ConfigureAwait(false);
@@ -450,7 +453,7 @@ public partial class DiscordSocketClient
                                 return;
                             }
                         }
-                        break;
+                            break;
                         case "CHANNEL_DELETE":
                         {
                             await _gatewayLogger.DebugAsync("Received Dispatch (CHANNEL_DELETE)").ConfigureAwait(false);
@@ -487,7 +490,7 @@ public partial class DiscordSocketClient
                                 return;
                             }
                         }
-                        break;
+                            break;
                         #endregion
 
                         #region Members
@@ -516,7 +519,7 @@ public partial class DiscordSocketClient
                                 return;
                             }
                         }
-                        break;
+                            break;
                         case "GUILD_MEMBER_UPDATE":
                         {
                             await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_MEMBER_UPDATE)").ConfigureAwait(false);
@@ -560,7 +563,7 @@ public partial class DiscordSocketClient
                                 return;
                             }
                         }
-                        break;
+                            break;
                         case "GUILD_MEMBER_REMOVE":
                         {
                             await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_MEMBER_REMOVE)").ConfigureAwait(false);
@@ -593,7 +596,7 @@ public partial class DiscordSocketClient
                                 return;
                             }
                         }
-                        break;
+                            break;
                         case "GUILD_MEMBERS_CHUNK":
                         {
                             await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_MEMBERS_CHUNK)").ConfigureAwait(false);
@@ -617,7 +620,7 @@ public partial class DiscordSocketClient
                                 return;
                             }
                         }
-                        break;
+                            break;
                         case "GUILD_JOIN_REQUEST_DELETE":
                         {
                             await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_JOIN_REQUEST_DELETE)").ConfigureAwait(false);
@@ -639,7 +642,7 @@ public partial class DiscordSocketClient
 
                             await TimedInvokeAsync(_guildJoinRequestDeletedEvent, nameof(GuildJoinRequestDeleted), cacheableUser, guild).ConfigureAwait(false);
                         }
-                        break;
+                            break;
                         #endregion
 
                         #region DM Channels
@@ -660,7 +663,7 @@ public partial class DiscordSocketClient
                                 return;
                             }
                         }
-                        break;
+                            break;
                         case "CHANNEL_RECIPIENT_REMOVE":
                         {
                             await _gatewayLogger.DebugAsync("Received Dispatch (CHANNEL_RECIPIENT_REMOVE)").ConfigureAwait(false);
@@ -683,7 +686,7 @@ public partial class DiscordSocketClient
                                 return;
                             }
                         }
-                        break;
+                            break;
 
                         #endregion
 
@@ -711,7 +714,7 @@ public partial class DiscordSocketClient
                                 return;
                             }
                         }
-                        break;
+                            break;
                         case "GUILD_ROLE_UPDATE":
                         {
                             await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_ROLE_UPDATE)").ConfigureAwait(false);
@@ -746,7 +749,7 @@ public partial class DiscordSocketClient
                                 return;
                             }
                         }
-                        break;
+                            break;
                         case "GUILD_ROLE_DELETE":
                         {
                             await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_ROLE_DELETE)").ConfigureAwait(false);
@@ -778,7 +781,7 @@ public partial class DiscordSocketClient
                                 return;
                             }
                         }
-                        break;
+                            break;
                         #endregion
 
                         #region Bans
@@ -807,7 +810,7 @@ public partial class DiscordSocketClient
                                 return;
                             }
                         }
-                        break;
+                            break;
                         case "GUILD_BAN_REMOVE":
                         {
                             await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_BAN_REMOVE)").ConfigureAwait(false);
@@ -833,7 +836,7 @@ public partial class DiscordSocketClient
                                 return;
                             }
                         }
-                        break;
+                            break;
                         #endregion
 
                         #region Messages
@@ -900,7 +903,7 @@ public partial class DiscordSocketClient
                             SocketChannelHelper.AddMessage(channel, this, msg);
                             await TimedInvokeAsync(_messageReceivedEvent, nameof(MessageReceived), msg).ConfigureAwait(false);
                         }
-                        break;
+                            break;
                         case "MESSAGE_UPDATE":
                         {
                             await _gatewayLogger.DebugAsync("Received Dispatch (MESSAGE_UPDATE)").ConfigureAwait(false);
@@ -986,7 +989,7 @@ public partial class DiscordSocketClient
 
                             await TimedInvokeAsync(_messageUpdatedEvent, nameof(MessageUpdated), cacheableBefore, after, channel).ConfigureAwait(false);
                         }
-                        break;
+                            break;
                         case "MESSAGE_DELETE":
                         {
                             await _gatewayLogger.DebugAsync("Received Dispatch (MESSAGE_DELETE)").ConfigureAwait(false);
@@ -1009,7 +1012,7 @@ public partial class DiscordSocketClient
 
                             await TimedInvokeAsync(_messageDeletedEvent, nameof(MessageDeleted), cacheableMsg, cacheableChannel).ConfigureAwait(false);
                         }
-                        break;
+                            break;
                         case "MESSAGE_REACTION_ADD":
                         {
                             await _gatewayLogger.DebugAsync("Received Dispatch (MESSAGE_REACTION_ADD)").ConfigureAwait(false);
@@ -1053,7 +1056,7 @@ public partial class DiscordSocketClient
 
                             await TimedInvokeAsync(_reactionAddedEvent, nameof(ReactionAdded), cacheableMsg, cacheableChannel, reaction).ConfigureAwait(false);
                         }
-                        break;
+                            break;
                         case "MESSAGE_REACTION_REMOVE":
                         {
                             await _gatewayLogger.DebugAsync("Received Dispatch (MESSAGE_REACTION_REMOVE)").ConfigureAwait(false);
@@ -1089,7 +1092,7 @@ public partial class DiscordSocketClient
 
                             await TimedInvokeAsync(_reactionRemovedEvent, nameof(ReactionRemoved), cacheableMsg, cacheableChannel, reaction).ConfigureAwait(false);
                         }
-                        break;
+                            break;
                         case "MESSAGE_REACTION_REMOVE_ALL":
                         {
                             await _gatewayLogger.DebugAsync("Received Dispatch (MESSAGE_REACTION_REMOVE_ALL)").ConfigureAwait(false);
@@ -1110,7 +1113,7 @@ public partial class DiscordSocketClient
 
                             await TimedInvokeAsync(_reactionsClearedEvent, nameof(ReactionsCleared), cacheableMsg, cacheableChannel).ConfigureAwait(false);
                         }
-                        break;
+                            break;
                         case "MESSAGE_REACTION_REMOVE_EMOJI":
                         {
                             await _gatewayLogger.DebugAsync("Received Dispatch (MESSAGE_REACTION_REMOVE_EMOJI)").ConfigureAwait(false);
@@ -1137,7 +1140,7 @@ public partial class DiscordSocketClient
 
                             await TimedInvokeAsync(_reactionsRemovedForEmoteEvent, nameof(ReactionsRemovedForEmote), cacheableMsg, cacheableChannel, emote).ConfigureAwait(false);
                         }
-                        break;
+                            break;
                         case "MESSAGE_DELETE_BULK":
                         {
                             await _gatewayLogger.DebugAsync("Received Dispatch (MESSAGE_DELETE_BULK)").ConfigureAwait(false);
@@ -1166,7 +1169,7 @@ public partial class DiscordSocketClient
 
                             await TimedInvokeAsync(_messagesBulkDeletedEvent, nameof(MessagesBulkDeleted), cacheableList, cacheableChannel).ConfigureAwait(false);
                         }
-                        break;
+                            break;
                         #endregion
 
                         #region Polls
@@ -1222,7 +1225,7 @@ public partial class DiscordSocketClient
 
                             await TimedInvokeAsync(_pollVoteAdded, nameof(PollVoteAdded), userCacheable, channelCacheable, messageCacheable, guildCacheable, data.AnswerId);
                         }
-                        break;
+                            break;
 
                         case "MESSAGE_POLL_VOTE_REMOVE":
                         {
@@ -1275,7 +1278,7 @@ public partial class DiscordSocketClient
 
                             await TimedInvokeAsync(_pollVoteRemoved, nameof(PollVoteRemoved), userCacheable, channelCacheable, messageCacheable, guildCacheable, data.AnswerId);
                         }
-                        break;
+                            break;
 
                         #endregion
 
@@ -1336,7 +1339,7 @@ public partial class DiscordSocketClient
                             user.Update(data);
                             await TimedInvokeAsync(_presenceUpdated, nameof(PresenceUpdated), user, before, user.Presence).ConfigureAwait(false);
                         }
-                        break;
+                            break;
                         case "TYPING_START":
                         {
                             await _gatewayLogger.DebugAsync("Received Dispatch (TYPING_START)").ConfigureAwait(false);
@@ -1363,7 +1366,7 @@ public partial class DiscordSocketClient
 
                             await TimedInvokeAsync(_userIsTypingEvent, nameof(UserIsTyping), cacheableUser, cacheableChannel).ConfigureAwait(false);
                         }
-                        break;
+                            break;
                         #endregion
 
                         #region Integrations
@@ -1395,7 +1398,7 @@ public partial class DiscordSocketClient
                                 return;
                             }
                         }
-                        break;
+                            break;
                         case "INTEGRATION_UPDATE":
                         {
                             await _gatewayLogger.DebugAsync("Received Dispatch (INTEGRATION_UPDATE)").ConfigureAwait(false);
@@ -1424,7 +1427,7 @@ public partial class DiscordSocketClient
                                 return;
                             }
                         }
-                        break;
+                            break;
                         case "INTEGRATION_DELETE":
                         {
                             await _gatewayLogger.DebugAsync("Received Dispatch (INTEGRATION_DELETE)").ConfigureAwait(false);
@@ -1449,7 +1452,7 @@ public partial class DiscordSocketClient
                                 return;
                             }
                         }
-                        break;
+                            break;
                         #endregion
 
                         #region Users
@@ -1470,7 +1473,7 @@ public partial class DiscordSocketClient
                                 return;
                             }
                         }
-                        break;
+                            break;
                         #endregion
 
                         #region Voice
@@ -1512,7 +1515,7 @@ public partial class DiscordSocketClient
 
                                 //Per g250k, this should always be sent, but apparently not always
                                 user = guild.GetUser(data.UserId)
-                                    ?? (data.Member.IsSpecified ? guild.AddOrUpdateUser(data.Member.Value) : null);
+                                       ?? (data.Member.IsSpecified ? guild.AddOrUpdateUser(data.Member.Value) : null);
                                 if (user == null)
                                 {
                                     await UnknownGuildUserAsync(type, data.UserId, guild.Id).ConfigureAwait(false);
@@ -1570,7 +1573,7 @@ public partial class DiscordSocketClient
 
                             await TimedInvokeAsync(_userVoiceStateUpdatedEvent, nameof(UserVoiceStateUpdated), user, before, after).ConfigureAwait(false);
                         }
-                        break;
+                            break;
                         case "VOICE_SERVER_UPDATE":
                         {
                             await _gatewayLogger.DebugAsync("Received Dispatch (VOICE_SERVER_UPDATE)").ConfigureAwait(false);
@@ -1594,7 +1597,7 @@ public partial class DiscordSocketClient
                             }
 
                         }
-                        break;
+                            break;
 
                         case "VOICE_CHANNEL_STATUS_UPDATE":
                         {
@@ -1612,7 +1615,7 @@ public partial class DiscordSocketClient
 
                             await TimedInvokeAsync(_voiceChannelStatusUpdated, nameof(VoiceChannelStatusUpdated), channelCacheable, before, after);
                         }
-                        break;
+                            break;
                         #endregion
 
                         #region Invites
@@ -1648,7 +1651,7 @@ public partial class DiscordSocketClient
                                 return;
                             }
                         }
-                        break;
+                            break;
                         case "INVITE_DELETE":
                         {
                             await _gatewayLogger.DebugAsync("Received Dispatch (INVITE_DELETE)").ConfigureAwait(false);
@@ -1671,7 +1674,7 @@ public partial class DiscordSocketClient
                                 return;
                             }
                         }
-                        break;
+                            break;
                         #endregion
 
                         #region Interactions
@@ -1743,7 +1746,7 @@ public partial class DiscordSocketClient
                                     break;
                             }
                         }
-                        break;
+                            break;
                         case "APPLICATION_COMMAND_CREATE":
                         {
                             await _gatewayLogger.DebugAsync("Received Dispatch (APPLICATION_COMMAND_CREATE)").ConfigureAwait(false);
@@ -1766,7 +1769,7 @@ public partial class DiscordSocketClient
 
                             await TimedInvokeAsync(_applicationCommandCreated, nameof(ApplicationCommandCreated), applicationCommand).ConfigureAwait(false);
                         }
-                        break;
+                            break;
                         case "APPLICATION_COMMAND_UPDATE":
                         {
                             await _gatewayLogger.DebugAsync("Received Dispatch (APPLICATION_COMMAND_UPDATE)").ConfigureAwait(false);
@@ -1789,7 +1792,7 @@ public partial class DiscordSocketClient
 
                             await TimedInvokeAsync(_applicationCommandUpdated, nameof(ApplicationCommandUpdated), applicationCommand).ConfigureAwait(false);
                         }
-                        break;
+                            break;
                         case "APPLICATION_COMMAND_DELETE":
                         {
                             await _gatewayLogger.DebugAsync("Received Dispatch (APPLICATION_COMMAND_DELETE)").ConfigureAwait(false);
@@ -1812,7 +1815,7 @@ public partial class DiscordSocketClient
 
                             await TimedInvokeAsync(_applicationCommandDeleted, nameof(ApplicationCommandDeleted), applicationCommand).ConfigureAwait(false);
                         }
-                        break;
+                            break;
                         #endregion
 
                         #region Threads
@@ -1849,7 +1852,7 @@ public partial class DiscordSocketClient
                             await TimedInvokeAsync(_threadCreated, nameof(ThreadCreated), threadChannel).ConfigureAwait(false);
                         }
 
-                        break;
+                            break;
                         case "THREAD_UPDATE":
                         {
                             await _gatewayLogger.DebugAsync("Received Dispatch (THREAD_UPDATE)").ConfigureAwait(false);
@@ -1890,7 +1893,7 @@ public partial class DiscordSocketClient
 
                             await TimedInvokeAsync(_threadUpdated, nameof(ThreadUpdated), before, threadChannel).ConfigureAwait(false);
                         }
-                        break;
+                            break;
                         case "THREAD_DELETE":
                         {
                             await _gatewayLogger.DebugAsync("Received Dispatch (THREAD_DELETE)").ConfigureAwait(false);
@@ -1911,7 +1914,7 @@ public partial class DiscordSocketClient
 
                             await TimedInvokeAsync(_threadDeleted, nameof(ThreadDeleted), cacheable).ConfigureAwait(false);
                         }
-                        break;
+                            break;
                         case "THREAD_LIST_SYNC":
                         {
                             await _gatewayLogger.DebugAsync("Received Dispatch (THREAD_LIST_SYNC)").ConfigureAwait(false);
@@ -1947,7 +1950,7 @@ public partial class DiscordSocketClient
                                 }
                             }
                         }
-                        break;
+                            break;
                         case "THREAD_MEMBER_UPDATE":
                         {
                             await _gatewayLogger.DebugAsync("Received Dispatch (THREAD_MEMBER_UPDATE)").ConfigureAwait(false);
@@ -1965,7 +1968,7 @@ public partial class DiscordSocketClient
                             thread.AddOrUpdateThreadMember(data, thread.Guild.CurrentUser);
                         }
 
-                        break;
+                            break;
                         case "THREAD_MEMBERS_UPDATE":
                         {
                             await _gatewayLogger.DebugAsync("Received Dispatch (THREAD_MEMBERS_UPDATE)").ConfigureAwait(false);
@@ -2035,7 +2038,7 @@ public partial class DiscordSocketClient
                             }
                         }
 
-                        break;
+                            break;
                         #endregion
 
                         #region Stage Channels
@@ -2078,7 +2081,7 @@ public partial class DiscordSocketClient
                                     return;
                             }
                         }
-                        break;
+                            break;
                         #endregion
 
                         #region Guild Scheduled Events
@@ -2100,7 +2103,7 @@ public partial class DiscordSocketClient
 
                             await TimedInvokeAsync(_guildScheduledEventCreated, nameof(GuildScheduledEventCreated), newEvent).ConfigureAwait(false);
                         }
-                        break;
+                            break;
                         case "GUILD_SCHEDULED_EVENT_UPDATE":
                         {
                             await _gatewayLogger.DebugAsync($"Received Dispatch ({type})").ConfigureAwait(false);
@@ -2132,7 +2135,7 @@ public partial class DiscordSocketClient
                             else
                                 await TimedInvokeAsync(_guildScheduledEventUpdated, nameof(GuildScheduledEventUpdated), beforeCacheable, after).ConfigureAwait(false);
                         }
-                        break;
+                            break;
                         case "GUILD_SCHEDULED_EVENT_DELETE":
                         {
                             await _gatewayLogger.DebugAsync($"Received Dispatch ({type})").ConfigureAwait(false);
@@ -2151,7 +2154,7 @@ public partial class DiscordSocketClient
 
                             await TimedInvokeAsync(_guildScheduledEventCancelled, nameof(GuildScheduledEventCancelled), guildEvent).ConfigureAwait(false);
                         }
-                        break;
+                            break;
                         case "GUILD_SCHEDULED_EVENT_USER_ADD" or "GUILD_SCHEDULED_EVENT_USER_REMOVE":
                         {
                             await _gatewayLogger.DebugAsync($"Received Dispatch ({type})").ConfigureAwait(false);
@@ -2188,7 +2191,7 @@ public partial class DiscordSocketClient
                                     break;
                             }
                         }
-                        break;
+                            break;
 
                         #endregion
 
@@ -2205,7 +2208,7 @@ public partial class DiscordSocketClient
 
                             await TimedInvokeAsync(_webhooksUpdated, nameof(WebhooksUpdated), guild, channel);
                         }
-                        break;
+                            break;
 
                         #endregion
 
@@ -2223,7 +2226,7 @@ public partial class DiscordSocketClient
 
                             await TimedInvokeAsync(_auditLogCreated, nameof(AuditLogCreated), auditLog, guild);
                         }
-                        break;
+                            break;
                         #endregion
 
                         #region Auto Moderation
@@ -2238,7 +2241,7 @@ public partial class DiscordSocketClient
 
                             await TimedInvokeAsync(_autoModRuleCreated, nameof(AutoModRuleCreated), rule);
                         }
-                        break;
+                            break;
 
                         case "AUTO_MODERATION_RULE_UPDATE":
                         {
@@ -2254,7 +2257,7 @@ public partial class DiscordSocketClient
 
                             await TimedInvokeAsync(_autoModRuleUpdated, nameof(AutoModRuleUpdated), cacheableBefore, guild.AddOrUpdateAutoModRule(data));
                         }
-                        break;
+                            break;
 
                         case "AUTO_MODERATION_RULE_DELETE":
                         {
@@ -2266,7 +2269,7 @@ public partial class DiscordSocketClient
 
                             await TimedInvokeAsync(_autoModRuleDeleted, nameof(AutoModRuleDeleted), rule);
                         }
-                        break;
+                            break;
 
                         case "AUTO_MODERATION_ACTION_EXECUTION":
                         {
@@ -2294,14 +2297,14 @@ public partial class DiscordSocketClient
                             var member = guild.GetUser(data.UserId);
 
                             var cacheableUser = new Cacheable<SocketGuildUser, ulong>(member,
-                                    data.UserId,
-                                    member is not null,
-                                    async () =>
-                                    {
-                                        var model = await ApiClient.GetGuildMemberAsync(data.GuildId, data.UserId);
-                                        return guild.AddOrUpdateUser(model);
-                                    }
-                                );
+                                data.UserId,
+                                member is not null,
+                                async () =>
+                                {
+                                    var model = await ApiClient.GetGuildMemberAsync(data.GuildId, data.UserId);
+                                    return guild.AddOrUpdateUser(model);
+                                }
+                            );
 
                             ISocketMessageChannel channel = null;
                             if (data.ChannelId.IsSpecified)
@@ -2356,7 +2359,7 @@ public partial class DiscordSocketClient
 
                             await TimedInvokeAsync(_autoModActionExecuted, nameof(AutoModActionExecuted), guild, action, eventData);
                         }
-                        break;
+                            break;
 
                         #endregion
 
@@ -2372,7 +2375,7 @@ public partial class DiscordSocketClient
 
                             await TimedInvokeAsync(_entitlementCreated, nameof(EntitlementCreated), entitlement);
                         }
-                        break;
+                            break;
 
                         case "ENTITLEMENT_UPDATE":
                         {
@@ -2396,7 +2399,7 @@ public partial class DiscordSocketClient
 
                             await TimedInvokeAsync(_entitlementUpdated, nameof(EntitlementUpdated), cacheableBefore, entitlement);
                         }
-                        break;
+                            break;
 
                         case "ENTITLEMENT_DELETE":
                         {
@@ -2415,7 +2418,7 @@ public partial class DiscordSocketClient
 
                             await TimedInvokeAsync(_entitlementDeleted, nameof(EntitlementDeleted), cacheableEntitlement);
                         }
-                        break;
+                            break;
 
                         case "SUBSCRIPTION_CREATE":
                         {
@@ -2427,7 +2430,7 @@ public partial class DiscordSocketClient
 
                             await TimedInvokeAsync(_subscriptionCreated, nameof(SubscriptionCreated), subscription);
                         }
-                        break;
+                            break;
 
                         case "SUBSCRIPTION_UPDATE":
                         {
@@ -2451,7 +2454,7 @@ public partial class DiscordSocketClient
 
                             await TimedInvokeAsync(_subscriptionUpdated, nameof(SubscriptionUpdated), cacheableBefore, subscription);
                         }
-                        break;
+                            break;
 
                         case "SUBSCRIPTION_DELETE":
                         {
@@ -2470,7 +2473,7 @@ public partial class DiscordSocketClient
 
                             await TimedInvokeAsync(_subscriptionDeleted, nameof(SubscriptionDeleted), cacheableSubscription);
                         }
-                        break;
+                            break;
 
                         #endregion
 
@@ -2502,7 +2505,7 @@ public partial class DiscordSocketClient
 
                             await TimedInvokeAsync(_unknownDispatchReceived, nameof(UnknownDispatchReceived), type, (payload as JToken));
                             break;
-                            #endregion
+                        #endregion
                     }
                     break;
                 default:
@@ -2519,8 +2522,17 @@ public partial class DiscordSocketClient
                 ex.Data["payload_data"] = (payload as JToken).ToString();
             }
 
+            activity?.AddExceptionToActivity(ex);
+            SocketMeter.RecordSocketEventException(ex, opCode, type, this);
+
             await _gatewayLogger.ErrorAsync($"Error handling {opCode}{(type != null ? $" ({type})" : "")}", ex).ConfigureAwait(false);
         }
-    }
+        finally
+        {
+            watch.Stop();
+            SocketMeter.RecordSocketEvent(watch.Elapsed, opCode, type, this);
 
+            activity?.Dispose();
+        }
+    }
 }

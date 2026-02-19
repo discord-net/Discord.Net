@@ -6,7 +6,7 @@ using Discord.Net.Udp;
 using Discord.Net.WebSockets;
 using Discord.Rest;
 using Discord.Utils;
-
+using Discord.WebSocket.Diagnostics;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -172,7 +172,12 @@ namespace Discord.WebSocket
             _connection = new ConnectionManager(_stateLock, _gatewayLogger, config.ConnectionTimeout,
                 OnConnectingAsync, OnDisconnectingAsync, x => ApiClient.Disconnected += x);
             _connection.Connected += () => TimedInvokeAsync(_connectedEvent, nameof(Connected));
-            _connection.Disconnected += (ex, recon) => TimedInvokeAsync(_disconnectedEvent, nameof(Disconnected), ex);
+            _connection.Disconnected += (ex, recon) =>
+            {
+                if (recon)
+                    SocketMeter.AddSocketReconnect(this);
+                return TimedInvokeAsync(_disconnectedEvent, nameof(Disconnected), ex);
+            };
 
             _nextAudioId = 1;
             _shardedClient = shardedClient;
@@ -192,7 +197,23 @@ namespace Discord.WebSocket
             JoinedGuild += async g => await _gatewayLogger.InfoAsync($"Joined {g.Name}").ConfigureAwait(false);
             GuildAvailable += async g => await _gatewayLogger.VerboseAsync($"Connected to {g.Name}").ConfigureAwait(false);
             GuildUnavailable += async g => await _gatewayLogger.VerboseAsync($"Disconnected from {g.Name}").ConfigureAwait(false);
-            LatencyUpdated += async (old, val) => await _gatewayLogger.DebugAsync($"Latency = {val} ms").ConfigureAwait(false);
+
+            Connected += () =>
+            {
+                SocketMeter.AddSocketConnections(1, this);
+                return Task.CompletedTask;
+            };
+            Disconnected += _ =>
+            {
+                SocketMeter.AddSocketConnections(-1, this);
+                return Task.CompletedTask;
+
+            };
+            LatencyUpdated += async (old, val) =>
+            {
+                SocketMeter.RecordConnectionLatency((double)val / 1000, this);
+                await _gatewayLogger.DebugAsync($"Latency = {val} ms").ConfigureAwait(false);
+            };
 
             GuildAvailable += g =>
             {
@@ -205,6 +226,8 @@ namespace Discord.WebSocket
 
             _largeGuilds = new ConcurrentQueue<ulong>();
             AuditLogCacheSize = config.AuditLogCacheSize;
+
+            SocketMeter.AddClientShards(1, this);
         }
         private static API.DiscordSocketApiClient CreateApiClient(DiscordSocketConfig config)
             => new DiscordSocketApiClient(config.RestClientProvider, config.WebSocketProvider, DiscordRestConfig.UserAgent, config.GatewayHost,
@@ -220,12 +243,13 @@ namespace Discord.WebSocket
                     ApiClient?.Dispose();
                     _stateLock?.Dispose();
                 }
+
+                SocketMeter.AddClientShards(-1, this);
                 _isDisposed = true;
             }
 
             base.Dispose(disposing);
         }
-
 
         internal override async ValueTask DisposeAsync(bool disposing)
         {
