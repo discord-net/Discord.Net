@@ -38,17 +38,6 @@ namespace Discord.Rest
             var embed = args.Embed;
             var embeds = args.Embeds;
 
-            bool hasText = args.Content.IsSpecified && !string.IsNullOrEmpty(args.Content.Value);
-            bool hasEmbeds = embed is { IsSpecified: true, Value: not null }
-                             || embeds is { IsSpecified: true, Value.Length: > 0 };
-            bool hasComponents = args.Components is { IsSpecified: true, Value: not null };
-            bool hasAttachments = args.Attachments.IsSpecified;
-            bool hasFlags = args.Flags.IsSpecified;
-
-            // No content needed if modifying flags
-            if ((!hasComponents && !hasText && !hasEmbeds && !hasAttachments) && !hasFlags)
-                Preconditions.NotNullOrEmpty(args.Content.IsSpecified ? args.Content.Value : string.Empty, nameof(args.Content));
-
             if (args.AllowedMentions.IsSpecified)
             {
                 var allowedMentions = args.AllowedMentions.Value;
