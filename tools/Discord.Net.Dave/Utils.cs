@@ -30,7 +30,7 @@ internal static class Utils
 
         str = new(ptr, sz);
 
-        return new(ptr);
+        return new((IntPtr)ptr);
     }
 
     /// <summary>

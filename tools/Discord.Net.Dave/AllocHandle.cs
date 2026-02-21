@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 namespace Discord.LibDave;
 
@@ -7,21 +8,25 @@ namespace Discord.LibDave;
 ///     a disposable.
 /// </summary>
 /// <param name="ptr">The underlying pointer to native memory.</param>
-internal unsafe ref struct AllocHandle(void* ptr) : IDisposable
+internal unsafe ref struct AllocHandle(IntPtr ptr) : IDisposable
 {
-    private int _freed = ptr is null ? 1 : 0;
-
     /// <summary>
     ///     The underlying pointer.
     /// </summary>
-    public readonly void* Pointer = ptr;
+    public IntPtr Pointer => _pointer;
+
+    private IntPtr _pointer = ptr;
 
     /// <summary>
     ///     Frees the underlying pointer.
     /// </summary>
     public void Dispose()
     {
-        if (Interlocked.CompareExchange(ref _freed, 1, 0) is 0)
-            NativeMemory.Free(Pointer);
+        var value = _pointer;
+
+        if (value is 0) return;
+
+        if (Interlocked.CompareExchange(ref _pointer, 0, value) is 0)
+            NativeMemory.Free((void*)value);
     }
 }

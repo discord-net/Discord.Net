@@ -109,34 +109,35 @@ public static class Dave
         var contextPtr = Marshal.StringToCoTaskMemAuto(context);
         var authSessionIdPtr = Marshal.StringToCoTaskMemAuto(authSessionId);
 
-        DaveSession? session = null;
-
-        Delegate mlsFailureCallback = OnMLSFailure;
-
-        session = new(
-            libdave.SessionCreate(
-                (byte*) contextPtr,
-                (byte*) authSessionIdPtr,
-                (MLSFailureCallback)Marshal.GetFunctionPointerForDelegate(mlsFailureCallback),
-                null
-            )
-        );
-
-        session.MLSFailureCallbackDelegate = mlsFailureCallback;
-
-        Marshal.FreeCoTaskMem(contextPtr);
-        Marshal.FreeCoTaskMem(authSessionIdPtr);
-
-        return session;
-
-        void OnMLSFailure(byte* sourcePtr, byte* reasonPtr)
+        try
         {
-            if (session is null) return;
+            DaveSession? session = null;
 
-            var source = Marshal.PtrToStringAnsi((IntPtr)sourcePtr);
-            var reason = Marshal.PtrToStringAnsi((IntPtr)reasonPtr);
+            Delegate mlsFailureCallback = OnMLSFailure;
 
-            session.HandleMLSFailure(source, reason);
+            session = new(
+                libdave.SessionCreate(
+                    (byte*)contextPtr,
+                    (byte*)authSessionIdPtr,
+                    (MLSFailureCallback)Marshal.GetFunctionPointerForDelegate(mlsFailureCallback),
+                    null
+                )
+            );
+
+            session.MLSFailureCallbackDelegate = mlsFailureCallback;
+
+            return session;
+
+            void OnMLSFailure(byte* sourcePtr, byte* reasonPtr)
+                => session?.HandleMLSFailure(
+                    source: Marshal.PtrToStringAnsi((IntPtr)sourcePtr),
+                    reason: Marshal.PtrToStringAnsi((IntPtr)reasonPtr)
+                );
+        }
+        finally
+        {
+            Marshal.FreeCoTaskMem(contextPtr);
+            Marshal.FreeCoTaskMem(authSessionIdPtr);
         }
     }
 
