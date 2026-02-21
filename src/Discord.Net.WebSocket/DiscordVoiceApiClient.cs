@@ -164,7 +164,7 @@ namespace Discord.Audio
             });
         }
 
-        public Task SendSelectProtocol(string externalIp)
+        public Task SendSelectProtocol(string externalIp, ushort externalPort)
         {
             return SendAsync(VoiceOpCode.SelectProtocol, new SelectProtocolParams
             {
@@ -172,7 +172,7 @@ namespace Discord.Audio
                 Data = new UdpProtocolInfo
                 {
                     Address = externalIp,
-                    Port = UdpPort,
+                    Port = externalPort,
                     Mode = Mode
                 }
             });

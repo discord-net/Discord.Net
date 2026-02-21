@@ -599,9 +599,11 @@ namespace Discord.Audio
                     }
 
                     string ip;
+                    ushort externalPort;
                     try
                     {
                         ip = Encoding.UTF8.GetString(packet, 8, 74 - 10).TrimEnd('\0');
+                        externalPort = (ushort)((packet[72] << 8) | packet[73]);
                     }
                     catch (Exception ex)
                     {
@@ -609,8 +611,8 @@ namespace Discord.Audio
                         return;
                     }
 
-                    await _audioLogger.DebugAsync("Received Discovery").ConfigureAwait(false);
-                    await ApiClient.SendSelectProtocol(ip).ConfigureAwait(false);
+                    await _audioLogger.DebugAsync($"Received Discovery (ip={ip}, externalPort={externalPort}, localPort={ApiClient.UdpPort})").ConfigureAwait(false);
+                    await ApiClient.SendSelectProtocol(ip, externalPort).ConfigureAwait(false);
                 }
                 else if (_connection.State == ConnectionState.Connected)
                 {
