@@ -379,7 +379,8 @@ namespace Discord.Audio
 
                 AudioOutStream opusDecoder = new OpusDecodeStream(readerStream); //Passes header
 
-                if (_dave is not null)
+                var hasDave = _dave is not null;
+                if (hasDave)
                 {
                     opusDecoder = new DaveDecryptStream(
                         this,
@@ -396,6 +397,7 @@ namespace Discord.Audio
 
                 _streams.TryAdd(userId, new StreamPair(readerStream, decryptStream));
 
+                await _audioLogger.DebugAsync($"Created input stream for user {userId} (dave={hasDave})");
                 await _streamCreatedEvent.InvokeAsync(userId, readerStream);
             }
         }
@@ -427,6 +429,35 @@ namespace Discord.Audio
 
             _ssrcMap.Clear();
             _streams.Clear();
+        }
+
+        /// <summary>
+        ///     Rebuilds all existing input streams to include the DAVE decrypt layer.
+        ///     Called after the initial DAVE transition completes since streams may have
+        ///     been created before the DaveSessionManager was initialized.
+        /// </summary>
+        internal async Task RebuildInputStreamsForDaveAsync()
+        {
+            if (_dave is null) return;
+
+            var existingUsers = _streams.Keys.ToArray();
+            if (existingUsers.Length == 0) return;
+
+            await _audioLogger.DebugAsync($"Rebuilding {existingUsers.Length} input stream(s) with DAVE decrypt layer");
+
+            foreach (var userId in existingUsers)
+            {
+                if (_streams.TryRemove(userId, out var pair))
+                {
+                    await _streamDestroyedEvent.InvokeAsync(userId).ConfigureAwait(false);
+                    await pair.Reader.DisposeAsync();
+                }
+            }
+
+            foreach (var userId in existingUsers)
+            {
+                await CreateInputStreamAsync(userId);
+            }
         }
 
         #endregion
@@ -599,9 +630,11 @@ namespace Discord.Audio
                     }
 
                     string ip;
+                    ushort externalPort;
                     try
                     {
                         ip = Encoding.UTF8.GetString(packet, 8, 74 - 10).TrimEnd('\0');
+                        externalPort = (ushort)((packet[72] << 8) | packet[73]);
                     }
                     catch (Exception ex)
                     {
@@ -609,8 +642,8 @@ namespace Discord.Audio
                         return;
                     }
 
-                    await _audioLogger.DebugAsync("Received Discovery").ConfigureAwait(false);
-                    await ApiClient.SendSelectProtocol(ip).ConfigureAwait(false);
+                    await _audioLogger.DebugAsync($"Received Discovery (ip={ip}, externalPort={externalPort}, localPort={ApiClient.UdpPort})").ConfigureAwait(false);
+                    await ApiClient.SendSelectProtocol(ip, externalPort).ConfigureAwait(false);
                 }
                 else if (_connection.State == ConnectionState.Connected)
                 {
