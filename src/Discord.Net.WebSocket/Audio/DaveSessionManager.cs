@@ -213,6 +213,10 @@ internal sealed class DaveSessionManager : IDisposable
 
             if (protocolVersion is not Dave.DisabledProtocolVersion && !ratchet.IsNull)
                 Encryptor.Ratchet = ratchet;
+
+            // Streams created before DAVE was initialized lack the DaveDecryptStream layer.
+            // Rebuild them now that keys are ready.
+            await _client.RebuildInputStreamsForDaveAsync();
         }
         else
         {
