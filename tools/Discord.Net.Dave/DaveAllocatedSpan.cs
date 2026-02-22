@@ -7,20 +7,10 @@ namespace Discord.LibDave;
 /// <summary>
 ///     Represents a region of memory allocated by the <see cref="libdave"/> binding.
 /// </summary>
-/// <param name="ptr">The pointer to the first element in the span.</param>
-/// <param name="length">The number of elements in the span.</param>
 /// <typeparam name="T">The underlying element type.</typeparam>
-public unsafe struct DaveAllocatedSpan<T>(
-    T* ptr,
-    int length
-) : IDisposable
+public unsafe struct DaveAllocatedSpan<T> : IDisposable
     where T : unmanaged
 {
-    /// <summary>
-    ///     Gets the length of this span.
-    /// </summary>
-    public readonly int Length = length;
-
     /// <summary>
     ///     Gets an element in this span at the specified index.
     /// </summary>
@@ -32,7 +22,9 @@ public unsafe struct DaveAllocatedSpan<T>(
         {
             if (index >= Length || index < 0) throw new IndexOutOfRangeException();
 
-            return ref Unsafe.AsRef<T>(Unsafe.Add<T>(ptr, index));
+            if (IsNull) throw new NullReferenceException();
+
+            return ref Unsafe.AsRef<T>(Unsafe.Add<T>((void*)_pointer, index));
         }
     }
 
@@ -49,12 +41,20 @@ public unsafe struct DaveAllocatedSpan<T>(
     /// <summary>
     ///     Gets whether the underlying pointer is null.
     /// </summary>
-    public bool IsNull => ptr is null;
+    public bool IsNull => _pointer is 0;
 
     /// <summary>
     ///     Creates a <see cref="ReadOnlySpan{T}"/> wrapping the underlying pointer.
     /// </summary>
-    public ReadOnlySpan<T> AsSpan => new(ptr, Length);
+    public ReadOnlySpan<T> AsSpan
+    {
+        get
+        {
+            if (IsNull) throw new NullReferenceException();
+
+            return new((void*)_pointer, Length);
+        }
+    }
 
     /// <summary>
     ///     Copies this span to a new array.
@@ -68,19 +68,32 @@ public unsafe struct DaveAllocatedSpan<T>(
     /// <returns>The <see cref="ReadOnlyMemory{T}"/> containing a copy of this spans content.</returns>
     public ReadOnlyMemory<T> ToMemory() => new(ToArray(), 0, Length);
 
+    /// <summary>
+    ///     Gets the length of this span.
+    /// </summary>
+    public readonly int Length;
+
+    private IntPtr _pointer;
+
+    /// <summary>
+    ///     Constructs a new <see cref="DaveAllocatedSpan{T}"/>
+    /// </summary>
+    /// <param name="pointer">The pointer to the first element in the span.</param>
+    /// <param name="length">The number of elements in the span.</param>
+    public DaveAllocatedSpan(T* pointer, int length)
+    {
+        _pointer = (IntPtr)pointer;
+        Length = length;
+    }
+
     /// <inheritdoc/>
     public void Dispose()
     {
-        var value = (IntPtr)ptr;
+        var value = _pointer;
 
         if (value is 0) return;
 
-        // best way I found to ref the 'ptr' field
-        ref var ptrField = ref Unsafe.AsRef<IntPtr>(Unsafe.AsPointer(ref this));
-
-        if (Interlocked.CompareExchange(ref ptrField, IntPtr.Zero, value) == value)
-        {
-            libdave.Free(ptr);
-        }
+        if(Interlocked.CompareExchange(ref _pointer, 0, value) is 0)
+            libdave.Free((void*)value);
     }
 }

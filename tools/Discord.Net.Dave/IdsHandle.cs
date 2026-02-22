@@ -11,14 +11,14 @@ internal unsafe ref struct IdsHandle : IDisposable
     /// <summary>
     ///     The pointer of the first id.
     /// </summary>
-    public readonly byte** Pointer;
+    public byte** Pointer => (byte**)_pointer;
 
     /// <summary>
     ///     The number of ids.
     /// </summary>
     public readonly int Length;
 
-    private int _freed;
+    private IntPtr _pointer;
 
     /// <summary>
     ///     Creates a new <see cref="IdsHandle"/>.
@@ -28,7 +28,7 @@ internal unsafe ref struct IdsHandle : IDisposable
     public IdsHandle(void* pointer, int length)
     {
         Length = length;
-        Pointer = (byte**)pointer;
+        _pointer = (IntPtr)pointer;
     }
 
     /// <summary>
@@ -36,16 +36,20 @@ internal unsafe ref struct IdsHandle : IDisposable
     /// </summary>
     public void Dispose()
     {
-        if (Interlocked.CompareExchange(ref _freed, 1, 0) is 0)
+        var value = _pointer;
+
+        if (value is 0) return;
+
+        if (Interlocked.CompareExchange(ref _pointer, 0, value) is 0)
         {
-            var span = new Span<nuint>(Pointer, Length);
+            var span = new Span<nuint>((void*)value, Length);
 
             for (var i = 0; i < span.Length; i++)
             {
                 NativeMemory.Free((void*)span[i]);
             }
 
-            NativeMemory.Free(Pointer);
+            NativeMemory.Free((void*)value);
         }
     }
 }
