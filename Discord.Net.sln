@@ -1,4 +1,4 @@
-Microsoft Visual Studio Solution File, Format Version 12.00
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.31903.286
 MinimumVisualStudioVersion = 10.0.40219.1
@@ -41,6 +41,10 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{BB59D5B5-E7B0-4BF4-8F82-D14431B2799B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Discord.Net.BuildOverrides", "experiment\Discord.Net.BuildOverrides\Discord.Net.BuildOverrides.csproj", "{115F4921-B44D-4F69-996B-69796959C99D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Discord.Net.Dave", "tools\Discord.Net.Dave\Discord.Net.Dave.csproj", "{A9198992-68A2-4DE0-A871-EB1A9768A47F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{5239E8F8-5B8B-48DF-BEA1-1C7745D25D08}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -244,6 +248,18 @@ Global
 		{115F4921-B44D-4F69-996B-69796959C99D}.Release|x64.Build.0 = Release|Any CPU
 		{115F4921-B44D-4F69-996B-69796959C99D}.Release|x86.ActiveCfg = Release|Any CPU
 		{115F4921-B44D-4F69-996B-69796959C99D}.Release|x86.Build.0 = Release|Any CPU
+		{A9198992-68A2-4DE0-A871-EB1A9768A47F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A9198992-68A2-4DE0-A871-EB1A9768A47F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A9198992-68A2-4DE0-A871-EB1A9768A47F}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{A9198992-68A2-4DE0-A871-EB1A9768A47F}.Debug|x64.Build.0 = Debug|Any CPU
+		{A9198992-68A2-4DE0-A871-EB1A9768A47F}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{A9198992-68A2-4DE0-A871-EB1A9768A47F}.Debug|x86.Build.0 = Debug|Any CPU
+		{A9198992-68A2-4DE0-A871-EB1A9768A47F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A9198992-68A2-4DE0-A871-EB1A9768A47F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A9198992-68A2-4DE0-A871-EB1A9768A47F}.Release|x64.ActiveCfg = Release|Any CPU
+		{A9198992-68A2-4DE0-A871-EB1A9768A47F}.Release|x64.Build.0 = Release|Any CPU
+		{A9198992-68A2-4DE0-A871-EB1A9768A47F}.Release|x86.ActiveCfg = Release|Any CPU
+		{A9198992-68A2-4DE0-A871-EB1A9768A47F}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -264,6 +280,7 @@ Global
 		{B61AAE66-15CC-40E4-873A-C23E697C3411} = {BB59D5B5-E7B0-4BF4-8F82-D14431B2799B}
 		{4A03840B-9EBE-47E3-89AB-E0914DF21AFB} = {BB59D5B5-E7B0-4BF4-8F82-D14431B2799B}
 		{115F4921-B44D-4F69-996B-69796959C99D} = {CC3D4B1C-9DE0-448B-8AE7-F3F1F3EC5C3A}
+		{A9198992-68A2-4DE0-A871-EB1A9768A47F} = {5239E8F8-5B8B-48DF-BEA1-1C7745D25D08}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D2404771-EEC8-45F2-9D71-F3373F6C1495}

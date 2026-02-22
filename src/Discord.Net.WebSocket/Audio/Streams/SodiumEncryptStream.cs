@@ -75,7 +75,7 @@ namespace Discord.Audio.Streams
                 _nonce,
                 _client.SecretKey);
 
-            // Append nonce to encripted payload
+            // Append nonce to encrypted payload
             Buffer.BlockCopy(counterBytes, 0, buffer, payloadOffset + encryptedLength, counterBytes.Length);
             int packageLength = _rtpHeader.Length + encryptedLength + counterBytes.Length;
 
