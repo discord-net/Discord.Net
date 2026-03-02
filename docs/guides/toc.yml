@@ -70,6 +70,8 @@
       topicUid: Guides.IntFw.PostExecution
     - name: Permissions
       topicUid: Guides.IntFw.Perms
+    - name: Modals
+      topicUid: Guides.IntFw.Modals
 - name: Slash Command Basics
   items:
     - name: Introduction
