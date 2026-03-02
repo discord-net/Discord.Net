@@ -72,6 +72,11 @@ namespace Discord.WebSocket
         UnknownEncryptionMode = 4016,
 
         /// <summary>
+        ///     This channel requires a client supporting E2EE via the DAVE Protocol.
+        /// </summary>
+        EndToEndEncryptionDAVEProtocolRequired = 4017,
+
+        /// <summary>
         ///     You sent a malformed request.
         /// </summary>
         BadRequest = 4020,
