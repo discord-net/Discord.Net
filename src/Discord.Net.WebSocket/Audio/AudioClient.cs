@@ -384,7 +384,7 @@ namespace Discord.Audio
                 {
                     opusDecoder = new DaveDecryptStream(
                         this,
-                        _dave.GetDecryptor(userId),
+                        _dave.GetOrCreateDecryptor(userId),
                         opusDecoder,
                         Discord.LogManager.CreateLogger($"Dave decrypt stream {userId}"),
                         userId
@@ -534,7 +534,7 @@ namespace Discord.Audio
                     {
                         var data = ((JToken)payload).ToObject<SpeakingEvent>(_serializer);
                         _ssrcMap.AddClient(data.Ssrc, data.UserId, data.Speaking);
-                        _dave?.AddUser(data.UserId);
+                        _dave?.GetOrCreateDecryptor(data.UserId);
 
                         await _speakingUpdatedEvent.InvokeAsync(data.UserId, data.Speaking);
                         break;
@@ -549,7 +549,10 @@ namespace Discord.Audio
                         if (data?.UserIds is not null)
                         {
                             for (var i = 0; i < data.UserIds.Length; i++)
-                                _dave.AddUser(data.UserIds[i]);
+                            {
+                                await _audioLogger.DebugAsync($"New client connected: {data.UserIds[i]}");
+                                _dave.GetOrCreateDecryptor(data.UserIds[i]);
+                            }
                         }
 
                         break;

@@ -36,6 +36,18 @@ internal sealed class DaveSessionManager : IDisposable
         _preparedTransitions = [];
         _session = Dave.CreateSession();
         Encryptor = Dave.CreateEncryptor();
+
+        /*
+         * TODO: ask staff about correct ways of handling empty VCs
+         *
+         * When the client connects to an empty voice channel, no protocol transition occurs, leaving the encryptor
+         * without a ratchet. This causes the encrypt method to fail.
+         *
+         * By setting passthrough mode to 'true' before doing any protocol operations ensures that we don't try to
+         * encrypt anything before we've set up all the cogs.
+         */
+        Encryptor.IsInPassthroughMode = true;
+
         _logger = client.Discord.LogManager.CreateLogger($"Dave #{clientId}");
 
         _session.OnMLSFailure += (source, reason) =>
@@ -51,25 +63,26 @@ internal sealed class DaveSessionManager : IDisposable
         };
     }
 
-    public DaveDecryptor GetDecryptor(ulong userId)
-        => _decryptors.GetOrAdd(
+    public DaveDecryptor GetOrCreateDecryptor(ulong userId)
+    {
+        var decryptor = _decryptors.GetOrAdd(
             userId,
             _ => Dave.CreateDecryptor()
         );
+
+        /*
+         * ensure the decryptor is configured correctly for the sessions state, this deals with updating the passthrough
+         * mode and the decryptors key ratchet.
+         */
+        decryptor.PrepareTransition(_session, userId, _session.ProtocolVersion);
+
+        return decryptor;
+    }
 
     public void AssignSsrc(uint ssrc)
     {
         // TODO: hardcode opus here?
         Encryptor.AssignSsrcToCodec(ssrc, Codec.Opus);
-    }
-
-    public void AddUser(ulong userId)
-    {
-        _decryptors.AddOrUpdate(
-            userId,
-            _ => Dave.CreateDecryptor(),
-            (_, existing) => existing
-        );
     }
 
     public bool RemoveUser(ulong id)
@@ -148,6 +161,13 @@ internal sealed class DaveSessionManager : IDisposable
 
     private async ValueTask OnDaveMLSProposalsAsync(ReadOnlyMemory<byte> payload)
     {
+        if (_logger.Level is LogSeverity.Debug)
+        {
+            await _logger.DebugAsync(
+                $"Processing MLS proposal; our users: [{string.Join(", ", _decryptors.Keys)}]"
+            );
+        }
+
         using var result = _session.ProcessProposals(
             payload,
             _decryptors.Keys
@@ -232,8 +252,6 @@ internal sealed class DaveSessionManager : IDisposable
         if (protocolVersion > Dave.DisabledProtocolVersion)
         {
             await HandlePrepareEpochAsync(Dave.MLSNewGroupExpectedEpoch, protocolVersion);
-            using var keyPackage = _session.GetMarshalledKeyPackage();
-            await SendMLSKeyPackageAsync(keyPackage.ToMemory());
         }
         else
         {
@@ -253,6 +271,9 @@ internal sealed class DaveSessionManager : IDisposable
             _client.ChannelId,
             SelfUserId
         );
+
+        using var keyPackage = _session.GetMarshalledKeyPackage();
+        await SendMLSKeyPackageAsync(keyPackage.ToMemory());
     }
 
     public async Task ExecuteProtocolTransitionAsync(ushort transitionId)
