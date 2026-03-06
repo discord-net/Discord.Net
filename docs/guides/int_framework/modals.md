@@ -69,7 +69,7 @@ Modals currently support the following components:
   - [Mentionable selects](#user--role--mentionable-and-channel-selects)
   - [Channel selects](#user--role--mentionable-and-channel-selects)
 - [File Uploads](#file-uploads)
-- [Text Display](#text-display
+- [Text Display](#text-display)
 
 ## Text Input
 Text inputs allow users to input text data into a modal. They can be configured with various options such as placeholder text, minimum and maximum length, and whether the input is required. Text inputs can be single-line or paragraph style.
@@ -93,6 +93,7 @@ public string[] TextSelectMenu { get; set; }
 ```
 
 ![Text select](images/modals/text-select.png)
+
 In case of `enum`, the enum values are automatically converted into options. `Hide` attribute can be used to declaratively remove options from the select menu. Custom attributes can be created by inheriting the `Hide` attribute and overriding the `Predicate` method to apply the attribute selectively during runtime.
 
 Option properties (like description, isDefault, and emote) can be configured by adding a `SelectMenuOption` attribute to the enum fields. Emote property accepts identifier strings for both unicode emojis and discord emotes. 
@@ -104,6 +105,7 @@ User, Role, Mentionable and Channel selects allow users to select one or more en
 
 [!code-csharp[Example modal](samples/modals/prefilled-selects.cs)]
 ![Prefilled selects](images/modals/prefilled-selects.png)
+
 For Channel selects in particular, the property type (if single entity), or the underlying type of the array can be used to restrict the type of channels available to the user. Implementations like `IStageChannel`, `IVoiceChannel`, `IDMChannel`, `IGroupChannel`, `ICategoryChannel`, `INewsChannel`, `IThreadChannel`, `ITextChannel`, `IMediaChannel`, or `IForumChannel` can be used.
 
 Additionally for Channel Select components, channel type constraints can be defined by annotating the property with a `ChannelTypes` attribute. 
