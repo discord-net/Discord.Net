@@ -30,6 +30,11 @@ namespace Discord
         Banner = 1L << 2,
 
         /// <summary>
+        ///     The guild is able to set gradient role colors.
+        /// </summary>
+        EnhancedRoleColors = 1L << 48,
+
+        /// <summary>
         ///     The guild has access to channel banners.
         /// </summary>
         ChannelBanner = 1L << 3,

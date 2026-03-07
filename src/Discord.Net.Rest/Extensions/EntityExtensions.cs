@@ -54,6 +54,24 @@ namespace Discord.Rest
                 model.IsAvailableForPurchase.IsSpecified,
                 model.GuildConnections.IsSpecified);
         }
+        public static RoleColors ToEntity(this API.RoleColors model)
+            => new(
+                model.PrimaryColor.IsSpecified && model.PrimaryColor.Value.HasValue ? new Color(model.PrimaryColor.Value.Value) : (Color?)null,
+                model.SecondaryColor.IsSpecified && model.SecondaryColor.Value.HasValue ? new Color(model.SecondaryColor.Value.Value) : (Color?)null,
+                model.TertiaryColor.IsSpecified && model.TertiaryColor.Value.HasValue ? new Color(model.TertiaryColor.Value.Value) : (Color?)null);
+
+        public static API.RoleColors ToModel(this RoleColors entity)
+        {
+            var normalized = entity.Normalize();
+
+            return new()
+            {
+                PrimaryColor = normalized.PrimaryColor?.RawValue,
+                SecondaryColor = normalized.SecondaryColor?.RawValue,
+                TertiaryColor = normalized.TertiaryColor?.RawValue
+            };
+        }
+
         public static API.Embed ToModel(this Embed entity)
         {
             if (entity == null)

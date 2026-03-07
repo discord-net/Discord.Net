@@ -1138,6 +1138,12 @@ namespace Discord.WebSocket
         public Task<RestRole> CreateRoleAsync(string name, GuildPermissions? permissions = default(GuildPermissions?), Color? color = default(Color?),
             bool isHoisted = false, bool isMentionable = false, RequestOptions options = null, Image? icon = null, Emoji emoji = null)
             => GuildHelper.CreateRoleAsync(this, Discord, name, permissions, color, isHoisted, isMentionable, options, icon, emoji);
+        /// <summary>
+        ///     Creates a new role with the provided role colors.
+        /// </summary>
+        public Task<RestRole> CreateRoleAsync(string name, RoleColors colors, GuildPermissions? permissions = default(GuildPermissions?),
+            bool isHoisted = false, bool isMentionable = false, RequestOptions options = null, Image? icon = null, Emoji emoji = null)
+            => GuildHelper.CreateRoleAsync(this, Discord, name, permissions, colors, isHoisted, isMentionable, options, icon, emoji);
         internal SocketRole AddRole(RoleModel model)
         {
             var role = SocketRole.Create(this, Discord.State, model);
@@ -2229,8 +2235,14 @@ namespace Discord.WebSocket
         async Task<IRole> IGuild.CreateRoleAsync(string name, GuildPermissions? permissions, Color? color, bool isHoisted, RequestOptions options)
             => await CreateRoleAsync(name, permissions, color, isHoisted, false, options).ConfigureAwait(false);
         /// <inheritdoc />
+        async Task<IRole> IGuild.CreateRoleAsync(string name, RoleColors colors, GuildPermissions? permissions, bool isHoisted, RequestOptions options)
+            => await CreateRoleAsync(name, colors, permissions, isHoisted, false, options).ConfigureAwait(false);
+        /// <inheritdoc />
         async Task<IRole> IGuild.CreateRoleAsync(string name, GuildPermissions? permissions, Color? color, bool isHoisted, bool isMentionable, RequestOptions options, Image? icon, Emoji emoji)
             => await CreateRoleAsync(name, permissions, color, isHoisted, isMentionable, options, icon, emoji).ConfigureAwait(false);
+        /// <inheritdoc />
+        async Task<IRole> IGuild.CreateRoleAsync(string name, RoleColors colors, GuildPermissions? permissions, bool isHoisted, bool isMentionable, RequestOptions options, Image? icon, Emoji emoji)
+            => await CreateRoleAsync(name, colors, permissions, isHoisted, isMentionable, options, icon, emoji).ConfigureAwait(false);
 
         /// <inheritdoc />
         async Task<IReadOnlyCollection<IGuildUser>> IGuild.GetUsersAsync(CacheMode mode, RequestOptions options)

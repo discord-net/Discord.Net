@@ -1,3 +1,4 @@
+using Discord.Rest;
 using Model = Discord.API.AuditLogs.RoleInfoAuditLogModel;
 
 namespace Discord.WebSocket;
@@ -13,6 +14,10 @@ public struct SocketRoleEditInfo
             Color = new Color(model.Color.Value);
         else
             Color = null;
+
+        Colors = model.Colors is not null
+            ? model.Colors.ToEntity()
+            : model.Color is not null && model.Color.Value != 0 ? RoleColors.FromColor(new Color(model.Color.Value)) : null;
 
         Mentionable = model.IsMentionable;
         Hoist = model.Hoist;
@@ -34,6 +39,11 @@ public struct SocketRoleEditInfo
     ///     color.
     /// </returns>
     public Color? Color { get; }
+
+    /// <summary>
+    ///     Gets the full color configuration of this role.
+    /// </summary>
+    public RoleColors? Colors { get; }
 
     /// <summary>
     ///     Gets a value that indicates whether this role is mentionable.

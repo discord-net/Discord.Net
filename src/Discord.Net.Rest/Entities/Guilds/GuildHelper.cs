@@ -645,6 +645,44 @@ namespace Discord.Rest
             return RestRole.Create(client, guild, model);
         }
 
+        public static async Task<RestRole> CreateRoleAsync(IGuild guild, BaseDiscordClient client,
+            string name, GuildPermissions? permissions, RoleColors? colors, bool isHoisted, bool isMentionable, RequestOptions options, Image? icon, Emoji emoji)
+        {
+            if (name == null)
+                throw new ArgumentNullException(paramName: nameof(name));
+
+            if (icon is not null || emoji is not null)
+            {
+                guild.Features.EnsureFeature(GuildFeature.RoleIcons);
+
+                if (icon is not null && emoji is not null)
+                {
+                    throw new ArgumentException("Emoji and Icon properties cannot be present on a role at the same time.");
+                }
+            }
+
+            if (colors.HasValue && (colors.Value.SecondaryColor.HasValue || colors.Value.TertiaryColor.HasValue))
+                guild.Features.EnsureFeature(GuildFeature.EnhancedRoleColors);
+
+            var normalizedColors = colors?.Normalize();
+
+            var createGuildRoleParams = new API.Rest.ModifyGuildRoleParams
+            {
+                Color = normalizedColors.HasValue && normalizedColors.Value.PrimaryColor.HasValue ? normalizedColors.Value.PrimaryColor.Value.RawValue : Optional.Create<uint>(),
+                Colors = normalizedColors?.ToModel() ?? Optional<API.RoleColors>.Unspecified,
+                Hoist = isHoisted,
+                Mentionable = isMentionable,
+                Name = name,
+                Permissions = permissions?.RawValue.ToString() ?? Optional.Create<string>(),
+                Icon = icon?.ToModel(),
+                Emoji = emoji?.Name
+            };
+
+            var model = await client.ApiClient.CreateGuildRoleAsync(guild.Id, createGuildRoleParams, options).ConfigureAwait(false);
+
+            return RestRole.Create(client, guild, model);
+        }
+
         public static async Task<RestRole> GetRoleAsync(IGuild guild, BaseDiscordClient client, ulong roleId, RequestOptions options)
         {
             var model = await client.ApiClient.GetRoleAsync(guild.Id, roleId, options).ConfigureAwait(false);

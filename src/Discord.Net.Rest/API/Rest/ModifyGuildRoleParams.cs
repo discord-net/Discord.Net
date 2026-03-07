@@ -11,6 +11,8 @@ namespace Discord.API.Rest
         public Optional<string> Permissions { get; set; }
         [JsonProperty("color")]
         public Optional<uint> Color { get; set; }
+        [JsonProperty("colors")]
+        public Optional<API.RoleColors> Colors { get; set; }
         [JsonProperty("hoist")]
         public Optional<bool> Hoist { get; set; }
         [JsonProperty("icon")]

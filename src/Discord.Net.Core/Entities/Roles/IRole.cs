@@ -24,6 +24,10 @@ namespace Discord
         /// </returns>
         Color Color { get; }
         /// <summary>
+        ///     Gets the full role color configuration of this role.
+        /// </summary>
+        RoleColors? Colors { get; }
+        /// <summary>
         ///     Gets a value that indicates whether the role can be separated in the user list.
         /// </summary>
         /// <returns>

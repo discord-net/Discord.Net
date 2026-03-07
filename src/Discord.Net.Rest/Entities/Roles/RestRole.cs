@@ -16,6 +16,8 @@ namespace Discord.Rest
         /// <inheritdoc />
         public Color Color { get; private set; }
         /// <inheritdoc />
+        public RoleColors? Colors { get; private set; }
+        /// <inheritdoc />
         public bool IsHoisted { get; private set; }
         /// <inheritdoc />
         public bool IsManaged { get; private set; }
@@ -65,6 +67,7 @@ namespace Discord.Rest
             IsMentionable = model.Mentionable;
             Position = model.Position;
             Color = new Color(model.Color);
+            Colors = model.Colors.IsSpecified ? model.Colors.Value?.ToEntity() : model.Color != 0 ? RoleColors.FromColor(Color) : null;
             Permissions = new GuildPermissions(model.Permissions);
             Flags = model.Flags;
 

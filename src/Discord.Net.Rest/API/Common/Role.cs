@@ -19,6 +19,9 @@ internal class Role
     [JsonProperty("color")]
     public uint Color { get; set; }
 
+    [JsonProperty("colors")]
+    public Optional<RoleColors> Colors { get; set; }
+
     [JsonProperty("hoist")]
     public bool Hoist { get; set; }
 
