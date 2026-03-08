@@ -16,6 +16,9 @@ internal class CheckboxComponent : IInteractableComponent
     [JsonProperty("default")]
     public Optional<bool> DefaultState { get; set; }
 
+    [JsonProperty("value")]
+    public Optional<bool> Value { get; set; } 
+
     public CheckboxComponent() { }
 
     public CheckboxComponent(Discord.CheckboxComponent component)

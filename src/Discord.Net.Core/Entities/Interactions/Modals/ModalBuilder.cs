@@ -247,6 +247,34 @@ namespace Discord
             return this;
         }
 
+        /// <inheritdoc cref="ModalComponentBuilder.WithCheckBox(string, CheckboxBuilder, string, int?)"/>
+        /// <returns>The current <see cref="ModalBuilder"/>.</returns>
+        public ModalBuilder AddCheckBox(
+            string label,
+            CheckboxBuilder checkbox,
+            string description = null,
+            int? labelId = null
+        )
+        {
+            Components.WithCheckBox(label, checkbox, description, labelId);
+            return this;
+        }
+
+        /// <inheritdoc cref="ModalComponentBuilder.WithCheckBox(string, string, bool, string, int?)"/>
+        /// <returns>The current <see cref="ModalBuilder"/>.</returns>
+        public ModalBuilder AddCheckBox(
+            string label,
+            string customId,
+            bool defaultState = false,
+            string description = null,
+            int? labelId = null
+        )
+        {
+            Components.WithCheckBox(label, customId, defaultState, description, labelId);
+            return this;
+        }
+
+
         /// <inheritdoc cref="ModalComponentBuilder.WithTextDisplay(TextDisplayBuilder)"/>
         /// <returns>The current <see cref="ModalBuilder"/>.</returns>
         public ModalBuilder AddTextDisplay(TextDisplayBuilder textDisplay)
@@ -752,6 +780,49 @@ namespace Discord
                 isRequired,
                 id
             ),
+            description,
+            labelId
+        );
+
+        /// <summary>
+        ///     Constructs and adds a <see cref="LabelBuilder"/> with the provided
+        ///     <see cref="CheckboxBuilder"/> to the current <see cref="ModalComponentBuilder"/>.
+        /// </summary>
+        /// <param name="label">The label around the <see cref="FileUploadComponentBuilder"/>.</param>
+        /// <param name="checkbox">The checkbox to add.</param>
+        /// <param name="description">The description around the <see cref="FileUploadComponentBuilder"/>.</param>
+        /// <param name="labelId">
+        ///     The id of the <see cref="LabelBuilder"/> wrapping the <see cref="FileUploadComponentBuilder"/>.
+        /// </param>
+        /// <returns>The current <see cref="ModalComponentBuilder"/>.</returns>
+        public ModalComponentBuilder WithCheckBox(
+            string label,
+            CheckboxBuilder checkbox,
+            string description = null,
+            int? labelId = null
+            ) => WithLabel(label, checkbox, description, labelId);
+
+        /// <summary>
+        ///     Constructs and adds a <see cref="LabelBuilder"/> with a <see cref="CheckboxBuilder"/>
+        ///     to the current <see cref="ModalComponentBuilder"/>.
+        /// </summary>
+        /// <param name="label">The label around the <see cref="CheckboxBuilder"/>.</param>
+        /// <param name="customId">The custom id of the <see cref="CheckboxBuilder"/>.</param>
+        /// <param name="defaultState">The default state of the <see cref="CheckboxBuilder"/>.</param>
+        /// <param name="description">The description around the <see cref="CheckboxBuilder"/>.</param>
+        /// <param name="labelId">
+        ///     The id of the <see cref="LabelBuilder"/> wrapping the <see cref="CheckboxBuilder"/>.
+        /// </param>
+        /// <returns>The current <see cref="ModalComponentBuilder"/>.</returns>
+        public ModalComponentBuilder WithCheckBox(
+            string label,
+            string customId,
+            bool defaultState = false,
+            string description = null,
+            int? labelId = null
+        ) => WithCheckBox(
+            label,
+            new CheckboxBuilder(customId, defaultState),
             description,
             labelId
         );

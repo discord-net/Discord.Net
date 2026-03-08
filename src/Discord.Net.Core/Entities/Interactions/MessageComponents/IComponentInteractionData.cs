@@ -18,7 +18,7 @@ namespace Discord
         ComponentType Type { get; }
 
         /// <summary>
-        ///     Gets the value(s) of a <see cref="ComponentType.SelectMenu"/> interaction response. <see langword="null"/> if select type is different.
+        ///     Gets the value(s) of a <see cref="ComponentType.SelectMenu"/> or <see cref="ComponentType.FileUpload"/> interaction response. <see langword="null"/> if select type is different.
         /// </summary>
         IReadOnlyCollection<string> Values { get; }
 
@@ -46,5 +46,10 @@ namespace Discord
         ///     Gets the value of a <see cref="ComponentType.TextInput"/> interaction response.
         /// </summary>
         public string Value { get; }
+
+        /// <summary>
+        ///     Gets the value of a <see cref="ComponentType.Checkbox"/> interaction response. <see langword="null"/> if component type is different.
+        /// </summary>
+        public bool? BoolValue { get; }
     }
 }

@@ -1,5 +1,5 @@
 using Newtonsoft.Json;
-using System.Collections.Generic;
+using Newtonsoft.Json.Linq;
 
 namespace Discord.API
 {
@@ -15,7 +15,7 @@ namespace Discord.API
         public Optional<string[]> Values { get; set; }
 
         [JsonProperty("value")]
-        public Optional<string> Value { get; set; }
+        public Optional<JToken> Value { get; set; }
 
         [JsonProperty("resolved")]
         public Optional<MessageComponentInteractionDataResolved> Resolved { get; set; }

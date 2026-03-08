@@ -1,7 +1,9 @@
 using Discord.Rest;
+
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+
 using Model = Discord.API.MessageComponentInteractionData;
 
 namespace Discord.WebSocket
@@ -48,15 +50,21 @@ namespace Discord.WebSocket
         IReadOnlyCollection<IGuildUser> IComponentInteractionData.Members => Members;
 
         #endregion
+
         /// <inheritdoc />
         public string Value { get; }
+
+        /// <inheritdoc />
+        public bool? BoolValue { get; }
 
         internal SocketMessageComponentData(Model model, DiscordSocketClient discord, ClientState state, SocketGuild guild, API.User dmUser)
         {
             CustomId = model.CustomId;
             Type = model.ComponentType;
             Values = model.Values.GetValueOrDefault();
-            Value = model.Value.GetValueOrDefault();
+
+            Value = model.Value.GetValueOrDefault(null)?.ToObject<string>();
+            BoolValue = model.Value.GetValueOrDefault(null)?.ToObject<bool>();
 
             if (model.Resolved.IsSpecified)
             {
@@ -73,13 +81,12 @@ namespace Discord.WebSocket
                     : null;
 
                 Channels = model.Resolved.Value.Channels.IsSpecified
-                    ? model.Resolved.Value.Channels.Value.Select(
-                        channel =>
-                        {
-                            if (channel.Value.Type is ChannelType.DM)
-                                return SocketDMChannel.Create(discord, state, channel.Value.Id, dmUser);
-                            return (SocketChannel)SocketGuildChannel.Create(guild, state, channel.Value);
-                        }).ToImmutableArray()
+                    ? model.Resolved.Value.Channels.Value.Select(channel =>
+                    {
+                        if (channel.Value.Type is ChannelType.DM)
+                            return SocketDMChannel.Create(discord, state, channel.Value.Id, dmUser);
+                        return (SocketChannel)SocketGuildChannel.Create(guild, state, channel.Value);
+                    }).ToImmutableArray()
                     : null;
 
                 Roles = model.Resolved.Value.Roles.IsSpecified
@@ -115,13 +122,12 @@ namespace Discord.WebSocket
                         : null;
 
                     Channels = select.Resolved.Value.Channels.IsSpecified
-                        ? select.Resolved.Value.Channels.Value.Select(
-                            channel =>
-                            {
-                                if (channel.Value.Type is ChannelType.DM)
-                                    return SocketDMChannel.Create(discord, state, channel.Value.Id, dmUser);
-                                return (SocketChannel)SocketGuildChannel.Create(guild, state, channel.Value);
-                            }).ToImmutableArray()
+                        ? select.Resolved.Value.Channels.Value.Select(channel =>
+                        {
+                            if (channel.Value.Type is ChannelType.DM)
+                                return SocketDMChannel.Create(discord, state, channel.Value.Id, dmUser);
+                            return (SocketChannel)SocketGuildChannel.Create(guild, state, channel.Value);
+                        }).ToImmutableArray()
                         : null;
 
                     Roles = select.Resolved.Value.Roles.IsSpecified
@@ -133,6 +139,11 @@ namespace Discord.WebSocket
             if (component is API.FileUploadComponent fileUpload)
             {
                 Values = fileUpload.Values.GetValueOrDefault(null);
+            }
+
+            if (component is API.CheckboxComponent checkbox)
+            {
+                BoolValue = checkbox.Value.ToNullable();
             }
         }
     }
