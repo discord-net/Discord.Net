@@ -77,10 +77,10 @@ public class RadioGroupBuilder : IInteractableComponentBuilder
     /// <param name="options">The options for this radio group.</param>
     /// <param name="isRequired">Whether the current radio group requires selection before submitting the modal.</param>
     /// <param name="id">The id for the component.</param>
-    public RadioGroupBuilder(string customId, List<RadioGroupOptionProperties> options = null, bool isRequired = true, int? id = null)
+    public RadioGroupBuilder(string customId, IEnumerable<RadioGroupOptionProperties> options = null, bool isRequired = true, int? id = null)
     {
         CustomId = customId;
-        Options = options;
+        Options = options?.ToList();
         IsRequired = isRequired;
         Id = id;
     }

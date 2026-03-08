@@ -149,6 +149,11 @@ namespace Discord.Rest
             {
                 Values = checkboxGroup.Values.GetValueOrDefault(null);
             }
+
+            if (component is API.RadioGroupComponent radioGroup)
+            {
+                Value = radioGroup.Value.GetValueOrDefault(null);
+            }
         }
     }
 }

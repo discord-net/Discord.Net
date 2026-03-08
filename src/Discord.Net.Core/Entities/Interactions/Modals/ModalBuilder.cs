@@ -287,6 +287,36 @@ namespace Discord
             return this;
         }
 
+        /// <inheritdoc cref="ModalComponentBuilder.WithRadioGroup(string, RadioGroupBuilder, string, int?)"/>
+        /// <returns>The current <see cref="ModalBuilder"/>.</returns>
+        public ModalBuilder AddRadioGroup(
+            string label,
+            RadioGroupBuilder radioGroup,
+            string description = null,
+            int? labelId = null
+        )
+        {
+            Components.WithRadioGroup(label, radioGroup, description, labelId);
+            return this;
+        }
+
+
+        /// <inheritdoc cref="ModalComponentBuilder.WithRadioGroup(string, string, IEnumerable{RadioGroupOptionProperties}, bool, int?, string, int?)"/>
+        /// <returns>The current <see cref="ModalBuilder"/>.</returns>
+        public ModalBuilder AddRadioGroup(
+            string label,
+            string customId,
+            IEnumerable<RadioGroupOptionProperties> radioOptions,
+            bool isRequired = true,
+            int? id = null,
+            string description = null,
+            int? labelId = null
+        )
+        {
+            Components.WithRadioGroup(label, customId, radioOptions, isRequired, id, description, labelId);
+            return this;
+        }
+
 
         /// <inheritdoc cref="ModalComponentBuilder.WithCheckBoxGroup(string, string, IEnumerable{CheckboxGroupOptionProperties}, int?, int?, bool, int?, string, int?)"/>
         /// <returns>The current <see cref="ModalBuilder"/>.</returns>
@@ -907,6 +937,54 @@ namespace Discord
         ) => WithCheckBoxGroup(
             label,
             new CheckboxGroupBuilder(customId, groupOptions, minValues, maxValues, isRequired, id),
+            description,
+            labelId
+        );
+
+
+        /// <summary>
+        ///     Constructs and adds a <see cref="LabelBuilder"/> with the provided
+        ///     <see cref="RadioGroupBuilder"/> to the current <see cref="ModalComponentBuilder"/>.
+        /// </summary>
+        /// <param name="label">The label around the <see cref="RadioGroupBuilder"/>.</param>
+        /// <param name="radioGroup">The radio to add.</param>
+        /// <param name="description">The description around the <see cref="RadioGroupBuilder"/>.</param>
+        /// <param name="labelId">
+        ///     The id of the <see cref="LabelBuilder"/> wrapping the <see cref="RadioGroupBuilder"/>.
+        /// </param>
+        /// <returns>The current <see cref="ModalComponentBuilder"/>.</returns>
+        public ModalComponentBuilder WithRadioGroup(
+            string label,
+            RadioGroupBuilder radioGroup,
+            string description = null,
+            int? labelId = null
+        ) => WithLabel(label, radioGroup, description, labelId);
+
+        /// <summary>
+        ///     Constructs and adds a <see cref="LabelBuilder"/> with a <see cref="RadioGroupBuilder"/>
+        ///     to the current <see cref="ModalComponentBuilder"/>.
+        /// </summary>
+        /// <param name="label">The label around the <see cref="RadioGroupBuilder"/>.</param>
+        /// <param name="customId">The custom id of the <see cref="RadioGroupBuilder"/>.</param>
+        /// <param name="radioOptions">The options for the radio group <see cref="RadioGroupBuilder"/>.</param>
+        /// <param name="isRequired">Whether the <see cref="RadioGroupBuilder"/> is required.</param>
+        /// <param name="id">The id of the <see cref="RadioGroupBuilder"/>.</param>
+        /// <param name="description">The description around the <see cref="RadioGroupBuilder"/>.</param>
+        /// <param name="labelId">
+        ///     The id of the <see cref="LabelBuilder"/> wrapping the <see cref="RadioGroupBuilder"/>.
+        /// </param>
+        /// <returns>The current <see cref="ModalComponentBuilder"/>.</returns>
+        public ModalComponentBuilder WithRadioGroup(
+            string label,
+            string customId,
+            IEnumerable<RadioGroupOptionProperties> radioOptions,
+            bool isRequired = true,
+            int? id = null,
+            string description = null,
+            int? labelId = null
+        ) => WithRadioGroup(
+            label,
+            new RadioGroupBuilder(customId, radioOptions, isRequired, id),
             description,
             labelId
         );
