@@ -19,7 +19,7 @@ namespace Discord
 
         /// <summary>
         ///     Gets the value(s) of a <see cref="ComponentType.SelectMenu"/>, <see cref="ComponentType.FileUpload"/>
-        ///     or <see cref="ComponentType.CheckboxGroup"/>> interaction response. <see langword="null"/> if select type is different.
+        ///     or <see cref="ComponentType.CheckboxGroup"/> interaction response. <see langword="null"/> if select type is different.
         /// </summary>
         IReadOnlyCollection<string> Values { get; }
 
@@ -44,7 +44,7 @@ namespace Discord
         IReadOnlyCollection<IGuildUser> Members { get; }
 
         /// <summary>
-        ///     Gets the value of a <see cref="ComponentType.TextInput"/> interaction response.
+        ///     Gets the value of a <see cref="ComponentType.TextInput"/> of <see cref="ComponentType.RadioGroup"/> interaction response.
         /// </summary>
         public string Value { get; }
 
