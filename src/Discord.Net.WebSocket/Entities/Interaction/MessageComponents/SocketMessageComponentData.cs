@@ -145,6 +145,11 @@ namespace Discord.WebSocket
             {
                 BoolValue = checkbox.Value.ToNullable();
             }
+
+            if (component is API.CheckboxGroupComponent checkboxGroup)
+            {
+                Values = checkboxGroup.Values.GetValueOrDefault(null);
+            }
         }
     }
 }

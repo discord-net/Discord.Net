@@ -18,7 +18,8 @@ namespace Discord
         ComponentType Type { get; }
 
         /// <summary>
-        ///     Gets the value(s) of a <see cref="ComponentType.SelectMenu"/> or <see cref="ComponentType.FileUpload"/> interaction response. <see langword="null"/> if select type is different.
+        ///     Gets the value(s) of a <see cref="ComponentType.SelectMenu"/>, <see cref="ComponentType.FileUpload"/>
+        ///     or <see cref="ComponentType.CheckboxGroup"/>> interaction response. <see langword="null"/> if select type is different.
         /// </summary>
         IReadOnlyCollection<string> Values { get; }
 

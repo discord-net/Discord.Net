@@ -119,10 +119,10 @@ public class CheckboxGroupBuilder : IInteractableComponentBuilder
     /// <param name="maxValues">The maximum number of options that can be selected.</param>
     /// <param name="isRequired">Whether the current checkbox group requires selection before submitting the modal.</param>
     /// <param name="id">The id for the component.</param>
-    public CheckboxGroupBuilder(string customId, List<CheckboxGroupOptionProperties> options = null, int? minValues = null, int? maxValues = null, bool isRequired = true, int? id = null)
+    public CheckboxGroupBuilder(string customId, IEnumerable<CheckboxGroupOptionProperties> options = null, int? minValues = null, int? maxValues = null, bool isRequired = true, int? id = null)
     {
         CustomId = customId;
-        Options = options;
+        Options = options?.ToList();
         MinValues = minValues;
         MaxValues = maxValues;
         IsRequired = isRequired;

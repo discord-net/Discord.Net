@@ -243,7 +243,7 @@ namespace Discord
             int? labelId = null
         )
         {
-            Components.WithFileUpload(label, customId,  minValues, maxValues, isRequired, id, description, labelId);
+            Components.WithFileUpload(label, customId, minValues, maxValues, isRequired, id, description, labelId);
             return this;
         }
 
@@ -274,6 +274,37 @@ namespace Discord
             return this;
         }
 
+        /// <inheritdoc cref="ModalComponentBuilder.WithCheckBoxGroup(string, CheckboxGroupBuilder, string, int?)"/>
+        /// <returns>The current <see cref="ModalBuilder"/>.</returns>
+        public ModalBuilder AddCheckBoxGroup(
+            string label,
+            CheckboxGroupBuilder checkboxGroup,
+            string description = null,
+            int? labelId = null
+        )
+        {
+            Components.WithCheckBoxGroup(label, checkboxGroup, description, labelId);
+            return this;
+        }
+
+
+        /// <inheritdoc cref="ModalComponentBuilder.WithCheckBoxGroup(string, string, IEnumerable{CheckboxGroupOptionProperties}, int?, int?, bool, int?, string, int?)"/>
+        /// <returns>The current <see cref="ModalBuilder"/>.</returns>
+        public ModalBuilder AddCheckBoxGroup(
+            string label,
+            string customId,
+            IEnumerable<CheckboxGroupOptionProperties> groupOptions,
+            int? minValues = null,
+            int? maxValues = null,
+            bool isRequired = true,
+            int? id = null,
+            string description = null,
+            int? labelId = null
+        )
+        {
+            Components.WithCheckBoxGroup(label, customId, groupOptions, minValues, maxValues, isRequired, id, description, labelId);
+            return this;
+        }
 
         /// <inheritdoc cref="ModalComponentBuilder.WithTextDisplay(TextDisplayBuilder)"/>
         /// <returns>The current <see cref="ModalBuilder"/>.</returns>
@@ -460,7 +491,8 @@ namespace Discord
         {
             foreach (var component in Components.ToArray())
             {
-                if (component.Type == type) Components.Remove(component);
+                if (component.Type == type)
+                    Components.Remove(component);
             }
 
             return this;
@@ -826,6 +858,59 @@ namespace Discord
             description,
             labelId
         );
+
+
+        /// <summary>
+        ///     Constructs and adds a <see cref="LabelBuilder"/> with the provided
+        ///     <see cref="CheckboxGroupBuilder"/> to the current <see cref="ModalComponentBuilder"/>.
+        /// </summary>
+        /// <param name="label">The label around the <see cref="CheckboxGroupBuilder"/>.</param>
+        /// <param name="checkboxGroup">The checkbox to add.</param>
+        /// <param name="description">The description around the <see cref="CheckboxGroupBuilder"/>.</param>
+        /// <param name="labelId">
+        ///     The id of the <see cref="LabelBuilder"/> wrapping the <see cref="CheckboxGroupBuilder"/>.
+        /// </param>
+        /// <returns>The current <see cref="ModalComponentBuilder"/>.</returns>
+        public ModalComponentBuilder WithCheckBoxGroup(
+            string label,
+            CheckboxGroupBuilder checkboxGroup,
+            string description = null,
+            int? labelId = null
+        ) => WithLabel(label, checkboxGroup, description, labelId);
+
+        /// <summary>
+        ///     Constructs and adds a <see cref="LabelBuilder"/> with a <see cref="CheckboxGroupBuilder"/>
+        ///     to the current <see cref="ModalComponentBuilder"/>.
+        /// </summary>
+        /// <param name="label">The label around the <see cref="CheckboxGroupBuilder"/>.</param>
+        /// <param name="customId">The custom id of the <see cref="CheckboxGroupBuilder"/>.</param>
+        /// <param name="groupOptions">The options for the checkbox group <see cref="CheckboxGroupBuilder"/>.</param>
+        /// <param name="minValues">The min values of the <see cref="CheckboxGroupBuilder"/>.</param>
+        /// <param name="maxValues">The max values of the <see cref="CheckboxGroupBuilder"/>.</param>
+        /// <param name="isRequired">Whether the <see cref="CheckboxGroupBuilder"/> is required.</param>
+        /// <param name="id">The id of the <see cref="CheckboxGroupBuilder"/>.</param>
+        /// <param name="description">The description around the <see cref="CheckboxGroupBuilder"/>.</param>
+        /// <param name="labelId">
+        ///     The id of the <see cref="LabelBuilder"/> wrapping the <see cref="CheckboxGroupBuilder"/>.
+        /// </param>
+        /// <returns>The current <see cref="ModalComponentBuilder"/>.</returns>
+        public ModalComponentBuilder WithCheckBoxGroup(
+            string label,
+            string customId,
+            IEnumerable<CheckboxGroupOptionProperties> groupOptions,
+            int? minValues = null,
+            int? maxValues = null,
+            bool isRequired = true,
+            int? id = null,
+            string description = null,
+            int? labelId = null
+        ) => WithCheckBoxGroup(
+            label,
+            new CheckboxGroupBuilder(customId, groupOptions, minValues, maxValues, isRequired, id),
+            description,
+            labelId
+        );
+
 
         /// <summary>
         ///     Adds a <see cref="TextDisplayBuilder"/> to the current <see cref="ModalComponentBuilder"/>.

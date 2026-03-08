@@ -144,6 +144,11 @@ namespace Discord.Rest
             {
                 BoolValue = checkbox.Value.ToNullable();
             }
+
+            if (component is API.CheckboxGroupComponent checkboxGroup)
+            {
+                Values = checkboxGroup.Values.GetValueOrDefault(null);
+            }
         }
     }
 }

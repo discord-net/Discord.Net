@@ -27,6 +27,9 @@ internal class CheckboxGroupComponent : IInteractableComponent
     [JsonProperty("required")]
     public Optional<bool> IsRequired { get; set; }
 
+    [JsonProperty("values")]
+    public Optional<string[]> Values { get; set; }
+
     public CheckboxGroupComponent() { }
 
     public CheckboxGroupComponent(Discord.CheckboxGroupComponent component)
