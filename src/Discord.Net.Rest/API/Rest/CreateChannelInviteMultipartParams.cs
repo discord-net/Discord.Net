@@ -1,4 +1,8 @@
+using Discord.Net.Converters;
 using Discord.Net.Rest;
+
+using Newtonsoft.Json;
+
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -8,6 +12,8 @@ namespace Discord.API.Rest;
 
 internal class CreateChannelInviteMultipartParams
 {
+    private static readonly JsonSerializer _serializer = new JsonSerializer { ContractResolver = new DiscordContractResolver() };
+
     public ulong[] UserIds { get; }
 
     public Optional<int> MaxAge { get; set; }
@@ -33,28 +39,37 @@ internal class CreateChannelInviteMultipartParams
 
     public IReadOnlyDictionary<string, object> ToDictionary()
     {
+        var d = new Dictionary<string, object>();
+
         var payload = new Dictionary<string, object>();
 
         if (MaxAge.IsSpecified)
-            payload["max_age"] = MaxAge.Value.ToString();
+            payload["max_age"] = MaxAge.Value;
         if (MaxUses.IsSpecified)
-            payload["max_uses"] = MaxUses.Value.ToString();
+            payload["max_uses"] = MaxUses.Value;
         if (IsTemporary.IsSpecified)
-            payload["temporary"] = IsTemporary.Value.ToString();
+            payload["temporary"] = IsTemporary.Value;
         if (IsUnique.IsSpecified)
-            payload["unique"] = IsUnique.Value.ToString();
+            payload["unique"] = IsUnique.Value;
         if (TargetType.IsSpecified)
-            payload["target_type"] = ((int)TargetType.Value).ToString();
+            payload["target_type"] = TargetType.Value;
         if (TargetUserId.IsSpecified)
-            payload["target_user_id"] = TargetUserId.Value.ToString();
+            payload["target_user_id"] = TargetUserId.Value;
         if (TargetApplicationId.IsSpecified)
-            payload["target_application_id"] = TargetApplicationId.Value.ToString();
+            payload["target_application_id"] = TargetApplicationId.Value;
         if (RoleIds.IsSpecified)
-            payload["role_ids"] = string.Join(',', RoleIds.Value);
+            payload["role_ids"] = RoleIds.Value;
 
-        var ms = new MemoryStream(Encoding.UTF8.GetBytes("Users\n" + string.Join('\n', UserIds)));
-        payload["target_users_file"] = new MultipartFile(ms, "file.csv", "text/csv");
+        var json = new StringBuilder();
+        using (var text = new StringWriter(json))
+        using (var writer = new JsonTextWriter(text))
+            _serializer.Serialize(writer, payload);
 
-        return payload;
+        d["payload_json"] = json.ToString();
+
+        var ms = new MemoryStream(Encoding.UTF8.GetBytes(string.Join('\n', UserIds)));
+        d["target_users_file"] = new MultipartFile(ms, "file.csv", "text/csv");
+
+        return d;
     }
 }

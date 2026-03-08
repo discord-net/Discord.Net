@@ -14,6 +14,7 @@ internal class ModifyChannelInviteTargetUsersMultipartParams
     {
         UserIds = userIds.ToArray();
     }
+
     public IReadOnlyDictionary<string, object> ToDictionary()
     {
         var payload = new Dictionary<string, object>();

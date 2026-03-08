@@ -118,6 +118,18 @@ namespace Discord.Rest
         public Task DeleteAsync(RequestOptions options = null)
             => InviteHelper.DeleteAsync(this, Discord, options);
 
+        /// <inheritdoc />
+        public Task<TargetUsersJobStatus> GetTargetUsersJobStatusAsync(RequestOptions options = null)
+            => InviteHelper.GetTargetUsersJobStatusAsync(Discord, Code, options);
+
+        /// <inheritdoc />
+        public Task<IReadOnlyCollection<ulong>> GetTargetUsersAsync(RequestOptions options = null)
+            => InviteHelper.GetInviteTargetUsersAsync(Discord, Code, options);
+
+        /// <inheritdoc />
+        public Task ModifyTargetUsersAsync(IEnumerable<ulong> userIds, RequestOptions options = null)
+            => InviteHelper.ModifyInviteTargetUsersAsync(Discord, Code, userIds, options);
+
         /// <summary>
         ///     Gets the URL of the invite.
         /// </summary>

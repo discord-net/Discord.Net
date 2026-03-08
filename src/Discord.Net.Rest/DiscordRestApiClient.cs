@@ -1985,6 +1985,16 @@ namespace Discord.API
             return SendMultipartAsync<InviteMetadata>("POST", () => $"channels/{channelId}/invites", args.ToDictionary(), ids, options: options);
         }
 
+        public Task ModifyInviteTargetUsersAsync(string inviteId, ModifyChannelInviteTargetUsersMultipartParams args, RequestOptions options = null)
+        {
+            Preconditions.NotNull(inviteId, nameof(inviteId));
+            Preconditions.NotNull(args, nameof(args));
+
+            options = RequestOptions.CreateOrClone(options);
+
+            return SendMultipartAsync("PUT", () => $"invites/{inviteId}/target-users", args.ToDictionary(), new BucketIds(), options: options);
+        }
+
         public Task<Invite> DeleteInviteAsync(string inviteId, RequestOptions options = null)
         {
             Preconditions.NotNullOrEmpty(inviteId, nameof(inviteId));
@@ -2010,6 +2020,14 @@ namespace Discord.API
                     userIds.Add(userId);
             }
             return userIds.ToArray();
+        }
+
+        public async Task<InviteTargetUsersJobStatus> GetInviteTargetUsersJobStatusAsync(string inviteId, RequestOptions options = null)
+        {
+            Preconditions.NotNullOrEmpty(inviteId, nameof(inviteId));
+            options = RequestOptions.CreateOrClone(options);
+
+            return await SendAsync<InviteTargetUsersJobStatus>("GET", () => $"invites/{inviteId}/target-users/job-status", new BucketIds(), options: options).ConfigureAwait(false);
         }
 
         #endregion

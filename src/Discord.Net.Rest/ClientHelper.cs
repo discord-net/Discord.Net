@@ -104,19 +104,6 @@ namespace Discord.Rest
             return models.Select(model => RestConnection.Create(client, model)).ToImmutableArray();
         }
 
-        public static async Task<RestInviteMetadata> GetInviteAsync(BaseDiscordClient client, string inviteId, RequestOptions options, ulong? scheduledEventId = null)
-        {
-            var model = await client.ApiClient.GetInviteAsync(inviteId, options, scheduledEventId).ConfigureAwait(false);
-            if (model != null)
-                return RestInviteMetadata.Create(client, null, null, model);
-            return null;
-        }
-
-        public static async Task<IReadOnlyCollection<ulong>> GetInviteTargetUsersAsync(BaseDiscordClient client, string inviteCode, RequestOptions options)
-        {
-            return [.. await client.ApiClient.GetInviteTargetUsersAsync(inviteCode).ConfigureAwait(false)];
-        }
-
         public static async Task<RestGuild> GetGuildAsync(BaseDiscordClient client,
             ulong id, bool withCounts, RequestOptions options)
         {

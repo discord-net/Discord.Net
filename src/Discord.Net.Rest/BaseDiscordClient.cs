@@ -227,6 +227,14 @@ namespace Discord.Rest
             => Task.FromResult<IReadOnlyCollection<ulong>>(ImmutableArray<ulong>.Empty);
 
         /// <inheritdoc />
+        Task IDiscordClient.ModifyTargetUsersAsync(string inviteId, IEnumerable<ulong> userIds, RequestOptions options)
+            => Task.CompletedTask;
+
+        /// <inheritdoc />
+        Task<TargetUsersJobStatus> IDiscordClient.GetTargetUsersJobStatus(string inviteId, RequestOptions options)
+            => Task.FromResult(new TargetUsersJobStatus());
+
+        /// <inheritdoc />
         Task<IGuild> IDiscordClient.GetGuildAsync(ulong id, CacheMode mode, RequestOptions options)
             => Task.FromResult<IGuild>(null);
         /// <inheritdoc />

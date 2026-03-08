@@ -137,6 +137,6 @@ namespace Discord
         /// <summary>
         ///     Gets the status of the asynchronous processing of target users.
         /// </summary>
-        Task<TargetUsersJobStatus> GetTargetUsersJobStatus(RequestOptions options = null);
+        Task<TargetUsersJobStatus> GetTargetUsersJobStatusAsync(RequestOptions options = null);
     }
 }

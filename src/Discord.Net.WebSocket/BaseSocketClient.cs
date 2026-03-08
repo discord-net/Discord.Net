@@ -283,7 +283,21 @@ namespace Discord.WebSocket
         ///     A task that represents the asynchronous get operation. The task result contains the invite information.
         /// </returns>
         public Task<RestInviteMetadata> GetInviteAsync(string inviteId, RequestOptions options = null, ulong? scheduledEventId = null)
-            => ClientHelper.GetInviteAsync(this, inviteId, options ?? RequestOptions.Default, scheduledEventId);
+            => InviteHelper.GetInviteAsync(this, inviteId, options ?? RequestOptions.Default, scheduledEventId);
+
+
+        /// <inheritdoc />
+        public Task<IReadOnlyCollection<ulong>> GetInviteTargetUsersAsync(string inviteId, RequestOptions options = null)
+            => InviteHelper.GetInviteTargetUsersAsync(this, inviteId, options);
+
+        /// <inheritdoc />
+        public Task ModifyTargetUsersAsync(string inviteId, IEnumerable<ulong> userIds, RequestOptions options = null)
+            => InviteHelper.ModifyInviteTargetUsersAsync(this, inviteId, userIds, options);
+
+        /// <inheritdoc />
+        public Task<TargetUsersJobStatus> GetTargetUsersJobStatus(string inviteId, RequestOptions options = null)
+            => InviteHelper.GetTargetUsersJobStatusAsync(this, inviteId, options);
+
         /// <summary>
         ///     Gets a sticker.
         /// </summary>
