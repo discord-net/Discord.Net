@@ -51,11 +51,13 @@ namespace Discord
         /// <param name="isTemporary">If <see langword="true" />, the user accepting this invite will be kicked from the guild after closing their client.</param>
         /// <param name="isUnique">If <see langword="true" />, don't try to reuse a similar invite (useful for creating many unique one time use invites).</param>
         /// <param name="options">The options to be used when sending the request.</param>
+        /// <param name="roleIds">Ids of the roles given to the user that accept the invite.</param>
+        /// <param name="userIds">Ids of the users able to accept this invite.</param>
         /// <returns>
         ///     A task that represents the asynchronous invite creation operation. The task result contains an invite
         ///     metadata object containing information for the created invite.
         /// </returns>
-        Task<IInviteMetadata> CreateInviteAsync(int? maxAge = 86400, int? maxUses = default(int?), bool isTemporary = false, bool isUnique = false, RequestOptions options = null);
+        Task<IInviteMetadata> CreateInviteAsync(int? maxAge = 86400, int? maxUses = null, bool isTemporary = false, bool isUnique = false, RequestOptions options = null, IEnumerable<ulong> roleIds = null, IEnumerable<ulong> userIds = null);
 
         /// <summary>
         ///     Creates a new invite to this channel.
@@ -66,11 +68,12 @@ namespace Discord
         /// <param name="isTemporary">If <see langword="true" />, the user accepting this invite will be kicked from the guild after closing their client.</param>
         /// <param name="isUnique">If <see langword="true" />, don't try to reuse a similar invite (useful for creating many unique one time use invites).</param>
         /// <param name="options">The options to be used when sending the request.</param>
+        /// <param name="userIds">Ids of the users able to accept this invite.</param>
         /// <returns>
         ///     A task that represents the asynchronous invite creation operation. The task result contains an invite
         ///     metadata object containing information for the created invite.
         /// </returns>
-        Task<IInviteMetadata> CreateInviteToApplicationAsync(ulong applicationId, int? maxAge = 86400, int? maxUses = default(int?), bool isTemporary = false, bool isUnique = false, RequestOptions options = null);
+        Task<IInviteMetadata> CreateInviteToApplicationAsync(ulong applicationId, int? maxAge = 86400, int? maxUses = null, bool isTemporary = false, bool isUnique = false, RequestOptions options = null, IEnumerable<ulong> userIds = null);
 
         /// <summary>
         ///     Creates a new invite to this channel.
@@ -81,11 +84,12 @@ namespace Discord
         /// <param name="isTemporary">If <see langword="true" />, the user accepting this invite will be kicked from the guild after closing their client.</param>
         /// <param name="isUnique">If <see langword="true" />, don't try to reuse a similar invite (useful for creating many unique one time use invites).</param>
         /// <param name="options">The options to be used when sending the request.</param>
+        /// <param name="userIds">Ids of the users able to accept this invite.</param>
         /// <returns>
         ///     A task that represents the asynchronous invite creation operation. The task result contains an invite
         ///     metadata object containing information for the created invite.
         /// </returns>
-        Task<IInviteMetadata> CreateInviteToApplicationAsync(DefaultApplications application, int? maxAge = 86400, int? maxUses = default(int?), bool isTemporary = false, bool isUnique = false, RequestOptions options = null);
+        Task<IInviteMetadata> CreateInviteToApplicationAsync(DefaultApplications application, int? maxAge = 86400, int? maxUses = null, bool isTemporary = false, bool isUnique = false, RequestOptions options = null, IEnumerable<ulong> userIds = null);
 
         /// <summary>
         ///     Creates a new invite to this channel.
@@ -103,11 +107,12 @@ namespace Discord
         /// <param name="isTemporary">If <see langword="true" />, the user accepting this invite will be kicked from the guild after closing their client.</param>
         /// <param name="isUnique">If <see langword="true" />, don't try to reuse a similar invite (useful for creating many unique one time use invites).</param>
         /// <param name="options">The options to be used when sending the request.</param>
+        /// <param name="userIds">Ids of the users able to accept this invite.</param>
         /// <returns>
         ///     A task that represents the asynchronous invite creation operation. The task result contains an invite
         ///     metadata object containing information for the created invite.
         /// </returns>
-        Task<IInviteMetadata> CreateInviteToStreamAsync(IUser user, int? maxAge = 86400, int? maxUses = default(int?), bool isTemporary = false, bool isUnique = false, RequestOptions options = null);
+        Task<IInviteMetadata> CreateInviteToStreamAsync(IUser user, int? maxAge = 86400, int? maxUses = null, bool isTemporary = false, bool isUnique = false, RequestOptions options = null, IEnumerable<ulong> userIds = null);
         /// <summary>
         ///     Gets a collection of all invites to this channel.
         /// </summary>B

@@ -234,6 +234,21 @@ namespace Discord
         Task<IInvite> GetInviteAsync(string inviteId, RequestOptions options = null);
 
         /// <summary>
+        ///     Gets a collection of users who can access the invite.
+        /// </summary>
+        Task<IReadOnlyCollection<ulong>> GetInviteTargetUsersAsync(string inviteId, RequestOptions options = null);
+
+        /// <summary>
+        ///     Sets the users who will be able to use this invite.
+        /// </summary>
+        Task ModifyTargetUsersAsync(string inviteId, IEnumerable<ulong> userIds, RequestOptions options = null);
+
+        /// <summary>
+        ///     Gets the status of the asynchronous processing of target users.
+        /// </summary>
+        Task<TargetUsersJobStatus> GetTargetUsersJobStatus(string inviteId, RequestOptions options = null);
+
+        /// <summary>
         ///     Gets a user.
         /// </summary>
         /// <example>

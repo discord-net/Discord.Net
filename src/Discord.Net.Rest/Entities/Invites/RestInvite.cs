@@ -1,8 +1,10 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+
 using Model = Discord.API.Invite;
 
 namespace Discord.Rest
@@ -48,6 +50,11 @@ namespace Discord.Rest
         ///     Gets guild scheduled event data. <see langword="null" /> if event id was invalid.
         /// </summary>
         public RestGuildEvent ScheduledEvent { get; private set; }
+
+        /// <summary>
+        ///     Gets the roles assigned to the user upon accepting the invite.
+        /// </summary>
+        public IReadOnlyCollection<RestRole> Roles { get; private set; }
 
         internal IChannel Channel { get; }
 
@@ -95,6 +102,10 @@ namespace Discord.Rest
 
             if(model.ScheduledEvent.IsSpecified)
                 ScheduledEvent = RestGuildEvent.Create(Discord, Guild, model.ScheduledEvent.Value);
+
+            Roles = model.Roles.IsSpecified
+                ? [..model.Roles.Value.Select(x => RestRole.Create(Discord, Guild, x))]
+                : ImmutableArray<RestRole>.Empty;
         }
 
         /// <inheritdoc />
@@ -106,6 +117,18 @@ namespace Discord.Rest
         /// <inheritdoc />
         public Task DeleteAsync(RequestOptions options = null)
             => InviteHelper.DeleteAsync(this, Discord, options);
+
+        /// <inheritdoc />
+        public Task<TargetUsersJobStatus> GetTargetUsersJobStatusAsync(RequestOptions options = null)
+            => InviteHelper.GetTargetUsersJobStatusAsync(Discord, Code, options);
+
+        /// <inheritdoc />
+        public Task<IReadOnlyCollection<ulong>> GetTargetUsersAsync(RequestOptions options = null)
+            => InviteHelper.GetInviteTargetUsersAsync(Discord, Code, options);
+
+        /// <inheritdoc />
+        public Task ModifyTargetUsersAsync(IEnumerable<ulong> userIds, RequestOptions options = null)
+            => InviteHelper.ModifyInviteTargetUsersAsync(Discord, Code, userIds, options);
 
         /// <summary>
         ///     Gets the URL of the invite.
