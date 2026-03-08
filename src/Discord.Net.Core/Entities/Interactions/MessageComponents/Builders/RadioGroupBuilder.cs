@@ -11,12 +11,12 @@ namespace Discord;
 public class RadioGroupBuilder : IInteractableComponentBuilder
 {
     /// <summary>
-    ///     
+    ///     Gets the minimum amount of options a radio group must have.
     /// </summary>
     public const int MinOptionCount = 2;
 
     /// <summary>
-    ///     
+    ///     Gets the maximum amount of options a radio group can have.
     /// </summary>
     public const int MaxOptionCount = 10;
 
@@ -47,7 +47,7 @@ public class RadioGroupBuilder : IInteractableComponentBuilder
     }
 
     /// <summary>
-    ///     
+    ///     Gets or sets the options for this radio group.
     /// </summary>
     public List<RadioGroupOptionProperties> Options
     {

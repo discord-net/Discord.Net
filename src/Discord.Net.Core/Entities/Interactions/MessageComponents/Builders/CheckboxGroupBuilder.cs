@@ -11,12 +11,12 @@ namespace Discord;
 public class CheckboxGroupBuilder : IInteractableComponentBuilder
 {
     /// <summary>
-    ///     
+    ///     Gets the minimum number of options a checkbox group must have.
     /// </summary>
     public const int MinOptionCount = 1;
 
     /// <summary>
-    ///     
+    ///     Gets the maximum number of options a checkbox group can have.
     /// </summary>
     public const int MaxOptionCount = 10;
 
@@ -47,7 +47,7 @@ public class CheckboxGroupBuilder : IInteractableComponentBuilder
     }
 
     /// <summary>
-    ///     
+    ///     Gets or sets the options for this checkbox group.
     /// </summary>
     public List<CheckboxGroupOptionProperties> Options
     {

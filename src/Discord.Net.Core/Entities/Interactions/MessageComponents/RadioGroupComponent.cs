@@ -3,7 +3,7 @@ using System.Collections.Generic;
 namespace Discord;
 
 /// <summary>
-///     
+///     Represents a component of type <see cref="ComponentType.RadioGroup"/>.
 /// </summary>
 public class RadioGroupComponent : IInteractableComponent
 {
@@ -21,7 +21,7 @@ public class RadioGroupComponent : IInteractableComponent
     public string CustomId { get; }
 
     /// <summary>
-    ///     
+    ///     Gets the options for this radio group.
     /// </summary>
     public IReadOnlyCollection<RadioGroupOption> Options { get; }
     

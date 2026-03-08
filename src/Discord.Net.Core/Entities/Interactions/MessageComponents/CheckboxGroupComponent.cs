@@ -2,6 +2,9 @@ using System.Collections.Generic;
 
 namespace Discord;
 
+/// <summary>
+///     Represents a component of type <see cref="ComponentType.CheckboxGroup"/>.
+/// </summary>
 public class CheckboxGroupComponent : IInteractableComponent
 {
     /// <inheritdoc/>
@@ -18,7 +21,7 @@ public class CheckboxGroupComponent : IInteractableComponent
     public string CustomId { get; }
 
     /// <summary>
-    ///     
+    ///     Gets the options for this checkbox group.
     /// </summary>
     public IReadOnlyCollection<CheckboxGroupOption> Options { get; }
 

@@ -1,7 +1,7 @@
 namespace Discord;
 
 /// <summary>
-///     
+///     Represents a message component of type <see cref="ComponentType.Checkbox"/>.
 /// </summary>
 public class CheckboxComponent : IInteractableComponent
 {
