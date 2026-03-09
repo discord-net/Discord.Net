@@ -566,12 +566,21 @@ public static class ComponentContainerExtensions
     ///     in this <see cref="IComponentContainer"/> and all child <see cref="IComponentContainer"/>s.
     /// </summary>
     public static IEnumerable<int> GetComponentIds(this IComponentContainer container)
-        => container.Components
-            .Where(x => x.Id is not null)
-            .Select(x => x.Id.Value)
-            .Concat(container.Components
-                .OfType<IComponentContainer>()
-                .SelectMany(x => x.GetComponentIds()));
+    {
+        var ids = new List<int>();
+        foreach (var component in container.Components)
+        {
+            if (component.Id is not null)
+                ids.Add(component.Id.Value);
+
+            if (component is SectionBuilder { Accessory.Id: not null } section)
+                ids.Add(section.Accessory.Id.Value);
+
+            if (component is IComponentContainer childContainer)
+                ids.AddRange(childContainer.GetComponentIds());
+        }
+        return ids;
+    }
 
     /// <summary>
     ///     Finds the first <see cref="IMessageComponent"/> in the <see cref="INestedComponent"/>
