@@ -103,7 +103,7 @@ public class CheckboxGroupBuilder : IInteractableComponentBuilder
     /// <summary>
     ///     Gets or sets a value indicating whether the current checkbox group has to be filled in before submitting the modal (defaults to <see langword="true"></see>).
     /// </summary>
-    public bool IsRequired { get; set; } = true;
+    public bool? IsRequired { get; set; }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="CheckboxGroupBuilder"/>.
@@ -119,7 +119,7 @@ public class CheckboxGroupBuilder : IInteractableComponentBuilder
     /// <param name="maxValues">The maximum number of options that can be selected.</param>
     /// <param name="isRequired">Whether the current checkbox group requires selection before submitting the modal.</param>
     /// <param name="id">The id for the component.</param>
-    public CheckboxGroupBuilder(string customId, IEnumerable<CheckboxGroupOptionProperties> options = null, int? minValues = null, int? maxValues = null, bool isRequired = true, int? id = null)
+    public CheckboxGroupBuilder(string customId, IEnumerable<CheckboxGroupOptionProperties> options = null, int? minValues = null, int? maxValues = null, bool? isRequired = null, int? id = null)
     {
         CustomId = customId;
         Options = options?.ToList();
@@ -189,7 +189,7 @@ public class CheckboxGroupBuilder : IInteractableComponentBuilder
     /// <returns>
     ///     The current builder.
     /// </returns>
-    public CheckboxGroupBuilder WithRequired(bool isRequired)
+    public CheckboxGroupBuilder WithRequired(bool? isRequired)
     {
         IsRequired = isRequired;
         return this;
@@ -239,7 +239,7 @@ public class CheckboxGroupBuilder : IInteractableComponentBuilder
     /// <returns>
     ///     The current builder.
     /// </returns>
-    public CheckboxGroupBuilder AddOption(string label, string value, string description = null, bool defaultState = false)
+    public CheckboxGroupBuilder AddOption(string label, string value, string description = null, bool? defaultState = null)
     {
         AddOption(new CheckboxGroupOptionProperties(value, label, description, defaultState));
         return this;

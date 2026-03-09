@@ -36,7 +36,7 @@ public class CheckboxBuilder : IInteractableComponentBuilder
     /// <summary>
     ///     Gets or sets the default state of the checkbox.
     /// </summary>
-    public bool DefaultState { get; set; }
+    public bool? DefaultState { get; set; }
 
     /// <summary>
     ///     Sets the custom id of the current checkbox.
@@ -55,7 +55,7 @@ public class CheckboxBuilder : IInteractableComponentBuilder
     /// </summary>
     /// <param name="defaultState"><see langword="true"/>> to set the checkbox as checked by default; otherwise, <see langword="false"/>.</param>
     /// <returns>The current instance of the CheckboxBuilder, enabling method chaining.</returns>
-    public CheckboxBuilder WithDefaultState(bool defaultState)
+    public CheckboxBuilder WithDefaultState(bool? defaultState)
     {
         DefaultState = defaultState;
         return this;
@@ -72,7 +72,7 @@ public class CheckboxBuilder : IInteractableComponentBuilder
     /// <param name="customId">The custom id of the current checkbox.</param>
     /// <param name="defaultState">The default state of the checkbox.</param>
     /// <param name="id">The id for the component.</param>
-    public CheckboxBuilder(string customId, bool defaultState = false, int? id = null)
+    public CheckboxBuilder(string customId, bool? defaultState = null, int? id = null)
     {
         CustomId = customId;
         DefaultState = defaultState;

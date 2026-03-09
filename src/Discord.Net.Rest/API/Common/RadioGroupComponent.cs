@@ -37,7 +37,7 @@ internal class RadioGroupComponent : IInteractableComponent
             Label = x.Label,
             Value = x.Value,
         }).ToArray();
-        IsRequired = component.IsRequired;
+        IsRequired = component.IsRequired ?? Optional<bool>.Unspecified;;
     }
 
     [JsonIgnore]

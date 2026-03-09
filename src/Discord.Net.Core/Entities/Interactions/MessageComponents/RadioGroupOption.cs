@@ -26,9 +26,9 @@ public readonly struct RadioGroupOption
     /// <summary>
     ///     Gets a value indicating whether the option is selected by default.
     /// </summary>
-    public bool IsDefault { get; }
+    public bool? IsDefault { get; }
 
-    internal RadioGroupOption(string value, string label, string description = null, bool isDefault = false)
+    internal RadioGroupOption(string value, string label, string description = null, bool? isDefault = null)
     {
         Value = value;
         Label = label;

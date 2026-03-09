@@ -26,9 +26,9 @@ public struct RadioGroupOptionProperties
     /// <summary>
     ///     Gets or sets a value indicating whether the option is selected by default.
     /// </summary>
-    public bool IsDefault { get; set; }
+    public bool? IsDefault { get; set; }
 
-    public RadioGroupOptionProperties(string value, string label, string description = null, bool isDefault = false)
+    public RadioGroupOptionProperties(string value, string label, string description = null, bool? isDefault = null)
     {
         Value = value;
         Label = label;

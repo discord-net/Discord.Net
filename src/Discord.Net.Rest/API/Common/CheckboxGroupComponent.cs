@@ -46,7 +46,7 @@ internal class CheckboxGroupComponent : IInteractableComponent
         }).ToArray();
         MinValues = component.MinValues ?? Optional<int>.Unspecified;
         MaxValues = component.MaxValues ?? Optional<int>.Unspecified;
-        IsRequired = component.IsRequired;
+        IsRequired = component.IsRequired ?? Optional<bool>.Unspecified;
     }
 
     [JsonIgnore]

@@ -26,9 +26,9 @@ public struct CheckboxGroupOption
     /// <summary>
     ///     Gets a value indicating whether the option is selected by default.
     /// </summary>
-    public bool DefaultState { get; }
+    public bool? DefaultState { get; }
 
-    internal CheckboxGroupOption(string value, string label, string description = null, bool defaultState = false)
+    internal CheckboxGroupOption(string value, string label, string description = null, bool? defaultState = null)
     {
         Value = value;
         Label = label;

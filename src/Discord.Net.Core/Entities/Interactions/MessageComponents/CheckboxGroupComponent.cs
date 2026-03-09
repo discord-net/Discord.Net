@@ -38,9 +38,9 @@ public class CheckboxGroupComponent : IInteractableComponent
     /// <summary>
     ///     Gets whether this component requires a file upload to be submitted.
     /// </summary>
-    public bool IsRequired { get; }
+    public bool? IsRequired { get; }
 
-    internal CheckboxGroupComponent(int? id, string customId, IReadOnlyCollection<CheckboxGroupOption> options, int? minValues, int? maxValues, bool isRequired)
+    internal CheckboxGroupComponent(int? id, string customId, IReadOnlyCollection<CheckboxGroupOption> options, int? minValues, int? maxValues, bool? isRequired)
     {
         Id = id;
         CustomId = customId;

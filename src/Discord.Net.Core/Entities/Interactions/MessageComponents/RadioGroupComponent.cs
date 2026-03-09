@@ -28,9 +28,9 @@ public class RadioGroupComponent : IInteractableComponent
     /// <summary>
     ///     Gets whether this component requires a file upload to be submitted.
     /// </summary>
-    public bool IsRequired { get; }
+    public bool? IsRequired { get; }
 
-    internal RadioGroupComponent(int? id, string customId, IReadOnlyCollection<RadioGroupOption> options, bool isRequired)
+    internal RadioGroupComponent(int? id, string customId, IReadOnlyCollection<RadioGroupOption> options, bool? isRequired)
     {
         Id = id;
         CustomId = customId;

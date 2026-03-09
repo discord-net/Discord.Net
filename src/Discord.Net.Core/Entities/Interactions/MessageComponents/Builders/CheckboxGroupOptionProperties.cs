@@ -3,7 +3,7 @@ namespace Discord;
 /// <summary>
 ///     Represents the properties of an option for a <see cref="ComponentType.CheckboxGroup"/> component, used when building a checkbox group with <see cref="RadioGroupBuilder"/>.
 /// </summary>
-public struct CheckboxGroupOptionProperties(string value, string label, string description = null, bool defaultState = false)
+public struct CheckboxGroupOptionProperties(string value, string label, string description = null, bool? defaultState = null)
 {
     /// <summary>
     ///     Gets or sets the value of the option.
@@ -26,5 +26,5 @@ public struct CheckboxGroupOptionProperties(string value, string label, string d
     /// <summary>
     ///     Gets or sets a value indicating whether the option is selected by default.
     /// </summary>
-    public bool DefaultState { get; set; } = defaultState;
+    public bool? DefaultState { get; set; } = defaultState;
 }

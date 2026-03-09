@@ -265,7 +265,7 @@ namespace Discord
         public ModalBuilder AddCheckBox(
             string label,
             string customId,
-            bool defaultState = false,
+            bool? defaultState = null,
             string description = null,
             int? labelId = null
         )
@@ -307,7 +307,7 @@ namespace Discord
             string label,
             string customId,
             IEnumerable<RadioGroupOptionProperties> radioOptions,
-            bool isRequired = true,
+            bool? isRequired = null,
             int? id = null,
             string description = null,
             int? labelId = null
@@ -326,7 +326,7 @@ namespace Discord
             IEnumerable<CheckboxGroupOptionProperties> groupOptions,
             int? minValues = null,
             int? maxValues = null,
-            bool isRequired = true,
+            bool? isRequired = null,
             int? id = null,
             string description = null,
             int? labelId = null
@@ -879,7 +879,7 @@ namespace Discord
         public ModalComponentBuilder WithCheckBox(
             string label,
             string customId,
-            bool defaultState = false,
+            bool? defaultState = null,
             string description = null,
             int? labelId = null
         ) => WithCheckBox(
@@ -930,7 +930,7 @@ namespace Discord
             IEnumerable<CheckboxGroupOptionProperties> groupOptions,
             int? minValues = null,
             int? maxValues = null,
-            bool isRequired = true,
+            bool? isRequired = null,
             int? id = null,
             string description = null,
             int? labelId = null
@@ -978,7 +978,7 @@ namespace Discord
             string label,
             string customId,
             IEnumerable<RadioGroupOptionProperties> radioOptions,
-            bool isRequired = true,
+            bool? isRequired = null,
             int? id = null,
             string description = null,
             int? labelId = null

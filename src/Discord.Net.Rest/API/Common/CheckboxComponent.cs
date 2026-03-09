@@ -26,7 +26,7 @@ internal class CheckboxComponent : IInteractableComponent
         Type = component.Type;
         Id = component.Id ?? Optional<int>.Unspecified;
         CustomId = component.CustomId;
-        DefaultState = component.DefaultState;
+        DefaultState = component.DefaultState ?? Optional<bool>.Unspecified;
     }
 
     [JsonIgnore]

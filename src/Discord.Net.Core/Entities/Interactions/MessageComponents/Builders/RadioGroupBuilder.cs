@@ -63,7 +63,7 @@ public class RadioGroupBuilder : IInteractableComponentBuilder
     /// <summary>
     ///     Gets or sets a value indicating whether the current radio group has to be filled in before submitting the modal (defaults to <see langword="true"></see>).
     /// </summary>
-    public bool IsRequired { get; set; } = true;
+    public bool? IsRequired { get; set; }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="RadioGroupBuilder"/>.
@@ -77,7 +77,7 @@ public class RadioGroupBuilder : IInteractableComponentBuilder
     /// <param name="options">The options for this radio group.</param>
     /// <param name="isRequired">Whether the current radio group requires selection before submitting the modal.</param>
     /// <param name="id">The id for the component.</param>
-    public RadioGroupBuilder(string customId, IEnumerable<RadioGroupOptionProperties> options = null, bool isRequired = true, int? id = null)
+    public RadioGroupBuilder(string customId, IEnumerable<RadioGroupOptionProperties> options = null, bool? isRequired = null, int? id = null)
     {
         CustomId = customId;
         Options = options?.ToList();
@@ -116,7 +116,7 @@ public class RadioGroupBuilder : IInteractableComponentBuilder
     /// <returns>
     ///     The current builder.
     /// </returns>
-    public RadioGroupBuilder WithRequired(bool isRequired)
+    public RadioGroupBuilder WithRequired(bool? isRequired)
     {
         IsRequired = isRequired;
         return this;
@@ -166,7 +166,7 @@ public class RadioGroupBuilder : IInteractableComponentBuilder
     /// <returns>
     ///     The current builder.
     /// </returns>
-    public RadioGroupBuilder AddOption(string label, string value, string description = null, bool isDefault = false)
+    public RadioGroupBuilder AddOption(string label, string value, string description = null, bool? isDefault = null)
     {
         AddOption(new RadioGroupOptionProperties(value, label, description, isDefault));
         return this;
