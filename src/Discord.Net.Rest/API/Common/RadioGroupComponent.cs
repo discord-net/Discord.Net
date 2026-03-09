@@ -33,7 +33,7 @@ internal class RadioGroupComponent : IInteractableComponent
         Options = component.Options.Select(x => new RadioGroupOption
         {
             Description = x.Description,
-            IsDefault = x.IsDefault,
+            IsDefault = x.IsDefault ?? Optional<bool>.Unspecified,
             Label = x.Label,
             Value = x.Value,
         }).ToArray();

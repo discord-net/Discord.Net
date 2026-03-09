@@ -40,7 +40,7 @@ internal class CheckboxGroupComponent : IInteractableComponent
         Options = component.Options.Select(x => new CheckboxGroupOption
         {
             Description = x.Description,
-            DefaultState = x.DefaultState,
+            DefaultState = x.DefaultState ?? Optional<bool>.Unspecified,
             Label = x.Label,
             Value = x.Value,
         }).ToArray();
