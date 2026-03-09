@@ -5,12 +5,12 @@ namespace Discord.API
     internal class RoleColors
     {
         [JsonProperty("primary_color")]
-        public Optional<uint?> PrimaryColor { get; set; }
+        public uint PrimaryColor { get; set; }
 
         [JsonProperty("secondary_color")]
-        public Optional<uint?> SecondaryColor { get; set; }
+        public uint? SecondaryColor { get; set; }
 
         [JsonProperty("tertiary_color")]
-        public Optional<uint?> TertiaryColor { get; set; }
+        public uint? TertiaryColor { get; set; }
     }
 }
