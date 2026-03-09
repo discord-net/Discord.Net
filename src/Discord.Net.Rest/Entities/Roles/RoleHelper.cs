@@ -27,17 +27,18 @@ namespace Discord.Rest
                 }
             }
 
-            if (args.Colors.IsSpecified && (args.Colors.Value.SecondaryColor.HasValue || args.Colors.Value.TertiaryColor.HasValue))
-                role.Guild.Features.EnsureFeature(GuildFeature.EnhancedRoleColors);
+            var normalizedColors = args.Colors.IsSpecified
+                ? args.Colors.Value.Normalize()
+                : args.Color.IsSpecified
+                    ? RoleColors.FromColor(args.Color.Value)
+                    : default(RoleColors?);
 
-            var normalizedColors = args.Colors.IsSpecified ? args.Colors.Value.Normalize() : default(RoleColors);
+            if (normalizedColors.HasValue && (normalizedColors.Value.SecondaryColor.HasValue || normalizedColors.Value.TertiaryColor.HasValue))
+                role.Guild.Features.EnsureFeature(GuildFeature.EnhancedRoleColors);
 
             var apiArgs = new API.Rest.ModifyGuildRoleParams
             {
-                Color = args.Colors.IsSpecified
-                    ? normalizedColors.PrimaryColor.HasValue ? normalizedColors.PrimaryColor.Value.RawValue : Optional.Create<uint>()
-                    : args.Color.IsSpecified ? args.Color.Value.RawValue : Optional.Create<uint>(),
-                Colors = args.Colors.IsSpecified ? normalizedColors.ToModel() : Optional<API.RoleColors>.Unspecified,
+                Colors = normalizedColors.HasValue ? normalizedColors.Value.ToModel() : Optional<API.RoleColors>.Unspecified,
                 Hoist = args.Hoist,
                 Mentionable = args.Mentionable,
                 Name = args.Name,

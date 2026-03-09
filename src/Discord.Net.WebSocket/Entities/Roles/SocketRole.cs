@@ -86,7 +86,7 @@ namespace Discord.WebSocket
             IsMentionable = model.Mentionable;
             Position = model.Position;
             Color = new Color(model.Color);
-            Colors = model.Colors.IsSpecified ? model.Colors.Value?.ToEntity() : model.Color != 0 ? RoleColors.FromColor(Color) : null;
+            Colors = model.Colors?.ToEntity();
             Permissions = new GuildPermissions(model.Permissions);
             Flags = model.Flags;
 

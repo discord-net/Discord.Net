@@ -15,9 +15,7 @@ public struct SocketRoleEditInfo
         else
             Color = null;
 
-        Colors = model.Colors is not null
-            ? model.Colors.ToEntity()
-            : model.Color is not null && model.Color.Value != 0 ? RoleColors.FromColor(new Color(model.Color.Value)) : null;
+        Colors = model.Colors?.ToEntity();
 
         Mentionable = model.IsMentionable;
         Hoist = model.Hoist;
