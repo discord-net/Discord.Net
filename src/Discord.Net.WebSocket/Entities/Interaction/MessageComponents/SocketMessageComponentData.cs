@@ -63,8 +63,23 @@ namespace Discord.WebSocket
             Type = model.ComponentType;
             Values = model.Values.GetValueOrDefault();
 
-            Value = model.Value.GetValueOrDefault(null)?.ToObject<string>();
-            BoolValue = model.Value.GetValueOrDefault(null)?.ToObject<bool>();
+            try 
+            {
+                Value = model.Value.GetValueOrDefault(null)?.ToObject<string>();
+            }
+            catch (Exception)
+            { 
+                // value is not a string :(
+            } 
+            
+            try 
+            {
+                BoolValue = model.Value.GetValueOrDefault(null)?.ToObject<bool>();
+            }
+            catch (Exception)
+            { 
+                // value is not a bool :(
+            }
 
             if (model.Resolved.IsSpecified)
             {
