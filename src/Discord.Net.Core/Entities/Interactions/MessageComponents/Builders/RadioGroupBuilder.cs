@@ -6,7 +6,7 @@ using System.Linq;
 namespace Discord;
 
 /// <summary>
-///     Represents a builder used to create a <see cref="RadioGroupComponent">.
+///     Represents a builder used to create a <see cref="RadioGroupComponent" />.
 /// </summary>
 public class RadioGroupBuilder : IInteractableComponentBuilder
 {

@@ -6,7 +6,7 @@ using System.Linq;
 namespace Discord;
 
 /// <summary>
-///     Represents a builder used to create a <see cref="CheckboxGroupComponent">.
+///     Represents a builder used to create a <see cref="CheckboxGroupComponent" />.
 /// </summary>
 public class CheckboxGroupBuilder : IInteractableComponentBuilder
 {

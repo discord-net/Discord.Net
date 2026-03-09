@@ -3,7 +3,7 @@ using System;
 namespace Discord;
 
 /// <summary>
-///     Represents a builder used to create a <see cref="CheckboxComponent">.
+///     Represents a builder used to create a <see cref="CheckboxComponent" />.
 /// </summary>
 public class CheckboxBuilder : IInteractableComponentBuilder
 {
