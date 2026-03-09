@@ -260,7 +260,7 @@ namespace Discord
             return this;
         }
 
-        /// <inheritdoc cref="ModalComponentBuilder.WithCheckBox(string, string, bool, string, int?)"/>
+        /// <inheritdoc cref="ModalComponentBuilder.WithCheckBox(string, string, bool?, string, int?)"/>
         /// <returns>The current <see cref="ModalBuilder"/>.</returns>
         public ModalBuilder AddCheckBox(
             string label,
@@ -301,7 +301,7 @@ namespace Discord
         }
 
 
-        /// <inheritdoc cref="ModalComponentBuilder.WithRadioGroup(string, string, IEnumerable{RadioGroupOptionProperties}, bool, int?, string, int?)"/>
+        /// <inheritdoc cref="ModalComponentBuilder.WithRadioGroup(string, string, IEnumerable{RadioGroupOptionProperties}, bool?, int?, string, int?)"/>
         /// <returns>The current <see cref="ModalBuilder"/>.</returns>
         public ModalBuilder AddRadioGroup(
             string label,
@@ -318,7 +318,7 @@ namespace Discord
         }
 
 
-        /// <inheritdoc cref="ModalComponentBuilder.WithCheckBoxGroup(string, string, IEnumerable{CheckboxGroupOptionProperties}, int?, int?, bool, int?, string, int?)"/>
+        /// <inheritdoc cref="ModalComponentBuilder.WithCheckBoxGroup(string, string, IEnumerable{CheckboxGroupOptionProperties}, int?, int?, bool?, int?, string, int?)"/>
         /// <returns>The current <see cref="ModalBuilder"/>.</returns>
         public ModalBuilder AddCheckBoxGroup(
             string label,
