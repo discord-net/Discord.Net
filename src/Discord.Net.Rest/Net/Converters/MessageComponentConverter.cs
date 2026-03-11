@@ -36,7 +36,7 @@ namespace Discord.Net.Converters
                 case ComponentType.MentionableSelect:
                 case ComponentType.RoleSelect:
                 case ComponentType.UserSelect:
-                    messageComponent = new API.SelectMenuComponent(){Type = (ComponentType)typeProperty};
+                    messageComponent = new API.SelectMenuComponent{Type = (ComponentType)typeProperty};
                     break;
                 case ComponentType.TextInput:
                     messageComponent = new API.TextInputComponent();
@@ -67,6 +67,15 @@ namespace Discord.Net.Converters
                     break;
                 case ComponentType.FileUpload:
                     messageComponent = new API.FileUploadComponent();
+                    break;
+                case ComponentType.RadioGroup:
+                    messageComponent = new API.RadioGroupComponent();
+                    break;
+                case ComponentType.CheckboxGroup:
+                    messageComponent = new API.CheckboxGroupComponent();
+                    break;
+                case ComponentType.Checkbox:
+                    messageComponent = new API.CheckboxComponent();
                     break;
                 default:
                     messageComponent = new API.UnknownComponent { RawType = typeProperty, RawJson = jsonObject.ToString() };

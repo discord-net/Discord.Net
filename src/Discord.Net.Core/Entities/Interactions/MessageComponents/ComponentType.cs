@@ -88,6 +88,21 @@ namespace Discord
         /// <summary>
         ///     A component that allows users to upload files in modals.
         /// </summary>
-        FileUpload = 19
+        FileUpload = 19,
+
+        /// <summary>
+        ///     A component that allows users to select a single option from a set of radio buttons.
+        /// </summary>
+        RadioGroup = 21,
+
+        /// <summary>
+        ///     A component that allows users to select multiple options from a set of checkboxes.
+        /// </summary>
+        CheckboxGroup = 22,
+
+        /// <summary>
+        ///     A checkbox.
+        /// </summary>
+        Checkbox = 23,
     }
 }
