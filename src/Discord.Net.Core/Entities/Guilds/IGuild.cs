@@ -977,11 +977,8 @@ namespace Discord
         ///     A task that represents the asynchronous creation operation. The task result contains the newly created
         ///     role.
         /// </returns>
-        Task<IRole> CreateRoleAsync(string name, GuildPermissions? permissions = null, Color? color = null, bool isHoisted = false, RequestOptions options = null);
-        /// <summary>
-        ///     Creates a new role with the provided role colors.
-        /// </summary>
-        Task<IRole> CreateRoleAsync(string name, RoleColors colors, GuildPermissions? permissions = null, bool isHoisted = false, RequestOptions options = null);
+        Task<IRole> CreateRoleAsync(string name, GuildPermissions? permissions = null, RoleColors? color = null, bool isHoisted = false, RequestOptions options = null);
+
         // TODO remove CreateRoleAsync overload that does not have isMentionable when breaking change is acceptable
         /// <summary>
         ///     Creates a new role with the provided name.
@@ -998,11 +995,7 @@ namespace Discord
         ///     A task that represents the asynchronous creation operation. The task result contains the newly created
         ///     role.
         /// </returns>
-        Task<IRole> CreateRoleAsync(string name, GuildPermissions? permissions = null, Color? color = null, bool isHoisted = false, bool isMentionable = false, RequestOptions options = null, Image? icon = null, Emoji emoji = null);
-        /// <summary>
-        ///     Creates a new role with the provided role colors.
-        /// </summary>
-        Task<IRole> CreateRoleAsync(string name, RoleColors colors, GuildPermissions? permissions = null, bool isHoisted = false, bool isMentionable = false, RequestOptions options = null, Image? icon = null, Emoji emoji = null);
+        Task<IRole> CreateRoleAsync(string name, GuildPermissions? permissions = null, RoleColors? color = null, bool isHoisted = false, bool isMentionable = false, RequestOptions options = null, Image? icon = null, Emoji emoji = null);
 
         /// <summary>
         ///     Adds a user to this guild.

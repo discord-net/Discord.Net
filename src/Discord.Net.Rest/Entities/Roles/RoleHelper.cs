@@ -27,18 +27,12 @@ namespace Discord.Rest
                 }
             }
 
-            var normalizedColors = args.Colors.IsSpecified
-                ? args.Colors.Value.Normalize()
-                : args.Color.IsSpecified
-                    ? RoleColors.FromColor(args.Color.Value)
-                    : default(RoleColors?);
-
-            if (normalizedColors.HasValue && (normalizedColors.Value.SecondaryColor.HasValue || normalizedColors.Value.TertiaryColor.HasValue))
+            if(args.Colors is { IsSpecified: true, Value.IsSolidColor: false })
                 role.Guild.Features.EnsureFeature(GuildFeature.EnhancedRoleColors);
 
             var apiArgs = new API.Rest.ModifyGuildRoleParams
             {
-                Colors = normalizedColors.HasValue ? normalizedColors.Value.ToModel() : Optional<API.RoleColors>.Unspecified,
+                Colors = args.Colors.IsSpecified ? args.Colors.Value.Normalized.ToModel() : Optional<API.RoleColors>.Unspecified,
                 Hoist = args.Hoist,
                 Mentionable = args.Mentionable,
                 Name = args.Name,

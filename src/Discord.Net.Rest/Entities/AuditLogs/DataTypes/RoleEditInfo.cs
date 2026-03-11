@@ -1,3 +1,4 @@
+using System;
 using Model = Discord.API.AuditLogs.RoleInfoAuditLogModel;
 
 namespace Discord.Rest;
@@ -9,13 +10,7 @@ public struct RoleEditInfo
 {
     internal RoleEditInfo(Model model)
     {
-        if (model.Color is not null)
-            Color = new Color(model.Color.Value);
-        else
-            Color = null;
-
-        Colors = model.Colors?.ToEntity();
-
+        Colors = model.Colors?.ToEntity() ?? model.Color;
         Mentionable = model.IsMentionable;
         Hoist = model.Hoist;
         Name = model.Name;
@@ -35,7 +30,14 @@ public struct RoleEditInfo
     ///     A color object representing the color assigned to this role; <see langword="null" /> if this role does not have a
     ///     color.
     /// </returns>
-    public Color? Color { get; }
+    /// <remarks>
+    ///     This property is deprecated in the API, and its value will always be <see cref="Colors"/>.PrimaryColor
+    /// </remarks>
+    [Obsolete(
+        $"This property is deprecated in the API, and its value will always be {nameof(Colors)}.{nameof(RoleColors.PrimaryColor)}",
+        error: false
+    )]
+    public Color? Color => Colors?.PrimaryColor;
 
     /// <summary>
     ///     Gets the full color configuration of this role.
@@ -46,7 +48,7 @@ public struct RoleEditInfo
     ///     Gets a value that indicates whether this role is mentionable.
     /// </summary>
     /// <returns>
-    ///     <see langword="true" /> if other members can mention this role in a text channel; otherwise <see langword="false" />; 
+    ///     <see langword="true" /> if other members can mention this role in a text channel; otherwise <see langword="false" />;
     ///     <see langword="null" /> if this is not mentioned in this entry.
     /// </returns>
     public bool? Mentionable { get; }
@@ -56,7 +58,7 @@ public struct RoleEditInfo
     ///     section on the user list).
     /// </summary>
     /// <returns>
-    ///     <see langword="true" /> if this role's members will appear in a separate section in the user list; otherwise 
+    ///     <see langword="true" /> if this role's members will appear in a separate section in the user list; otherwise
     ///     <see langword="false" />; <see langword="null" /> if this is not mentioned in this entry.
     /// </returns>
     public bool? Hoist { get; }

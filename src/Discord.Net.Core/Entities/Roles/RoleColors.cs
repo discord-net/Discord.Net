@@ -1,84 +1,81 @@
 using System;
 
-namespace Discord
+namespace Discord;
+
+/// <summary>
+///      Represents the full color configuration of a role.
+/// </summary>
+/// <param name="PrimaryColor">The primary (or main) color of the role.</param>
+/// <param name="SecondaryColor">
+///     The secondary color of the role, this will make the role a gradient between the other provided colors.
+/// </param>
+/// <param name="TertiaryColor">
+///     The tertiary color of the role, this will turn the gradient into a holographic style.
+/// </param>
+public readonly record struct RoleColors(
+    Color PrimaryColor,
+    Color? SecondaryColor = null,
+    Color? TertiaryColor = null
+)
 {
+    private const uint HolographicPrimaryColor = 11127295;
+    private const uint HolographicSecondaryColor = 16759788;
+    private const uint HolographicTertiaryColor = 16761760;
+
     /// <summary>
-    ///     Represents the full color configuration of a role.
+    ///     A holographic <see cref="RoleColors"/>.
     /// </summary>
-    public struct RoleColors : IEquatable<RoleColors>
-    {
-        /// <summary>
-        ///     Gets the primary color required by Discord for holographic role colors.
-        /// </summary>
-        public static Color HolographicPrimaryColor { get; } = new(11127295);
+    public static readonly RoleColors Holographic = new(
+        PrimaryColor: HolographicPrimaryColor,
+        SecondaryColor: HolographicSecondaryColor,
+        TertiaryColor: HolographicTertiaryColor
+    );
 
-        /// <summary>
-        ///     Gets the secondary color required by Discord for holographic role colors.
-        /// </summary>
-        public static Color HolographicSecondaryColor { get; } = new(16759788);
+    /// <summary>
+    ///     Gets whether this color is the <see cref="Holographic"/> color.
+    /// </summary>
+    public bool IsHolographic => this == Holographic;
 
-        /// <summary>
-        ///     Gets the tertiary color required by Discord for holographic role colors.
-        /// </summary>
-        public static Color HolographicTertiaryColor { get; } = new(16761760);
+    /// <summary>
+    ///     Gets whether this <see cref="RoleColors"/> is a gradient between 2 colors.
+    /// </summary>
+    public bool IsGradient => this is { SecondaryColor: not null, TertiaryColor: null };
 
-        /// <summary>
-        ///     Gets the primary color of this role.
-        /// </summary>
-        public Color? PrimaryColor { get; }
+    /// <summary>
+    ///     Gets whether this <see cref="RoleColors"/> is a single, solid color.
+    /// </summary>
+    public bool IsSolidColor => this is { SecondaryColor: null, TertiaryColor: null };
 
-        /// <summary>
-        ///     Gets the secondary color of this role.
-        /// </summary>
-        public Color? SecondaryColor { get; }
+    /// <summary>
+    ///     When sending <see cref="TertiaryColor"/>, the API enforces the role color to be a constant value,
+    ///     defined as <see cref="Holographic"/>.
+    /// </summary>
+    internal RoleColors Normalized
+        => TertiaryColor is not null ? Holographic : this;
 
-        /// <summary>
-        ///     Gets the tertiary color of this role.
-        /// </summary>
-        public Color? TertiaryColor { get; }
+    /// <summary>
+    ///     Creates a new <see cref="RoleColors"/> representing a single, solid color.
+    /// </summary>
+    /// <param name="color">The solid color to use to construct the new <see cref="RoleColors"/>.</param>
+    /// <returns>
+    ///     A new <see cref="RoleColors"/> representing the supplied color.
+    /// </returns>
+    public static RoleColors Solid(Color color)
+        => new(color);
 
-        /// <summary>
-        ///     Initializes a new <see cref="RoleColors"/> struct with the given role colors.
-        /// </summary>
-        public RoleColors(Color? primaryColor = null, Color? secondaryColor = null, Color? tertiaryColor = null)
-        {
-            PrimaryColor = primaryColor;
-            SecondaryColor = secondaryColor;
-            TertiaryColor = tertiaryColor;
-        }
+    /// <summary>
+    ///     Creates a new <see cref="RoleColors"/> representing a gradient between 2 colors.
+    /// </summary>
+    /// <param name="primary">The primary color of the gradient.</param>
+    /// <param name="secondary">The secondary color of the gradient.</param>
+    /// <returns>
+    ///     A new <see cref="RoleColors"/> representing the gradient between the 2 supplied colors.
+    /// </returns>
+    public static RoleColors Gradient(Color primary, Color secondary)
+        => new(primary, secondary);
 
-        /// <summary>
-        ///     Creates a <see cref="RoleColors"/> value from a single solid role color.
-        /// </summary>
-        public static RoleColors FromColor(Color color)
-            => new(color);
-
-        /// <summary>
-        ///     Returns the role colors normalized to Discord's API requirements.
-        /// </summary>
-        public RoleColors Normalize()
-            => TertiaryColor.HasValue
-                ? new(HolographicPrimaryColor, HolographicSecondaryColor, HolographicTertiaryColor)
-                : this;
-
-        public static bool operator ==(RoleColors left, RoleColors right)
-            => left.Equals(right);
-
-        public static bool operator !=(RoleColors left, RoleColors right)
-            => !left.Equals(right);
-
-        public bool Equals(RoleColors other)
-            => PrimaryColor == other.PrimaryColor
-            && SecondaryColor == other.SecondaryColor
-            && TertiaryColor == other.TertiaryColor;
-
-        public override bool Equals(object obj)
-            => obj is RoleColors other && Equals(other);
-
-        public override int GetHashCode()
-            => HashCode.Combine(PrimaryColor, SecondaryColor, TertiaryColor);
-
-        public override string ToString()
-            => $"{PrimaryColor} / {SecondaryColor?.ToString() ?? "null"} / {TertiaryColor?.ToString() ?? "null"}";
-    }
+    public static implicit operator RoleColors(Color color) => Solid(color);
+    public static implicit operator RoleColors?(Color? color) => color.HasValue ? Solid(color.Value) : null;
+    public static implicit operator RoleColors(uint color) => Solid(color);
+    public static implicit operator RoleColors?(uint? color) => color.HasValue ? Solid(color.Value) : null;
 }

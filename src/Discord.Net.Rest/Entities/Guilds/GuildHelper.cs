@@ -612,13 +612,18 @@ namespace Discord.Rest
         #endregion
 
         #region Roles
-        /// <exception cref="ArgumentNullException"><paramref name="name"/> is <see langword="null" />.</exception>
-        public static Task<RestRole> CreateRoleAsync(IGuild guild, BaseDiscordClient client,
-            string name, GuildPermissions? permissions, Color? color, bool isHoisted, bool isMentionable, RequestOptions options, Image? icon, Emoji emoji)
-            => CreateRoleAsync(guild, client, name, permissions, color.HasValue ? RoleColors.FromColor(color.Value) : default(RoleColors?), isHoisted, isMentionable, options, icon, emoji);
-
-        public static async Task<RestRole> CreateRoleAsync(IGuild guild, BaseDiscordClient client,
-            string name, GuildPermissions? permissions, RoleColors? colors, bool isHoisted, bool isMentionable, RequestOptions options, Image? icon, Emoji emoji)
+        public static async Task<RestRole> CreateRoleAsync(
+            IGuild guild,
+            BaseDiscordClient client,
+            string name,
+            GuildPermissions? permissions,
+            RoleColors? colors,
+            bool isHoisted,
+            bool isMentionable,
+            RequestOptions options,
+            Image? icon,
+            Emoji emoji
+        )
         {
             if (name == null)
                 throw new ArgumentNullException(paramName: nameof(name));
@@ -633,15 +638,12 @@ namespace Discord.Rest
                 }
             }
 
-            if (colors.HasValue && (colors.Value.SecondaryColor.HasValue || colors.Value.TertiaryColor.HasValue))
+            if(colors is {IsSolidColor: false})
                 guild.Features.EnsureFeature(GuildFeature.EnhancedRoleColors);
-
-            var normalizedColors = colors?.Normalize();
 
             var createGuildRoleParams = new API.Rest.ModifyGuildRoleParams
             {
-                Color = normalizedColors.HasValue && normalizedColors.Value.PrimaryColor.HasValue ? normalizedColors.Value.PrimaryColor.Value.RawValue : Optional.Create<uint>(),
-                Colors = normalizedColors?.ToModel() ?? Optional<API.RoleColors>.Unspecified,
+                Colors = colors?.Normalized.ToModel() ?? Optional<API.RoleColors>.Unspecified,
                 Hoist = isHoisted,
                 Mentionable = isMentionable,
                 Name = name,
