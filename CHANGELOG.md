@@ -1,5 +1,20 @@
 # Changelog
 
+## [3.19.1] - 2026-03-12
+### Added
+- #3226 Added Community Invites (9bb0e06)
+- #3229 Added Modal radio/checkbox groups & checkboxes (c0fbefe)
+- #3246 Added support for enhanced role colors ( gradient and holograpic ) (3e8aacf)
+### Fixed
+- #3224 Fixed forum CreatePostWithFileAsync with V2 components (0449e53)
+- #3231 Derived types of ContextCommandAttribute should be able to specify a RunMode in their constructor. (8556416)
+- #3244 Fixed libdave audio issues for users joining/leaving vc, as well as empty vcs (1c534fa)
+- #3249 GetComponentIds missing accessory component in sections (66c7409)
+### Misc
+- #3219 Document new modal components (8333e4b)
+- #3245 Patch modal docs oversights (c0bde1c)
+- #3248 Replace a deprecated Exception in the slash command guide (f5b9d3a)
+
 ## [3.19.0] - 2025-03-02
 ### Added
 - #3241 libdave support (#3222) (0195461)
