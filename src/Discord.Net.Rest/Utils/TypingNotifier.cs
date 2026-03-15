@@ -38,6 +38,7 @@ namespace Discord.Rest
                 }
             }
             catch (OperationCanceledException) { }
+            catch (TaskCanceledException) { }
         }
 
         public void Dispose()
