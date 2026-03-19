@@ -188,6 +188,13 @@ internal sealed class DaveSessionManager : IDisposable
             await _logger.DebugAsync(
                 $"Commit result ignored, transaction id: {transitionId}, was prepared and removed? {wasRemoved}"
             );
+
+            /*
+             * As the committer, our session already advanced to the new epoch when ProcessProposals generated the
+             * commit. Update the encryptor ratchet now so outgoing audio uses the current epoch's keys.
+             */
+            UpdateEncryptorRatchet(_session.ProtocolVersion);
+
             return;
         }
 
@@ -225,15 +232,14 @@ internal sealed class DaveSessionManager : IDisposable
             decryptor.PrepareTransition(_session, id, protocolVersion);
         }
 
+        /*
+         * The encryptor ratchet update was moved out of the InitTransitionId-only branch so it runs for ALL
+         * transitions. This covers the non-committer path (receiving someone else's commit or welcome).
+         */
+        UpdateEncryptorRatchet(protocolVersion);
+
         if (transitionId is Dave.InitTransitionId)
         {
-            var ratchet = _session.GetKeyRatchet(SelfUserId);
-
-            Encryptor.IsInPassthroughMode = protocolVersion is Dave.DisabledProtocolVersion || ratchet.IsNull;
-
-            if (protocolVersion is not Dave.DisabledProtocolVersion && !ratchet.IsNull)
-                Encryptor.Ratchet = ratchet;
-
             // Streams created before DAVE was initialized lack the DaveDecryptStream layer.
             // Rebuild them now that keys are ready.
             await _client.RebuildInputStreamsForDaveAsync();
@@ -320,6 +326,17 @@ internal sealed class DaveSessionManager : IDisposable
             VoiceOpCode.DaveTransitionReady,
             new DaveMLSTransitionParams() { TransitionId = transitionId }
         );
+
+    private void UpdateEncryptorRatchet(ushort protocolVersion)
+    {
+        var ratchet = _session.GetKeyRatchet(SelfUserId);
+
+        var isDisabled = protocolVersion is Dave.DisabledProtocolVersion || ratchet.IsNull;
+
+        Encryptor.IsInPassthroughMode = isDisabled;
+
+        if (!isDisabled) Encryptor.Ratchet = ratchet;
+    }
 
     public void Dispose()
     {
