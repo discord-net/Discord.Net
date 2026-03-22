@@ -99,7 +99,7 @@ namespace Discord
         UserProperties? PublicFlags { get; }
 
         /// <summary>
-        ///     Gets the user's display name, if it is set. For bots, this will get the application name.
+        ///     Gets the user's display name, if it is set.
         /// </summary>
         /// <remarks>
         ///     This property will be <see langword="null"/> if user has no display name set.
