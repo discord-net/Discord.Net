@@ -31,6 +31,7 @@ namespace Discord
         UnknownWebhook = 10015,
         UnknownWebhookService = 10016,
         UnknownSession = 10020,
+        UnknownAsset = 10021,
         UnknownBan = 10026,
         UnknownSKU = 10027,
         UnknownStoreListing = 10028,
@@ -46,6 +47,7 @@ namespace Discord
         UnknownGuildTemplate = 10057,
         UnknownDiscoverableServerCategory = 10059,
         UnknownSticker = 10060,
+        UnknownStickerPack = 10061,
         UnknownInteraction = 10062,
         UnknownApplicationCommand = 10063,
         UnknownVoiceState = 10065,
@@ -55,10 +57,13 @@ namespace Discord
         UnknownGuildWelcomeScreen = 10069,
         UnknownGuildScheduledEvent = 10070,
         UnknownGuildScheduledEventUser = 10071,
+        UnknownTag = 10087,
+        UnknownSound = 10097,
+        UnknownInviteTargetUsersJob = 10124,
+        UnknownInviteTargetUsers = 10129,
         #endregion
 
         #region General Actions (20XXX)
-        UnknownTag = 10087,
         BotsCannotUse = 20001,
         OnlyBotsCanUse = 20002,
         CannotSendExplicitContent = 20009,
@@ -99,10 +104,11 @@ namespace Discord
         MaximumStickersReached = 30039,
         MaximumPruneRequestReached = 30040,
         MaximumGuildWidgetsReached = 30042,
-        BitrateIsTooHighForChannelOfThisType = 30052,
+        MaximumNumberOfSoundboardSoundsReached = 30045,
         MaximumNumberOfEditsReached = 30046,
         MaximumNumberOfPinnedThreadsInAForumChannelReached = 30047,
         MaximumNumberOfTagsInAForumChannelReached = 30048,
+        BitrateIsTooHighForChannelOfThisType = 30052,
         MaximumNumberOfPremiumEmojisReached = 30056,
         MaximumNumberOfWebhooksReached = 30058,
         MaximumNumberOfChannelPermissionOverwritesReached = 30060,
@@ -118,6 +124,8 @@ namespace Discord
         FeatureDisabled = 40006,
         UserBanned = 40007,
         ConnectionHasBeenRevoked = 40012,
+        OnlyConsumableSKUsCanBeConsumed = 40018,
+        YouCanOnlyDeleteSandboxEntitlements = 40019,
         TargetUserNotInVoice = 40032,
         MessageAlreadyCrossposted = 40033,
         ApplicationNameAlreadyExists = 40041,
@@ -128,6 +136,9 @@ namespace Discord
         ServiceResourceIsBeingRateLimited = 40062,
         ThereAreNoTagsAvailableThatCanBeSetByNonModerators = 40066,
         ATagIsRequiredToCreateAForumPostInThisChannel = 40067,
+        AnEntitlementHasAlreadyBeenGrantedForThisResource = 40074,
+        ThisInteractionHasHitTheMaximumNumberOfFollowUpMessages = 40094,
+        CloudflareIsBlockingYourRequest = 40333,
         #endregion
 
         #region Action Preconditions/Checks (50XXX)
@@ -166,6 +177,7 @@ namespace Discord
         InvalidFileUpload = 50046,
         CannotSelfRedeemGift = 50054,
         InvalidGuild = 50055,
+        InvalidSKU = 50057,
         InvalidRequestOrigin = 50067,
         InvalidMessageType = 50068,
         PaymentSourceRequiredForGift = 50070,
@@ -182,13 +194,26 @@ namespace Discord
         ServerRequiresMonetization = 50097,
         ServerRequiresBoosts = 50101,
         RequestBodyContainsInvalidJSON = 50109,
+        TheProvidedFileIsInvalid = 50110,
+        TheProvidedFileTypeIsInvalid = 50123,
+        ProvidedFileDurationExceedsMaximumLength = 50124,
+        OwnerCannotBePendingMember = 50131,
         OwnershipCannotBeTransferredToABotUser = 50132,
         FailedToResizeAssetBelowTheMaximumSize = 50138,
         CannotMixSubscriptionAndNonSubscriptionRolesForAnEmoji = 50144,
         CannotConvertBetweenPremiumEmojiAndNormalEmoji = 50145,
         UploadedFileNotFound = 50146,
+        TheSpecifiedEmojiIsInvalid = 50151,
         FeatureInProcessOfRollingOut = 50155,
+        VoiceMessagesDoNotSupportAdditionalContent = 50159,
+        VoiceMessagesMustHaveASingleAudioAttachment = 50160,
+        VoiceMessagesMustHaveSupportingMetadata = 50161,
+        VoiceMessagesCannotBeEdited = 50162,
+        CannotDeleteGuildSubscriptionIntegration = 50163,
         CannotSendVoiceMessageInThisChannel = 50173,
+        TheUserAccountMustFirstBeVerified = 50178,
+        ProvidedFileDoesNotHaveAValidDuration = 50192,
+        CannotSendMessageToThisUser_2 = 50278,
         MissingPermissionToSendThisSticker = 50600,
         #endregion
 
@@ -252,15 +277,25 @@ namespace Discord
         CannotUpdateOnboardingBelowRequirements = 350001,
         #endregion
 
-        #region Polls (520XXX)
+        #region File Uploads (400XXX)
+        AccessToFileUploadsHasBeenLimitedForThisGuild = 400001,
+        #endregion
 
+        #region Polls, JWT and other errors (500XXX)
+        FailedToBanUsers = 500000,
         PollVotingBlocked = 520000,
         PollExpired = 520001,
         InvalidChannelTypeForPollCreation = 520002,
         CannotEditAPollMessage = 520003,
         CannotUseAnEmojiIncludedWithThePoll = 520004,
         CannotExpireANonPollMessage = 520006,
-
+        ProvisionalAccountsPermissionNotGranted = 530000,
+        IdTokenJWTExpired = 530001,
+        IdTokenJWTIssuerMismatch = 530002,
+        IdTokenJWTAudienceMismatch = 530003,
+        IdTokenJWTIssuedTooLongAgo = 530004,
+        FailedToGenerateUniqueUsername = 530006,
+        InvalidClientSecret = 530007,
         #endregion
     }
 }
