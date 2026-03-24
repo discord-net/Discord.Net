@@ -141,6 +141,18 @@ namespace Discord.Interactions.Builders
             _autocompleteCommands = new List<AutocompleteCommandBuilder>();
             _modalCommands = new List<ModalCommandBuilder>();
             _preconditions = new List<PreconditionAttribute>();
+
+            if (parent is not null)
+            {
+#pragma warning disable CS0618 // Type or member is obsolete
+                DefaultPermission = parent.DefaultPermission;
+                IsEnabledInDm = parent.IsEnabledInDm;
+#pragma warning restore CS0618 // Type or member is obsolete
+                IsNsfw = parent.IsNsfw;
+                DefaultMemberPermissions = parent.DefaultMemberPermissions;
+                ContextTypes = parent.ContextTypes;
+                IntegrationTypes = parent.IntegrationTypes;
+            }
         }
 
         /// <summary>
