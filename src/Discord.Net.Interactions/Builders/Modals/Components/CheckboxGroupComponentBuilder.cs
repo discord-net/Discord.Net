@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 namespace Discord.Interactions.Builders;
 
+/// <summary>
+///     Represents a builder for creating <see cref="CheckboxGroupComponentInfo"/>.
+/// </summary>
 public class CheckboxGroupComponentBuilder : InputComponentBuilder<CheckboxGroupComponentInfo, CheckboxGroupComponentBuilder>
 {
     private readonly List<CheckboxGroupOptionProperties> _options;

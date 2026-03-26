@@ -3,11 +3,17 @@ using System.Collections.Generic;
 
 namespace Discord.Interactions.Builders;
 
+/// <summary>
+///     Represents a builder for creating <see cref="RadioGroupComponentInfo"/>.
+/// </summary>
 public class RadioGroupComponentBuilder : InputComponentBuilder<RadioGroupComponentInfo, RadioGroupComponentBuilder>
 {
     private readonly List<RadioGroupOptionProperties> _options;
     protected override RadioGroupComponentBuilder Instance => this;
 
+    /// <summary>
+    ///     Gets the options of this radio group component.
+    /// </summary>
     public IReadOnlyCollection<RadioGroupOptionProperties> Options => _options.AsReadOnly();
 
     internal RadioGroupComponentBuilder(ModalBuilder modal) : base(modal)
