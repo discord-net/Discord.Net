@@ -2,17 +2,39 @@
 
 namespace Discord.Interactions;
 
+/// <summary>
+///     Adds a radio group option to the marked field.
+/// </summary>
 [AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
 public class ModalRadioGroupOptionAttribute : Attribute
 {
-    public string Value { get; set; }
+    /// <summary>
+    ///     Gets the label of the option.
+    /// </summary>
+    public string Label { get; }
 
-    public string Label { get; set; }
+    /// <summary>
+    ///     Gets the value of the option.
+    /// </summary>
+    public string Value { get; }
 
+    /// <summary>
+    ///     Gets or sets the description of the option.
+    /// </summary>
     public string Description { get; set; }
 
+    /// <summary>
+    ///     Gets or sets whether the option is selected by default.
+    /// </summary>
     public bool IsDefault { get; set; }
 
+    /// <summary>
+    ///     Create a new <see cref="ModalRadioGroupOptionAttribute"/>.
+    /// </summary>
+    /// <param name="label">Label of the option.</param>
+    /// <param name="value">Value of the option.</param>
+    /// <param name="description">Description of the option.</param>
+    /// <param name="isDefault">Whether the option is selected by default.</param>
     public ModalRadioGroupOptionAttribute(string value, string label, string description = null, bool isDefault = false)
     {
         Value = value;
