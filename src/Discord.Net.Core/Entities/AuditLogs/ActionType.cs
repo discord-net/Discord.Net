@@ -186,11 +186,11 @@ namespace Discord
         /// </summary>
         EventCreate = 100,
         /// <summary>
-        ///     A scheduled event was created.
+        ///     A scheduled event was updated.
         /// </summary>
         EventUpdate = 101,
         /// <summary>
-        ///     A scheduled event was created.
+        ///     A scheduled event was deleted.
         /// </summary>
         EventDelete = 102,
 
@@ -210,6 +210,19 @@ namespace Discord
         ///     Permissions were updated for a command.
         /// </summary>
         ApplicationCommandPermissionUpdate = 121,
+
+        /// <summary>
+        ///     A soundboard sound was created.
+        /// </summary>
+        SoundboardSoundCreate = 130,
+        /// <summary>
+        ///     A soundboard sound was updated.
+        /// </summary>
+        SoundboardSoundUpdate = 131,
+        /// <summary>
+        ///     A soundboard sound was deleted.
+        /// </summary>
+        SoundboardSoundDelete = 132,
 
         /// <summary>
         ///     Auto Moderation rule was created.
@@ -235,6 +248,19 @@ namespace Discord
         ///     Member was timed out by Auto Moderation.
         /// </summary>
         AutoModerationUserCommunicationDisabled = 145,
+        /// <summary>
+        ///     Member was quarantined by Auto Moderation.
+        /// </summary>
+        AutoModerationQuarantineUser = 146,
+
+        /// <summary>
+        ///     Creator monetization request was created.
+        /// </summary>
+        CreatorMonetizationRequestCreated = 150,
+        /// <summary>
+        ///     Creator monetization terms were accepted.
+        /// </summary>
+        CreatorMonetizationTermsAccepted = 151,
 
         /// <summary>
         ///     Guild Onboarding Question was created.
@@ -245,11 +271,28 @@ namespace Discord
         ///     Guild Onboarding Question was updated.
         /// </summary>
         OnboardingQuestionUpdated = 164,
+        /// <summary>
+        ///     Guild Onboarding Question was deleted.
+        /// </summary>
+        OnboardingQuestionDeleted = 165,
 
+        /// <summary>
+        ///     Guild Onboarding was created.
+        /// </summary>
+        OnboardingCreated = 166,
         /// <summary>
         ///     Guild Onboarding was updated.
         /// </summary>
         OnboardingUpdated = 167,
+
+        /// <summary>
+        ///     Guild Server Guide was created.
+        /// </summary>
+        HomeSettingsCreated = 190,
+        /// <summary>
+        ///     Guild Server Guide was updated.
+        /// </summary>
+        HomeSettingsUpdated = 191,
 
         /// <summary>
         ///     A voice channel status was updated by a user.

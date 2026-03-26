@@ -10,6 +10,9 @@ internal class RoleInfoAuditLogModel : IAuditLogInfoModel
     [JsonField("color")]
     public uint? Color { get; set; }
 
+    [JsonField("colors")]
+    public RoleColors Colors { get; set; }
+
     [JsonField("hoist")]
     public bool? Hoist { get; set; }
 

@@ -110,6 +110,7 @@ namespace Discord
             AssertFlag(() => new GuildPermissions(useExternalSounds: true), GuildPermission.UseExternalSounds);
             AssertFlag(() => new GuildPermissions(createEvents: true), GuildPermission.CreateEvents);
             AssertFlag(() => new GuildPermissions(pinMessages: true), GuildPermission.PinMessages);
+            AssertFlag(() => new GuildPermissions(bypassSlowmode: true), GuildPermission.BypassSlowmode);
         }
 
         /// <summary>
@@ -199,6 +200,7 @@ namespace Discord
             AssertUtil(GuildPermission.UseExternalSounds, x => x.UserExternalSounds, (p, enable) => p.Modify(useExternalSounds: enable));
             AssertUtil(GuildPermission.CreateEvents, x => x.CreateEvents, (p, enable) => p.Modify(createEvents: enable));
             AssertUtil(GuildPermission.PinMessages, x => x.PinMessages, (p, enable) => p.Modify(pinMessages: enable));
+            AssertUtil(GuildPermission.BypassSlowmode, x => x.BypassSlowmode, (p, enable) => p.Modify(bypassSlowmode: enable));
         }
     }
 }

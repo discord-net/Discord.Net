@@ -201,7 +201,19 @@ namespace Discord.Rest
             => ClientHelper.GetConnectionsAsync(this, options);
 
         public Task<RestInviteMetadata> GetInviteAsync(string inviteId, RequestOptions options = null, ulong? scheduledEventId = null)
-            => ClientHelper.GetInviteAsync(this, inviteId, options, scheduledEventId);
+            => InviteHelper.GetInviteAsync(this, inviteId, options, scheduledEventId);
+
+        /// <inheritdoc />
+        public Task<IReadOnlyCollection<ulong>> GetInviteTargetUsersAsync(string inviteId, RequestOptions options = null)
+            => InviteHelper.GetInviteTargetUsersAsync(this, inviteId, options);
+
+        /// <inheritdoc />
+        public Task ModifyTargetUsersAsync(string inviteId, IEnumerable<ulong> userIds, RequestOptions options = null)
+            => InviteHelper.ModifyInviteTargetUsersAsync(this, inviteId, userIds, options);
+
+        /// <inheritdoc />
+        public Task<TargetUsersJobStatus> GetTargetUsersJobStatus(string inviteId, RequestOptions options = null)
+            => InviteHelper.GetTargetUsersJobStatusAsync(this, inviteId, options);
 
         public Task<RestGuild> GetGuildAsync(ulong id, RequestOptions options = null)
             => ClientHelper.GetGuildAsync(this, id, false, options);

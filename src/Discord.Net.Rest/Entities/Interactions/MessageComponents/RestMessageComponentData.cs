@@ -56,12 +56,32 @@ namespace Discord.Rest
         /// <inheritdoc/>
         public string Value { get; }
 
+        /// <inheritdoc />
+        public bool? BoolValue { get; }
+
         internal RestMessageComponentData(Model model, BaseDiscordClient discord, IGuild guild)
         {
             CustomId = model.CustomId;
             Type = model.ComponentType;
             Values = model.Values.GetValueOrDefault();
-            Value = model.Value.GetValueOrDefault();
+
+            try 
+            {
+                Value = model.Value.GetValueOrDefault(null)?.ToObject<string>();
+            }
+            catch (Exception)
+            { 
+                // value is not a string :(
+            } 
+            
+            try 
+            {
+                BoolValue = model.Value.GetValueOrDefault(null)?.ToObject<bool>();
+            }
+            catch (Exception)
+            { 
+                // value is not a bool :(
+            }
 
             if (model.Resolved.IsSpecified)
             {
@@ -133,6 +153,21 @@ namespace Discord.Rest
             if (component is API.FileUploadComponent fileUpload)
             {
                 Values = fileUpload.Values.GetValueOrDefault(null);
+            }
+
+            if (component is API.CheckboxComponent checkbox)
+            {
+                BoolValue = checkbox.Value.ToNullable();
+            }
+
+            if (component is API.CheckboxGroupComponent checkboxGroup)
+            {
+                Values = checkboxGroup.Values.GetValueOrDefault(null);
+            }
+
+            if (component is API.RadioGroupComponent radioGroup)
+            {
+                Value = radioGroup.Value.GetValueOrDefault(null);
             }
         }
     }

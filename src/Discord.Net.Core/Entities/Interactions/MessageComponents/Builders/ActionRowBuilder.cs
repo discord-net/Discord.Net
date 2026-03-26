@@ -65,6 +65,16 @@ public class ActionRowBuilder : IMessageComponentBuilder, IInteractableComponent
     }
 
     /// <summary>
+    ///     Initializes a new <see cref="ActionRowBuilder"/>.
+    /// </summary>
+    public ActionRowBuilder(IEnumerable<IMessageComponentBuilder> components, int? id)
+    {
+        Components = components?.ToList() ?? [];
+        Id = id;
+    }
+
+
+    /// <summary>
     ///     Initializes a new <see cref="ActionRowBuilder"/> from existing component.
     /// </summary>
     public ActionRowBuilder(ActionRowComponent actionRow)

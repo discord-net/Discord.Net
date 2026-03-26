@@ -66,6 +66,7 @@ jobs:
               dotnet pack "src\Discord.Net.Commands\Discord.Net.Commands.csproj" --no-restore --no-build -v minimal -c Release -o ${{ env.ArtifactStagingDirectory }} /p:BuildNumber=${{ env.Suffix }} /p:IsTagBuild=${{ env.IsTagBuild }}
               dotnet pack "src\Discord.Net.Webhook\Discord.Net.Webhook.csproj" --no-restore --no-build -v minimal -c Release -o ${{ env.ArtifactStagingDirectory }} /p:BuildNumber=${{ env.Suffix }} /p:IsTagBuild=${{ env.IsTagBuild }}
               dotnet pack "src\Discord.Net.Interactions\Discord.Net.Interactions.csproj" --no-restore --no-build -v minimal -c Release -o ${{ env.ArtifactStagingDirectory }} /p:BuildNumber=${{ env.Suffix }} /p:IsTagBuild=${{ env.IsTagBuild }}
+              dotnet pack "tools\Discord.Net.Dave\Discord.Net.Dave.csproj" --no-restore --no-build -v minimal -c Release -o ${{ env.ArtifactStagingDirectory }} /p:BuildNumber=${{ env.Suffix }} /p:IsTagBuild=${{ env.IsTagBuild }}
 #              dotnet pack "experiment\Discord.Net.BuildOverrides\Discord.Net.BuildOverrides.csproj" --no-restore --no-build -v minimal -c Release -o ${{ env.ArtifactStagingDirectory }} /p:BuildNumber=${{ env.Suffix }} /p:IsTagBuild=${{ env.IsTagBuild }}
           
           - name: Publish Artifacts
@@ -122,12 +123,12 @@ jobs:
 
         - name: Push Nightly
           if: vars.PUSH_NIGHTLY_CUSTOM == 'true'
-          run: nuget push "${{ env.ArtifactStagingDirectory }}/*.nupkg" -Source ${{ vars.NIGHTLY_FEED }}
+          run: nuget push "${{ env.ArtifactStagingDirectory }}/*.nupkg" -SkipDuplicate -Source ${{ vars.NIGHTLY_FEED }}
 
         - name: Push Nightly to GitHub Pacakges
           if: vars.PUSH_NIGHTLY_GITHUB == 'true'            
-          run: nuget push "${{ env.ArtifactStagingDirectory }}/*.nupkg" -Source ${{ env.REPOSITORY_URL }}
+          run: nuget push "${{ env.ArtifactStagingDirectory }}/*.nupkg" -SkipDuplicate -Source ${{ env.REPOSITORY_URL }}
 
         - name: Push Release
           if: env.IsTagBuild == 'true' && vars.PUSH_NUGET == 'true'
-          run: nuget push "${{ env.ArtifactStagingDirectory }}/*.nupkg" -Source https://api.nuget.org/v3/index.json
+          run: nuget push "${{ env.ArtifactStagingDirectory }}/*.nupkg" -SkipDuplicate -Source https://api.nuget.org/v3/index.json

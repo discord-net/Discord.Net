@@ -1,5 +1,40 @@
 # Changelog
 
+## [3.19.1] - 2026-03-12
+### Added
+- #3226 Added Community Invites (9bb0e06)
+- #3229 Added Modal radio/checkbox groups & checkboxes (c0fbefe)
+- #3246 Added support for enhanced role colors ( gradient and holograpic ) (3e8aacf)
+### Fixed
+- #3224 Fixed forum CreatePostWithFileAsync with V2 components (0449e53)
+- #3231 Derived types of ContextCommandAttribute should be able to specify a RunMode in their constructor. (8556416)
+- #3244 Fixed libdave audio issues for users joining/leaving vc, as well as empty vcs (1c534fa)
+- #3249 GetComponentIds missing accessory component in sections (66c7409)
+### Misc
+- #3219 Document new modal components (8333e4b)
+- #3245 Patch modal docs oversights (c0bde1c)
+- #3248 Replace a deprecated Exception in the slash command guide (f5b9d3a)
+
+## [3.19.0] - 2025-03-02
+### Added
+- #3241 libdave support (#3222) (0195461)
+- #3242 Added voice close code `4017` (0ea1dcb)
+- #3221 Added missing channel types for selects in interaction framework (9c1db3f)
+- #3228 Added `BypassSlowmode` permission (0dea5bb)
+- #3233 Added optional id parameter to ThumbnailBuilder constructor (09e0fdb)
+- #3234 Added optional id parameter to SeparatorBuilder constructor (c3a30db)
+- #3235 Added constructor for SectionBuilder with id (b169a11)
+- #3236 Added constructor for ActionRowBuilder with id (e05e849)
+- #3237 Added overloaded constructor to ContainerBuilder (e3cb507)
+- #3238 Added overloaded constructor with id to MediaGalleryBuilder (16ea091)
+
+### Fixed
+- #3221 Fix Modal write invocation without instance (9c1db3f)
+
+### Misc
+- #3240 Removed unnecessary checks for content in `ModifyAsync` (414b1a0)
+
+
 ## [3.19.0-beta.1] - 2026-01-03
 ### Added
 - #3172 Modal refactoring & select menu support (a476014)

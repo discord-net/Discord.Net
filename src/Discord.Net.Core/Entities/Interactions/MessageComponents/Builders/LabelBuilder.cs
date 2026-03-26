@@ -17,7 +17,10 @@ public class LabelBuilder : IMessageComponentBuilder
         ComponentType.RoleSelect,
         ComponentType.MentionableSelect,
         ComponentType.ChannelSelect,
-        ComponentType.FileUpload
+        ComponentType.FileUpload,
+        ComponentType.RadioGroup,
+        ComponentType.CheckboxGroup,
+        ComponentType.Checkbox
     ];
 
     /// <summary>
@@ -41,7 +44,7 @@ public class LabelBuilder : IMessageComponentBuilder
     /// </summary>
     public string Label
     {
-        get => _label;
+        get;
         set
         {
             if (value is not null)
@@ -49,7 +52,7 @@ public class LabelBuilder : IMessageComponentBuilder
                 Preconditions.AtMost(value.Length, MaxLabelLength, nameof(Label));
             }
 
-            _label = value;
+            field = value;
         }
     }
 
@@ -58,7 +61,7 @@ public class LabelBuilder : IMessageComponentBuilder
     /// </summary>
     public string Description
     {
-        get => _description;
+        get;
         set
         {
             if (value is not null)
@@ -66,7 +69,7 @@ public class LabelBuilder : IMessageComponentBuilder
                 Preconditions.AtMost(value.Length, MaxDescriptionLength, nameof(Description));
             }
 
-            _description = value;
+            field = value;
         }
     }
 
@@ -113,9 +116,6 @@ public class LabelBuilder : IMessageComponentBuilder
         Component = component;
         return this;
     }
-
-    private string _label;
-    private string _description;
 
     /// <summary>
     ///     Initializes a new <see cref="LabelBuilder"/>.

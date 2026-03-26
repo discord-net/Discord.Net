@@ -21,10 +21,11 @@ public class SeparatorBuilder : IMessageComponentBuilder
     /// <summary>
     ///     Initializes a new <see cref="SeparatorBuilder"/>.
     /// </summary>
-    public SeparatorBuilder(bool isDivider = true, SeparatorSpacingSize spacing = SeparatorSpacingSize.Small)
+    public SeparatorBuilder(bool isDivider = true, SeparatorSpacingSize spacing = SeparatorSpacingSize.Small, int? id = null)
     {
         IsDivider = isDivider;
         Spacing = spacing;
+        Id = id;
     }
 
     /// <summary>

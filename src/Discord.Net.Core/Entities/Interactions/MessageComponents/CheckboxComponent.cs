@@ -1,7 +1,7 @@
 namespace Discord;
 
 /// <summary>
-///     
+///     Represents a message component of type <see cref="ComponentType.Checkbox"/>.
 /// </summary>
 public class CheckboxComponent : IInteractableComponent
 {
@@ -21,9 +21,9 @@ public class CheckboxComponent : IInteractableComponent
     /// <summary>
     ///     Gets the default state of this checkbox.
     /// </summary>
-    public bool DefaultState { get; }
+    public bool? DefaultState { get; }
 
-    internal CheckboxComponent(int? id, string customId, bool defaultState)
+    internal CheckboxComponent(int? id, string customId, bool? defaultState)
     {
         Id = id;
         CustomId = customId;

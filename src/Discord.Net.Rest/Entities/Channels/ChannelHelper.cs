@@ -1,10 +1,12 @@
 using Discord.API.Rest;
+
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+
 using Model = Discord.API.Channel;
 using StageInstance = Discord.API.StageInstance;
 
@@ -122,6 +124,7 @@ namespace Discord.Rest
             var models = await client.ApiClient.GetChannelInvitesAsync(channel.Id, options).ConfigureAwait(false);
             return models.Select(x => RestInviteMetadata.Create(client, null, channel, x)).ToImmutableArray();
         }
+
         /// <exception cref="ArgumentException">
         /// <paramref name="channel.Id"/> may not be equal to zero.
         /// -and-
@@ -130,16 +133,34 @@ namespace Discord.Rest
         /// <paramref name="maxAge"/> must be lesser than 86400.
         /// </exception>
         public static async Task<RestInviteMetadata> CreateInviteAsync(IGuildChannel channel, BaseDiscordClient client,
-            int? maxAge, int? maxUses, bool isTemporary, bool isUnique, RequestOptions options)
+            int? maxAge, int? maxUses, bool isTemporary, bool isUnique, IEnumerable<ulong> roleIds, IEnumerable<ulong> userIds, RequestOptions options)
         {
-            var args = new API.Rest.CreateChannelInviteParams
+            API.InviteMetadata model;
+            if (userIds is null || !userIds.Any())
             {
-                IsTemporary = isTemporary,
-                IsUnique = isUnique,
-                MaxAge = maxAge ?? 0,
-                MaxUses = maxUses ?? 0
-            };
-            var model = await client.ApiClient.CreateChannelInviteAsync(channel.Id, args, options).ConfigureAwait(false);
+                var args = new CreateChannelInviteParams
+                {
+                    IsTemporary = isTemporary,
+                    IsUnique = isUnique,
+                    MaxAge = maxAge ?? 0,
+                    MaxUses = maxUses ?? 0,
+                    RoleIds = roleIds?.ToArray() ?? Optional.Create<ulong[]>()
+                };
+                model = await client.ApiClient.CreateChannelInviteAsync(channel.Id, args, options).ConfigureAwait(false);
+            }
+            else
+            {
+                var args = new CreateChannelInviteMultipartParams(userIds)
+                {
+                    IsTemporary = isTemporary,
+                    IsUnique = isUnique,
+                    MaxAge = maxAge ?? 0,
+                    MaxUses = maxUses ?? 0,
+                    RoleIds = roleIds?.ToArray() ?? Optional.Create<ulong[]>()
+                };
+                model = await client.ApiClient.CreateChannelInviteMultipartAsync(channel.Id, args, options).ConfigureAwait(false);
+            }
+
             return RestInviteMetadata.Create(client, null, channel, model);
         }
 
@@ -151,19 +172,37 @@ namespace Discord.Rest
         /// <paramref name="maxAge"/> must be lesser than 86400.
         /// </exception>
         public static async Task<RestInviteMetadata> CreateInviteToStreamAsync(IGuildChannel channel, BaseDiscordClient client,
-            int? maxAge, int? maxUses, bool isTemporary, bool isUnique, IUser user,
+            int? maxAge, int? maxUses, bool isTemporary, bool isUnique, IUser user, IEnumerable<ulong> userIds,
             RequestOptions options)
         {
-            var args = new API.Rest.CreateChannelInviteParams
+            API.InviteMetadata model;
+            if (userIds is null || !userIds.Any())
             {
-                IsTemporary = isTemporary,
-                IsUnique = isUnique,
-                MaxAge = maxAge ?? 0,
-                MaxUses = maxUses ?? 0,
-                TargetType = TargetUserType.Stream,
-                TargetUserId = user.Id
-            };
-            var model = await client.ApiClient.CreateChannelInviteAsync(channel.Id, args, options).ConfigureAwait(false);
+                var args = new CreateChannelInviteParams
+                {
+                    IsTemporary = isTemporary,
+                    IsUnique = isUnique,
+                    MaxAge = maxAge ?? 0,
+                    MaxUses = maxUses ?? 0,
+                    TargetType = TargetUserType.Stream,
+                    TargetUserId = user.Id
+                };
+                model = await client.ApiClient.CreateChannelInviteAsync(channel.Id, args, options).ConfigureAwait(false);
+            }
+            else
+            {
+                var args = new CreateChannelInviteMultipartParams(userIds)
+                {
+                    IsTemporary = isTemporary,
+                    IsUnique = isUnique,
+                    MaxAge = maxAge ?? 0,
+                    MaxUses = maxUses ?? 0,
+                    TargetType = TargetUserType.Stream,
+                    TargetUserId = user.Id
+                };
+                model = await client.ApiClient.CreateChannelInviteMultipartAsync(channel.Id, args, options).ConfigureAwait(false);
+            }
+
             return RestInviteMetadata.Create(client, null, channel, model);
         }
 
@@ -175,19 +214,37 @@ namespace Discord.Rest
         /// <paramref name="maxAge"/> must be lesser than 86400.
         /// </exception>
         public static async Task<RestInviteMetadata> CreateInviteToApplicationAsync(IGuildChannel channel, BaseDiscordClient client,
-            int? maxAge, int? maxUses, bool isTemporary, bool isUnique, ulong applicationId,
+            int? maxAge, int? maxUses, bool isTemporary, bool isUnique, ulong applicationId, IEnumerable<ulong> userIds,
             RequestOptions options)
         {
-            var args = new API.Rest.CreateChannelInviteParams
+            API.InviteMetadata model;
+            if (userIds is null || !userIds.Any())
             {
-                IsTemporary = isTemporary,
-                IsUnique = isUnique,
-                MaxAge = maxAge ?? 0,
-                MaxUses = maxUses ?? 0,
-                TargetType = TargetUserType.EmbeddedApplication,
-                TargetApplicationId = applicationId
-            };
-            var model = await client.ApiClient.CreateChannelInviteAsync(channel.Id, args, options).ConfigureAwait(false);
+                var args = new CreateChannelInviteParams
+                {
+                    IsTemporary = isTemporary,
+                    IsUnique = isUnique,
+                    MaxAge = maxAge ?? 0,
+                    MaxUses = maxUses ?? 0,
+                    TargetType = TargetUserType.EmbeddedApplication,
+                    TargetApplicationId = applicationId
+                };
+                model = await client.ApiClient.CreateChannelInviteAsync(channel.Id, args, options).ConfigureAwait(false);
+            }
+            else
+            {
+                var args = new CreateChannelInviteMultipartParams(userIds)
+                {
+                    IsTemporary = isTemporary,
+                    IsUnique = isUnique,
+                    MaxAge = maxAge ?? 0,
+                    MaxUses = maxUses ?? 0,
+                    TargetType = TargetUserType.EmbeddedApplication,
+                    TargetApplicationId = applicationId
+                };
+                model = await client.ApiClient.CreateChannelInviteMultipartAsync(channel.Id, args, options).ConfigureAwait(false);
+            }
+
             return RestInviteMetadata.Create(client, null, channel, model);
         }
         #endregion

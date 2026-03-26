@@ -200,6 +200,11 @@ namespace Discord
         public static implicit operator uint(Color color)
             => color.RawValue;
 
+        public static implicit operator uint?(Color? color)
+            => color?.RawValue;
+
+        public static implicit operator Color?(uint? raw) => raw.HasValue ? raw.Value : null;
+
         /// <summary>
         ///     Converts the string representation of a color to a Color object.
         /// </summary>
@@ -228,7 +233,7 @@ namespace Discord
 
             if (string.IsNullOrWhiteSpace(rawValue))
                 return false;
-            
+
             rawValue = rawValue.TrimStart('#');
 
             if (rawValue.StartsWith("0x"))
@@ -256,7 +261,7 @@ namespace Discord
                     fullHex = (r << 16) | (g << 8) | b;
 
                     break;
-                
+
                 case (4, ColorType.CssHexColor):
                     r = (parsedValue & 0xF00) >> 8;
                     g = (parsedValue & 0xF0) >> 4;
@@ -284,7 +289,7 @@ namespace Discord
             }
 
             color = new Color(fullHex);
-            
+
             return true;
         }
 

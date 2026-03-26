@@ -612,9 +612,18 @@ namespace Discord.Rest
         #endregion
 
         #region Roles
-        /// <exception cref="ArgumentNullException"><paramref name="name"/> is <see langword="null" />.</exception>
-        public static async Task<RestRole> CreateRoleAsync(IGuild guild, BaseDiscordClient client,
-            string name, GuildPermissions? permissions, Color? color, bool isHoisted, bool isMentionable, RequestOptions options, Image? icon, Emoji emoji)
+        public static async Task<RestRole> CreateRoleAsync(
+            IGuild guild,
+            BaseDiscordClient client,
+            string name,
+            GuildPermissions? permissions,
+            RoleColors? colors,
+            bool isHoisted,
+            bool isMentionable,
+            RequestOptions options,
+            Image? icon,
+            Emoji emoji
+        )
         {
             if (name == null)
                 throw new ArgumentNullException(paramName: nameof(name));
@@ -629,9 +638,12 @@ namespace Discord.Rest
                 }
             }
 
+            if(colors is {IsSolidColor: false})
+                guild.Features.EnsureFeature(GuildFeature.EnhancedRoleColors);
+
             var createGuildRoleParams = new API.Rest.ModifyGuildRoleParams
             {
-                Color = color?.RawValue ?? Optional.Create<uint>(),
+                Colors = colors?.Normalized.ToModel() ?? Optional<API.RoleColors>.Unspecified,
                 Hoist = isHoisted,
                 Mentionable = isMentionable,
                 Name = name,

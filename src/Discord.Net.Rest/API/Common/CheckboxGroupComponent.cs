@@ -27,6 +27,9 @@ internal class CheckboxGroupComponent : IInteractableComponent
     [JsonProperty("required")]
     public Optional<bool> IsRequired { get; set; }
 
+    [JsonProperty("values")]
+    public Optional<string[]> Values { get; set; }
+
     public CheckboxGroupComponent() { }
 
     public CheckboxGroupComponent(Discord.CheckboxGroupComponent component)
@@ -37,13 +40,13 @@ internal class CheckboxGroupComponent : IInteractableComponent
         Options = component.Options.Select(x => new CheckboxGroupOption
         {
             Description = x.Description,
-            DefaultState = x.DefaultState,
+            DefaultState = x.DefaultState ?? Optional<bool>.Unspecified,
             Label = x.Label,
             Value = x.Value,
         }).ToArray();
         MinValues = component.MinValues ?? Optional<int>.Unspecified;
         MaxValues = component.MaxValues ?? Optional<int>.Unspecified;
-        IsRequired = component.IsRequired;
+        IsRequired = component.IsRequired ?? Optional<bool>.Unspecified;
     }
 
     [JsonIgnore]

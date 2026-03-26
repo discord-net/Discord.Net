@@ -214,7 +214,7 @@ internal static class MessageComponentExtension
                 return new RadioGroupComponent(parsed.Id.ToNullable(),
                     parsed.CustomId,
                     parsed.Options.Select(x => new RadioGroupOption(x.Value, x.Label, x.Description.GetValueOrDefault(), x.IsDefault.GetValueOrDefault(false))).ToImmutableArray(),
-                    parsed.IsRequired.GetValueOrDefault());
+                    parsed.IsRequired.ToNullable());
             }
 
             case ComponentType.CheckboxGroup:
@@ -225,7 +225,7 @@ internal static class MessageComponentExtension
                     parsed.Options.Select(x => new CheckboxGroupOption(x.Value, x.Label, x.Description.GetValueOrDefault(), x.DefaultState.GetValueOrDefault(false))).ToImmutableArray(),
                     parsed.MinValues.ToNullable(),
                     parsed.MaxValues.ToNullable(),
-                    parsed.IsRequired.GetValueOrDefault());
+                    parsed.IsRequired.ToNullable());
             }
 
             case ComponentType.Checkbox:
@@ -233,7 +233,7 @@ internal static class MessageComponentExtension
                 var parsed = (API.CheckboxComponent)component;
                 return  new CheckboxComponent(parsed.Id.ToNullable(),
                     parsed.CustomId,
-                    parsed.DefaultState.GetValueOrDefault(false));
+                    parsed.DefaultState.ToNullable());
             }
 
             default:

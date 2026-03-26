@@ -83,6 +83,12 @@ namespace Discord
             => HasFeature(GuildFeature.RoleIcons);
 
         /// <summary>
+        ///     Gets whether or not this server has enhanced role colors enabled.
+        /// </summary>
+        public bool HasEnhancedRoleColors
+            => HasFeature(GuildFeature.EnhancedRoleColors);
+
+        /// <summary>
         ///     Gets whether or not this server has private threads enabled.
         /// </summary>
         public bool HasPrivateThreads

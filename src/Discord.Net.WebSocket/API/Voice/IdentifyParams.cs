@@ -12,5 +12,7 @@ namespace Discord.API.Voice
         public string SessionId { get; set; }
         [JsonProperty("token")]
         public string Token { get; set; }
+        [JsonProperty("max_dave_protocol_version")]
+        public Optional<ushort> MaxDaveProtocolVersion { get; set; }
     }
 }

@@ -20,6 +20,9 @@ internal class RadioGroupComponent : IInteractableComponent
     [JsonProperty("required")]
     public Optional<bool> IsRequired { get; set; }
 
+    [JsonProperty("value")]
+    public Optional<string> Value { get; set; } 
+
     public RadioGroupComponent() { }
 
     public RadioGroupComponent(Discord.RadioGroupComponent component)
@@ -30,11 +33,11 @@ internal class RadioGroupComponent : IInteractableComponent
         Options = component.Options.Select(x => new RadioGroupOption
         {
             Description = x.Description,
-            IsDefault = x.IsDefault,
+            IsDefault = x.IsDefault ?? Optional<bool>.Unspecified,
             Label = x.Label,
             Value = x.Value,
         }).ToArray();
-        IsRequired = component.IsRequired;
+        IsRequired = component.IsRequired ?? Optional<bool>.Unspecified;;
     }
 
     [JsonIgnore]
