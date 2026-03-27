@@ -42,7 +42,7 @@ internal class EnumUtils
 
         foreach (var member in members)
         {
-            var selectMenuOptionAttr = member.GetCustomAttribute<SelectMenuOptionAttribute>();
+            var selectMenuOptionAttr = member.GetCustomAttribute<EnumOptionAttribute>();
 
             Emoji emoji = null;
             Emote emote = null;

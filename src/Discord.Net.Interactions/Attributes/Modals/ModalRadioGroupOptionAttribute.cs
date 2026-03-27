@@ -5,6 +5,9 @@ namespace Discord.Interactions;
 /// <summary>
 ///     Adds a radio group option to the marked field.
 /// </summary>
+/// <remarks>
+///     To add additional metadata to enum fields, use <see cref="EnumOptionAttribute"/> instead.
+/// </remarks>
 [AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
 public class ModalRadioGroupOptionAttribute : Attribute
 {
@@ -35,7 +38,7 @@ public class ModalRadioGroupOptionAttribute : Attribute
     /// <param name="value">Value of the option.</param>
     /// <param name="description">Description of the option.</param>
     /// <param name="isDefault">Whether the option is selected by default.</param>
-    public ModalRadioGroupOptionAttribute(string value, string label, string description = null, bool isDefault = false)
+    public ModalRadioGroupOptionAttribute(string label, string value, string description = null, bool isDefault = false)
     {
         Value = value;
         Label = label;

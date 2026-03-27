@@ -6,7 +6,7 @@ namespace Discord.Interactions;
 ///     Adds a select menu option to the marked field.
 /// </summary>
 /// <remarks>
-///     To add additional metadata to enum fields, use <see cref="SelectMenuOptionAttribute"/> instead.
+///     To add additional metadata to enum fields, use <see cref="EnumOptionAttribute"/> instead.
 /// </remarks>
 [AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
 public class ModalSelectMenuOptionAttribute : Attribute
