@@ -875,9 +875,10 @@ namespace Discord.Interactions.Builders
                         builder.ComponentType = checkboxInput.ComponentType;
                         builder.Id = checkboxInput.Id;
                         break;
-                    case RequiredInputAttribute requiredInput:
-                        builder.IsRequired = requiredInput.IsRequired;
-                        break;
+                    case RequiredInputAttribute { IsRequired: false }:
+                        // required: true => noop
+                        throw new InvalidOperationException(
+                            "Checkbox component cannot be set as optional, see Discord API documentation for more information.");
                     case InputLabelAttribute inputLabel:
                         builder.Label = inputLabel.Label;
                         builder.Description = inputLabel.Description;
