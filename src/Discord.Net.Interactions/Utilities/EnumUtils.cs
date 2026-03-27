@@ -5,10 +5,30 @@ using System.Reflection;
 
 namespace Discord.Interactions.Utilities;
 
-internal record EnumSelectMenuOption(
-    SelectMenuOption MenuOption,
-    Predicate<IDiscordInteraction> Predicate,
-    object Value);
+internal record EnumSelectMenuOption
+{
+    public SelectMenuOption MenuOption { get; }
+    public Predicate<IDiscordInteraction> Predicate { get; }
+    public object Value { get; }
+
+    public EnumSelectMenuOption(SelectMenuOption menuOption, Predicate<IDiscordInteraction> predicate, object value)
+    {
+        MenuOption = menuOption;
+        Predicate = predicate;
+        Value = value;
+    }
+
+    public SelectMenuOptionBuilder ToSelectMenuOptionBuilder()
+        => new(MenuOption);
+
+    public CheckboxGroupOptionProperties ToCheckboxGroupOptionProperties()
+        => new(MenuOption.Value, MenuOption.Label, MenuOption.Description,
+            MenuOption.IsDefault);
+
+    public RadioGroupOptionProperties ToRadioGroupOptionProperties()
+        => new(MenuOption.Value, MenuOption.Label, MenuOption.Description,
+            MenuOption.IsDefault);
+}
 
 internal class EnumUtils
 {

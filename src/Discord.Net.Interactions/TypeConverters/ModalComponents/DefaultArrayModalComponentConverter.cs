@@ -132,12 +132,19 @@ internal sealed class DefaultArrayModalComponentConverter<T> : ModalComponentTyp
 
     public override Task WriteAsync<TBuilder>(TBuilder builder, IDiscordInteraction interaction, InputComponentInfo component, object value)
     {
-        if (builder is FileUploadComponentBuilder)
-            return Task.CompletedTask;
+        return builder switch
+        {
+            FileUploadComponentBuilder => Task.CompletedTask,
+            SelectMenuBuilder selectMenu when component.ComponentType.IsSelectType() => WriteSelectMenuAsync(selectMenu,
+                interaction, component, value),
+            CheckboxGroupBuilder checkboxGroup => WriteCheckboxGroupAsync(checkboxGroup, interaction, component, value),
+            _ => throw new InvalidOperationException($"Component type of the input {component.CustomId} of modal {component.Modal.Type.FullName} must be either a select component type, file upload or checkbox group.")
+        };
+    }
 
-        if (builder is not SelectMenuBuilder selectMenu || !component.ComponentType.IsSelectType())
-            throw new InvalidOperationException($"Component type of the input {component.CustomId} of modal {component.Modal.Type.FullName} must be a select type.");
-
+    private Task WriteSelectMenuAsync(SelectMenuBuilder builder, IDiscordInteraction interaction,
+        InputComponentInfo component, object value)
+    {
         if (!_enumOptions.IsEmpty)
         {
             var visibleOptions = _enumOptions.Where(x => !x.Predicate?.Invoke(interaction) ?? true);
@@ -146,18 +153,18 @@ internal sealed class DefaultArrayModalComponentConverter<T> : ModalComponentTyp
 
             foreach (var option in visibleOptions)
             {
-                var optionBuilder = new SelectMenuOptionBuilder(option.MenuOption);
+                var optionBuilder = option.ToSelectMenuOptionBuilder();
 
                 if (enumValues is not null)
                     optionBuilder.IsDefault = enumValues.Contains(option.Value);
 
-                selectMenu.AddOption(optionBuilder);
+                builder.AddOption(optionBuilder);
             }
 
             return Task.CompletedTask;
         }
 
-        selectMenu.DefaultValues = value switch
+        builder.DefaultValues = value switch
         {
             IEnumerable<IUser> defaultUsers => defaultUsers.Select(SelectMenuDefaultValue.FromUser).ToList(),
             IEnumerable<IRole> defaultRoles => defaultRoles.Select(SelectMenuDefaultValue.FromRole).ToList(),
@@ -175,11 +182,51 @@ internal sealed class DefaultArrayModalComponentConverter<T> : ModalComponentTyp
                     };
                 })
                 .ToList(),
-            _ => selectMenu.DefaultValues
+            _ => builder.DefaultValues
         };
 
+        if (value is IEnumerable<IConvertible> arr)
+        {
+            foreach (var option in builder.Options)
+            {
+                option.IsDefault = option.Value == Convert.ToString(option);
+            }
+        }
+
         if (component.ComponentType == ComponentType.ChannelSelect && _channelTypes.Length > 0)
-            selectMenu.WithChannelTypes(_channelTypes.ToList());
+            builder.WithChannelTypes(_channelTypes.ToList());
+
+        return Task.CompletedTask;
+    }
+
+    private Task WriteCheckboxGroupAsync(CheckboxGroupBuilder builder, IDiscordInteraction interaction,
+        InputComponentInfo component, object value)
+    {
+        if (!_enumOptions.IsEmpty)
+        {
+            var visibleOptions = _enumOptions.Where(x => !x.Predicate?.Invoke(interaction) ?? true);
+
+            var enumValues = value is IEnumerable valueArr ? valueArr.Cast<Enum>().ToArray() : null;
+
+            foreach (var option in visibleOptions)
+            {
+                var optionBuilder = option.ToCheckboxGroupOptionProperties();
+
+                if (enumValues is not null)
+                    optionBuilder.DefaultState = enumValues.Contains(option.Value);
+
+                builder.AddOption(optionBuilder);
+            }
+        }
+
+        if (value is IEnumerable<IConvertible> arr)
+        {
+            builder.Options = builder.Options.Select(x =>
+            {
+                x.DefaultState = x.Value == Convert.ToString(x);
+                return x;
+            }).ToList();
+        }
 
         return Task.CompletedTask;
     }
