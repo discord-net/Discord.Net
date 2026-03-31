@@ -239,7 +239,7 @@ namespace Discord.Rest
             }
 
             if (model.Call.IsSpecified)
-                CallData = new MessageCallData(model.Call.Value.Participants, model.Call.Value.EndedTimestamp.ToNullable());
+                CallData = new MessageCallData(model.Call.Value.Participants, model.Call.Value.EndedTimestamp.GetValueOrDefault(null));
         }
 
         /// <inheritdoc />
