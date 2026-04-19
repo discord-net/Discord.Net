@@ -34,8 +34,35 @@ namespace Discord.Audio.Streams
                 (buffer[offset + 6] << 8) |
                 (buffer[offset + 7] << 0));
 
+            // RFC 3550 §5.1: if the P (padding) bit is set in the first RTP
+            // header byte, the last octet of the packet is the padding count,
+            // which must be stripped from the payload before it is handed off
+            // to the next stream (e.g. the DAVE decryptor). Without this,
+            // decryption fails with DecryptionFailure on any padded packet —
+            // observed in the wild with real Discord clients that pad voice
+            // frames to MTU / silence boundaries.
+            int paddingBytes = 0;
+            if ((buffer[offset] & 0b0010_0000) != 0 && count > 0)
+            {
+                paddingBytes = buffer[offset + count - 1];
+                if (paddingBytes > count - headerSize)
+                {
+                    paddingBytes = 0; // malformed — don't overshoot into the header
+                }
+            }
+
+            int payloadLength = count - headerSize - paddingBytes;
+            if (payloadLength <= 0)
+            {
+                // Pure-padding packet (e.g. RTP keepalive / DTX marker with no
+                // real payload). Nothing to decode — drop silently rather than
+                // invoking the downstream decryptor with an empty buffer,
+                // which would spuriously log DecryptionFailure.
+                return Task.CompletedTask;
+            }
+
             _next.WriteHeader(seq, timestamp, false);
-            return _next.WriteAsync(buffer, offset + headerSize, count - headerSize, cancelToken);
+            return _next.WriteAsync(buffer, offset + headerSize, payloadLength, cancelToken);
         }
 
         public static bool TryReadSsrc(byte[] buffer, int offset, out uint ssrc)
