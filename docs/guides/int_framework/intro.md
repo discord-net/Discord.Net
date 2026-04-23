@@ -240,7 +240,7 @@ A Modal implementation would look like this:
 
 > [!NOTE]
 > If you are using Modals in the interaction service it is **highly
-> recommended** that you enable `PreCompiledLambdas` in your config
+> recommended** that you enable `InteractionServiceConfig.UseCompiledLambda`
 > to prevent performance issues.
 
 ## Interaction Context
