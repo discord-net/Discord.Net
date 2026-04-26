@@ -99,7 +99,7 @@ namespace Discord.Interactions.Builders
         /// </returns>
         public override TBuilder WithType(Type type)
         {
-            TypeConverter = Modal._interactionService.GetModalInputTypeConverter(type);
+            TypeConverter = Modal._interactionService.GetModalComponentTypeConverter(type);
             return base.WithType(type);
         }
 

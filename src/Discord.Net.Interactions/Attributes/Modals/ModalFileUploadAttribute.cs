@@ -1,8 +1,11 @@
+using System;
+
 namespace Discord.Interactions;
 
 /// <summary>
 ///     Marks a <see cref="IModal"/> property as a file upload input.
 /// </summary>
+[AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
 public class ModalFileUploadAttribute : ModalInputAttribute
 {
     /// <inheritdoc/>

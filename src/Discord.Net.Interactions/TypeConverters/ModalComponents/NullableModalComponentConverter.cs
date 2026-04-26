@@ -14,7 +14,7 @@ internal class NullableModalComponentConverter<T> : ModalComponentTypeConverter<
         if (type is null)
             throw new ArgumentException($"No type {nameof(TypeConverter)} is defined for this {type.FullName}", "type");
 
-        _typeConverter = interactionService.GetModalInputTypeConverter(type, services);
+        _typeConverter = interactionService.GetModalComponentTypeConverter(type, services);
     }
 
     public override Task<TypeConverterResult> ReadAsync(IInteractionContext context, IComponentInteractionData option, IServiceProvider services)

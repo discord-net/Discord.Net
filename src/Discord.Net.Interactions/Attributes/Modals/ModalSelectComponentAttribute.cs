@@ -1,8 +1,11 @@
+using System;
+
 namespace Discord.Interactions;
 
 /// <summary>
 ///     Base attribute for select-menu, user, channel, role, and mentionable select inputs in modals.
 /// </summary>
+[AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
 public abstract class ModalSelectComponentAttribute : ModalInputAttribute
 {
     /// <summary>

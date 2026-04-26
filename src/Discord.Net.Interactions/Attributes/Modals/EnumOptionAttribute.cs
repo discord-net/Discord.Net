@@ -3,13 +3,15 @@ using System;
 namespace Discord.Interactions;
 
 /// <summary>
-///     Adds additional metadata to enum fields that are used for select-menus.
+///     Adds additional metadata to enum fields that are used for select-menus, checkbox groups, and radio groups.
 /// </summary>
 /// <remarks>
-///     To manually add select menu options to modal components, use <see cref="ModalSelectMenuOptionAttribute"/> instead.
+///     To manually add select menu, checkbox group or radio group options to modal components,
+///     instead use <see cref="ModalSelectMenuOptionAttribute"/>, <see cref="ModalCheckboxGroupOptionAttribute"/>,
+///     and <see cref="ModalRadioGroupOptionAttribute"/> respectively.
 /// </remarks>
 [AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
-public class SelectMenuOptionAttribute : Attribute
+public class EnumOptionAttribute : Attribute
 {
     /// <summary>
     ///     Gets or sets the desription of the option.
@@ -25,7 +27,9 @@ public class SelectMenuOptionAttribute : Attribute
     ///     Gets or sets the emote of the option.
     /// </summary>
     /// <remarks>
-    ///     Can be either an <see cref="Emoji"/> or an <see cref="Discord.Emote"/>
+    ///     Can be either an <see cref="Emoji"/> or an <see cref="Discord.Emote"/>.
+    ///     <br/>
+    ///     <b>Only applicable for select menus.</b>
     /// </remarks>
     public string Emote { get; set; }
 }

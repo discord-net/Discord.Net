@@ -84,6 +84,12 @@ namespace Discord.Interactions
         /// </summary>
         public IReadOnlyCollection<TextDisplayComponentInfo> TextDisplayComponents { get; }
 
+        public IReadOnlyCollection<CheckboxComponentInfo> CheckboxComponents { get; }
+
+        public IReadOnlyCollection<CheckboxGroupComponentInfo> CheckboxGroupComponents { get; }
+
+        public IReadOnlyCollection<RadioGroupComponentInfo> RadioGroupComponents { get; }
+
         internal ModalInfo(Builders.ModalBuilder builder)
         {
             Title = builder.Title;
@@ -98,6 +104,9 @@ namespace Discord.Interactions
                 Builders.MentionableSelectComponentBuilder mentionableSelectComponent => mentionableSelectComponent.Build(this),
                 Builders.FileUploadComponentBuilder fileUploadComponent => fileUploadComponent.Build(this),
                 Builders.TextDisplayComponentBuilder textDisplayComponent => textDisplayComponent.Build(this),
+                Builders.CheckboxComponentBuilder checkboxComponent => checkboxComponent.Build(this),
+                Builders.CheckboxGroupComponentBuilder checkboxGroupComponent => checkboxGroupComponent.Build(this),
+                Builders.RadioGroupComponentBuilder radioGroupComponent => radioGroupComponent.Build(this),
                 _ => throw new InvalidOperationException($"{x.GetType().FullName} isn't a supported modal input component builder type.")
             }).ToImmutableArray();
 
@@ -111,6 +120,9 @@ namespace Discord.Interactions
             ChannelSelectComponents = Components.OfType<ChannelSelectComponentInfo>().ToImmutableArray();
             FileUploadComponents = Components.OfType<FileUploadComponentInfo>().ToImmutableArray();
             TextDisplayComponents = Components.OfType<TextDisplayComponentInfo>().ToImmutableArray();
+            CheckboxComponents = Components.OfType<CheckboxComponentInfo>().ToImmutableArray();
+            CheckboxGroupComponents = Components.OfType<CheckboxGroupComponentInfo>().ToImmutableArray();
+            RadioGroupComponents = Components.OfType<RadioGroupComponentInfo>().ToImmutableArray();
 
             _interactionService = builder._interactionService;
             _initializer = builder.ModalInitializer;

@@ -23,6 +23,9 @@ namespace Discord.Interactions
         /// <summary>
         ///     Gets whether or not this component requires a user input.
         /// </summary>
+        /// <remarks>
+        ///     Not applicable for checkbox component. See Discord API documentation for further information.
+        /// </remarks>
         public bool IsRequired { get; }
 
         /// <summary>

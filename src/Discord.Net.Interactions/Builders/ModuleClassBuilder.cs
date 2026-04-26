@@ -635,6 +635,15 @@ namespace Discord.Interactions.Builders
                         case ComponentType.TextDisplay:
                             builder.AddTextDisplayComponent(x => BuildTextDisplayComponent(x, prop, prop.GetValue(instance)));
                             break;
+                        case ComponentType.Checkbox:
+                            builder.AddCheckboxComponent(x => BuildCheckboxComponent(x, prop, prop.GetValue(instance)));
+                            break;
+                        case ComponentType.CheckboxGroup:
+                            builder.AddCheckboxGroupComponent(x => BuildCheckboxGroupComponent(x, prop, prop.GetValue(instance)));
+                            break;
+                        case ComponentType.RadioGroup:
+                            builder.AddRadioGroupComponent(x => BuildRadioGroupComponent(x, prop, prop.GetValue(instance)));
+                            break;
                         case null:
                             throw new InvalidOperationException($"{prop.Name} of {prop.DeclaringType.Name} isn't a valid modal input field.");
                         default:
@@ -838,6 +847,129 @@ namespace Discord.Interactions.Builders
                         builder.ComponentType = textDisplay.ComponentType;
                         builder.Content = textDisplay.Content;
                         builder.Id = textDisplay.Id;
+                        break;
+                    default:
+                        builder.WithAttributes(attribute);
+                        break;
+                }
+            }
+        }
+
+        private static void BuildCheckboxComponent(CheckboxComponentBuilder builder, PropertyInfo propertyInfo, object defaultValue)
+        {
+            EnsurePubliclySettable(propertyInfo);
+
+            var attributes = propertyInfo.GetCustomAttributes();
+
+            builder.Label = propertyInfo.Name;
+            builder.DefaultValue = defaultValue;
+            builder.WithType(propertyInfo.PropertyType);
+            builder.PropertyInfo = propertyInfo;
+
+            foreach (var attribute in attributes)
+            {
+                switch (attribute)
+                {
+                    case ModalCheckboxAttribute checkboxInput:
+                        builder.CustomId = checkboxInput.CustomId;
+                        builder.ComponentType = checkboxInput.ComponentType;
+                        builder.Id = checkboxInput.Id;
+                        break;
+                    case RequiredInputAttribute { IsRequired: false }:
+                        // required: true => noop
+                        throw new InvalidOperationException(
+                            "Checkbox component cannot be set as optional, see Discord API documentation for more information.");
+                    case InputLabelAttribute inputLabel:
+                        builder.Label = inputLabel.Label;
+                        builder.Description = inputLabel.Description;
+                        break;
+                    default:
+                        builder.WithAttributes(attribute);
+                        break;
+                }
+            }
+        }
+
+        private static void BuildCheckboxGroupComponent(CheckboxGroupComponentBuilder builder, PropertyInfo propertyInfo, object defaultValue)
+        {
+            EnsurePubliclySettable(propertyInfo);
+
+            var attributes = propertyInfo.GetCustomAttributes();
+
+            builder.Label = propertyInfo.Name;
+            builder.DefaultValue = defaultValue;
+            builder.WithType(propertyInfo.PropertyType);
+            builder.PropertyInfo = propertyInfo;
+
+            foreach (var attribute in attributes)
+            {
+                switch (attribute)
+                {
+                    case ModalCheckboxGroupAttribute checkboxGroupInput:
+                        builder.CustomId = checkboxGroupInput.CustomId;
+                        builder.ComponentType = checkboxGroupInput.ComponentType;
+                        builder.Id = checkboxGroupInput.Id;
+                        builder.MinValues = checkboxGroupInput.MinValues;
+                        builder.MaxValues = checkboxGroupInput.MaxValues;
+                        break;
+                    case RequiredInputAttribute requiredInput:
+                        builder.IsRequired = requiredInput.IsRequired;
+                        break;
+                    case InputLabelAttribute inputLabel:
+                        builder.Label = inputLabel.Label;
+                        builder.Description = inputLabel.Description;
+                        break;
+                    case ModalCheckboxGroupOptionAttribute checkboxGroupOption:
+                        builder.AddOption(new CheckboxGroupOptionProperties
+                        {
+                            Label = checkboxGroupOption.Label,
+                            Value = checkboxGroupOption.Value,
+                            Description = checkboxGroupOption.Description,
+                            DefaultState = checkboxGroupOption.DefaultState
+                        });
+                        break;
+                    default:
+                        builder.WithAttributes(attribute);
+                        break;
+                }
+            }
+        }
+
+        private static void BuildRadioGroupComponent(RadioGroupComponentBuilder builder, PropertyInfo propertyInfo, object defaultValue)
+        {
+            EnsurePubliclySettable(propertyInfo);
+
+            var attributes = propertyInfo.GetCustomAttributes();
+
+            builder.Label = propertyInfo.Name;
+            builder.DefaultValue = defaultValue;
+            builder.WithType(propertyInfo.PropertyType);
+            builder.PropertyInfo = propertyInfo;
+
+            foreach (var attribute in attributes)
+            {
+                switch (attribute)
+                {
+                    case ModalRadioGroupAttribute radioGroupInput:
+                        builder.CustomId = radioGroupInput.CustomId;
+                        builder.ComponentType = radioGroupInput.ComponentType;
+                        builder.Id = radioGroupInput.Id;
+                        break;
+                    case RequiredInputAttribute requiredInput:
+                        builder.IsRequired = requiredInput.IsRequired;
+                        break;
+                    case InputLabelAttribute inputLabel:
+                        builder.Label = inputLabel.Label;
+                        builder.Description = inputLabel.Description;
+                        break;
+                    case ModalRadioGroupOptionAttribute radioGroupOption:
+                        builder.AddOption(new RadioGroupOptionProperties
+                        {
+                            Label = radioGroupOption.Label,
+                            Value = radioGroupOption.Value,
+                            Description = radioGroupOption.Description,
+                            IsDefault = radioGroupOption.IsDefault
+                        });
                         break;
                     default:
                         builder.WithAttributes(attribute);
