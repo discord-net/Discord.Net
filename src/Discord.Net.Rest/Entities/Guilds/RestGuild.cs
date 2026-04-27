@@ -844,6 +844,31 @@ namespace Discord.Rest
             => GuildHelper.GetVoiceRegionsAsync(this, Discord, options);
         #endregion
 
+        #region Voice States
+        /// <summary>
+        ///     Gets the current user's voice state in this guild.
+        /// </summary>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains the current user's
+        ///     <see cref="RestVoiceState"/>, or <see langword="null"/> if the current user is not in any voice channel of this guild.
+        /// </returns>
+        public Task<RestVoiceState> GetMyVoiceStateAsync(RequestOptions options = null)
+            => GuildHelper.GetMyVoiceStateAsync(this, Discord, options);
+
+        /// <summary>
+        ///     Gets the voice state of the specified user in this guild.
+        /// </summary>
+        /// <param name="userId">The snowflake of the user.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains the user's
+        ///     <see cref="RestVoiceState"/>, or <see langword="null"/> if the user is not in any voice channel of this guild.
+        /// </returns>
+        public Task<RestVoiceState> GetUserVoiceStateAsync(ulong userId, RequestOptions options = null)
+            => GuildHelper.GetUserVoiceStateAsync(this, Discord, userId, options);
+        #endregion
+
         #region Integrations
         public Task<IReadOnlyCollection<RestIntegration>> GetIntegrationsAsync(RequestOptions options = null)
             => GuildHelper.GetIntegrationsAsync(this, Discord, options);
