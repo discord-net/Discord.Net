@@ -213,7 +213,7 @@ namespace Discord
         CannotSendVoiceMessageInThisChannel = 50173,
         TheUserAccountMustFirstBeVerified = 50178,
         ProvidedFileDoesNotHaveAValidDuration = 50192,
-        CannotSendMessageToThisUser_2 = 50278,
+        CannotSendMessagesToThisUserDueToHavingNoMutualGuilds = 50278,
         MissingPermissionToSendThisSticker = 50600,
         #endregion
 
