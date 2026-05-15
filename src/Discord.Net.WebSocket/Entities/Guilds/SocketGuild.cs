@@ -670,6 +670,10 @@ namespace Discord.WebSocket
         public Task<GuildIncidentsData> ModifyIncidentActionsAsync(Action<GuildIncidentsDataProperties> props, RequestOptions options = null)
             => GuildHelper.ModifyGuildIncidentActionsAsync(this, Discord, props, options);
 
+        /// <inheritdoc />
+        public Task<GuildMessageSearchData> GetGuildMessagesAsync(GetGuildMessagesParams args, RequestOptions options = null)
+            => GuildHelper.GetGuildMessagesAsync(this, Discord, args, options);
+
         #endregion
 
         #region Bans

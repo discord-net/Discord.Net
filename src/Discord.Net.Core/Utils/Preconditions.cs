@@ -72,6 +72,22 @@ namespace Discord
         private static ArgumentException CreateNotEmptyException(string name, string msg)
             => new ArgumentException(message: msg ?? "Argument cannot be blank.", paramName: name);
 
+        /// <exception cref="ArgumentException">String size may not be equal to <paramref name="size"/>.</exception>
+        public static void NotEqualSize(Optional<string> obj, int size, string name, string msg = null) { if (obj.IsSpecified && obj.Value.Length == size) throw new ArgumentException(message: msg ?? $"String size may not be equal to {size}.", paramName: name); }
+
+        /// <exception cref="ArgumentException">String size must be at least <paramref name="size"/>.</exception>
+        public static void AtLeastSize(Optional<string> obj, int size, string name, string msg = null) { if (obj.IsSpecified && obj.Value.Length < size) throw new ArgumentException(message: msg ?? $"String size must be at least {size}.", paramName: name); }
+
+        /// <exception cref="ArgumentException">String size must be greater than <paramref name="size"/>.</exception>
+        public static void GreaterThanSize(Optional<string> obj, int size, string name, string msg = null) { if (obj.IsSpecified && obj.Value.Length <= size) throw new ArgumentException(message: msg ?? $"String size must be greater than {size}.", paramName: name); }
+
+        /// <exception cref="ArgumentException">String size must be at most <paramref name="size"/>.</exception>
+        public static void AtMostSize(Optional<string> obj, int size, string name, string msg = null) { if (obj.IsSpecified && obj.Value.Length > size) throw new ArgumentException(message: msg ?? $"String size must be at most {size}.", paramName: name); }
+
+        /// <exception cref="ArgumentException">String size must be less than <paramref name="size"/>.</exception>
+        public static void LessThanSize(Optional<string> obj, int size, string name, string msg = null) { if (obj.IsSpecified && obj.Value.Length >= size) throw new ArgumentException(message: msg ?? $"String size must be less than {size}.", paramName: name); }
+
+
         #endregion
 
         #region Message Validation
@@ -399,6 +415,25 @@ namespace Discord
             AtLeast(description.Length, 1, nameof(description));
             AtMost(description.Length, SlashCommandBuilder.MaxDescriptionLength, nameof(description));
         }
+
+        #endregion
+
+        #region Array Size
+
+        /// <exception cref="ArgumentException">Array size may not be equal to <paramref name="size"/>.</exception>
+        public static void NotEqualSize<T>(Optional<T[]> obj, int size, string name, string msg = null) { if (obj.IsSpecified && obj.Value.Length == size) throw new ArgumentException(message: msg ?? $"Array size may not be equal to {size}.", paramName: name); }
+
+        /// <exception cref="ArgumentException">Array size must be at least <paramref name="size"/>.</exception>
+        public static void AtLeastSize<T>(Optional<T[]> obj, int size, string name, string msg = null) { if (obj.IsSpecified && obj.Value.Length < size) throw new ArgumentException(message: msg ?? $"Array size must be at least {size}.", paramName: name); }
+
+        /// <exception cref="ArgumentException">Array size must be greater than <paramref name="size"/>.</exception>
+        public static void GreaterThanSize<T>(Optional<T[]> obj, int size, string name, string msg = null) { if (obj.IsSpecified && obj.Value.Length <= size) throw new ArgumentException(message: msg ?? $"Array size must be greater than {size}.", paramName: name); }
+
+        /// <exception cref="ArgumentException">Array size must be at most <paramref name="size"/>.</exception>
+        public static void AtMostSize<T>(Optional<T[]> obj, int size, string name, string msg = null) { if (obj.IsSpecified && obj.Value.Length > size) throw new ArgumentException(message: msg ?? $"Array size must be at most {size}.", paramName: name); }
+
+        /// <exception cref="ArgumentException">Array size must be less than <paramref name="size"/>.</exception>
+        public static void LessThanSize<T>(Optional<T[]> obj, int size, string name, string msg = null) { if (obj.IsSpecified && obj.Value.Length >= size) throw new ArgumentException(message: msg ?? $"Array size must be less than {size}.", paramName: name); }
 
         #endregion
 

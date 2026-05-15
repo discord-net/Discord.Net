@@ -1462,6 +1462,14 @@ namespace Discord
         Task<GuildIncidentsData> ModifyIncidentActionsAsync(Action<GuildIncidentsDataProperties> props, RequestOptions options = null);
 
         /// <summary>
+        ///     Requests a list of messages of this guild with some filters.
+        /// </summary>
+        /// <returns>
+        ///     A task that represents the asynchronous creation operation. The task result contains the modified <see cref="GuildMessageSearchData"/>.
+        /// </returns>
+        Task<GuildMessageSearchData> GetGuildMessagesAsync(GetGuildMessagesParams args, RequestOptions options = null);
+
+        /// <summary>
         ///     Executes a bulk ban on the specified users.
         /// </summary>
         /// <param name="userIds">A collection of user ids to ban.</param>

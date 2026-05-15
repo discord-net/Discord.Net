@@ -178,6 +178,29 @@ namespace Discord.Rest
                 InvitesDisabledUntil = model.InvitesDisabledUntil
             };
         }
+
+        public static async Task<GuildMessageSearchData> GetGuildMessagesAsync(IGuild guild, BaseDiscordClient client, GetGuildMessagesParams args, RequestOptions options = null)
+        {
+            var model = await client.ApiClient.GetGuildMessagesAsync(guild.Id, args, options);
+
+            var builder = ImmutableArray.CreateBuilder<RestMessage>();
+            if (model.ParseMessages)
+                foreach (var msg in model.Messages)
+                {
+                    var author = MessageHelper.GetAuthor(client, guild, msg.Author.Value, msg.WebhookId.ToNullable());
+                    var channel = GetChannelAsync(guild, client, msg.ChannelId, options).Result;
+                    builder.Add(RestMessage.Create(client, channel as IMessageChannel, author, msg));
+                }
+
+            return new GuildMessageSearchData
+            {
+                DoingDeepHistoricalIndex = model.DoingDeepHistoricalIndex,
+                DocumentsIndexed = model.DocumentsIndexed,
+                TotalResults = model.TotalResults,
+                Messages = builder.ToImmutable(),
+            };
+        }
+
         #endregion
 
         #region Bans

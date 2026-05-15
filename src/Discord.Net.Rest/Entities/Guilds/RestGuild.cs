@@ -313,6 +313,10 @@ namespace Discord.Rest
             return IncidentsData;
         }
 
+        /// <inheritdoc />
+        public Task<GuildMessageSearchData> GetGuildMessagesAsync(GetGuildMessagesParams args, RequestOptions options = null)
+            => GuildHelper.GetGuildMessagesAsync(this, Discord, args, options);
+
         #endregion
 
         #region Interactions
