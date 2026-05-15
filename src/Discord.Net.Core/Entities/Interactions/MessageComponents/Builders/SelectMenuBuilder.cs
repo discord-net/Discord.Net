@@ -122,6 +122,11 @@ public class SelectMenuBuilder : IInteractableComponentBuilder
     }
 
     /// <summary>
+    ///     Gets or sets whether the current menu is required to answer in a modal (defaults to <see langword="true"/>).
+    /// </summary>
+    public bool IsRequired { get ; set; } = true;
+
+    /// <summary>
     ///     Gets or sets whether the current menu is disabled.
     /// </summary>
     public bool IsDisabled { get; set; }
@@ -168,11 +173,13 @@ public class SelectMenuBuilder : IInteractableComponentBuilder
         CustomId = selectMenu.CustomId;
         MaxValues = selectMenu.MaxValues;
         MinValues = selectMenu.MinValues;
+        IsRequired = selectMenu.IsRequired;
         IsDisabled = selectMenu.IsDisabled;
         Type = selectMenu.Type;
         Options = selectMenu.Options?
            .Select(x => new SelectMenuOptionBuilder(x.Label, x.Value, x.Description, x.Emote, x.IsDefault))
            .ToList();
+        ChannelTypes = selectMenu.ChannelTypes?.ToList();
         DefaultValues = selectMenu.DefaultValues?.ToList();
         Id = selectMenu.Id;
     }
@@ -188,12 +195,16 @@ public class SelectMenuBuilder : IInteractableComponentBuilder
     /// <param name="isDisabled">Disabled this select menu or not.</param>
     /// <param name="type">The <see cref="ComponentType"/> of this select menu.</param>
     /// <param name="channelTypes">The types of channels this menu can select (only valid on <see cref="ComponentType.ChannelSelect"/>s)</param>
-    public SelectMenuBuilder(string customId, List<SelectMenuOptionBuilder> options = null, string placeholder = null, int maxValues = 1, int minValues = 1,
-        bool isDisabled = false, ComponentType type = ComponentType.SelectMenu, List<ChannelType> channelTypes = null, List<SelectMenuDefaultValue> defaultValues = null, int? id = null)
+    /// <param name="defaultValues">The list of default values.</param>
+    /// <param name="id">An optional id for the component.</param>
+    /// <param name="isRequired">Whether the current menu is required to answer in a modal.</param>
+    public SelectMenuBuilder(string customId, List<SelectMenuOptionBuilder> options = null, string placeholder = null, int maxValues = 1, int minValues = 1, bool isDisabled = false,
+        ComponentType type = ComponentType.SelectMenu, List<ChannelType> channelTypes = null, List<SelectMenuDefaultValue> defaultValues = null, int? id = null, bool isRequired = true)
     {
         CustomId = customId;
         Options = options;
         Placeholder = placeholder;
+        IsRequired = isRequired;
         IsDisabled = isDisabled;
         MaxValues = maxValues;
         MinValues = minValues;
@@ -353,6 +364,19 @@ public class SelectMenuBuilder : IInteractableComponentBuilder
     }
 
     /// <summary>
+    ///     Sets whether the current menu is required to answer in a modal.
+    /// </summary>
+    /// <param name="isRequired">Whether the current menu is required to answer in a modal.</param>
+    /// <returns>
+    ///     The current builder.
+    /// </returns>
+    public SelectMenuBuilder WithRequired(bool isRequired)
+    {
+        IsRequired = isRequired;
+        return this;
+    }
+
+    /// <summary>
     ///     Sets whether the current menu is disabled.
     /// </summary>
     /// <param name="isDisabled">Whether the current menu is disabled or not.</param>
@@ -414,7 +438,7 @@ public class SelectMenuBuilder : IInteractableComponentBuilder
     {
         var options = Options?.Select(x => x.Build()).ToList();
 
-        return new SelectMenuComponent(CustomId, options, Placeholder, MinValues, MaxValues, IsDisabled, Type, Id, ChannelTypes, DefaultValues);
+        return new SelectMenuComponent(CustomId, options, Placeholder, MinValues, MaxValues, IsRequired, IsDisabled, Type, Id, ChannelTypes, DefaultValues);
     }
 
     /// <inheritdoc/>

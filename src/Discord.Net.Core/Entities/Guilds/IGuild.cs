@@ -1,6 +1,7 @@
 using Discord.Audio;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Globalization;
 using System.IO;
 using System.Threading.Tasks;
@@ -976,7 +977,8 @@ namespace Discord
         ///     A task that represents the asynchronous creation operation. The task result contains the newly created
         ///     role.
         /// </returns>
-        Task<IRole> CreateRoleAsync(string name, GuildPermissions? permissions = null, Color? color = null, bool isHoisted = false, RequestOptions options = null);
+        Task<IRole> CreateRoleAsync(string name, GuildPermissions? permissions = null, RoleColors? color = null, bool isHoisted = false, RequestOptions options = null);
+
         // TODO remove CreateRoleAsync overload that does not have isMentionable when breaking change is acceptable
         /// <summary>
         ///     Creates a new role with the provided name.
@@ -993,7 +995,7 @@ namespace Discord
         ///     A task that represents the asynchronous creation operation. The task result contains the newly created
         ///     role.
         /// </returns>
-        Task<IRole> CreateRoleAsync(string name, GuildPermissions? permissions = null, Color? color = null, bool isHoisted = false, bool isMentionable = false, RequestOptions options = null, Image? icon = null, Emoji emoji = null);
+        Task<IRole> CreateRoleAsync(string name, GuildPermissions? permissions = null, RoleColors? color = null, bool isHoisted = false, bool isMentionable = false, RequestOptions options = null, Image? icon = null, Emoji emoji = null);
 
         /// <summary>
         ///     Adds a user to this guild.
@@ -1469,5 +1471,15 @@ namespace Discord
         ///     A task that represents the asynchronous creation operation. The task result contains a <see cref="BulkBanResult"/>.
         /// </returns>
         Task<BulkBanResult> BulkBanAsync(IEnumerable<ulong> userIds, int? deleteMessageSeconds = null, RequestOptions options = null);
+
+        /// <summary>
+        ///     Gets a mapping of role IDs to the number of users that have each role.
+        /// </summary>
+        Task<ImmutableDictionary<ulong, int>> GetRoleUserCountsAsync(RequestOptions options = null);
+
+        /// <summary>
+        ///     Modifies the current user in this guild.
+        /// </summary>
+        Task ModifyCurrentUserAsync(Action<SelfGuildUserProperties> props, RequestOptions options = null);
     }
 }

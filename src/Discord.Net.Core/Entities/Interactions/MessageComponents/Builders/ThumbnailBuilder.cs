@@ -38,11 +38,12 @@ public class ThumbnailBuilder : IMessageComponentBuilder
     /// <summary>
     ///     Initializes a new instance of the <see cref="ThumbnailBuilder"/>.
     /// </summary>
-    public ThumbnailBuilder(UnfurledMediaItemProperties media, string description = null, bool isSpoiler = false)
+    public ThumbnailBuilder(UnfurledMediaItemProperties media, string description = null, bool isSpoiler = false, int? id = null)
     {
         Media = media;
         Description = description;
         IsSpoiler = isSpoiler;
+        Id = id;
     }
 
     /// <summary>

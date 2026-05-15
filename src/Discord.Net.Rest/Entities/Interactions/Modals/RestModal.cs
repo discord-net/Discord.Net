@@ -7,6 +7,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 
 using DataModel = Discord.API.ModalInteractionData;
@@ -22,26 +23,30 @@ namespace Discord.Rest
         internal RestModal(DiscordRestClient client, ModelBase model)
              : base(client, model.Id)
         {
-            var dataModel = model.Data.IsSpecified
-                ? (DataModel)model.Data.Value
-                : null;
-
             if (model.Message.IsSpecified && model.ChannelId.IsSpecified)
             {
                 Message = RestUserMessage.Create(Discord, Channel, User, model.Message.Value);
             }
-
-            Data = new RestModalData(dataModel, client, Guild);
         }
 
         internal new static async Task<RestModal> CreateAsync(DiscordRestClient client, ModelBase model, bool doApiCall)
         {
             var entity = new RestModal(client, model);
             await entity.UpdateAsync(client, model, doApiCall);
+
+            var dataModel = model.Data.IsSpecified
+                ? (DataModel)model.Data.Value
+                : null;
+
+            entity.Data = new RestModalData(dataModel, client, entity.Guild);
             return entity;
         }
 
-        private object _lock = new object();
+#if NET9_0_OR_GREATER
+        private readonly Lock _lock = new();
+#else
+        private readonly object _lock = new();
+#endif
 
         /// <summary>
         ///     Acknowledges this interaction with the <see cref="InteractionResponseType.DeferredUpdateMessage"/> if the modal was created
@@ -138,7 +143,7 @@ namespace Discord.Rest
             MessageComponent component = null,
             Embed embed = null,
             RequestOptions options = null,
-            PollProperties poll = null, 
+            PollProperties poll = null,
             MessageFlags flags = MessageFlags.None)
         {
             if (!IsValidToken)

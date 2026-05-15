@@ -62,6 +62,17 @@ public class ContainerBuilder : IMessageComponentBuilder, IStaticComponentContai
     {
         Components = components?.ToList();
     }
+
+    /// <summary>
+    ///     Initializes a new <see cref="ContainerBuilder"/>.
+    /// </summary>
+    public ContainerBuilder(Color? accentColor = null, bool? isSpoiler = null, int? id = null, params IEnumerable<IMessageComponentBuilder> components)
+    {
+        Components = components?.ToList();
+        AccentColor = accentColor;
+        IsSpoiler = IsSpoiler;
+        Id = id;
+    }
     
     /// <summary>
     ///     Initializes a new <see cref="ContainerBuilder"/> from existing component.

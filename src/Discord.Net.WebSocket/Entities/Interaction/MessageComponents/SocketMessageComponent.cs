@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using DataModel = Discord.API.MessageComponentInteractionData;
 using Model = Discord.API.Interaction;
@@ -20,11 +21,15 @@ namespace Discord.WebSocket
         ///     Gets the data received with this interaction, contains the button that was clicked.
         /// </summary>
         public new SocketMessageComponentData Data { get; }
-        
+
         /// <inheritdoc cref="IComponentInteraction.Message"/>
         public SocketUserMessage Message { get; private set; }
 
-        private object _lock = new object();
+#if NET9_0_OR_GREATER
+        private readonly Lock _lock = new();
+#else
+        private readonly object _lock = new();
+#endif
         public override bool HasResponded { get; internal set; } = false;
 
         internal SocketMessageComponent(DiscordSocketClient client, Model model, ISocketMessageChannel channel, SocketUser user)
@@ -358,7 +363,7 @@ namespace Discord.WebSocket
                 flags |= MessageFlags.Ephemeral;
 
             Preconditions.ValidateMessageFlags(flags);
-                
+
 
             var args = new API.Rest.CreateWebhookMessageParams
             {
@@ -504,7 +509,7 @@ namespace Discord.WebSocket
                 {
                     CustomId = modal.CustomId,
                     Title = modal.Title,
-                    Components = modal.Component.Components.Select(x => new Discord.API.ActionRowComponent(x)).ToArray()
+                    Components = modal.Component.Components.Select(x => x.ToModel()).ToArray()
                 }
             };
 

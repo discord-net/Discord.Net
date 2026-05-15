@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using DataModel = Discord.API.AutocompleteInteractionData;
 using Model = Discord.API.Interaction;
@@ -19,7 +20,11 @@ namespace Discord.Rest
         /// </summary>
         public new RestAutocompleteInteractionData Data { get; }
 
-        private object _lock = new object();
+#if NET9_0_OR_GREATER
+        private readonly Lock _lock = new();
+#else
+        private readonly object _lock = new();
+#endif
 
         internal RestAutocompleteInteraction(DiscordRestClient client, Model model)
             : base(client, model.Id)

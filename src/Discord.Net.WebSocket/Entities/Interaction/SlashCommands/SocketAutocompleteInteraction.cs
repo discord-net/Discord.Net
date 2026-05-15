@@ -2,6 +2,7 @@ using Discord.Rest;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using DataModel = Discord.API.AutocompleteInteractionData;
 using Model = Discord.API.Interaction;
@@ -21,7 +22,11 @@ namespace Discord.WebSocket
         /// <inheritdoc/>
         public override bool HasResponded { get; internal set; }
 
-        private object _lock = new object();
+#if NET9_0_OR_GREATER
+        private readonly Lock _lock = new();
+#else
+        private readonly object _lock = new();
+#endif
 
         internal SocketAutocompleteInteraction(DiscordSocketClient client, Model model, ISocketMessageChannel channel, SocketUser user)
             : base(client, model.Id, channel, user)

@@ -243,6 +243,19 @@ namespace Discord.API
             return SendInternalAsync(method, endpoint, request);
         }
 
+        internal Task<Stream> SendRawResponseAsync(string method, Expression<Func<string>> endpointExpr, BucketIds ids,
+            ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null, [CallerMemberName] string funcName = null)
+            => SendRawResponseAsync(method, GetEndpoint(endpointExpr), GetBucketId(method, ids, endpointExpr, funcName), clientBucket, options);
+        public Task<Stream> SendRawResponseAsync(string method, string endpoint,
+            BucketId bucketId = null, ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null)
+        {
+            options ??= new RequestOptions();
+            options.BucketId = bucketId;
+
+            var request = new RestRequest(RestClient, method, endpoint, options);
+            return SendInternalAsync(method, endpoint, request);
+        }
+
         internal Task<TResponse> SendAsync<TResponse>(string method, Expression<Func<string>> endpointExpr, BucketIds ids,
              ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null, [CallerMemberName] string funcName = null) where TResponse : class
             => SendAsync<TResponse>(method, GetEndpoint(endpointExpr), GetBucketId(method, ids, endpointExpr, funcName), clientBucket, options);
@@ -1711,6 +1724,15 @@ namespace Discord.API
             return await SendJsonAsync<GuildIncidentsData>("PUT", () => $"guilds/{guildId}/incident-actions", args, ids, options: options).ConfigureAwait(false);
         }
 
+        public async Task<Dictionary<ulong, int>> GetRoleUserCountsAsync(ulong guildId, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+
+            var ids = new BucketIds(guildId: guildId);
+
+            return await SendAsync<Dictionary<ulong, int>>("GET", () => $"guilds/{guildId}/roles/member-counts", ids, options: options);
+        }
+
         #endregion
 
         #region Guild Bans
@@ -1941,6 +1963,38 @@ namespace Discord.API
             return SendJsonAsync<InviteMetadata>("POST", () => $"channels/{channelId}/invites", args, ids, options: options);
         }
 
+        public Task<InviteMetadata> CreateChannelInviteMultipartAsync(ulong channelId, CreateChannelInviteMultipartParams args, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(channelId, 0, nameof(channelId));
+            Preconditions.NotNull(args, nameof(args));
+            Preconditions.AtLeast(args.MaxAge, 0, nameof(args.MaxAge));
+            Preconditions.AtLeast(args.MaxUses, 0, nameof(args.MaxUses));
+            Preconditions.AtMost(args.MaxAge, 86400, nameof(args.MaxAge),
+                "The maximum age of an invite must be less than or equal to a day (86400 seconds).");
+            if (args.TargetType.IsSpecified)
+            {
+                Preconditions.NotEqual((int)args.TargetType.Value, (int)TargetUserType.Undefined, nameof(args.TargetType));
+                if (args.TargetType.Value == TargetUserType.Stream)
+                    Preconditions.GreaterThan(args.TargetUserId, 0, nameof(args.TargetUserId));
+                if (args.TargetType.Value == TargetUserType.EmbeddedApplication)
+                    Preconditions.GreaterThan(args.TargetApplicationId, 0, nameof(args.TargetApplicationId));
+            }
+            options = RequestOptions.CreateOrClone(options);
+
+            var ids = new BucketIds(channelId: channelId);
+            return SendMultipartAsync<InviteMetadata>("POST", () => $"channels/{channelId}/invites", args.ToDictionary(), ids, options: options);
+        }
+
+        public Task ModifyInviteTargetUsersAsync(string inviteId, ModifyChannelInviteTargetUsersMultipartParams args, RequestOptions options = null)
+        {
+            Preconditions.NotNull(inviteId, nameof(inviteId));
+            Preconditions.NotNull(args, nameof(args));
+
+            options = RequestOptions.CreateOrClone(options);
+
+            return SendMultipartAsync("PUT", () => $"invites/{inviteId}/target-users", args.ToDictionary(), new BucketIds(), options: options);
+        }
+
         public Task<Invite> DeleteInviteAsync(string inviteId, RequestOptions options = null)
         {
             Preconditions.NotNullOrEmpty(inviteId, nameof(inviteId));
@@ -1948,6 +2002,34 @@ namespace Discord.API
 
             return SendAsync<Invite>("DELETE", () => $"invites/{inviteId}", new BucketIds(), options: options);
         }
+
+        public async Task<ulong[]> GetInviteTargetUsersAsync(string inviteId, RequestOptions options = null)
+        {
+            var csvStream = await SendRawResponseAsync("GET", () => $"invites/{inviteId}/target-users", new BucketIds(), options: options).ConfigureAwait(false);
+            var userIds = new List<ulong>();
+
+            using var streamReader = new StreamReader(csvStream);
+            var line = await streamReader.ReadLineAsync().ConfigureAwait(false); // Skip header line
+            while (line is not null)
+            {
+                line = await streamReader.ReadLineAsync().ConfigureAwait(false);
+                if (line is null)
+                    break;
+
+                if (ulong.TryParse(line, out var userId))
+                    userIds.Add(userId);
+            }
+            return userIds.ToArray();
+        }
+
+        public async Task<InviteTargetUsersJobStatus> GetInviteTargetUsersJobStatusAsync(string inviteId, RequestOptions options = null)
+        {
+            Preconditions.NotNullOrEmpty(inviteId, nameof(inviteId));
+            options = RequestOptions.CreateOrClone(options);
+
+            return await SendAsync<InviteTargetUsersJobStatus>("GET", () => $"invites/{inviteId}/target-users/job-status", new BucketIds(), options: options).ConfigureAwait(false);
+        }
+
         #endregion
 
         #region Guild Members
@@ -2013,7 +2095,7 @@ namespace Discord.API
             return SendAsync("DELETE", () => $"guilds/{guildId}/members/{userId}", ids, options: options);
         }
 
-        public async Task ModifyGuildMemberAsync(ulong guildId, ulong userId, Rest.ModifyGuildMemberParams args, RequestOptions options = null)
+        public async Task ModifyGuildMemberAsync(ulong guildId, ulong userId, ModifyGuildMemberParams args, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             Preconditions.NotEqual(userId, 0, nameof(userId));
@@ -2021,17 +2103,19 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
 
             bool isCurrentUser = userId == CurrentUserId;
-
             if (isCurrentUser && args.Nickname.IsSpecified)
             {
-                var nickArgs = new Rest.ModifyCurrentUserNickParams(args.Nickname.Value ?? "");
-                await ModifyMyNickAsync(guildId, nickArgs).ConfigureAwait(false);
-                args.Nickname = Optional.Create<string>(); //Remove
+                var nickArgs = new ModifyCurrentMemberParams
+                {
+                    Nickname = args.Nickname
+                };
+                await ModifyCurrentMemberAsync(guildId, nickArgs).ConfigureAwait(false);
+                args.Nickname = Optional.Create<string>(); // Remove so it's not getting updated again
             }
             if (!isCurrentUser || args.Deaf.IsSpecified || args.Mute.IsSpecified || args.RoleIds.IsSpecified)
             {
                 var ids = new BucketIds(guildId: guildId);
-                await SendJsonAsync("PATCH", () => $"guilds/{guildId}/members/{userId}", args, ids, options: options).ConfigureAwait(false);
+                await SendJsonAsync<GuildMember>("PATCH", () => $"guilds/{guildId}/members/{userId}", args, ids, options: options).ConfigureAwait(false);
             }
         }
 
@@ -2445,14 +2529,14 @@ namespace Discord.API
             return SendJsonAsync<User>("PATCH", () => "users/@me", args, new BucketIds(), options: options);
         }
 
-        public Task ModifyMyNickAsync(ulong guildId, Rest.ModifyCurrentUserNickParams args, RequestOptions options = null)
+        public Task<GuildMember> ModifyCurrentMemberAsync(ulong guildId, ModifyCurrentMemberParams args, RequestOptions options = null)
         {
             Preconditions.NotNull(args, nameof(args));
-            Preconditions.NotNull(args.Nickname, nameof(args.Nickname));
+
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(guildId: guildId);
-            return SendJsonAsync("PATCH", () => $"guilds/{guildId}/members/@me/nick", args, ids, options: options);
+            return SendJsonAsync<GuildMember>("PATCH", () => $"guilds/{guildId}/members/@me", args, ids, options: options);
         }
 
         public Task<Channel> CreateDMChannelAsync(CreateDMChannelParams args, RequestOptions options = null)

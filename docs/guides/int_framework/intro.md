@@ -233,14 +233,14 @@ Alternatively, you can use the [AutocompleteHandlers] to simplify this workflow.
 
 ## Modals
 
-Modal commands last parameter must be an implementation of `IModal`.
+Modal commands last parameter must be an implementation of `IModal`. For in-depth information on creating modals, please refer to the [Modals] guide.
 A Modal implementation would look like this:
 
 [!code-csharp[Modal Command](samples/intro/modal.cs)]
 
 > [!NOTE]
 > If you are using Modals in the interaction service it is **highly
-> recommended** that you enable `PreCompiledLambdas` in your config
+> recommended** that you enable `InteractionServiceConfig.UseCompiledLambda`
 > to prevent performance issues.
 
 ## Interaction Context
@@ -430,6 +430,7 @@ User apps are the kind of Discord applications that are installed onto a user in
 [AutocompleteHandlers]: xref:Guides.IntFw.AutoCompletion
 [DependencyInjection]: xref:Guides.DI.Intro
 [Post-Execution Documentation]: xref:Guides.IntFw.PostExecution
+[Modals]: xref:Guides.IntFw.Modals
 
 [GroupAttribute]: xref:Discord.Interactions.GroupAttribute
 [DontAutoRegisterAttribute]: xref:Discord.Interactions.DontAutoRegisterAttribute

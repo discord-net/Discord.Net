@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using Model = Discord.API.User;
 
 namespace Discord.WebSocket
@@ -31,7 +32,11 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         internal override SocketGlobalUser GlobalUser { get => this; set => throw new NotImplementedException(); }
 
-        private readonly object _lockObj = new object();
+#if NET9_0_OR_GREATER
+        private readonly Lock _lockObj = new();
+#else
+        private readonly object _lockObj = new();
+#endif
         private ushort _references;
 
         private SocketGlobalUser(DiscordSocketClient discord, ulong id)

@@ -46,6 +46,13 @@ namespace Discord
         /// </remarks>
         public Optional<Color> Color { get; set; }
         /// <summary>
+        ///     Gets or sets the full color configuration of the role.
+        /// </summary>
+        /// <remarks>
+        ///     This value may not be set if the role is an @everyone role.
+        /// </remarks>
+        public Optional<RoleColors> Colors { get; set; }
+        /// <summary>
         ///     Gets or sets whether or not this role should be displayed independently in the user list.
         /// </summary>
         /// <remarks>

@@ -26,16 +26,14 @@ namespace Discord.Rest
 
             return client.ApiClient.ModifySelfAsync(apiArgs, options);
         }
-        public static async Task<GuildUserProperties> ModifyAsync(IGuildUser user, BaseDiscordClient client, Action<GuildUserProperties> func,
+
+        public static async Task<GuildUserProperties> ModifyAsync(IGuild guild, IUser user, BaseDiscordClient client, GuildUserProperties args,
             RequestOptions options)
         {
-            var args = new GuildUserProperties();
-            func(args);
-
             if (args.TimedOutUntil.IsSpecified && args.TimedOutUntil.Value.Value.Offset > (new TimeSpan(28, 0, 0, 0)))
                 throw new ArgumentOutOfRangeException(nameof(args.TimedOutUntil), "Offset cannot be more than 28 days from the current date.");
 
-            var apiArgs = new API.Rest.ModifyGuildMemberParams
+            var apiArgs = new ModifyGuildMemberParams
             {
                 Deaf = args.Deaf,
                 Mute = args.Mute,
@@ -59,11 +57,31 @@ namespace Discord.Rest
              * string.Empty ("") is the only way to reset the user nick in the API,
              * a value of null does not. This is a workaround.
              */
-            if (apiArgs.Nickname.IsSpecified && apiArgs.Nickname.Value == null)
+            if (apiArgs.Nickname is { IsSpecified: true, Value: null })
                 apiArgs.Nickname = new Optional<string>(string.Empty);
 
-            await client.ApiClient.ModifyGuildMemberAsync(user.GuildId, user.Id, apiArgs, options).ConfigureAwait(false);
+            await client.ApiClient.ModifyGuildMemberAsync(guild.Id, user.Id, apiArgs, options).ConfigureAwait(false);
             return args;
+        }
+
+        public static async Task ModifyCurrentUserAsync(IGuild guild, IUser user, BaseDiscordClient client, SelfGuildUserProperties args, RequestOptions options)
+        {
+            if (args.Nickname.IsSpecified || args.Avatar.IsSpecified || args.Banner.IsSpecified || args.Bio.IsSpecified)
+            {
+                var props = new ModifyCurrentMemberParams
+                {
+                    Nickname = args.Nickname,
+                    Avatar = args.Avatar.IsSpecified ? args.Avatar.Value?.ToModel() : Optional<ImageModel?>.Unspecified,
+                    Banner = args.Banner.IsSpecified ? args.Banner.Value?.ToModel() : Optional<ImageModel?>.Unspecified,
+                    Bio = args.Bio
+                };
+
+                await client.ApiClient.ModifyCurrentMemberAsync(guild.Id, props, options).ConfigureAwait(false);
+
+                args.Nickname = Optional<string>.Unspecified;
+            }
+
+            await ModifyAsync(guild, user, client, args, options);
         }
 
         public static Task KickAsync(IGuildUser user, BaseDiscordClient client, string reason, RequestOptions options)

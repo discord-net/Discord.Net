@@ -22,7 +22,20 @@ namespace Discord
         /// <returns>
         ///     A <see cref="Color"/> struct representing the color of this role.
         /// </returns>
+        /// <remarks>
+        ///     This property is deprecated in the API, and its value will always be <see cref="Colors"/>.PrimaryColor
+        /// </remarks>
+        [Obsolete(
+            $"This property is deprecated in the API, and its value will always be {nameof(Colors)}.{nameof(RoleColors.PrimaryColor)}",
+            error: false
+        )]
         Color Color { get; }
+
+        /// <summary>
+        ///     Gets the full role color configuration of this role.
+        /// </summary>
+        RoleColors Colors { get; }
+
         /// <summary>
         ///     Gets a value that indicates whether the role can be separated in the user list.
         /// </summary>
@@ -30,6 +43,7 @@ namespace Discord
         ///     <see langword="true" /> if users of this role are separated in the user list; otherwise <see langword="false" />.
         /// </returns>
         bool IsHoisted { get; }
+
         /// <summary>
         ///     Gets a value that indicates whether the role is managed by Discord.
         /// </summary>
@@ -37,6 +51,7 @@ namespace Discord
         ///     <see langword="true" /> if this role is automatically managed by Discord; otherwise <see langword="false" />.
         /// </returns>
         bool IsManaged { get; }
+
         /// <summary>
         ///     Gets a value that indicates whether the role is mentionable.
         /// </summary>
@@ -44,6 +59,7 @@ namespace Discord
         ///     <see langword="true" /> if this role may be mentioned in messages; otherwise <see langword="false" />.
         /// </returns>
         bool IsMentionable { get; }
+
         /// <summary>
         ///     Gets the name of this role.
         /// </summary>
@@ -51,6 +67,7 @@ namespace Discord
         ///     A string containing the name of this role.
         /// </returns>
         string Name { get; }
+
         /// <summary>
         ///     Gets the icon of this role.
         /// </summary>
@@ -58,6 +75,7 @@ namespace Discord
         ///     A string containing the hash of this role's icon.
         /// </returns>
         string Icon { get; }
+
         /// <summary>
         ///     Gets the unicode emoji of this role.
         /// </summary>
@@ -65,6 +83,7 @@ namespace Discord
         ///     This field is mutually exclusive with <see cref="Icon"/>, either icon is set or emoji is set.
         /// </remarks>
         Emoji Emoji { get; }
+
         /// <summary>
         ///     Gets the permissions granted to members of this role.
         /// </summary>
@@ -72,6 +91,7 @@ namespace Discord
         ///     A <see cref="GuildPermissions"/> struct that this role possesses.
         /// </returns>
         GuildPermissions Permissions { get; }
+
         /// <summary>
         ///     Gets this role's position relative to other roles in the same guild.
         /// </summary>
@@ -79,6 +99,7 @@ namespace Discord
         ///     An <see cref="int"/> representing the position of the role in the role list of the guild.
         /// </returns>
         int Position { get; }
+
         /// <summary>
         ///     Gets the tags related to this role.
         /// </summary>

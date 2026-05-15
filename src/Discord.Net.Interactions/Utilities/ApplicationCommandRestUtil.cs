@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Discord.Interactions
 {
@@ -336,26 +337,6 @@ namespace Discord.Interactions
                 MaxLength = commandOption.MaxLength,
                 MinLength = commandOption.MinLength,
             };
-
-        public static Modal ToModal(this ModalInfo modalInfo, string customId, Action<ModalBuilder> modifyModal = null)
-        {
-            var builder = new ModalBuilder(modalInfo.Title, customId);
-
-            foreach (var input in modalInfo.Components)
-                switch (input)
-                {
-                    case TextInputComponentInfo textComponent:
-                        builder.AddTextInput(textComponent.Label, textComponent.CustomId, textComponent.Style, textComponent.Placeholder, textComponent.IsRequired ? textComponent.MinLength : null,
-                            textComponent.MaxLength, textComponent.IsRequired, textComponent.InitialValue);
-                        break;
-                    default:
-                        throw new InvalidOperationException($"{input.GetType().FullName} isn't a valid component info class");
-                }
-
-            modifyModal?.Invoke(builder);
-
-            return builder.Build();
-        }
 
         public static GuildPermission? SanitizeGuildPermissions(this GuildPermission permissions) =>
             permissions == 0 ? null : permissions;

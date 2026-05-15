@@ -18,7 +18,7 @@ public class MediaGalleryBuilder : IMessageComponentBuilder
     /// <inheritdoc/>
     public int? Id { get; set; }
 
-    private List<MediaGalleryItemProperties> _items = new();
+    private List<MediaGalleryItemProperties> _items = [];
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="MediaGalleryBuilder"/>.
@@ -31,6 +31,14 @@ public class MediaGalleryBuilder : IMessageComponentBuilder
     public MediaGalleryBuilder(params IEnumerable<MediaGalleryItemProperties> items)
     {
         Items = items?.ToList();
+    }
+        
+    /// <summary>
+    ///    Initializes a new instance of the <see cref="MediaGalleryBuilder"/>.
+    /// </summary>
+    public MediaGalleryBuilder(IEnumerable<MediaGalleryItemProperties> items, int? id) : this(items)
+    {
+        Id = id;
     }
 
     /// <summary>

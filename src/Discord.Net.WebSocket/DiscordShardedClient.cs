@@ -21,7 +21,11 @@ namespace Discord.WebSocket
         private ImmutableArray<StickerPack<SocketSticker>> _defaultStickers;
         private int _totalShards;
         private SemaphoreSlim[] _identifySemaphores;
-        private object _semaphoreResetLock;
+#if NET9_0_OR_GREATER
+        private readonly Lock _semaphoreResetLock;
+#else
+        private readonly object _semaphoreResetLock;
+#endif
         private Task _semaphoreResetTask;
 
         private bool _isDisposed;
@@ -80,7 +84,7 @@ namespace Discord.WebSocket
             if (ids != null && config.TotalShards == null)
                 throw new ArgumentException($"Custom ids are not supported when {nameof(config.TotalShards)} is not specified.");
 
-            _semaphoreResetLock = new object();
+            _semaphoreResetLock = new();
             _shardIdsToIndex = new Dictionary<int, int>();
             config.DisplayInitialLog = false;
             _baseConfig = config;
@@ -524,7 +528,7 @@ namespace Discord.WebSocket
             client.AuditLogCreated += (arg1, arg2) => _auditLogCreated.InvokeAsync(arg1, arg2);
 
             client.VoiceChannelStatusUpdated += (arg1, arg2, arg3) => _voiceChannelStatusUpdated.InvokeAsync(arg1, arg2, arg3);
-            
+
             client.EntitlementCreated += (arg1) => _entitlementCreated.InvokeAsync(arg1);
             client.EntitlementUpdated += (arg1, arg2) => _entitlementUpdated.InvokeAsync(arg1, arg2);
             client.EntitlementDeleted += (arg1) => _entitlementDeleted.InvokeAsync(arg1);

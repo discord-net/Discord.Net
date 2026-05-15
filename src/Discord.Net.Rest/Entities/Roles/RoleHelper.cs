@@ -27,9 +27,12 @@ namespace Discord.Rest
                 }
             }
 
+            if(args.Colors is { IsSpecified: true, Value.IsSolidColor: false })
+                role.Guild.Features.EnsureFeature(GuildFeature.EnhancedRoleColors);
+
             var apiArgs = new API.Rest.ModifyGuildRoleParams
             {
-                Color = args.Color.IsSpecified ? args.Color.Value.RawValue : Optional.Create<uint>(),
+                Colors = args.Colors.IsSpecified ? args.Colors.Value.Normalized.ToModel() : Optional<API.RoleColors>.Unspecified,
                 Hoist = args.Hoist,
                 Mentionable = args.Mentionable,
                 Name = args.Name,
@@ -40,7 +43,7 @@ namespace Discord.Rest
 
             if ((args.Icon.IsSpecified && args.Icon.Value != null) && role.Emoji != null)
             {
-                apiArgs.Emoji = "";
+                apiArgs.Emoji = Optional<string>. Unspecified;
             }
 
             if ((args.Emoji.IsSpecified && args.Emoji.Value != null) && !string.IsNullOrEmpty(role.Icon))

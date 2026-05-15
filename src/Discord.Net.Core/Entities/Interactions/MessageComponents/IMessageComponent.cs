@@ -11,7 +11,7 @@ public interface IMessageComponent
     ComponentType Type { get; }
 
     /// <summary>
-    ///     
+    ///     Gets the id for the component.
     /// </summary>
     int? Id { get; }
 

@@ -10,11 +10,13 @@ namespace Discord.Audio.Streams
     public class SodiumDecryptStream : AudioOutStream
     {
         private const int RtpHeaderSize = 12;
+        private const int ExtendedRtpHeaderSize = RtpHeaderSize + 4;
         private const int NonceSize = 24;
         private const int NonceCounterSize = 4;
 
         private readonly AudioClient _client;
         private readonly AudioStream _next;
+        private readonly byte[] _rtpHeader;
         private readonly byte[] _nonce;
 
         public override bool CanRead => true;
@@ -25,6 +27,7 @@ namespace Discord.Audio.Streams
         {
             _next = next;
             _client = (AudioClient)client;
+            _rtpHeader = new byte[ExtendedRtpHeaderSize];
             _nonce = new byte[NonceSize];
         }
 
@@ -35,26 +38,30 @@ namespace Discord.Audio.Streams
             if (_client.SecretKey == null)
                 return Task.CompletedTask;
 
-            // Extract nonce from the payload.
-            for (int i = 0; i < NonceCounterSize; i++ )
-                _nonce[i] = buffer[offset + count + NonceCounterSize - i - 1]; // Big-endian to little-endian
+            // Extract nonce counter from the end of the payload.
+            for (int i = 0; i < NonceCounterSize; i++)
+                _nonce[i] = buffer[offset + count - NonceCounterSize + i];
+
+            // Extract RTP header
+            bool hasExtendedHeader = (buffer[0] & 0x10) != 0;
+            int rtpHeaderSize = hasExtendedHeader ? ExtendedRtpHeaderSize : RtpHeaderSize;
+            Buffer.BlockCopy(buffer, offset, _rtpHeader, 0, rtpHeaderSize);
 
             // Decrypt payload
-            byte[] rtpHeader = new byte[RtpHeaderSize];
-            Buffer.BlockCopy(buffer, offset, rtpHeader, 0, rtpHeader.Length);
-            int payloadOffset = offset + rtpHeader.Length;
-            int payloadLength = count - rtpHeader.Length - NonceCounterSize;
+            int payloadOffset = offset + rtpHeaderSize;
+            int payloadLength = count - offset - rtpHeaderSize - NonceCounterSize;
             int decryptedLength = SecretBox.Decrypt(
                 buffer,
                 payloadOffset,
                 payloadLength,
                 buffer,
                 payloadOffset,
-                rtpHeader,
+                _rtpHeader,
+                rtpHeaderSize,
                 _nonce,
                 _client.SecretKey);
 
-            int packageLength = rtpHeader.Length + decryptedLength;
+            int packageLength = rtpHeaderSize + decryptedLength;
             return _next.WriteAsync(buffer, offset, packageLength, cancelToken);
         }
 

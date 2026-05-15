@@ -1,3 +1,4 @@
+using Discord.Interactions.Builders;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -36,24 +37,92 @@ namespace Discord.Interactions
         /// <summary>
         ///     Gets a collection of the components of this modal.
         /// </summary>
-        public IReadOnlyCollection<InputComponentInfo> Components { get; }
+        public IReadOnlyCollection<ModalComponentInfo> Components { get; }
+
+        /// <summary>
+        ///     Gets a collection of the input components of this modal.
+        /// </summary>
+        public IReadOnlyCollection<InputComponentInfo> InputComponents { get; }
 
         /// <summary>
         ///     Gets a collection of the text components of this modal.
         /// </summary>
-        public IReadOnlyCollection<TextInputComponentInfo> TextComponents { get; }
+        public IReadOnlyCollection<TextInputComponentInfo> TextInputComponents { get; }
+
+        /// <summary>
+        ///     Get a collection of the select menu components of this modal.
+        /// </summary>
+        public IReadOnlyCollection<SelectMenuComponentInfo> SelectMenuComponents { get; }
+
+        /// <summary>
+        ///     Get a collection of the user select components of this modal.
+        /// </summary>
+        public IReadOnlyCollection<UserSelectComponentInfo> UserSelectComponents { get; }
+
+        /// <summary>
+        ///     Get a collection of the role select components of this modal.
+        /// </summary>
+        public IReadOnlyCollection<RoleSelectComponentInfo> RoleSelectComponents { get; }
+
+        /// <summary>
+        ///     Get a collection of the mentionable select components of this modal.
+        /// </summary>
+        public IReadOnlyCollection<MentionableSelectComponentInfo> MentionableSelectComponents { get; }
+
+        /// <summary>
+        ///     Get a collection of the channel select components of this modal.
+        /// </summary>
+        public IReadOnlyCollection<ChannelSelectComponentInfo> ChannelSelectComponents { get; }
+
+        /// <summary>
+        ///     Get a collection of the file upload components of this modal.
+        /// </summary>
+        public IReadOnlyCollection<FileUploadComponentInfo> FileUploadComponents { get; }
+
+        /// <summary>
+        ///     Gets a collection of the text display components of this modal.
+        /// </summary>
+        public IReadOnlyCollection<TextDisplayComponentInfo> TextDisplayComponents { get; }
+
+        public IReadOnlyCollection<CheckboxComponentInfo> CheckboxComponents { get; }
+
+        public IReadOnlyCollection<CheckboxGroupComponentInfo> CheckboxGroupComponents { get; }
+
+        public IReadOnlyCollection<RadioGroupComponentInfo> RadioGroupComponents { get; }
 
         internal ModalInfo(Builders.ModalBuilder builder)
         {
             Title = builder.Title;
             Type = builder.Type;
-            Components = builder.Components.Select(x => x switch
+            Components = builder.Components.Select<IModalComponentBuilder, ModalComponentInfo>(x => x switch
             {
                 Builders.TextInputComponentBuilder textComponent => textComponent.Build(this),
+                Builders.SelectMenuComponentBuilder selectMenuComponent => selectMenuComponent.Build(this),
+                Builders.RoleSelectComponentBuilder roleSelectComponent => roleSelectComponent.Build(this),
+                Builders.ChannelSelectComponentBuilder channelSelectComponent => channelSelectComponent.Build(this),
+                Builders.UserSelectComponentBuilder userSelectComponent => userSelectComponent.Build(this),
+                Builders.MentionableSelectComponentBuilder mentionableSelectComponent => mentionableSelectComponent.Build(this),
+                Builders.FileUploadComponentBuilder fileUploadComponent => fileUploadComponent.Build(this),
+                Builders.TextDisplayComponentBuilder textDisplayComponent => textDisplayComponent.Build(this),
+                Builders.CheckboxComponentBuilder checkboxComponent => checkboxComponent.Build(this),
+                Builders.CheckboxGroupComponentBuilder checkboxGroupComponent => checkboxGroupComponent.Build(this),
+                Builders.RadioGroupComponentBuilder radioGroupComponent => radioGroupComponent.Build(this),
                 _ => throw new InvalidOperationException($"{x.GetType().FullName} isn't a supported modal input component builder type.")
             }).ToImmutableArray();
 
-            TextComponents = Components.OfType<TextInputComponentInfo>().ToImmutableArray();
+            InputComponents = Components.OfType<InputComponentInfo>().ToImmutableArray();
+
+            TextInputComponents = Components.OfType<TextInputComponentInfo>().ToImmutableArray();
+            SelectMenuComponents = Components.OfType<SelectMenuComponentInfo>().ToImmutableArray();
+            UserSelectComponents = Components.OfType<UserSelectComponentInfo>().ToImmutableArray();
+            RoleSelectComponents = Components.OfType<RoleSelectComponentInfo>().ToImmutableArray();
+            MentionableSelectComponents = Components.OfType<MentionableSelectComponentInfo>().ToImmutableArray();
+            ChannelSelectComponents = Components.OfType<ChannelSelectComponentInfo>().ToImmutableArray();
+            FileUploadComponents = Components.OfType<FileUploadComponentInfo>().ToImmutableArray();
+            TextDisplayComponents = Components.OfType<TextDisplayComponentInfo>().ToImmutableArray();
+            CheckboxComponents = Components.OfType<CheckboxComponentInfo>().ToImmutableArray();
+            CheckboxGroupComponents = Components.OfType<CheckboxGroupComponentInfo>().ToImmutableArray();
+            RadioGroupComponents = Components.OfType<RadioGroupComponentInfo>().ToImmutableArray();
 
             _interactionService = builder._interactionService;
             _initializer = builder.ModalInitializer;
@@ -74,7 +143,7 @@ namespace Discord.Interactions
 
             for (var i = 0; i < Components.Count; i++)
             {
-                var input = Components.ElementAt(i);
+                var input = InputComponents.ElementAt(i);
                 var component = components.Find(x => x.CustomId == input.CustomId);
 
                 if (component is null)
@@ -107,12 +176,12 @@ namespace Discord.Interactions
 
             services ??= EmptyServiceProvider.Instance;
 
-            var args = new object[Components.Count];
+            var args = new object[InputComponents.Count];
             var components = modalInteraction.Data.Components.ToList();
 
-            for (var i = 0; i < Components.Count; i++)
+            for (var i = 0; i < InputComponents.Count; i++)
             {
-                var input = Components.ElementAt(i);
+                var input = InputComponents.ElementAt(i);
                 var component = components.Find(x => x.CustomId == input.CustomId);
 
                 if (component is null)

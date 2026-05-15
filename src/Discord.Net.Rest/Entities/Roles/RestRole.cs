@@ -13,8 +13,15 @@ namespace Discord.Rest
     {
         #region RestRole
         internal IGuild Guild { get; }
+
         /// <inheritdoc />
-        public Color Color { get; private set; }
+        [Obsolete(
+            $"This property is deprecated in the API, and its value will always be {nameof(Colors)}.{nameof(RoleColors.PrimaryColor)}",
+            error: false
+        )]
+        public Color Color => Colors.PrimaryColor;
+        /// <inheritdoc />
+        public RoleColors Colors { get; private set; }
         /// <inheritdoc />
         public bool IsHoisted { get; private set; }
         /// <inheritdoc />
@@ -64,7 +71,7 @@ namespace Discord.Rest
             IsManaged = model.Managed;
             IsMentionable = model.Mentionable;
             Position = model.Position;
-            Color = new Color(model.Color);
+            Colors = model.Colors?.ToEntity() ?? model.Color;
             Permissions = new GuildPermissions(model.Permissions);
             Flags = model.Flags;
 

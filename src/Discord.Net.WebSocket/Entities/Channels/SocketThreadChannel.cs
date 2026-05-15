@@ -6,6 +6,7 @@ using System.Collections.Immutable;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Model = Discord.API.Channel;
 using ThreadMember = Discord.API.ThreadMember;
@@ -110,8 +111,13 @@ namespace Discord.WebSocket
 
         private bool _usersDownloaded;
 
-        private readonly object _downloadLock = new object();
-        private readonly object _ownerLock = new object();
+#if NET9_0_OR_GREATER
+        private readonly Lock _downloadLock = new();
+        private readonly Lock _ownerLock = new();
+#else
+        private readonly object _downloadLock = new();
+        private readonly object _ownerLock = new();
+#endif
 
         private ulong _ownerId;
 
@@ -288,21 +294,21 @@ namespace Discord.WebSocket
         /// <remarks>
         ///     <b>This method is not supported in threads.</b>
         /// </remarks>
-        public override Task<IInviteMetadata> CreateInviteAsync(int? maxAge = 86400, int? maxUses = null, bool isTemporary = false, bool isUnique = false, RequestOptions options = null)
+        public override Task<IInviteMetadata> CreateInviteAsync(int? maxAge = 86400, int? maxUses = null, bool isTemporary = false, bool isUnique = false, RequestOptions options = null, IEnumerable<ulong> roleIds = null, IEnumerable<ulong> userIds = null)
             => throw new NotSupportedException("This method is not supported in threads.");
 
         /// <inheritdoc/>
         /// <remarks>
         ///     <b>This method is not supported in threads.</b>
         /// </remarks>
-        public override Task<IInviteMetadata> CreateInviteToApplicationAsync(ulong applicationId, int? maxAge, int? maxUses = null, bool isTemporary = false, bool isUnique = false, RequestOptions options = null)
+        public override Task<IInviteMetadata> CreateInviteToApplicationAsync(ulong applicationId, int? maxAge, int? maxUses = null, bool isTemporary = false, bool isUnique = false, RequestOptions options = null, IEnumerable<ulong> userIds = null)
             => throw new NotSupportedException("This method is not supported in threads.");
 
         /// <inheritdoc/>
         /// <remarks>
         ///     <b>This method is not supported in threads.</b>
         /// </remarks>
-        public override Task<IInviteMetadata> CreateInviteToStreamAsync(IUser user, int? maxAge, int? maxUses = null, bool isTemporary = false, bool isUnique = false, RequestOptions options = null)
+        public override Task<IInviteMetadata> CreateInviteToStreamAsync(IUser user, int? maxAge, int? maxUses = null, bool isTemporary = false, bool isUnique = false, RequestOptions options = null, IEnumerable<ulong> userIds = null)
             => throw new NotSupportedException("This method is not supported in threads.");
 
         /// <inheritdoc/>
@@ -385,6 +391,30 @@ namespace Discord.WebSocket
 
         /// <inheritdoc/> <exception cref="NotSupportedException">This method is not supported in threads.</exception>
         public override Task<IReadOnlyCollection<RestThreadChannel>> GetActiveThreadsAsync(RequestOptions options = null)
+            => throw new NotSupportedException("This method is not supported in threads.");
+
+        /// <inheritdoc />
+        /// <remarks>
+        ///     This method is not supported in threads.
+        /// </remarks>
+        /// <exception cref="NotSupportedException">This method is not supported in threads.</exception>
+        public override Task<IReadOnlyCollection<RestThreadChannel>> GetPublicArchivedThreadsAsync(int? limit, DateTimeOffset? before, RequestOptions options)
+            => throw new NotSupportedException("This method is not supported in threads.");
+
+        /// <inheritdoc />
+        /// <remarks>
+        ///     This method is not supported in threads.
+        /// </remarks>
+        /// <exception cref="NotSupportedException">This method is not supported in threads.</exception>
+        public override Task<IReadOnlyCollection<RestThreadChannel>> GetPrivateArchivedThreadsAsync(int? limit, DateTimeOffset? before, RequestOptions options)
+            => throw new NotSupportedException("This method is not supported in threads.");
+
+        /// <inheritdoc />
+        /// <remarks>
+        ///     This method is not supported in threads.
+        /// </remarks>
+        /// <exception cref="NotSupportedException">This method is not supported in threads.</exception>
+        public override Task<IReadOnlyCollection<RestThreadChannel>> GetJoinedPrivateArchivedThreadsAsync(int? limit, DateTimeOffset? before, RequestOptions options)
             => throw new NotSupportedException("This method is not supported in threads.");
 
         string IChannel.Name => Name;

@@ -17,7 +17,11 @@ namespace Discord.Net.Queue
     {
         private const int MinimumSleepTimeMs = 750;
 
+#if NET9_0_OR_GREATER
+        private readonly Lock _lock;
+#else
         private readonly object _lock;
+#endif
         private readonly RequestQueue _queue;
         private int _semaphore;
         private DateTimeOffset? _resetTick;
@@ -32,7 +36,7 @@ namespace Discord.Net.Queue
             _queue = queue;
             Id = id;
 
-            _lock = new object();
+            _lock = new();
 
             if (request.Options.IsClientBucket)
                 WindowCount = ClientBucket.Get(request.Options.BucketId).WindowCount;

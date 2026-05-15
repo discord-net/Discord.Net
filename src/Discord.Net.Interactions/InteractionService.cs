@@ -3,7 +3,6 @@ using Discord.Logging;
 using Discord.Rest;
 using Discord.WebSocket;
 using System;
-using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -98,6 +97,7 @@ namespace Discord.Interactions
         private readonly TypeMap<TypeConverter, IApplicationCommandInteractionDataOption> _typeConverterMap;
         private readonly TypeMap<ComponentTypeConverter, IComponentInteractionData> _compTypeConverterMap;
         private readonly TypeMap<TypeReader, string> _typeReaderMap;
+        private readonly TypeMap<ModalComponentTypeConverter, IComponentInteractionData> _modalInputTypeConverterMap;
         private readonly ConcurrentDictionary<Type, IAutocompleteHandler> _autocompleteHandlers = new();
         private readonly ConcurrentDictionary<Type, ModalInfo> _modalInfos = new();
         private readonly SemaphoreSlim _lock;
@@ -228,6 +228,21 @@ namespace Discord.Interactions
                     [typeof(Enum)] = typeof(EnumReader<>),
                     [typeof(Nullable<>)] = typeof(NullableReader<>)
                 });
+
+            _modalInputTypeConverterMap = new TypeMap<ModalComponentTypeConverter, IComponentInteractionData>(this, new ConcurrentDictionary<Type, ModalComponentTypeConverter>
+            {
+            }, new ConcurrentDictionary<Type, Type>
+            {
+                [typeof(IConvertible)] = typeof(DefaultValueModalComponentConverter<>),
+                [typeof(Enum)] = typeof(EnumModalComponentConverter<>),
+                [typeof(Nullable<>)] = typeof(NullableComponentConverter<>),
+                [typeof(Array)] = typeof(DefaultArrayModalComponentConverter<>),
+                [typeof(IChannel)] = typeof(DefaultChannelModalComponentConverter<>),
+                [typeof(IUser)] = typeof(DefaultUserModalComponentConverter<>),
+                [typeof(IRole)] = typeof(DefaultRoleModalComponentConverter<>),
+                [typeof(IMentionable)] = typeof(DefaultMentionableModalComponentConverter<>),
+                [typeof(IAttachment)] = typeof(DefaultAttachmentModalComponentConverter<>)
+            });
         }
 
         /// <summary>
@@ -910,7 +925,7 @@ namespace Discord.Interactions
                 matchContainer.SetSegmentMatches(Array.Empty<RouteSegmentMatch>());
         }
 
-        internal TypeConverter GetTypeConverter(Type type, IServiceProvider services = null)
+        public TypeConverter GetTypeConverter(Type type, IServiceProvider services = null)
             => _typeConverterMap.Get(type, services);
 
         /// <summary>
@@ -946,7 +961,7 @@ namespace Discord.Interactions
         public void AddGenericTypeConverter(Type targetType, Type converterType) =>
             _typeConverterMap.AddGeneric(targetType, converterType);
 
-        internal ComponentTypeConverter GetComponentTypeConverter(Type type, IServiceProvider services = null) =>
+        public ComponentTypeConverter GetComponentTypeConverter(Type type, IServiceProvider services = null) =>
             _compTypeConverterMap.Get(type, services);
 
         /// <summary>
@@ -981,7 +996,7 @@ namespace Discord.Interactions
         public void AddGenericComponentTypeConverter(Type targetType, Type converterType) =>
             _compTypeConverterMap.AddGeneric(targetType, converterType);
 
-        internal TypeReader GetTypeReader(Type type, IServiceProvider services = null) =>
+        public TypeReader GetTypeReader(Type type, IServiceProvider services = null) =>
             _typeReaderMap.Get(type, services);
 
         /// <summary>
@@ -1064,6 +1079,94 @@ namespace Discord.Interactions
         public bool TryRemoveGenericTypeReader(Type type, out Type readerType)
             => _typeReaderMap.TryRemoveGeneric(type, out readerType);
 
+        public ModalComponentTypeConverter GetModalComponentTypeConverter(Type type, IServiceProvider services = null) =>
+            _modalInputTypeConverterMap.Get(type, services);
+
+        /// <summary>
+        ///     Add a concrete type <see cref="ModalComponentTypeConverter"/>.
+        /// </summary>
+        /// <typeparam name="T">Primary target <see cref="Type"/> of the <see cref="ModalComponentTypeConverter"/>.</typeparam>
+        /// <param name="converter">The <see cref="ModalComponentTypeConverter"/> instance.</param>
+        public void AddModalComponentTypeConverter<T>(ModalComponentTypeConverter converter) =>
+            AddModalComponentTypeConverter(typeof(T), converter);
+
+        /// <summary>
+        ///     Add a concrete type <see cref="ModalComponentTypeConverter"/>.
+        /// </summary>
+        /// <param name="type">Primary target <see cref="Type"/> of the <see cref="ModalComponentTypeConverter"/>.</param>
+        /// <param name="converter">The <see cref="ModalComponentTypeConverter"/> instance.</param>
+        public void AddModalComponentTypeConverter(Type type, ModalComponentTypeConverter converter) =>
+            _modalInputTypeConverterMap.AddConcrete(type, converter);
+
+        /// <summary>
+        ///     Add a generic type <see cref="ModalComponentTypeConverter{T}"/>.
+        /// </summary>
+        /// <typeparam name="T">Generic Type constraint of the <see cref="Type"/> of the <see cref="ModalComponentTypeConverter{T}"/>.</typeparam>
+        /// <param name="converterType">Type of the <see cref="ModalComponentTypeConverter{T}"/>.</param>
+        public void AddGenericModalComponentTypeConverter<T>(Type converterType) =>
+            AddGenericModalComponentTypeConverter(typeof(T), converterType);
+
+        /// <summary>
+        ///     Add a generic type <see cref="ModalComponentTypeConverter{T}"/>.
+        /// </summary>
+        /// <param name="targetType">Generic Type constraint of the <see cref="Type"/> of the <see cref="ModalComponentTypeConverter{T}"/>.</param>
+        /// <param name="converterType">Type of the <see cref="ModalComponentTypeConverter{T}"/>.</param>
+        public void AddGenericModalComponentTypeConverter(Type targetType, Type converterType) =>
+            _modalInputTypeConverterMap.AddGeneric(targetType, converterType);
+
+        /// <summary>
+        ///     Removes a <see cref="ModalComponentTypeConverter"/> for the type <typeparamref name="T"/>.
+        /// </summary>
+        /// <remarks>
+        ///     Removing a <see cref="ModalComponentTypeConverter"/> from the <see cref="InteractionService"/> will not dereference the <see cref="ModalComponentTypeConverter"/> from the loaded module/command instances.
+        ///     You need to reload the modules for the changes to take effect.
+        /// </remarks>
+        /// <typeparam name="T">The type to remove the converter from.</typeparam>
+        /// <param name="converter">The converter if the resulting remove operation was successful.</param>
+        /// <returns><see langword="true"/> if the remove operation was successful; otherwise <see langword="false"/>.</returns>
+        public bool TryRemoveModalComponentTypeConverter<T>(out ModalComponentTypeConverter converter) =>
+            TryRemoveModalComponentTypeConverter(typeof(T), out converter);
+
+        /// <summary>
+        ///     Removes a <see cref="ModalComponentTypeConverter"/> for the type <paramref name="type"/>.
+        /// </summary>
+        /// <remarks>
+        ///     Removing a <see cref="ModalComponentTypeConverter"/> from the <see cref="InteractionService"/> will not dereference the <see cref="ModalComponentTypeConverter"/> from the loaded module/command instances.
+        ///     You need to reload the modules for the changes to take effect.
+        /// </remarks>
+        /// <param name="type">The type to remove the converter from.</param>
+        /// <param name="converter">The converter if the resulting remove operation was successful.</param>
+        /// <returns><see langword="true"/> if the remove operation was successful; otherwise <see langword="false"/>.</returns>
+        public bool TryRemoveModalComponentTypeConverter(Type type, out ModalComponentTypeConverter converter) =>
+            _modalInputTypeConverterMap.TryRemoveConcrete(type, out converter);
+
+        /// <summary>
+        ///     Removes a generic <see cref="ModalComponentTypeConverter"/> for the type <typeparamref name="T"/>.
+        /// </summary>
+        /// <remarks>
+        ///     Removing a <see cref="ModalComponentTypeConverter"/> from the <see cref="InteractionService"/> will not dereference the <see cref="ModalComponentTypeConverter"/> from the loaded module/command instances.
+        ///     You need to reload the modules for the changes to take effect.
+        /// </remarks>
+        /// <typeparam name="T">The type to remove the converter from.</typeparam>
+        /// <param name="converterType">The converter if the resulting remove operation was successful.</param>
+        /// <returns><see langword="true"/> if the remove operation was successful; otherwise <see langword="false"/>.</returns>
+        public bool TryRemoveGenericModalComponentTypeConverter<T>(out Type converterType) =>
+            TryRemoveGenericModalComponentTypeConverter(typeof(T), out converterType);
+
+        /// <summary>
+        ///     Removes a generic <see cref="ModalComponentTypeConverter"/> for the type <paramref name="type"/>.
+        /// </summary>
+        /// <remarks>
+        ///     Removing a <see cref="ModalComponentTypeConverter"/> from the <see cref="InteractionService"/> will not dereference the <see cref="ModalComponentTypeConverter"/> from the loaded module/command instances.
+        ///     You need to reload the modules for the changes to take effect.
+        /// </remarks>
+        /// <param name="type">The type to remove the converter from.</param>
+        /// <param name="converterType">The converter if the resulting remove operation was successful.</param>
+        /// <returns><see langword="true"/> if the remove operation was successful; otherwise <see langword="false"/>.</returns>
+        public bool TryRemoveGenericModalComponentTypeConverter(Type type, out Type converterType) =>
+            _modalInputTypeConverterMap.TryRemoveGeneric(type, out converterType);
+
+
         /// <summary>
         ///     Serialize an object using a <see cref="TypeReader"/> into a <see cref="string"/> to be placed in a Component CustomId.
         /// </summary>
@@ -1116,7 +1219,7 @@ namespace Discord.Interactions
         {
             var type = typeof(T);
 
-            if (_modalInfos.ContainsKey(type))
+            if (ModalUtils.Contains(type))
                 throw new InvalidOperationException($"Modal type {type.FullName} already exists.");
 
             return ModalUtils.GetOrAdd(type, this);

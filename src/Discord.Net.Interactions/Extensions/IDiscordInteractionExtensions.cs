@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Discord.Interactions
@@ -10,6 +11,7 @@ namespace Discord.Interactions
         /// </summary>
         /// <typeparam name="T">Type of the <see cref="IModal"/> implementation.</typeparam>
         /// <param name="interaction">The interaction to respond to.</param>
+        /// <param name="customId">The custom id of the modal.</param>
         /// <param name="modifyModal">Delegate that can be used to modify the modal.</param>
         /// <param name="options">The request options for this <see langword="async"/> request.</param>
         /// <returns>A task that represents the asynchronous operation of responding to the interaction.</returns>
@@ -19,7 +21,7 @@ namespace Discord.Interactions
             if (!ModalUtils.TryGet<T>(out var modalInfo))
                 throw new ArgumentException($"{typeof(T).FullName} isn't referenced by any registered Modal Interaction Command and doesn't have a cached {typeof(ModalInfo)}");
 
-            return SendModalResponseAsync(interaction, customId, modalInfo, options, modifyModal);
+            return SendModalResponseAsync<T>(interaction, customId, modalInfo, null, options, modifyModal);
         }
 
         /// <summary>
@@ -31,17 +33,18 @@ namespace Discord.Interactions
         /// </remarks>
         /// <typeparam name="T">Type of the <see cref="IModal"/> implementation.</typeparam>
         /// <param name="interaction">The interaction to respond to.</param>
+        /// <param name="customId">The custom id of the modal.</param>
         /// <param name="interactionService">Interaction service instance that should be used to build <see cref="ModalInfo"/>s.</param>
         /// <param name="options">The request options for this <see langword="async"/> request.</param>
         /// <param name="modifyModal">Delegate that can be used to modify the modal.</param>
-        /// <returns></returns>
+        /// <returns>A task that represents the asynchronous operation of responding to the interaction.</returns>
         public static Task RespondWithModalAsync<T>(this IDiscordInteraction interaction, string customId, InteractionService interactionService,
             RequestOptions options = null, Action<ModalBuilder> modifyModal = null)
             where T : class, IModal
         {
             var modalInfo = ModalUtils.GetOrAdd<T>(interactionService);
 
-            return SendModalResponseAsync(interaction, customId, modalInfo, options, modifyModal);
+            return SendModalResponseAsync<T>(interaction, customId, modalInfo, null, options, modifyModal);
         }
 
         /// <summary>
@@ -50,10 +53,11 @@ namespace Discord.Interactions
         /// </summary>
         /// <typeparam name="T">Type of the <see cref="IModal"/> implementation.</typeparam>
         /// <param name="interaction">The interaction to respond to.</param>
+        /// <param name="customId">The custom id of the modal.</param>
         /// <param name="modal">The <see cref="IModal"/> instance to get field values from.</param>
         /// <param name="options">The request options for this <see langword="async"/> request.</param>
         /// <param name="modifyModal">Delegate that can be used to modify the modal.</param>
-        /// <returns></returns>
+        /// <returns>A task that represents the asynchronous operation of responding to the interaction.</returns>
         public static Task RespondWithModalAsync<T>(this IDiscordInteraction interaction, string customId, T modal, RequestOptions options = null,
             Action<ModalBuilder> modifyModal = null)
             where T : class, IModal
@@ -61,36 +65,137 @@ namespace Discord.Interactions
             if (!ModalUtils.TryGet<T>(out var modalInfo))
                 throw new ArgumentException($"{typeof(T).FullName} isn't referenced by any registered Modal Interaction Command and doesn't have a cached {typeof(ModalInfo)}");
 
-            var builder = new ModalBuilder(modal.Title, customId);
+            return SendModalResponseAsync(interaction, customId, modalInfo, modal, options, modifyModal);
+        }
+
+        public static async Task<Modal> ToModalAsync<T>(this IDiscordInteraction interaction, string customId, ModalInfo modalInfo, T modalInstance = null, RequestOptions options = null, Action<ModalBuilder> modifyModal = null)
+            where T : class, IModal
+        {
+            if (!modalInfo.Type.IsAssignableFrom(typeof(T)))
+                throw new ArgumentException($"{modalInfo.Type.FullName} isn't assignable from {typeof(T).FullName}.");
+
+            var builder = new ModalBuilder(modalInstance?.Title ?? modalInfo.Title, customId);
 
             foreach (var input in modalInfo.Components)
                 switch (input)
                 {
                     case TextInputComponentInfo textComponent:
                         {
-                            var boxedValue = textComponent.Getter(modal);
-                            var value = textComponent.TypeOverridesToString
-                                ? boxedValue?.ToString()
-                                : boxedValue as string;
+                            var inputBuilder = new TextInputBuilder(textComponent.CustomId, textComponent.Style, textComponent.Placeholder, textComponent.IsRequired ? textComponent.MinLength : null,
+                            textComponent.MaxLength, textComponent.IsRequired, id: textComponent.Id);
 
-                            builder.AddTextInput(textComponent.Label, textComponent.CustomId, textComponent.Style, textComponent.Placeholder, textComponent.IsRequired ? textComponent.MinLength : null,
-                                textComponent.MaxLength, textComponent.IsRequired, value);
+                            var instanceValue = modalInstance is not null ? textComponent.Getter(modalInstance) : null;
+                            await textComponent.TypeConverter.WriteAsync(inputBuilder, interaction, textComponent, instanceValue);
+
+                            var labelBuilder = new LabelBuilder(textComponent.Label, inputBuilder, textComponent.Description);
+                            builder.AddLabel(labelBuilder);
+                        }
+                        break;
+                    case SelectMenuComponentInfo selectMenuComponent:
+                        {
+                            var inputBuilder = new SelectMenuBuilder(selectMenuComponent.CustomId, selectMenuComponent.Options.Select(x => new SelectMenuOptionBuilder(x)).ToList(), selectMenuComponent.Placeholder, selectMenuComponent.MaxValues, selectMenuComponent.MinValues, false, isRequired: selectMenuComponent.IsRequired, id: selectMenuComponent.Id);
+
+                            var instanceValue = modalInstance is not null ? selectMenuComponent.Getter(modalInstance) : null;
+                            await selectMenuComponent.TypeConverter.WriteAsync(inputBuilder, interaction, selectMenuComponent, instanceValue);
+
+                            var labelBuilder = new LabelBuilder(selectMenuComponent.Label, inputBuilder, selectMenuComponent.Description);
+                            builder.AddLabel(labelBuilder);
+                        }
+                        break;
+                    case SnowflakeSelectComponentInfo snowflakeSelectComponent:
+                        {
+                            var channelTypes = snowflakeSelectComponent is ChannelSelectComponentInfo channelSelectComponent ? channelSelectComponent.ChannelTypes : null;
+                            var inputBuilder = new SelectMenuBuilder(snowflakeSelectComponent.CustomId, null, snowflakeSelectComponent.Placeholder, snowflakeSelectComponent.MaxValues, snowflakeSelectComponent.MinValues, false, snowflakeSelectComponent.ComponentType, channelTypes?.ToList(), snowflakeSelectComponent.DefaultValues.ToList(), snowflakeSelectComponent.Id, snowflakeSelectComponent.IsRequired);
+
+                            var instanceValue = modalInstance is not null ? snowflakeSelectComponent.Getter(modalInstance) : null;
+                            await snowflakeSelectComponent.TypeConverter.WriteAsync(inputBuilder, interaction, snowflakeSelectComponent, instanceValue);
+
+                            var labelBuilder = new LabelBuilder(snowflakeSelectComponent.Label, inputBuilder, snowflakeSelectComponent.Description);
+                            builder.AddLabel(labelBuilder);
+                        }
+                        break;
+                    case FileUploadComponentInfo fileUploadComponent:
+                        {
+                            var inputBuilder = new FileUploadComponentBuilder(fileUploadComponent.CustomId, fileUploadComponent.MinValues, fileUploadComponent.MaxValues, fileUploadComponent.IsRequired, fileUploadComponent.Id);
+
+                            var instanceValue = modalInstance is not null ? fileUploadComponent.Getter(modalInstance) : null;
+                            await fileUploadComponent.TypeConverter.WriteAsync(inputBuilder, interaction, fileUploadComponent, instanceValue);
+
+                            var labelBuilder = new LabelBuilder(fileUploadComponent.Label, inputBuilder, fileUploadComponent.Description);
+                            builder.AddLabel(labelBuilder);
+                        }
+                        break;
+                    case TextDisplayComponentInfo textDisplayComponent:
+                        {
+                            var instanceValue = modalInstance is not null ? textDisplayComponent.Getter(modalInstance).ToString() : null;
+                            var content = instanceValue ?? (textDisplayComponent.DefaultValue as string) ?? textDisplayComponent.Content;
+
+                            var componentBuilder = new TextDisplayBuilder(content, textDisplayComponent.Id);
+                            builder.AddTextDisplay(componentBuilder);
+                        }
+                        break;
+                    case CheckboxComponentInfo checkboxComponent:
+                        {
+                            var inputBuilder = new CheckboxBuilder(checkboxComponent.CustomId, checkboxComponent.DefaultState, checkboxComponent.Id);
+
+                            var instanceValue = modalInstance is not null ? checkboxComponent.Getter(modalInstance) : null;
+                            await checkboxComponent.TypeConverter.WriteAsync(inputBuilder, interaction, checkboxComponent, instanceValue);
+
+                            var labelBuilder = new LabelBuilder(checkboxComponent.Label, inputBuilder, checkboxComponent.Description);
+                            builder.AddLabel(labelBuilder);
+                        }
+                        break;
+                    case CheckboxGroupComponentInfo checkboxGroupComponent:
+                    {
+                        var inputBuilder = new CheckboxGroupBuilder(checkboxGroupComponent.CustomId,
+                            checkboxGroupComponent.Options.Select(x => new CheckboxGroupOptionProperties(x.Value, x.Label, x.Description, x.DefaultState)).ToList(),
+                            checkboxGroupComponent.MinValues,
+                            checkboxGroupComponent.MaxValues,
+                            checkboxGroupComponent.IsRequired,
+                            checkboxGroupComponent.Id);
+
+                        var instanceValue = modalInstance is not null
+                            ? checkboxGroupComponent.Getter(modalInstance)
+                            : null;
+                        await checkboxGroupComponent.TypeConverter.WriteAsync(inputBuilder, interaction,
+                            checkboxGroupComponent, instanceValue);
+
+                        var labelBuilder = new LabelBuilder(checkboxGroupComponent.Label, inputBuilder,
+                            checkboxGroupComponent.Description);
+                        builder.AddLabel(labelBuilder);
+                    }
+                        break;
+                    case RadioGroupComponentInfo radioGroupComponent:
+                        {
+                            var inputBuilder = new RadioGroupBuilder(radioGroupComponent.CustomId,
+                                radioGroupComponent.Options.Select(x => new RadioGroupOptionProperties(x.Value, x.Label, x.Description, x.IsDefault)).ToList(),
+                                radioGroupComponent.IsRequired, radioGroupComponent.Id);
+
+                            var instanceValue =
+                                modalInstance is not null ? radioGroupComponent.Getter(modalInstance) : null;
+                            await radioGroupComponent.TypeConverter.WriteAsync(inputBuilder, interaction,
+                                radioGroupComponent, instanceValue);
+
+                            var labelBuilder = new LabelBuilder(radioGroupComponent.Label, inputBuilder,
+                                radioGroupComponent.Description);
+                            builder.AddLabel(labelBuilder);
                         }
                         break;
                     default:
                         throw new InvalidOperationException($"{input.GetType().FullName} isn't a valid component info class");
                 }
 
-            if (modifyModal is not null)
-                modifyModal(builder);
+            modifyModal?.Invoke(builder);
 
-            return interaction.RespondWithModalAsync(builder.Build(), options);
+            return builder.Build();
         }
 
-        private static Task SendModalResponseAsync(IDiscordInteraction interaction, string customId, ModalInfo modalInfo, RequestOptions options = null, Action<ModalBuilder> modifyModal = null)
+        private static async Task SendModalResponseAsync<T>(IDiscordInteraction interaction, string customId, ModalInfo modalInfo, T modalInstance = null, RequestOptions options = null, Action<ModalBuilder> modifyModal = null)
+            where T : class, IModal
         {
-            var modal = modalInfo.ToModal(customId, modifyModal);
-            return interaction.RespondWithModalAsync(modal, options);
+            var modal = await interaction.ToModalAsync(customId, modalInfo, modalInstance, options, modifyModal);
+
+            await interaction.RespondWithModalAsync(modal, options);
         }
     }
 }

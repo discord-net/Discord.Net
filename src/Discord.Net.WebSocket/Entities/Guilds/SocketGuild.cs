@@ -1135,9 +1135,10 @@ namespace Discord.WebSocket
         ///     A task that represents the asynchronous creation operation. The task result contains the newly created
         ///     role.
         /// </returns>
-        public Task<RestRole> CreateRoleAsync(string name, GuildPermissions? permissions = default(GuildPermissions?), Color? color = default(Color?),
+        public Task<RestRole> CreateRoleAsync(string name, GuildPermissions? permissions = null, RoleColors? color = null,
             bool isHoisted = false, bool isMentionable = false, RequestOptions options = null, Image? icon = null, Emoji emoji = null)
             => GuildHelper.CreateRoleAsync(this, Discord, name, permissions, color, isHoisted, isMentionable, options, icon, emoji);
+
         internal SocketRole AddRole(RoleModel model)
         {
             var role = SocketRole.Create(this, Discord.State, model);
@@ -1187,6 +1188,9 @@ namespace Discord.WebSocket
                 return sticker;
             return null;
         }
+        /// <inheritdoc />
+        public Task<ImmutableDictionary<ulong, int>> GetRoleUserCountsAsync(RequestOptions options = null)
+            => GuildHelper.GetRoleUserCountsAsync(this, Discord, options);
         #endregion
 
         #region Users
@@ -1340,6 +1344,15 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public Task<MemberSearchResult> SearchUsersAsyncV2(int limit = DiscordConfig.MaxUsersPerBatch, MemberSearchPropertiesV2 args = null, RequestOptions options = null)
             => GuildHelper.SearchUsersAsyncV2(this, Discord, limit, args, options);
+
+        /// <inheritdoc />
+        public Task ModifyCurrentUserAsync(Action<SelfGuildUserProperties> props, RequestOptions options = null)
+        {
+            var args = new SelfGuildUserProperties();
+            props(args);
+            return UserHelper.ModifyCurrentUserAsync(this, Discord.CurrentUser, Discord, args, options);
+        }
+
         #endregion
 
         #region Guild Events
@@ -2214,10 +2227,11 @@ namespace Discord.WebSocket
             => await GetRoleAsync(id);
 
         /// <inheritdoc />
-        async Task<IRole> IGuild.CreateRoleAsync(string name, GuildPermissions? permissions, Color? color, bool isHoisted, RequestOptions options)
+        async Task<IRole> IGuild.CreateRoleAsync(string name, GuildPermissions? permissions, RoleColors? color, bool isHoisted, RequestOptions options)
             => await CreateRoleAsync(name, permissions, color, isHoisted, false, options).ConfigureAwait(false);
+
         /// <inheritdoc />
-        async Task<IRole> IGuild.CreateRoleAsync(string name, GuildPermissions? permissions, Color? color, bool isHoisted, bool isMentionable, RequestOptions options, Image? icon, Emoji emoji)
+        async Task<IRole> IGuild.CreateRoleAsync(string name, GuildPermissions? permissions, RoleColors? color, bool isHoisted, bool isMentionable, RequestOptions options, Image? icon, Emoji emoji)
             => await CreateRoleAsync(name, permissions, color, isHoisted, isMentionable, options, icon, emoji).ConfigureAwait(false);
 
         /// <inheritdoc />

@@ -5,8 +5,10 @@ namespace Discord.API.Voice
     internal class SpeakingParams
     {
         [JsonProperty("speaking")]
-        public bool IsSpeaking { get; set; }
+        public int Speaking { get; set; }
         [JsonProperty("delay")]
         public int Delay { get; set; }
+        [JsonProperty("ssrc")]
+        public uint Ssrc { get; set; }
     }
 }

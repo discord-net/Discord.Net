@@ -41,6 +41,24 @@ internal static class MessageComponentExtension
 
             case ContainerComponent container:
                 return new API.ContainerComponent(container);
+
+            case LabelComponent label:
+                return new API.LabelComponent(label);
+
+            case FileUploadComponent fileUpload:
+                return new API.FileUploadComponent(fileUpload);
+
+            case RadioGroupComponent radioGroup:
+                return new API.RadioGroupComponent(radioGroup);
+
+            case CheckboxGroupComponent checkboxGroup:
+                return new API.CheckboxGroupComponent(checkboxGroup);
+
+            case CheckboxComponent checkbox:
+                return new API.CheckboxComponent(checkbox);
+
+            case UnknownComponent unknown:
+                return new API.UnknownComponent { RawType = unknown.RawType, RawJson = unknown.RawJson, Id = unknown.Id ?? Optional<int>.Unspecified };
         }
 
         return null;
@@ -96,6 +114,7 @@ internal static class MessageComponentExtension
                     parsed.Placeholder.GetValueOrDefault(),
                     parsed.MinValues,
                     parsed.MaxValues,
+                    parsed.Required,
                     parsed.Disabled,
                     parsed.Type,
                     parsed.Id.ToNullable(),
@@ -110,7 +129,7 @@ internal static class MessageComponentExtension
             {
                 var parsed = (API.TextInputComponent)component;
                 return new TextInputComponent(parsed.CustomId,
-                    parsed.Label,
+                    parsed.Label.GetValueOrDefault(),
                     parsed.Placeholder.GetValueOrDefault(null),
                     parsed.MinLength.ToNullable(),
                     parsed.MaxLength.ToNullable(),
@@ -173,8 +192,56 @@ internal static class MessageComponentExtension
                     parsed.Id.ToNullable());
             }
 
+            case ComponentType.Label:
+            {
+                var parsed = (API.LabelComponent)component;
+                return new LabelComponent(parsed.Id.ToNullable(), parsed.Label, parsed.Description, parsed.Component.ToEntity());
+            }
+
+            case ComponentType.FileUpload:
+            {
+                var parsed = (API.FileUploadComponent)component;
+                return new FileUploadComponent(parsed.Id.ToNullable(),
+                    parsed.CustomId,
+                    parsed.MaxValues.ToNullable(),
+                    parsed.MaxValues.ToNullable(),
+                    parsed.IsRequired.GetValueOrDefault(false));
+            }
+
+            case ComponentType.RadioGroup:
+            {
+                var parsed = (API.RadioGroupComponent)component;
+                return new RadioGroupComponent(parsed.Id.ToNullable(),
+                    parsed.CustomId,
+                    parsed.Options.Select(x => new RadioGroupOption(x.Value, x.Label, x.Description.GetValueOrDefault(), x.IsDefault.GetValueOrDefault(false))).ToImmutableArray(),
+                    parsed.IsRequired.ToNullable());
+            }
+
+            case ComponentType.CheckboxGroup:
+            {
+                var parsed = (API.CheckboxGroupComponent)component;
+                return new CheckboxGroupComponent(parsed.Id.ToNullable(),
+                    parsed.CustomId,
+                    parsed.Options.Select(x => new CheckboxGroupOption(x.Value, x.Label, x.Description.GetValueOrDefault(), x.DefaultState.GetValueOrDefault(false))).ToImmutableArray(),
+                    parsed.MinValues.ToNullable(),
+                    parsed.MaxValues.ToNullable(),
+                    parsed.IsRequired.ToNullable());
+            }
+
+            case ComponentType.Checkbox:
+            {
+                var parsed = (API.CheckboxComponent)component;
+                return  new CheckboxComponent(parsed.Id.ToNullable(),
+                    parsed.CustomId,
+                    parsed.DefaultState.ToNullable());
+            }
+
             default:
+            {
+                if (component is API.UnknownComponent unknown)
+                    return new UnknownComponent(unknown.RawType, unknown.RawJson, unknown.Id.ToNullable());
                 return null;
+            }
         }
     }
 

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using DataModel = Discord.API.MessageComponentInteractionData;
 using Model = Discord.API.Interaction;
@@ -19,27 +20,32 @@ namespace Discord.Rest
         /// <summary>
         ///     Gets the data received with this interaction, contains the button that was clicked.
         /// </summary>
-        public new RestMessageComponentData Data { get; }
+        public new RestMessageComponentData Data { get; private set; }
 
         /// <inheritdoc cref="IComponentInteraction.Message"/>
         public RestUserMessage Message { get; private set; }
 
-        private object _lock = new object();
+#if NET9_0_OR_GREATER
+        private readonly Lock _lock = new();
+#else
+        private readonly object _lock = new();
+#endif
 
         internal RestMessageComponent(BaseDiscordClient client, Model model)
             : base(client, model.Id)
         {
-            var dataModel = model.Data.IsSpecified
-                ? (DataModel)model.Data.Value
-                : null;
-
-            Data = new RestMessageComponentData(dataModel, client, Guild);
         }
 
         internal new static async Task<RestMessageComponent> CreateAsync(DiscordRestClient client, Model model, bool doApiCall)
         {
             var entity = new RestMessageComponent(client, model);
             await entity.UpdateAsync(client, model, doApiCall).ConfigureAwait(false);
+
+            var dataModel = model.Data.IsSpecified
+                ? (DataModel)model.Data.Value
+                : null;
+
+            entity.Data = new RestMessageComponentData(dataModel, client, entity.Guild);
             return entity;
         }
         internal override async Task UpdateAsync(DiscordRestClient discord, Model model, bool doApiCall)
@@ -455,7 +461,7 @@ namespace Discord.Rest
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="ephemeral"></param>
         /// <param name="options"></param>
@@ -508,7 +514,7 @@ namespace Discord.Rest
                 {
                     CustomId = modal.CustomId,
                     Title = modal.Title,
-                    Components = modal.Component.Components.Select(x => new Discord.API.ActionRowComponent(x)).ToArray()
+                    Components = modal.Component.Components.Select(x => x.ToModel()).ToArray()
                 }
             };
 

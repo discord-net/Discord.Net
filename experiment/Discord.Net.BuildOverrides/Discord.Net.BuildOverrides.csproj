@@ -5,7 +5,7 @@
     <AssemblyName>Discord.Net.BuildOverrides</AssemblyName>
     <RootNamespace>Discord.BuildOverrides</RootNamespace>
     <Description>A Discord.Net extension adding a way to add build overrides for testing.</Description>
-    <TargetFrameworks>net8.0;net9.0;</TargetFrameworks>
+    <TargetFrameworks>net8.0;net9.0;net10.0;</TargetFrameworks>
     <IsTrimmable>false</IsTrimmable>
     <IsAotCompatible>false</IsAotCompatible>
     <IncludeSymbols>true</IncludeSymbols>
@@ -13,11 +13,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
-    <Reference Include="System.Net.Http" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
   </ItemGroup>
 
 </Project>

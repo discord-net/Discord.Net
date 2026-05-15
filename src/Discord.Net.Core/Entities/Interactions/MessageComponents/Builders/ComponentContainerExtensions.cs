@@ -470,6 +470,54 @@ public static class ComponentContainerExtensions
     }
 
     /// <summary>
+    ///     Adds a <see cref="FileUploadComponentBuilder"/> to the container.
+    /// </summary>
+    /// <returns>
+    ///     The current container.
+    /// </returns>
+    public static BuilderT WithFileUpload<BuilderT>(this BuilderT container, FileUploadComponentBuilder fileUpload)
+        where BuilderT : class, IInteractableComponentContainer
+    {
+        container.AddComponent(fileUpload);
+        return container;
+    }
+
+    /// <summary>
+    ///     Adds a <see cref="FileUploadComponentBuilder"/> to the container.
+    /// </summary>
+    /// <returns>
+    ///     The current container.
+    /// </returns>
+    public static BuilderT WithFileUpload<BuilderT>(this BuilderT container,
+        string customId,
+        int? minValues = null,
+        int? maxValues = null,
+        bool isRequired = true,
+        int? id = null)
+        where BuilderT : class, IInteractableComponentContainer
+        => container.WithFileUpload(new FileUploadComponentBuilder()
+            .WithCustomId(customId)
+            .WithMinValues(minValues)
+            .WithMaxValues(maxValues)
+            .WithRequired(isRequired)
+            .WithId(id));
+
+    /// <summary>
+    ///     Adds a <see cref="FileUploadComponentBuilder"/> to the container.
+    /// </summary>
+    /// <returns>
+    ///     The current container.
+    /// </returns>
+    public static BuilderT WithFileUpload<BuilderT>(this BuilderT container,
+        Action<FileUploadComponentBuilder> options)
+        where BuilderT : class, IInteractableComponentContainer
+    {
+        var comp = new FileUploadComponentBuilder();
+        options(comp);
+        return container.WithFileUpload(comp);
+    }
+
+    /// <summary>
     ///     Finds the first <see cref="IMessageComponentBuilder"/> in the <see cref="IComponentContainer"/>
     ///     or any of its child <see cref="IComponentContainer"/>s with matching id.
     /// </summary>
@@ -518,12 +566,21 @@ public static class ComponentContainerExtensions
     ///     in this <see cref="IComponentContainer"/> and all child <see cref="IComponentContainer"/>s.
     /// </summary>
     public static IEnumerable<int> GetComponentIds(this IComponentContainer container)
-        => container.Components
-            .Where(x => x.Id is not null)
-            .Select(x => x.Id.Value)
-            .Concat(container.Components
-                .OfType<IComponentContainer>()
-                .SelectMany(x => x.GetComponentIds()));
+    {
+        var ids = new List<int>();
+        foreach (var component in container.Components)
+        {
+            if (component.Id is not null)
+                ids.Add(component.Id.Value);
+
+            if (component is SectionBuilder { Accessory.Id: not null } section)
+                ids.Add(section.Accessory.Id.Value);
+
+            if (component is IComponentContainer childContainer)
+                ids.AddRange(childContainer.GetComponentIds());
+        }
+        return ids;
+    }
 
     /// <summary>
     ///     Finds the first <see cref="IMessageComponent"/> in the <see cref="INestedComponent"/>

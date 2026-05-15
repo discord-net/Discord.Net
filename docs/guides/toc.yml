@@ -6,6 +6,8 @@
       topicUid: Guides.Breakings.V2V3Guide
     - name: V3.18
       topicUid: Guides.Breakings.V3_18
+    - name: V3.19
+      topicUid: Guides.Breakings.V3_19
 - name: Getting Started
   items:
     - name: Installation
@@ -68,6 +70,8 @@
       topicUid: Guides.IntFw.PostExecution
     - name: Permissions
       topicUid: Guides.IntFw.Perms
+    - name: Modals
+      topicUid: Guides.IntFw.Modals
 - name: Slash Command Basics
   items:
     - name: Introduction
@@ -141,7 +145,11 @@
 - name: Bearer Tokens
   topicUid: Guides.BearerToken
 - name: Voice
-  topicUid: Guides.Voice.SendingVoice
+  items:
+    - name: Connecting and Sending
+      topicUid: Guides.Voice.SendingVoice
+    - name: libdave Support
+      topicUid: Guides.Voice.LibDave
 - name: Polls
   topicUid: Guides.Polls
 - name: Deployment

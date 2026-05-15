@@ -8,5 +8,7 @@ namespace Discord.API.Voice
         public byte[] SecretKey { get; set; }
         [JsonProperty("mode")]
         public string Mode { get; set; }
+        [JsonProperty("dave_protocol_version")]
+        public ushort DaveProtocolVersion { get; set; }
     }
 }
