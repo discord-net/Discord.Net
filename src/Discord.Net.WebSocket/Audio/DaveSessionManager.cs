@@ -245,17 +245,13 @@ internal sealed class DaveSessionManager : IDisposable
 
         UpdateEncryptorRatchet(protocolVersion);
 
+        await _client.RebuildInputStreamsForDaveAsync();
+
         if (transitionId is Dave.InitTransitionId)
-        {
-            // Streams created before DAVE was initialized lack the DaveDecryptStream layer.
-            // Rebuild them now that keys are ready.
-            await _client.RebuildInputStreamsForDaveAsync();
-        }
-        else
-        {
-            _preparedTransitions[transitionId] = protocolVersion;
-            await SendDaveProtocolReadyForTransitionAsync(transitionId);
-        }
+            return;
+
+        _preparedTransitions[transitionId] = protocolVersion;
+        await SendDaveProtocolReadyForTransitionAsync(transitionId);
     }
 
     public async Task HandleDaveProtocolInitAsync(ushort protocolVersion)
