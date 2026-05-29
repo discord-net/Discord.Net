@@ -144,7 +144,7 @@ internal sealed class DaveSessionManager : IDisposable
         if (welcomeResult.IsNull)
         {
             await SendMLSInvalidCommitWelcomeAsync(transitionId);
-            await HandleDaveProtocolInitAsync(transitionId);
+            await HandleDaveProtocolInitAsync(_session.ProtocolVersion);
         }
         else
         {
@@ -191,7 +191,7 @@ internal sealed class DaveSessionManager : IDisposable
             using var keyPackage = _session.GetMarshalledKeyPackage();
             await SendMLSKeyPackageAsync(keyPackage.ToMemory());
 
-            await HandleDaveProtocolInitAsync(transitionId);
+            await HandleDaveProtocolInitAsync(_session.ProtocolVersion);
 
             return;
         }
@@ -218,7 +218,7 @@ internal sealed class DaveSessionManager : IDisposable
             using var keyPackage = _session.GetMarshalledKeyPackage();
             await SendMLSKeyPackageAsync(keyPackage.ToMemory());
 
-            await HandleDaveProtocolInitAsync(transitionId);
+            await HandleDaveProtocolInitAsync(_session.ProtocolVersion);
         }
         else
         {
@@ -245,10 +245,17 @@ internal sealed class DaveSessionManager : IDisposable
 
         UpdateEncryptorRatchet(protocolVersion);
 
-        await _client.RebuildInputStreamsForDaveAsync();
+        if (protocolVersion > Dave.DisabledProtocolVersion)
+        {
+            // Streams created before DAVE was initialized lack the DaveDecryptStream layer.
+            // Rebuild them now that keys are ready.
+            await _client.RebuildInputStreamsForDaveAsync();
+        }
 
         if (transitionId is Dave.InitTransitionId)
+        {
             return;
+        }
 
         _preparedTransitions[transitionId] = protocolVersion;
         await SendDaveProtocolReadyForTransitionAsync(transitionId);
