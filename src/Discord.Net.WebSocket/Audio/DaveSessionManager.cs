@@ -188,9 +188,6 @@ internal sealed class DaveSessionManager : IDisposable
             );
 
             await SendMLSInvalidCommitWelcomeAsync(transitionId);
-            using var keyPackage = _session.GetMarshalledKeyPackage();
-            await SendMLSKeyPackageAsync(keyPackage.ToMemory());
-
             await HandleDaveProtocolInitAsync(_session.ProtocolVersion);
 
             return;
@@ -215,9 +212,6 @@ internal sealed class DaveSessionManager : IDisposable
             );
 
             await SendMLSInvalidCommitWelcomeAsync(transitionId);
-            using var keyPackage = _session.GetMarshalledKeyPackage();
-            await SendMLSKeyPackageAsync(keyPackage.ToMemory());
-
             await HandleDaveProtocolInitAsync(_session.ProtocolVersion);
         }
         else
