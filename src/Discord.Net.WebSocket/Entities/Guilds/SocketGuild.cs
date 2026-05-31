@@ -670,6 +670,10 @@ namespace Discord.WebSocket
         public Task<GuildIncidentsData> ModifyIncidentActionsAsync(Action<GuildIncidentsDataProperties> props, RequestOptions options = null)
             => GuildHelper.ModifyGuildIncidentActionsAsync(this, Discord, props, options);
 
+        /// <inheritdoc />
+        public Task<GuildMessageSearchData> SearchMessagesAsync(SearchGuildMessages args, CacheMode guildMemberCacheMode = CacheMode.CacheOnly, RequestOptions options = null)
+            => GuildHelper.SearchMessagesAsync(this, Discord, args, guildMemberCacheMode, options);
+
         #endregion
 
         #region Bans

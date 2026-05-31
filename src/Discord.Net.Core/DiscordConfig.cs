@@ -259,7 +259,7 @@ namespace Discord
         ///     Returns the maximum length of a voice channel status.
         /// </summary>
         public const int MaxVoiceChannelStatusLength = 500;
-      
+
         /// <summary>
         ///     Returns the maximum number of entitlements that can be gotten per-batch.
         /// </summary>
@@ -284,10 +284,60 @@ namespace Discord
         ///     Returns the maximum length of a poll question text.
         /// </summary>
         public const int MaxPollQuestionTextLength = 300;
-      
+
         /// <summary>
         ///     Returns the maximum number of bans that can be banned in a single bulk request.
         /// </summary>
         public const int MaxBansPerBulkBatch = 200;
+
+        /// <summary>
+        ///     Returns the maximum number of messages fetched provided to a guild message search.
+        /// </summary>
+        public const int MaxGuildMessageSearchLimit = 25;
+
+        /// <summary>
+        ///     Returns the maximum string length of the message content that can be provided to a guild message search.
+        /// </summary>
+        public const int MaxGuildMessageSearchContentLength = 1024;
+
+        /// <summary>
+        ///     Returns the maximum number of channel IDs that can be provided to a guild message search.
+        /// </summary>
+        public const int MaxGuildMessageSearchChannels = 500;
+
+        /// <summary>
+        ///     Returns the maximum number of author (user) IDs that can be provided to a guild message search.
+        /// </summary>
+        public const int MaxGuildMessageSearchAuthors = 100;
+
+        /// <summary>
+        ///     Returns the maximum size of the resulting messages offset provided to a guild message search.
+        /// </summary>
+        public const int MaxGuildMessageSearchOffset = 9975;
+
+        /// <summary>
+        ///     Returns the maximum number of words to skip between matching tokens provided to a guild message search.
+        /// </summary>
+        public const int MaxGuildMessageSearchSlop = 100;
+
+        /// <summary>
+        ///     Returns the maximum number of user mentions provided to a guild message search.
+        /// </summary>
+        public const int MaxGuildMessageSearchUserMentions = 100;
+
+        /// <summary>
+        ///     Returns the maximum number of role mentions provided to a guild message search.
+        /// </summary>
+        public const int MaxGuildMessageSearchRoleMentions = 100;
+
+        /// <summary>
+        ///     Returns the maximum number of replied user IDs provided to a guild message search.
+        /// </summary>
+        public const int MaxGuildMessageSearchReplyUserIds = 100;
+
+        /// <summary>
+        ///     Returns the maximum number of replied message IDs provided to a guild message search.
+        /// </summary>
+        public const int MaxGuildMessageSearchReplyMessageIds = 100;
     }
 }

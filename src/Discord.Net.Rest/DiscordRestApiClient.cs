@@ -1770,6 +1770,111 @@ namespace Discord.API
             return await SendAsync<Dictionary<ulong, int>>("GET", () => $"guilds/{guildId}/roles/member-counts", ids, options: options);
         }
 
+        public async Task<GuildMessageSearchData> SearchGuildMessagesAsync(ulong guildId, SearchGuildMessages args, RequestOptions options = null)
+        {
+            var channelIds = args.ChannelIds.GetValueOrDefault([]).ToArray();
+            var authorIds = args.AuthorIds.GetValueOrDefault([]).ToArray();
+            var userMentionIds = args.UserMentionIds.GetValueOrDefault([]).ToArray();
+            var roleMentionIds = args.RoleMentionIds.GetValueOrDefault([]).ToArray();
+            var repliedToUserIds = args.RepliedToUserIds.GetValueOrDefault([]).ToArray();
+            var repliedToMessageIds = args.RepliedToMessageIds.GetValueOrDefault([]).ToArray();
+
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+            Preconditions.NotNull(args, nameof(args));
+            Preconditions.AtLeast(args.Limit, 0, nameof(args.Limit));
+            Preconditions.AtMost(args.Limit, DiscordConfig.MaxGuildMessageSearchLimit, nameof(args.Limit));
+            Preconditions.AtMost(args.Offset, DiscordConfig.MaxGuildMessageSearchOffset, nameof(args.Offset));
+            Preconditions.AtMost(args.Slop, DiscordConfig.MaxGuildMessageSearchSlop, nameof(args.Slop));
+            Preconditions.AtMostLength(args.Content, DiscordConfig.MaxGuildMessageSearchContentLength, nameof(args.Content));
+            Preconditions.AtMostLength(channelIds, DiscordConfig.MaxGuildMessageSearchChannels, nameof(args.ChannelIds));
+            Preconditions.AtMostLength(authorIds, DiscordConfig.MaxGuildMessageSearchAuthors, nameof(args.AuthorIds));
+            Preconditions.AtMostLength(userMentionIds, DiscordConfig.MaxGuildMessageSearchUserMentions, nameof(args.UserMentionIds));
+            Preconditions.AtMostLength(roleMentionIds, DiscordConfig.MaxGuildMessageSearchRoleMentions, nameof(args.RoleMentionIds));
+            Preconditions.AtMostLength(repliedToUserIds, DiscordConfig.MaxGuildMessageSearchReplyUserIds, nameof(args.RepliedToUserIds));
+            Preconditions.AtMostLength(repliedToMessageIds, DiscordConfig.MaxGuildMessageSearchReplyMessageIds, nameof(args.RepliedToMessageIds));
+
+            options = RequestOptions.CreateOrClone(options);
+
+            int limit = args.Limit.GetValueOrDefault(DiscordConfig.MaxGuildMessageSearchLimit);
+            var sortDirection = args.SortDirection.GetValueOrDefault(SortDirection.Descending) switch
+            {
+                SortDirection.Ascending => "asc",
+                _ => "desc",
+            };
+            var sortAlgorithm = args.SortAlgorithm.GetValueOrDefault(SortAlgorithm.Timestamp) switch
+            {
+                SortAlgorithm.Relevance => "relevance",
+                _ => "timestamp",
+            };
+
+            var endpointQueryParams = new StringBuilder($"limit={(limit == 0 ? 1 : limit)}");
+            if (args.Offset.IsSpecified)
+                endpointQueryParams.Append($"&offset={args.Offset.Value}");
+            if (args.MinMessageId.IsSpecified)
+                endpointQueryParams.Append($"&min_id={args.MinMessageId.Value}");
+            if (args.MaxMessageId.IsSpecified)
+                endpointQueryParams.Append($"&max_id={args.MaxMessageId.Value}");
+            if (args.Slop.IsSpecified)
+                endpointQueryParams.Append($"&slop={args.Slop.Value}");
+            if (args.Content.IsSpecified)
+                endpointQueryParams.Append($"&content={args.Content.Value}");
+            if (args.AuthorFilterUsers is { IsSpecified: true, Value: true })
+                endpointQueryParams.Append("&author_type=user");
+            if (args.AuthorFilterBots is { IsSpecified: true, Value: true })
+                endpointQueryParams.Append("&author_type=bot");
+            if (args.AuthorFilterWebhooks is { IsSpecified: true, Value: true })
+                endpointQueryParams.Append("&author_type=webhook");
+            if (args.EveryoneMention.IsSpecified)
+                endpointQueryParams.Append($"&mention_everyone={(args.EveryoneMention.Value ? "true" : "false")}");
+
+            if (args.AuthorIds.IsSpecified)
+            {
+                foreach (var authorId in authorIds)
+                    endpointQueryParams.Append($"&author_id={authorId}");
+            }
+            if (args.UserMentionIds.IsSpecified)
+            {
+                foreach (var mentionedUserId in userMentionIds)
+                    endpointQueryParams.Append($"&mentions={mentionedUserId}");
+            }
+            if (args.RoleMentionIds.IsSpecified)
+            {
+                foreach (var mentionedRoleId in roleMentionIds)
+                    endpointQueryParams.Append($"&mentions_role_id={mentionedRoleId}");
+            }
+            if (args.RepliedToUserIds.IsSpecified)
+            {
+                foreach (var repliedToUserId in repliedToUserIds)
+                    endpointQueryParams.Append($"&replied_to_user_id={repliedToUserId}");
+            }
+            if (args.RepliedToMessageIds.IsSpecified)
+            {
+                foreach (var repliedToMessageId in repliedToMessageIds)
+                    endpointQueryParams.Append($"&replied_to_message_id={repliedToMessageId}");
+            }
+            if (args.ChannelIds.IsSpecified)
+            {
+                foreach (var channelId in channelIds)
+                    endpointQueryParams.Append($"&channel_id={channelId}");
+            }
+
+            if (args.IsPinned.IsSpecified)
+                endpointQueryParams.Append($"&pinned={(args.IsPinned.Value ? "true" : "false")}");
+            if (args.SortDirection.IsSpecified)
+                endpointQueryParams.Append($"&sort_order={sortDirection}");
+            if (args.SortAlgorithm.IsSpecified)
+                endpointQueryParams.Append($"&sort_by={sortAlgorithm}");
+            if (args.IncludeNsfw.IsSpecified)
+                endpointQueryParams.Append($"&include_nsfw={(args.IncludeNsfw.Value ? "true" : "false")}");
+
+            var ids = new BucketIds(guildId: guildId);
+            Expression<Func<string>> endpoint = () => $"guilds/{guildId}/messages/search?{endpointQueryParams}";
+
+            var data = await SendAsync<GuildMessageSearchData>("GET", endpoint, ids, options: options);
+
+            return data;
+        }
+
         #endregion
 
         #region Guild Bans
@@ -2177,7 +2282,7 @@ namespace Discord.API
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             options = RequestOptions.CreateOrClone(options);
-            
+
             var ids = new BucketIds(guildId: guildId);
             var response = await SendJsonAsync<GuildMemberSearchResponse>("POST", () => $"guilds/{guildId}/members-search", args, ids, options: options);
 
