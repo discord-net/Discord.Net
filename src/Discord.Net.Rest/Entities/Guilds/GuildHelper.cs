@@ -200,8 +200,9 @@ namespace Discord.Rest
 
 
             var users = new ConcurrentDictionary<ulong, Task<IGuildUser>>();
-
             var messageParseTasks = model.Messages.Select(ParseMessage);
+
+            var threadMembers = model.ThreadMembers.GetValueOrDefault([]).Select(x => RestThreadUser.Create(client, guild, x, threads.FirstOrDefault(thr => thr.Id == x.Id.ToNullable())));
 
             builder.AddRange(await Task.WhenAll(messageParseTasks));
 
@@ -214,6 +215,7 @@ namespace Discord.Rest
                 IndexNotYetAvailable = model.ErrorMessage.IsSpecified,
                 RetryAfter = model.RetryAfter.ToNullable(),
                 Threads = threads,
+                ThreadMembers = threadMembers.ToImmutableArray(),
             };
 
             async Task<RestMessage> ParseMessage(Message msg)
