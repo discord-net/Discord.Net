@@ -179,9 +179,9 @@ namespace Discord.Rest
             };
         }
 
-        public static async Task<GuildMessageSearchData> GetGuildMessagesAsync(IGuild guild, BaseDiscordClient client, GetGuildMessagesParams args, RequestOptions options = null)
+        public static async Task<GuildMessageSearchData> SearchMessagesAsync(IGuild guild, BaseDiscordClient client, GetGuildMessagesParams args, RequestOptions options = null)
         {
-            var model = await client.ApiClient.GetGuildMessagesAsync(guild.Id, args, options);
+            var model = await client.ApiClient.SearchGuildMessagesAsync(guild.Id, args, options);
 
             var builder = ImmutableArray.CreateBuilder<RestMessage>();
             if (model.ParseMessages)

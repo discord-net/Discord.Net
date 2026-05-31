@@ -1467,7 +1467,7 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous creation operation. The task result contains the modified <see cref="GuildMessageSearchData"/>.
         /// </returns>
-        Task<GuildMessageSearchData> GetGuildMessagesAsync(GetGuildMessagesParams args, RequestOptions options = null);
+        Task<GuildMessageSearchData> SearchMessagesAsync(GetGuildMessagesParams args, RequestOptions options = null);
 
         /// <summary>
         ///     Executes a bulk ban on the specified users.

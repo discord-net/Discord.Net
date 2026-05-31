@@ -1733,7 +1733,7 @@ namespace Discord.API
             return await SendAsync<Dictionary<ulong, int>>("GET", () => $"guilds/{guildId}/roles/member-counts", ids, options: options);
         }
 
-        public async Task<GuildMessageSearchData> GetGuildMessagesAsync(ulong guildId, GetGuildMessagesParams args, RequestOptions options = null)
+        public async Task<GuildMessageSearchData> SearchGuildMessagesAsync(ulong guildId, GetGuildMessagesParams args, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             Preconditions.NotNull(args, nameof(args));
