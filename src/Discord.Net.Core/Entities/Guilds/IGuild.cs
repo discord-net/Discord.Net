@@ -1468,7 +1468,7 @@ namespace Discord
         /// <param name="guildMemberCacheMode">The cache mode to use when retrieving guild members.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <remarks>
-        ///     When using <see cref="guildMemberCacheMode"/> set to <see cref="CacheMode.CacheOnly"/>, the author of retrieved messages will be a cached <see cref="IGuildUser"/>
+        ///     When using <paramref name="guildMemberCacheMode"/> set to <see cref="CacheMode.CacheOnly"/>, the author of retrieved messages will be a cached <see cref="IGuildUser"/>
         ///     or <see cref="IUser"/> constructed from the retrieved data. When using <see cref="CacheMode.AllowDownload"/>, the author will be a full <see cref="IGuildUser"/> retrieved from the API,
         ///     which may trigger additional requests if the user is not cached.
         /// </remarks>
