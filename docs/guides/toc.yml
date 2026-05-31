@@ -8,6 +8,8 @@
       topicUid: Guides.Breakings.V3_18
     - name: V3.19
       topicUid: Guides.Breakings.V3_19
+    - name: V3.20
+      topicUid: Guides.Breakings.V3_20
 - name: Getting Started
   items:
     - name: Installation

@@ -134,7 +134,7 @@ internal sealed class DefaultArrayModalComponentConverter<T> : ModalComponentTyp
 
     public override Task WriteAsync<TBuilder>(TBuilder builder, IDiscordInteraction interaction, InputComponentInfo component, object value)
     {
-        if (value is not T)
+        if (value is not null && value is not T)
             throw new ArgumentException($"Provided instance value type doesn't match {typeof(T).Name}");
 
         return builder switch
@@ -236,9 +236,15 @@ internal sealed class DefaultArrayModalComponentConverter<T> : ModalComponentTyp
 
     private bool TryCastValueTypeArray<TValueType>(object obj, out TValueType[] array)
     {
+        if (obj is null)
+        {
+            array = [];
+            return false;
+        }
+
         try //covariance not supported for value types on pattern matching
         {
-            array = obj is IEnumerable valueArr ? valueArr.Cast<TValueType>().ToArray() : null;
+            array = obj is IEnumerable valueArr ? valueArr.Cast<TValueType>().ToArray() : [];
 
             return true;
         }
