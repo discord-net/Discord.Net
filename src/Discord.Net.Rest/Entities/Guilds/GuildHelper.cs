@@ -2,11 +2,13 @@ using Discord.API;
 using Discord.API.Rest;
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Data;
 using System.IO;
 using System.Linq;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 
 using ImageModel = Discord.API.Image;
@@ -179,33 +181,48 @@ namespace Discord.Rest
             };
         }
 
-        public static async Task<GuildMessageSearchData> SearchMessagesAsync(IGuild guild, BaseDiscordClient client, GetGuildMessagesParams args, RequestOptions options = null)
+        public static async Task<GuildMessageSearchData> SearchMessagesAsync(IGuild guild, BaseDiscordClient client, SearchGuildMessages args, CacheMode guildMemberCacheMode = CacheMode.CacheOnly, RequestOptions options = null)
         {
             var model = await client.ApiClient.SearchGuildMessagesAsync(guild.Id, args, options);
 
             var builder = ImmutableArray.CreateBuilder<RestMessage>();
-            if (model.ParseMessages)
-                builder.AddRange(await Task.WhenAll(
-                    model.Messages.Select(ParseMessage)
-                ));
+            var threadsBuilder = ImmutableArray.CreateBuilder<IThreadChannel>();
+
+            foreach (var threadModel in model.Threads.GetValueOrDefault([]))
+                threadsBuilder.Add(await guild.GetThreadChannelAsync(threadModel.Id, guildMemberCacheMode) ?? RestThreadChannel.Create(client, guild, threadModel));
+            var threads = threadsBuilder.ToImmutable();
+
+            var channels = new ConcurrentDictionary<ulong, Task<IGuildChannel>>();
+
+            // prefill the message channels with parsed threads
+            foreach (var thread in threads)
+                 channels.TryAdd(thread.Id, Task.FromResult<IGuildChannel>(thread));
+
+
+            var users = new ConcurrentDictionary<ulong, Task<IGuildUser>>();
+
+            var messageParseTasks = model.Messages.Select(ParseMessage);
+
+            builder.AddRange(await Task.WhenAll(messageParseTasks));
 
             return new GuildMessageSearchData
             {
-                DoingDeepHistoricalIndex = model.DoingDeepHistoricalIndex,
-                DocumentsIndexed = model.DocumentsIndexed,
-                TotalResults = model.TotalResults,
+                DoingDeepHistoricalIndex = model.DoingDeepHistoricalIndex.GetValueOrDefault(false),
+                DocumentsIndexed = model.DocumentsIndexed.ToNullable(),
+                TotalResults = model.TotalResults.GetValueOrDefault(0),
                 Messages = builder.ToImmutable(),
+                IndexNotYetAvailable = model.ErrorMessage.IsSpecified,
+                RetryAfter = model.RetryAfter.ToNullable(),
+                Threads = threads,
             };
 
             async Task<RestMessage> ParseMessage(Message msg)
             {
-                var authorTask = guild.GetUserAsync(msg.Author.Value.Id, options: options);
-                var channelTask = guild.GetChannelAsync(msg.ChannelId, options: options);
+                var cachedAuthor = await users.GetOrAdd(msg.Author.Value.Id, _ => guild.GetUserAsync(msg.Author.Value.Id, guildMemberCacheMode)).ConfigureAwait(false) as IUser;
+                var author = cachedAuthor ?? RestUser.Create(client, msg.Author.Value);
 
-                await Task.WhenAll(authorTask, channelTask);
-
-                var author = await authorTask;
-                var channel = await channelTask;
+                var cachedChannel = channels.GetOrAdd(msg.ChannelId, _ => guild.GetChannelAsync(msg.ChannelId, options: options));
+                var channel = await cachedChannel.ConfigureAwait(false);
 
                 return RestMessage.Create(client, channel as IMessageChannel, author, msg);
             }
@@ -671,7 +688,7 @@ namespace Discord.Rest
                 }
             }
 
-            if(colors is {IsSolidColor: false})
+            if (colors is { IsSolidColor: false })
                 guild.Features.EnsureFeature(GuildFeature.EnhancedRoleColors);
 
             var createGuildRoleParams = new API.Rest.ModifyGuildRoleParams

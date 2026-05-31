@@ -1,10 +1,12 @@
+using System.Collections.Generic;
+
 namespace Discord
 {
     /// <summary>
     ///     Represents guild message search filter options.
     ///     Uses the following endpoint: https://docs.discord.com/developers/resources/message#search-guild-messages
     /// </summary>
-    public class GetGuildMessagesParams
+    public class SearchGuildMessages
     {
         /// <summary>
         /// How many messages to fetch.
@@ -41,7 +43,7 @@ namespace Discord
         /// <summary>
         /// A list of channel IDs serving as a whitelist for the search.
         /// </summary>
-        public Optional<ulong[]> ChannelIds { get; set; }
+        public Optional<IEnumerable<ulong>> ChannelIds { get; set; }
 
         /// <summary>
         /// Whether to whitelist messages sent by regular users.
@@ -70,17 +72,17 @@ namespace Discord
         /// <summary>
         /// A list of user IDs used as a filter for the messages' authors.
         /// </summary>
-        public Optional<ulong[]> AuthorIds { get; set; }
+        public Optional<IEnumerable<ulong>> AuthorIds { get; set; }
 
         /// <summary>
         /// A list of user IDs that need to be mentioned in the response.
         /// </summary>
-        public Optional<ulong[]> UserMentionIds { get; set; }
+        public Optional<IEnumerable<ulong>> UserMentionIds { get; set; }
 
         /// <summary>
         /// A list of role IDs that need to be mentioned in the response.
         /// </summary>
-        public Optional<ulong[]> RoleMentionIds { get; set; }
+        public Optional<IEnumerable<ulong>> RoleMentionIds { get; set; }
 
         /// <summary>
         /// Whether the @everyone mention needs to be present in the message for it to be included in the response.
@@ -90,12 +92,12 @@ namespace Discord
         /// <summary>
         /// A list of user IDs that is used as a whitelist checking whether a message replies to any of the specified users.
         /// </summary>
-        public Optional<ulong[]> RepliedToUserIds { get; set; }
+        public Optional<IEnumerable<ulong>> RepliedToUserIds { get; set; }
 
         /// <summary>
         /// A list of message IDs that is used as a whitelist checking whether a message replies to any of the specified messages.
         /// </summary>
-        public Optional<ulong[]> RepliedToMessageIds { get; set; }
+        public Optional<IEnumerable<ulong>> RepliedToMessageIds { get; set; }
 
         /// <summary>
         /// Whether the message needs to be pinned for it to be included in the response.

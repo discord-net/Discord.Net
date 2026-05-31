@@ -88,6 +88,21 @@ namespace Discord
         public static void LessThanLength(Optional<string> obj, int length, string name, string msg = null) { if (obj.IsSpecified && obj.Value.Length >= length) throw new ArgumentException(message: msg ?? $"String length must be less than {length}.", paramName: name); }
 
 
+        /// <exception cref="ArgumentException">String length may not be equal to <paramref name="length"/>.</exception>
+        public static void NotEqualLength(string obj, int length, string name, string msg = null) { if (obj.Length == length) throw new ArgumentException(message: msg ?? $"String length may not be equal to {length}.", paramName: name); }
+
+        /// <exception cref="ArgumentException">String length must be at least <paramref name="length"/>.</exception>
+        public static void AtLeastLength(string obj, int length, string name, string msg = null) { if (obj.Length < length) throw new ArgumentException(message: msg ?? $"String length must be at least {length}.", paramName: name); }
+
+        /// <exception cref="ArgumentException">String length must be greater than <paramref name="length"/>.</exception>
+        public static void GreaterThanLength(string obj, int length, string name, string msg = null) { if (obj.Length <= length) throw new ArgumentException(message: msg ?? $"String length must be greater than {length}.", paramName: name); }
+
+        /// <exception cref="ArgumentException">String length must be at most <paramref name="length"/>.</exception>
+        public static void AtMostLength(string obj, int length, string name, string msg = null) { if (obj.Length > length) throw new ArgumentException(message: msg ?? $"String length must be at most {length}.", paramName: name); }
+
+        /// <exception cref="ArgumentException">String length must be less than <paramref name="length"/>.</exception>
+        public static void LessThanLength(string obj, int length, string name, string msg = null) { if (obj.Length >= length) throw new ArgumentException(message: msg ?? $"String length must be less than {length}.", paramName: name); }
+
         #endregion
 
         #region Message Validation
@@ -434,6 +449,22 @@ namespace Discord
 
         /// <exception cref="ArgumentException">Array length must be less than <paramref name="length"/>.</exception>
         public static void LessThanLength<T>(Optional<T[]> obj, int length, string name, string msg = null) { if (obj.IsSpecified && obj.Value.Length >= length) throw new ArgumentException(message: msg ?? $"Array length must be less than {length}.", paramName: name); }
+
+
+        /// <exception cref="ArgumentException">Array length may not be equal to <paramref name="length"/>.</exception>
+        public static void NotEqualLength<T>(T[] obj, int length, string name, string msg = null) { if (obj.Length == length) throw new ArgumentException(message: msg ?? $"Array length may not be equal to {length}.", paramName: name); }
+
+        /// <exception cref="ArgumentException">Array length must be at least <paramref name="length"/>.</exception>
+        public static void AtLeastLength<T>(T[] obj, int length, string name, string msg = null) { if (obj.Length < length) throw new ArgumentException(message: msg ?? $"Array length must be at least {length}.", paramName: name); }
+
+        /// <exception cref="ArgumentException">Array length must be greater than <paramref name="length"/>.</exception>
+        public static void GreaterThanLength<T>(T[] obj, int length, string name, string msg = null) { if (obj.Length <= length) throw new ArgumentException(message: msg ?? $"Array length must be greater than {length}.", paramName: name); }
+
+        /// <exception cref="ArgumentException">Array length must be at most <paramref name="length"/>.</exception>
+        public static void AtMostLength<T>(T[] obj, int length, string name, string msg = null) { if (obj.Length > length) throw new ArgumentException(message: msg ?? $"Array length must be at most {length}.", paramName: name); }
+
+        /// <exception cref="ArgumentException">Array length must be less than <paramref name="length"/>.</exception>
+        public static void LessThanLength<T>(T[] obj, int length, string name, string msg = null) { if (obj.Length >= length) throw new ArgumentException(message: msg ?? $"Array length must be less than {length}.", paramName: name); }
 
         #endregion
 

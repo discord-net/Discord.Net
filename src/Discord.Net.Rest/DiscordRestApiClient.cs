@@ -1733,8 +1733,15 @@ namespace Discord.API
             return await SendAsync<Dictionary<ulong, int>>("GET", () => $"guilds/{guildId}/roles/member-counts", ids, options: options);
         }
 
-        public async Task<GuildMessageSearchData> SearchGuildMessagesAsync(ulong guildId, GetGuildMessagesParams args, RequestOptions options = null)
+        public async Task<GuildMessageSearchData> SearchGuildMessagesAsync(ulong guildId, SearchGuildMessages args, RequestOptions options = null)
         {
+            var channelIds = args.ChannelIds.GetValueOrDefault([]).ToArray();
+            var authorIds = args.AuthorIds.GetValueOrDefault([]).ToArray();
+            var userMentionIds = args.UserMentionIds.GetValueOrDefault([]).ToArray();
+            var roleMentionIds = args.RoleMentionIds.GetValueOrDefault([]).ToArray();
+            var repliedToUserIds = args.RepliedToUserIds.GetValueOrDefault([]).ToArray();
+            var repliedToMessageIds = args.RepliedToMessageIds.GetValueOrDefault([]).ToArray();
+
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             Preconditions.NotNull(args, nameof(args));
             Preconditions.AtLeast(args.Limit, 0, nameof(args.Limit));
@@ -1742,12 +1749,12 @@ namespace Discord.API
             Preconditions.AtMost(args.Offset, DiscordConfig.MaxGuildMessageSearchOffset, nameof(args.Offset));
             Preconditions.AtMost(args.Slop, DiscordConfig.MaxGuildMessageSearchSlop, nameof(args.Slop));
             Preconditions.AtMostLength(args.Content, DiscordConfig.MaxGuildMessageSearchContentLength, nameof(args.Content));
-            Preconditions.AtMostLength(args.ChannelIds, DiscordConfig.MaxGuildMessageSearchChannels, nameof(args.ChannelIds));
-            Preconditions.AtMostLength(args.AuthorIds, DiscordConfig.MaxGuildMessageSearchAuthors, nameof(args.AuthorIds));
-            Preconditions.AtMostLength(args.UserMentionIds, DiscordConfig.MaxGuildMessageSearchUserMentions, nameof(args.UserMentionIds));
-            Preconditions.AtMostLength(args.RoleMentionIds, DiscordConfig.MaxGuildMessageSearchRoleMentions, nameof(args.RoleMentionIds));
-            Preconditions.AtMostLength(args.RepliedToUserIds, DiscordConfig.MaxGuildMessageSearchReplyUserIds, nameof(args.RepliedToUserIds));
-            Preconditions.AtMostLength(args.RepliedToMessageIds, DiscordConfig.MaxGuildMessageSearchReplyMessageIds, nameof(args.RepliedToMessageIds));
+            Preconditions.AtMostLength(channelIds, DiscordConfig.MaxGuildMessageSearchChannels, nameof(args.ChannelIds));
+            Preconditions.AtMostLength(authorIds, DiscordConfig.MaxGuildMessageSearchAuthors, nameof(args.AuthorIds));
+            Preconditions.AtMostLength(userMentionIds, DiscordConfig.MaxGuildMessageSearchUserMentions, nameof(args.UserMentionIds));
+            Preconditions.AtMostLength(roleMentionIds, DiscordConfig.MaxGuildMessageSearchRoleMentions, nameof(args.RoleMentionIds));
+            Preconditions.AtMostLength(repliedToUserIds, DiscordConfig.MaxGuildMessageSearchReplyUserIds, nameof(args.RepliedToUserIds));
+            Preconditions.AtMostLength(repliedToMessageIds, DiscordConfig.MaxGuildMessageSearchReplyMessageIds, nameof(args.RepliedToMessageIds));
 
             options = RequestOptions.CreateOrClone(options);
 
@@ -1774,32 +1781,46 @@ namespace Discord.API
                 endpointQueryParams.Append($"&slop={args.Slop.Value}");
             if (args.Content.IsSpecified)
                 endpointQueryParams.Append($"&content={args.Content.Value}");
-            if (args.ChannelIds.IsSpecified)
-                foreach (var channelId in args.ChannelIds.Value)
-                    endpointQueryParams.Append($"&channel_id={channelId}");
-            if (args.AuthorFilterUsers.IsSpecified && args.AuthorFilterUsers.Value)
-                endpointQueryParams.Append($"&author_type=user");
-            if (args.AuthorFilterBots.IsSpecified && args.AuthorFilterBots.Value)
-                endpointQueryParams.Append($"&author_type=bot");
-            if (args.AuthorFilterWebhooks.IsSpecified && args.AuthorFilterWebhooks.Value)
-                endpointQueryParams.Append($"&author_type=webhook");
-            if (args.AuthorIds.IsSpecified)
-                foreach (var authorId in args.AuthorIds.Value)
-                    endpointQueryParams.Append($"&author_id={authorId}");
-            if (args.UserMentionIds.IsSpecified)
-                foreach (var mentionedUserId in args.UserMentionIds.Value)
-                    endpointQueryParams.Append($"&mentions={mentionedUserId}");
-            if (args.RoleMentionIds.IsSpecified)
-                foreach (var mentionedRoleId in args.RoleMentionIds.Value)
-                    endpointQueryParams.Append($"&mentions_role_id={mentionedRoleId}");
+            if (args.AuthorFilterUsers is { IsSpecified: true, Value: true })
+                endpointQueryParams.Append("&author_type=user");
+            if (args.AuthorFilterBots is { IsSpecified: true, Value: true })
+                endpointQueryParams.Append("&author_type=bot");
+            if (args.AuthorFilterWebhooks is { IsSpecified: true, Value: true })
+                endpointQueryParams.Append("&author_type=webhook");
             if (args.EveryoneMention.IsSpecified)
                 endpointQueryParams.Append($"&mention_everyone={(args.EveryoneMention.Value ? "true" : "false")}");
+
+            if (args.AuthorIds.IsSpecified)
+            {
+                foreach (var authorId in authorIds)
+                    endpointQueryParams.Append($"&author_id={authorId}");
+            }
+            if (args.UserMentionIds.IsSpecified)
+            {
+                foreach (var mentionedUserId in userMentionIds)
+                    endpointQueryParams.Append($"&mentions={mentionedUserId}");
+            }
+            if (args.RoleMentionIds.IsSpecified)
+            {
+                foreach (var mentionedRoleId in roleMentionIds)
+                    endpointQueryParams.Append($"&mentions_role_id={mentionedRoleId}");
+            }
             if (args.RepliedToUserIds.IsSpecified)
-                foreach (var repliedToUserId in args.RepliedToUserIds.Value)
+            {
+                foreach (var repliedToUserId in repliedToUserIds)
                     endpointQueryParams.Append($"&replied_to_user_id={repliedToUserId}");
+            }
             if (args.RepliedToMessageIds.IsSpecified)
-                foreach (var repliedToMessageId in args.RepliedToMessageIds.Value)
+            {
+                foreach (var repliedToMessageId in repliedToMessageIds)
                     endpointQueryParams.Append($"&replied_to_message_id={repliedToMessageId}");
+            }
+            if (args.ChannelIds.IsSpecified)
+            {
+                foreach (var channelId in channelIds)
+                    endpointQueryParams.Append($"&channel_id={channelId}");
+            }
+
             if (args.IsPinned.IsSpecified)
                 endpointQueryParams.Append($"&pinned={(args.IsPinned.Value ? "true" : "false")}");
             if (args.SortDirection.IsSpecified)
@@ -1813,7 +1834,6 @@ namespace Discord.API
             Expression<Func<string>> endpoint = () => $"guilds/{guildId}/messages/search?{endpointQueryParams}";
 
             var data = await SendAsync<GuildMessageSearchData>("GET", endpoint, ids, options: options);
-            data.ParseMessages = limit != 0;
 
             return data;
         }

@@ -314,8 +314,8 @@ namespace Discord.Rest
         }
 
         /// <inheritdoc />
-        public Task<GuildMessageSearchData> SearchMessagesAsync(GetGuildMessagesParams args, RequestOptions options = null)
-            => GuildHelper.SearchMessagesAsync(this, Discord, args, options);
+        public Task<GuildMessageSearchData> SearchMessagesAsync(SearchGuildMessages args, CacheMode guildMemberCacheMode = CacheMode.CacheOnly, RequestOptions options = null)
+            => GuildHelper.SearchMessagesAsync(this, Discord, args, guildMemberCacheMode, options);
 
         #endregion
 

@@ -7,19 +7,20 @@ namespace Discord.API;
 
 internal class GuildMessageSearchData
 {
+    // Regular payload
     [JsonProperty("doing_deep_historical_index")]
-    public bool DoingDeepHistoricalIndex { get; set; }
+    public Optional<bool> DoingDeepHistoricalIndex { get; set; }
 
     [JsonProperty("documents_indexed")]
     public Optional<int> DocumentsIndexed { get; set; }
 
     [JsonProperty("total_results")]
-    public int TotalResults { get; set; }
+    public Optional<int> TotalResults { get; set; }
 
     [JsonProperty("messages")]
-    public IReadOnlyCollection<IReadOnlyCollection<Message>> NestedMessages { get; set; }
+    public Optional<Message[][]> NestedMessages { get; set; }
 
-    [JsonIgnore] public IEnumerable<Message> Messages => NestedMessages.SelectMany(m => m);
+    [JsonIgnore] public IEnumerable<Message> Messages => NestedMessages.GetValueOrDefault([]).SelectMany(m => m);
 
     [JsonProperty("threads")]
     public Optional<IReadOnlyCollection<Channel>> Threads { get; set; }
@@ -27,5 +28,13 @@ internal class GuildMessageSearchData
     [JsonProperty("members")]
     public Optional<IReadOnlyCollection<ThreadMember>> ThreadMembers { get; set; }
 
-    [JsonIgnore] public bool ParseMessages = true;
+    // Error response
+    [JsonProperty("message")]
+    public Optional<string> ErrorMessage { get; set; }
+
+    [JsonProperty("code")]
+    public Optional<string> Code { get; set; }
+    
+    [JsonProperty("retry_after")]
+    public Optional<int> RetryAfter { get; set; }
 }
