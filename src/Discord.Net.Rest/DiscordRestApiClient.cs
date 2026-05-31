@@ -1741,13 +1741,13 @@ namespace Discord.API
             Preconditions.AtMost(args.Limit, DiscordConfig.MaxGuildMessageSearchLimit, nameof(args.Limit));
             Preconditions.AtMost(args.Offset, DiscordConfig.MaxGuildMessageSearchOffset, nameof(args.Offset));
             Preconditions.AtMost(args.Slop, DiscordConfig.MaxGuildMessageSearchSlop, nameof(args.Slop));
-            Preconditions.AtMostSize(args.Content, DiscordConfig.MaxGuildMessageSearchContentLength, nameof(args.Content));
-            Preconditions.AtMostSize(args.ChannelIds, DiscordConfig.MaxGuildMessageSearchChannels, nameof(args.ChannelIds));
-            Preconditions.AtMostSize(args.AuthorIds, DiscordConfig.MaxGuildMessageSearchAuthors, nameof(args.AuthorIds));
-            Preconditions.AtMostSize(args.UserMentionIds, DiscordConfig.MaxGuildMessageSearchUserMentions, nameof(args.UserMentionIds));
-            Preconditions.AtMostSize(args.RoleMentionIds, DiscordConfig.MaxGuildMessageSearchRoleMentions, nameof(args.RoleMentionIds));
-            Preconditions.AtMostSize(args.RepliedToUserIds, DiscordConfig.MaxGuildMessageSearchReplyUserIds, nameof(args.RepliedToUserIds));
-            Preconditions.AtMostSize(args.RepliedToMessageIds, DiscordConfig.MaxGuildMessageSearchReplyMessageIds, nameof(args.RepliedToMessageIds));
+            Preconditions.AtMostLength(args.Content, DiscordConfig.MaxGuildMessageSearchContentLength, nameof(args.Content));
+            Preconditions.AtMostLength(args.ChannelIds, DiscordConfig.MaxGuildMessageSearchChannels, nameof(args.ChannelIds));
+            Preconditions.AtMostLength(args.AuthorIds, DiscordConfig.MaxGuildMessageSearchAuthors, nameof(args.AuthorIds));
+            Preconditions.AtMostLength(args.UserMentionIds, DiscordConfig.MaxGuildMessageSearchUserMentions, nameof(args.UserMentionIds));
+            Preconditions.AtMostLength(args.RoleMentionIds, DiscordConfig.MaxGuildMessageSearchRoleMentions, nameof(args.RoleMentionIds));
+            Preconditions.AtMostLength(args.RepliedToUserIds, DiscordConfig.MaxGuildMessageSearchReplyUserIds, nameof(args.RepliedToUserIds));
+            Preconditions.AtMostLength(args.RepliedToMessageIds, DiscordConfig.MaxGuildMessageSearchReplyMessageIds, nameof(args.RepliedToMessageIds));
 
             options = RequestOptions.CreateOrClone(options);
 
@@ -1808,8 +1808,6 @@ namespace Discord.API
                 endpointQueryParams.Append($"&sort_by={sortAlgorithm}");
             if (args.IncludeNsfw.IsSpecified)
                 endpointQueryParams.Append($"&include_nsfw={(args.IncludeNsfw.Value ? "true" : "false")}");
-
-            Console.WriteLine($"ENDPOINT: guilds/{guildId}/messages/search?{endpointQueryParams}");
 
             var ids = new BucketIds(guildId: guildId);
             Expression<Func<string>> endpoint = () => $"guilds/{guildId}/messages/search?{endpointQueryParams}";

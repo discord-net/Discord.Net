@@ -185,12 +185,9 @@ namespace Discord.Rest
 
             var builder = ImmutableArray.CreateBuilder<RestMessage>();
             if (model.ParseMessages)
-                foreach (var msg in model.Messages)
-                {
-                    var author = MessageHelper.GetAuthor(client, guild, msg.Author.Value, msg.WebhookId.ToNullable());
-                    var channel = GetChannelAsync(guild, client, msg.ChannelId, options).Result;
-                    builder.Add(RestMessage.Create(client, channel as IMessageChannel, author, msg));
-                }
+                builder.AddRange(await Task.WhenAll(
+                    model.Messages.Select(ParseMessage)
+                ));
 
             return new GuildMessageSearchData
             {
@@ -199,6 +196,19 @@ namespace Discord.Rest
                 TotalResults = model.TotalResults,
                 Messages = builder.ToImmutable(),
             };
+
+            async Task<RestMessage> ParseMessage(Message msg)
+            {
+                var authorTask = guild.GetUserAsync(msg.Author.Value.Id, options: options);
+                var channelTask = guild.GetChannelAsync(msg.ChannelId, options: options);
+
+                await Task.WhenAll(authorTask, channelTask);
+
+                var author = await authorTask;
+                var channel = await channelTask;
+
+                return RestMessage.Create(client, channel as IMessageChannel, author, msg);
+            }
         }
 
         #endregion
