@@ -778,6 +778,43 @@ namespace Discord.API
 
             return SendJsonAsync("PATCH", () => $"guilds/{guildId}/voice-states/{userId}", args, bucket, options: options);
         }
+
+        public async Task<VoiceState> GetMyVoiceStateAsync(ulong guildId, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+
+            options = RequestOptions.CreateOrClone(options);
+
+            var bucket = new BucketIds(guildId: guildId);
+
+            try
+            {
+                return await SendAsync<VoiceState>("GET", () => $"guilds/{guildId}/voice-states/@me", bucket, options: options).ConfigureAwait(false);
+            }
+            catch (HttpException ex) when (ex.HttpCode == HttpStatusCode.NotFound)
+            {
+                return null;
+            }
+        }
+
+        public async Task<VoiceState> GetUserVoiceStateAsync(ulong guildId, ulong userId, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+            Preconditions.NotEqual(userId, 0, nameof(userId));
+
+            options = RequestOptions.CreateOrClone(options);
+
+            var bucket = new BucketIds(guildId: guildId);
+
+            try
+            {
+                return await SendAsync<VoiceState>("GET", () => $"guilds/{guildId}/voice-states/{userId}", bucket, options: options).ConfigureAwait(false);
+            }
+            catch (HttpException ex) when (ex.HttpCode == HttpStatusCode.NotFound)
+            {
+                return null;
+            }
+        }
         #endregion
 
         #region Roles

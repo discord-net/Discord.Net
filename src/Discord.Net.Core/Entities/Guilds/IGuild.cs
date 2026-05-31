@@ -1481,5 +1481,26 @@ namespace Discord
         ///     Modifies the current user in this guild.
         /// </summary>
         Task ModifyCurrentUserAsync(Action<SelfGuildUserProperties> props, RequestOptions options = null);
+
+        /// <summary>
+        ///     Gets the current user's voice state in this guild.
+        /// </summary>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains the current user's
+        ///     <see cref="IVoiceState"/>, or <see langword="null"/> if the current user is not in any voice channel of this guild.
+        /// </returns>
+        public Task<IVoiceState> GetMyVoiceStateAsync(RequestOptions options = null);
+
+        /// <summary>
+        ///     Gets the voice state of the specified user in this guild.
+        /// </summary>
+        /// <param name="userId">The snowflake of the user.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains the user's
+        ///     <see cref="IVoiceState"/>, or <see langword="null"/> if the user is not in any voice channel of this guild.
+        /// </returns>
+        public Task<IVoiceState> GetUserVoiceStateAsync(ulong userId, RequestOptions options = null);
     }
 }

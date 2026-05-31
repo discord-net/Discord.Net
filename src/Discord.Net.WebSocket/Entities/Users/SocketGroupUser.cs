@@ -93,6 +93,8 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         IVoiceChannel IVoiceState.VoiceChannel => null;
         /// <inheritdoc />
+        ulong? IVoiceState.VoiceChannelId => null;
+        /// <inheritdoc />
         string IVoiceState.VoiceSessionId => null;
         /// <inheritdoc />
         bool IVoiceState.IsStreaming => false;

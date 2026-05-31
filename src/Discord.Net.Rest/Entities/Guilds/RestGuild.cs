@@ -844,6 +844,17 @@ namespace Discord.Rest
             => GuildHelper.GetVoiceRegionsAsync(this, Discord, options);
         #endregion
 
+        #region Voice States
+
+        /// <inheritdoc cref="IGuild.GetMyVoiceStateAsync"/>
+        public Task<RestVoiceState> GetMyVoiceStateAsync(RequestOptions options = null)
+            => GuildHelper.GetMyVoiceStateAsync(this, Discord, options);
+
+        /// <inheritdoc cref="IGuild.GetUserVoiceStateAsync"/>
+        public Task<RestVoiceState> GetUserVoiceStateAsync(ulong userId, RequestOptions options = null)
+            => GuildHelper.GetUserVoiceStateAsync(this, Discord, userId, options);
+        #endregion
+
         #region Integrations
         public Task<IReadOnlyCollection<RestIntegration>> GetIntegrationsAsync(RequestOptions options = null)
             => GuildHelper.GetIntegrationsAsync(this, Discord, options);
@@ -1779,6 +1790,14 @@ namespace Discord.Rest
         /// <inheritdoc/>
         async Task<IGuildOnboarding> IGuild.ModifyOnboardingAsync(Action<GuildOnboardingProperties> props, RequestOptions options)
             => await ModifyOnboardingAsync(props, options);
+
+        /// <inheritdoc/>
+        async Task<IVoiceState> IGuild.GetUserVoiceStateAsync(ulong userId, RequestOptions options)
+            => await GetUserVoiceStateAsync(userId, options).ConfigureAwait(false);
+
+        /// <inheritdoc/>
+        async Task<IVoiceState> IGuild.GetMyVoiceStateAsync(RequestOptions options)
+            => await GetMyVoiceStateAsync(options).ConfigureAwait(false);
 
         #endregion
     }

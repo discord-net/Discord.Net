@@ -564,6 +564,20 @@ namespace Discord.Rest
         }
         #endregion
 
+        #region Voice States
+        public static async Task<RestVoiceState> GetMyVoiceStateAsync(IGuild guild, BaseDiscordClient client, RequestOptions options)
+        {
+            var model = await client.ApiClient.GetMyVoiceStateAsync(guild.Id, options).ConfigureAwait(false);
+            return model is null ? null : RestVoiceState.Create(client, guild, model);
+        }
+
+        public static async Task<RestVoiceState> GetUserVoiceStateAsync(IGuild guild, BaseDiscordClient client, ulong userId, RequestOptions options)
+        {
+            var model = await client.ApiClient.GetUserVoiceStateAsync(guild.Id, userId, options).ConfigureAwait(false);
+            return model is null ? null : RestVoiceState.Create(client, guild, model);
+        }
+        #endregion
+
         #region Integrations
         public static async Task<IReadOnlyCollection<RestIntegration>> GetIntegrationsAsync(IGuild guild, BaseDiscordClient client,
             RequestOptions options)
