@@ -8,12 +8,18 @@ namespace Discord.Rest
     ///     Represents a snapshot of a user's voice state in a guild, fetched via REST.
     /// </summary>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    public class RestVoiceState : RestEntity<ulong>
+    public class RestVoiceState : RestEntity<ulong>, IVoiceState
     {
         /// <summary>
         ///     Gets the guild this voice state is for.
         /// </summary>
         public IGuild Guild { get; }
+
+        /// <inheritdoc />
+        /// <remarks>
+        ///     This property will always be null for a REST voice state, as the voice channel is not included in the payload.
+        /// </remarks>
+        public IVoiceChannel VoiceChannel { get; private set; }
 
         /// <summary>
         ///     Gets the snowflake of the voice channel the user is currently in,
@@ -81,6 +87,7 @@ namespace Discord.Rest
 
         internal void Update(Model model)
         {
+            VoiceChannel = null;
             VoiceChannelId = model.ChannelId;
             VoiceSessionId = model.SessionId;
             IsDeafened = model.Deaf;
