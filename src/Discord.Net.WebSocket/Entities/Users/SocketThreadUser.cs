@@ -148,6 +148,10 @@ namespace Discord.WebSocket
             => GuildUser.VoiceChannel;
 
         /// <inheritdoc/>
+        public ulong? VoiceChannelId
+            => GuildUser.VoiceChannelId;
+
+        /// <inheritdoc/>
         public string VoiceSessionId
             => GuildUser.VoiceSessionId;
 

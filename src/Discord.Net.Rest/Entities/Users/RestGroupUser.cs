@@ -37,6 +37,8 @@ namespace Discord.Rest
         /// <inheritdoc />
         IVoiceChannel IVoiceState.VoiceChannel => null;
         /// <inheritdoc />
+        ulong? IVoiceState.VoiceChannelId => null;
+        /// <inheritdoc />
         string IVoiceState.VoiceSessionId => null;
         /// <inheritdoc />
         bool IVoiceState.IsStreaming => false;

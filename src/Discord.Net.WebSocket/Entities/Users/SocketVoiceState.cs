@@ -34,6 +34,10 @@ namespace Discord.WebSocket
         ///     Gets the voice channel that the user is currently in; or <see langword="null" /> if none.
         /// </summary>
         public SocketVoiceChannel VoiceChannel { get; }
+
+        /// <inheritdoc />
+        public ulong? VoiceChannelId { get; }
+
         /// <inheritdoc />
         public string VoiceSessionId { get; }
         /// <inheritdoc/>
@@ -58,6 +62,7 @@ namespace Discord.WebSocket
         internal SocketVoiceState(SocketVoiceChannel voiceChannel, DateTimeOffset? requestToSpeak, string sessionId, bool isSelfMuted, bool isSelfDeafened, bool isMuted, bool isDeafened, bool isSuppressed, bool isStream, bool isVideo)
         {
             VoiceChannel = voiceChannel;
+            VoiceChannelId = voiceChannel.Id;
             VoiceSessionId = sessionId;
             RequestToSpeakTimestamp = requestToSpeak;
 
