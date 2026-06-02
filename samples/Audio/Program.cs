@@ -7,11 +7,18 @@ namespace Audio;
 
 internal class Program
 {
-    private static DiscordSocketClient _client;
+    private static DiscordSocketClient _client = null!;
 
     static async Task Main(string[] args)
     {
-        await Utils.DownloadBinariesAsync();
+        using (AudioSetupHandler audioSetup = new AudioSetupHandler())
+        {
+            if (!await audioSetup.PrepareAsync())
+            {
+                Console.WriteLine("The setup process was cancelled by the user. The files required to continue are not available, so execution will be terminated.");
+                return;
+            }
+        }
 
         _client = new DiscordSocketClient(new DiscordSocketConfig
         {
@@ -71,7 +78,7 @@ internal class Program
         const string audioUrl = "https://dn720306.ca.archive.org/0/items/S8_18/Gotye%20-%20Somebody%20That%20I%20Used%20To%20Know%20%28feat.%20Kimbra%29%20-%20official%20video.mp3";
         Process ffmpeg = Process.Start(new ProcessStartInfo
         {
-            FileName = Utils.FfmpegFileName,
+            FileName = "ffmpeg",
             Arguments = $"-i {audioUrl} -ac 2 -f s16le -ar 48000 pipe:1",
             RedirectStandardOutput = true,
             CreateNoWindow = true
