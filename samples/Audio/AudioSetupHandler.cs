@@ -26,7 +26,8 @@ internal class AudioSetupHandler : IDisposable
 
         return await DownloadFfmpegIfNotExists()
             && await DownloadLibDaveIfNotExists()
-            && await DownloadOpusIfNotExists();
+            && await DownloadOpusIfNotExists()
+            && await DownloadLibsodiumIfNotExists();
     }
 
     private async Task<bool> DownloadFfmpegIfNotExists()
@@ -191,28 +192,57 @@ internal class AudioSetupHandler : IDisposable
         await stream.CopyToAsync(file);
 
         return true;
-
-        /*
-        if (File.Exists(OpusFileName) && File.Exists(SodiumFileName))
-            return true;
-
-        using Stream stream = await _httpClient.GetStreamAsync(OpusDownloadUrl);
-        using ZipArchive zip = new ZipArchive(stream, ZipArchiveMode.Read);
-
-        if (!File.Exists(OpusFileName))
-        {
-            ZipArchiveEntry opusEntry = zip.Entries.First(entry => entry.Name.EndsWith(OpusFileName));
-            await opusEntry.ExtractToFileAsync(OpusFileName, true);
-        }
-
-        if (!File.Exists(SodiumFileName))
-        {
-            ZipArchiveEntry sodiumEntry = zip.GetEntry(SodiumFileName)!;
-            await sodiumEntry.ExtractToFileAsync(SodiumFileName, true);
-        }*/
-    }
+    }    
 
     private (string fileName, string downloadUrl) GetOpusReleaseInfo()
+    {
+        const string baseUrl = "https://github.com/AvionBlock/OpusSharp/raw/refs/heads/master/OpusSharp.Natives/runtimes/";
+        string fileName;
+        string os;
+        string architecture;
+
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        {
+            os = "linux";
+            fileName = "opus.so";
+        }
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        {
+            os = "osx";
+            fileName = "opus.dylib";
+        }
+        else
+        {
+            os = "win";
+            fileName = "opus.dll";
+        }
+
+        if (RuntimeInformation.OSArchitecture == Architecture.Arm64)
+            architecture = "arm64";
+        else
+            architecture = "x64";
+
+        return (fileName, $"{baseUrl}{os}-{architecture}/native/{fileName}");
+    }
+
+    private async Task<bool> DownloadLibsodiumIfNotExists()
+    {
+        (string filename, string downloadUrl) = GetLibsodiumReleaseInfo();
+
+        if (File.Exists(filename))
+            return true;
+
+        if (!RequestUserPermission("Libsodium", downloadUrl))
+            return false;
+
+        using Stream stream = await _httpClient.GetStreamAsync(downloadUrl);
+        using FileStream file = File.Create(filename);
+        await stream.CopyToAsync(file);
+
+        return true;
+    }
+
+    private (string fileName, string downloadUrl) GetLibsodiumReleaseInfo()
     {
         const string baseUrl = "https://github.com/AvionBlock/OpusSharp/raw/refs/heads/master/OpusSharp.Natives/runtimes/";
         string fileName;

@@ -75,7 +75,7 @@ internal class Program
 
     private static async Task PlayAudioAsync(IAudioClient audioClient)
     {
-        const string audioUrl = "https://dn720306.ca.archive.org/0/items/S8_18/Gotye%20-%20Somebody%20That%20I%20Used%20To%20Know%20%28feat.%20Kimbra%29%20-%20official%20video.mp3";
+        const string audioUrl = "https://github.com/ShivamJoker/sample-songs/raw/refs/heads/master/Faded.mp3";
         Process ffmpeg = Process.Start(new ProcessStartInfo
         {
             FileName = "ffmpeg",
