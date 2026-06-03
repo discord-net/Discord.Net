@@ -227,42 +227,44 @@ internal class AudioSetupHandler : IDisposable
 
     private async Task<bool> DownloadLibsodiumIfNotExists()
     {
-        (string filename, string downloadUrl) = GetLibsodiumReleaseInfo();
+        const string downloadUrl = "https://www.nuget.org/api/v2/package/libsodium";
+        (string zipFolderName, string fileName) = GetLibsodiumFileInfo();
 
-        if (File.Exists(filename))
+        if (File.Exists(fileName))
             return true;
 
         if (!RequestUserPermission("Libsodium", downloadUrl))
             return false;
 
+        string zipFolderPath = $"runtimes/{zipFolderName}/native";
         using Stream stream = await _httpClient.GetStreamAsync(downloadUrl);
-        using FileStream file = File.Create(filename);
-        await stream.CopyToAsync(file);
+        using ZipArchive zip = new ZipArchive(stream, ZipArchiveMode.Read);
+        ZipArchiveEntry libsodiumEntry = zip.Entries.First(entry => entry.FullName.StartsWith(zipFolderPath));
+        await libsodiumEntry.ExtractToFileAsync(libsodiumEntry.Name, true);
 
         return true;
     }
 
-    private (string fileName, string downloadUrl) GetLibsodiumReleaseInfo()
+    private (string zipFolderName, string fileName) GetLibsodiumFileInfo()
     {
-        const string baseUrl = "https://github.com/AvionBlock/OpusSharp/raw/refs/heads/master/OpusSharp.Natives/runtimes/";
         string fileName;
         string os;
         string architecture;
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
         {
+            fileName = "libsodium.so";
             os = "linux";
-            fileName = "opus.so";
         }
         else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
         {
+            fileName = "libsodium.dylib";
             os = "osx";
-            fileName = "opus.dylib";
         }
         else
         {
+            fileName = "libsodium.dll";
             os = "win";
-            fileName = "opus.dll";
         }
 
         if (RuntimeInformation.OSArchitecture == Architecture.Arm64)
@@ -270,7 +272,7 @@ internal class AudioSetupHandler : IDisposable
         else
             architecture = "x64";
 
-        return (fileName, $"{baseUrl}{os}-{architecture}/native/{fileName}");
+        return ($"{os}-{architecture}", fileName);
     }
 
     private bool RequestUserPermission(string binaryName, string downloadUrl)
@@ -285,7 +287,7 @@ internal class AudioSetupHandler : IDisposable
             if (response.Key == ConsoleKey.Y)
             {
                 allowed = true;
-                Console.WriteLine();
+                Console.WriteLine($"Downloading {binaryName}...");
             }
             else if (response.Key == ConsoleKey.N)
             {

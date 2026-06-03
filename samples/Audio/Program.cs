@@ -36,8 +36,14 @@ internal class Program
 
     private static async Task OnReadyAsync()
     {
-        SocketGuild guild = _client.GetGuild(ulong.Parse(Environment.GetEnvironmentVariable("guildId")));
-        SocketVoiceChannel voiceChannel = guild.GetVoiceChannel(ulong.Parse(Environment.GetEnvironmentVariable("channelId")));
+        if (!ulong.TryParse(Environment.GetEnvironmentVariable("guildId"), out ulong guildId))
+            throw new Exception("Guild id was not found");
+
+        if (!ulong.TryParse(Environment.GetEnvironmentVariable("channelId"), out ulong channelId))
+            throw new Exception("Channel id was not found");
+
+        SocketGuild guild = _client.GetGuild(guildId);
+        SocketVoiceChannel voiceChannel = guild.GetVoiceChannel(channelId);
         IAudioClient audioClient = await voiceChannel.ConnectAsync(selfDeaf: false, selfMute: false, external: false);
 
         audioClient.Connected += () =>
