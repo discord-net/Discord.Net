@@ -7,6 +7,9 @@ namespace Audio.Dependencies
 {
     internal sealed class Ffmpeg : Dependency
     {
+        private const string GithubRepositoryReleaseBaseUrl = "https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest";
+        private const string OsxDownloadUrl = "https://evermeet.cx/ffmpeg/getrelease/zip";
+
         public override string Name => "Ffmpeg";
 
         public override string DownloadUrl { get; }
@@ -22,11 +25,10 @@ namespace Audio.Dependencies
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
-                downloadUrl = "https://evermeet.cx/ffmpeg/getrelease/zip";
+                downloadUrl = OsxDownloadUrl;
             }
             else
             {
-                const string baseUrl = "https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest";
                 string platform;
                 string fileExtension;
 
@@ -44,7 +46,7 @@ namespace Audio.Dependencies
                 if (RuntimeInformation.OSArchitecture == Architecture.Arm64)
                     platform += "arm";
 
-                downloadUrl = $"{baseUrl}-{platform}64-gpl.{fileExtension}";
+                downloadUrl = $"{GithubRepositoryReleaseBaseUrl}-{platform}64-gpl.{fileExtension}";
             }
 
             return downloadUrl;
@@ -77,6 +79,32 @@ namespace Audio.Dependencies
             return installed;
         }
 
+        /// <summary>
+        /// Downloads the FFmpeg binary for the current platform and extracts it to the working directory.
+        /// </summary>
+        /// <param name="httpClient">
+        /// The <see cref="System.Net.Http.HttpClient"/> instance used to perform the HTTP request.
+        /// </param>
+        /// <returns>A task that represents the asynchronous download and extraction operation.</returns>
+        /// <remarks>
+        /// The download source depends on the current platform:
+        /// <list type="bullet">
+        ///   <item>
+        ///     <description>
+        ///       <b>macOS</b> — Downloaded from <see href="https://evermeet.cx/ffmpeg/getrelease/zip">evermeet.cx</see>,
+        ///       a third-party site that provides up-to-date static FFmpeg builds for macOS as a ZIP.
+        ///     </description>
+        ///   </item>
+        ///   <item>
+        ///     <description>
+        ///       <b>Windows / Linux</b> — Downloaded from
+        ///       <see href="https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest">BtbN/FFmpeg-Builds</see>,
+        ///       a GitHub repository that publishes automated GPL-licensed FFmpeg builds for multiple
+        ///       platforms and architectures.
+        ///     </description>
+        ///   </item>
+        /// </list>
+        /// </remarks>
         public override async Task DownloadAsync(HttpClient httpClient)
         {
             using Stream stream = await httpClient.GetStreamAsync(DownloadUrl);

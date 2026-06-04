@@ -52,6 +52,19 @@ namespace Audio.Dependencies
             return File.Exists(FileName);
         }
 
+        /// <summary>
+        /// Downloads the Libsodium native binary for the current platform and extracts it to the working directory.
+        /// </summary>
+        /// <param name="httpClient">
+        /// The <see cref="System.Net.Http.HttpClient"/> instance used to perform the HTTP request.
+        /// </param>
+        /// <returns>A task that represents the asynchronous download and extraction operation.</returns>
+        /// <remarks>
+        /// The binary is fetched from
+        /// <see href="https://www.nuget.org/packages/libsodium">libsodium on NuGet</see>,
+        /// the official NuGet package for the libsodium cryptography library.
+        /// That package is a ZIP archive that bundle prebuilt native binaries for all platforms.
+        /// </remarks>
         public override async Task DownloadAsync(HttpClient httpClient)
         {
             string zipFolderPath = $"runtimes/{ZipFolderName}/native";

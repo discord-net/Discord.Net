@@ -51,13 +51,25 @@ namespace Audio.Dependencies
             return File.Exists(FileName);
         }
 
+        /// <summary>
+        /// Downloads the LibDave native binary for the current platform and extracts it to the working directory.
+        /// </summary>
+        /// <param name="httpClient">
+        /// The <see cref="System.Net.Http.HttpClient"/> instance used to perform the HTTP request.
+        /// </param>
+        /// <returns>A task that represents the asynchronous download and extraction operation.</returns>
+        /// <remarks>
+        /// The binary is fetched as a ZIP from
+        /// <see href="https://github.com/discord/libdave/releases/latest">discord/libdave</see>,
+        /// Discord's official GitHub repository for their end-to-end encryption library.
+        /// Only the native library file is extracted from the archive; the rest is discarded.
+        /// </remarks>
         public override async Task DownloadAsync(HttpClient httpClient)
         {
-            string zipFolderPath = $"runtimes/{ZipFolderName}/native";
             using Stream stream = await httpClient.GetStreamAsync(DownloadUrl);
             using ZipArchive zip = new ZipArchive(stream, ZipArchiveMode.Read);
-            ZipArchiveEntry libsodiumEntry = zip.Entries.First(entry => entry.FullName.StartsWith(zipFolderPath));
-            await libsodiumEntry.ExtractToFileAsync(libsodiumEntry.Name, true);
+            ZipArchiveEntry libDaveEntry = zip.Entries.First(entry => entry.Name == FileName);
+            await libDaveEntry.ExtractToFileAsync(libDaveEntry.Name, true);
         }
     }
 }

@@ -1,16 +1,24 @@
 using Audio.Dependencies;
-using SharpCompress.Readers;
-using System.Diagnostics;
-using System.IO.Compression;
 using System.Runtime.InteropServices;
 
 namespace Audio;
 
-internal class AudioSetupHandler : IDisposable
+internal class AudioSetupHandler
 {
     private static readonly OSPlatform[] SupportedPlatforms = [OSPlatform.Linux, OSPlatform.OSX, OSPlatform.Windows];
     private static readonly Dependency[] AllDependencies = [new Ffmpeg(), new LibDave(), new Libsodium(), new Opus()];
 
+    /// <summary>
+    /// Prepares the environment by verifying platform compatibility and installing any missing dependencies.
+    /// </summary>
+    /// <returns>
+    /// A task that represents the asynchronous operation. The task result is <c>true</c> if all dependencies
+    /// are already installed or were successfully downloaded; <c>false</c> if the user denied permission
+    /// to install the missing dependencies.
+    /// </returns>
+    /// <exception cref="PlatformNotSupportedException">
+    /// Thrown when the current operating system is not among the supported platforms.
+    /// </exception>
     public async Task<bool> PrepareAsync()
     {
         if (!SupportedPlatforms.Any(RuntimeInformation.IsOSPlatform))
@@ -26,7 +34,7 @@ internal class AudioSetupHandler : IDisposable
         if (!RequestUserPermission(dependenciesToInstall))
             return false;
 
-        HttpClient httpClient = new HttpClient();
+        using HttpClient httpClient = new HttpClient();
         IEnumerable<Task> installTasks = dependenciesToInstall
             .Select(dependency => dependency.DownloadAsync(httpClient));
 
@@ -35,15 +43,17 @@ internal class AudioSetupHandler : IDisposable
         return true;
     }
 
-    private bool RequestUserPermission(IEnumerable<Dependency> dependencies)
+    private bool RequestUserPermission(Dependency[] dependencies)
     {
         bool? allowed = null;
-        Console.WriteLine($"{binaryName} was not found. It will be downloaded from {downloadUrl}. Do you agree? (Y/N)");
+        Console.WriteLine($"The following {dependencies.Length} external dependencies need to be installed:");
 
         foreach (Dependency dependency in dependencies)
         {
-            Console.WriteLine($"- {dependency.Name} from {dependency.DownloadUrl}");
+            Console.WriteLine($"  - {dependency.Name} from {dependency.DownloadUrl}");
         }
+
+        Console.WriteLine("Do you agree? (Y/N)");
 
         while (allowed is null)
         {
@@ -52,7 +62,7 @@ internal class AudioSetupHandler : IDisposable
             if (response.Key == ConsoleKey.Y)
             {
                 allowed = true;
-                Console.WriteLine("Downloading dependencies...");
+                Console.WriteLine("\nDownloading dependencies...");
             }
             else if (response.Key == ConsoleKey.N)
             {
@@ -66,10 +76,5 @@ internal class AudioSetupHandler : IDisposable
         }
 
         return allowed.Value;
-    }
-
-    public void Dispose()
-    {
-        _httpClient.Dispose();
     }
 }

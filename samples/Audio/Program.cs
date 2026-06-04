@@ -11,13 +11,12 @@ internal class Program
 
     static async Task Main(string[] args)
     {
-        using (AudioSetupHandler audioSetup = new AudioSetupHandler())
+        AudioSetupHandler audioSetup = new AudioSetupHandler();
+
+        if (!await audioSetup.PrepareAsync())
         {
-            if (!await audioSetup.PrepareAsync())
-            {
-                Console.WriteLine("The setup process was cancelled by the user. The files required to continue are not available, so execution will be terminated.");
-                return;
-            }
+            Console.WriteLine("The setup process was cancelled by the user. The files required to continue are not available, so execution will be terminated.");
+            return;
         }
 
         _client = new DiscordSocketClient(new DiscordSocketConfig
