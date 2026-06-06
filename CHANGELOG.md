@@ -1,5 +1,28 @@
 # Changelog
 
+## [3.20.0] - 2026-06-36
+### Added
+- #3232 IF modal radio buttons, and checkboxes (c95fbf6)
+- #3268 add support for getting messages from a guild (with filters) (31fed25)
+- #3255 add missing audit log action types (4476eea)
+- #3265 Add GET voice-state REST wrappers (13d83da)
+
+### Fixed
+- #3258 propagate parent module attributes to child commands (cbc61d9)
+- #3263 strip RTP padding before DAVE decrypt (RFC 3550 В§5.1) (1a843fb)
+- #3256 Add empty payload check (6527e71)
+- #3264 Fix reference to PreCompiledLambdas/UseCompiledLambda (763aa79)
+- #3271 fix for #3269 (9abfbfd)
+- #3272 Fix default array converter in modals & add docs for checkboxes/radio groups (527764c)
+
+### Misc
+- #3254 user `global_name` description (05af64b)
+- #3257 feat(Core): add missing JSON error codes (4272ae1)
+- #3259 refactor(Core): rename JSON error code (504e1db)
+- #3261 Message call data timestamp nullability (5a328a0)
+- #3266 Add play audio sample (4d8b0bc)
+
+
 ## [3.19.1] - 2026-03-12
 ### Added
 - #3226 Added Community Invites (9bb0e06)
