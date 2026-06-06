@@ -1,6 +1,6 @@
 # Changelog
 
-## [3.20.0] - 2026-06-36
+## [3.20.0] - 2026-06-06
 ### Added
 - #3232 IF modal radio buttons, and checkboxes (c95fbf6)
 - #3268 add support for getting messages from a guild (with filters) (31fed25)
