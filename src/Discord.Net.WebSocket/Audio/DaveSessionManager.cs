@@ -144,7 +144,7 @@ internal sealed class DaveSessionManager : IDisposable
         if (welcomeResult.IsNull)
         {
             await SendMLSInvalidCommitWelcomeAsync(transitionId);
-            await HandleDaveProtocolInitAsync(transitionId);
+            await HandleDaveProtocolInitAsync(_session.ProtocolVersion);
         }
         else
         {
@@ -188,10 +188,7 @@ internal sealed class DaveSessionManager : IDisposable
             );
 
             await SendMLSInvalidCommitWelcomeAsync(transitionId);
-            using var keyPackage = _session.GetMarshalledKeyPackage();
-            await SendMLSKeyPackageAsync(keyPackage.ToMemory());
-
-            await HandleDaveProtocolInitAsync(transitionId);
+            await HandleDaveProtocolInitAsync(_session.ProtocolVersion);
 
             return;
         }
@@ -215,10 +212,7 @@ internal sealed class DaveSessionManager : IDisposable
             );
 
             await SendMLSInvalidCommitWelcomeAsync(transitionId);
-            using var keyPackage = _session.GetMarshalledKeyPackage();
-            await SendMLSKeyPackageAsync(keyPackage.ToMemory());
-
-            await HandleDaveProtocolInitAsync(transitionId);
+            await HandleDaveProtocolInitAsync(_session.ProtocolVersion);
         }
         else
         {
@@ -245,17 +239,20 @@ internal sealed class DaveSessionManager : IDisposable
 
         UpdateEncryptorRatchet(protocolVersion);
 
-        if (transitionId is Dave.InitTransitionId)
+        if (protocolVersion > Dave.DisabledProtocolVersion)
         {
             // Streams created before DAVE was initialized lack the DaveDecryptStream layer.
             // Rebuild them now that keys are ready.
             await _client.RebuildInputStreamsForDaveAsync();
         }
-        else
+
+        if (transitionId is Dave.InitTransitionId)
         {
-            _preparedTransitions[transitionId] = protocolVersion;
-            await SendDaveProtocolReadyForTransitionAsync(transitionId);
+            return;
         }
+
+        _preparedTransitions[transitionId] = protocolVersion;
+        await SendDaveProtocolReadyForTransitionAsync(transitionId);
     }
 
     public async Task HandleDaveProtocolInitAsync(ushort protocolVersion)
