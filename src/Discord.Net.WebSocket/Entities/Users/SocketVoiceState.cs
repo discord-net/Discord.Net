@@ -62,7 +62,7 @@ namespace Discord.WebSocket
         internal SocketVoiceState(SocketVoiceChannel voiceChannel, DateTimeOffset? requestToSpeak, string sessionId, bool isSelfMuted, bool isSelfDeafened, bool isMuted, bool isDeafened, bool isSuppressed, bool isStream, bool isVideo)
         {
             VoiceChannel = voiceChannel;
-            VoiceChannelId = voiceChannel.Id;
+            VoiceChannelId = voiceChannel?.Id;
             VoiceSessionId = sessionId;
             RequestToSpeakTimestamp = requestToSpeak;
 
