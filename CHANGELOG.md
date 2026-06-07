@@ -1,5 +1,10 @@
 # Changelog
 
+## [3.20.1] - 2026-06-07
+### Fixed
+- #3276 Handle null VoiceChannel in SocketVoiceState constructor (61ed916)
+
+
 ## [3.20.0] - 2026-06-06
 ### Added
 - #3232 IF modal radio buttons, and checkboxes (c95fbf6)
