@@ -23,5 +23,16 @@ public enum AttachmentFlags
     /// <summary>
     ///     Indicates that this attachment has been edited using the remix feature on mobile.
     /// </summary>
+    [Obsolete("Discord's remix feature is deprecated.")]
     IsRemix = 1 << 2,
+
+    /// <summary>
+    ///     Hides the attachment behind a spoiler warning.
+    /// </summary>
+    IsSpoiler = 1 << 3,
+
+    /// <summary>
+    ///     Indicates that the attachment contains animated content.
+    /// </summary>
+    IsAnimated = 1 << 5,
 }

@@ -10,6 +10,6 @@ namespace Discord
         ///     Gets whether the message's attachments are spoilers or not.
         /// </summary>
         public static bool IsSpoiler(this IAttachment attachment)
-            => attachment.Filename.StartsWith(SpoilerPrefix);
+            => attachment.Filename.StartsWith(SpoilerPrefix) || attachment.Flags.HasFlag(AttachmentFlags.IsSpoiler);
     }
 }
