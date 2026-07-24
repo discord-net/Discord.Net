@@ -70,7 +70,7 @@ public class ContainerBuilder : IMessageComponentBuilder, IStaticComponentContai
     {
         Components = components?.ToList();
         AccentColor = accentColor;
-        IsSpoiler = IsSpoiler;
+        IsSpoiler = isSpoiler;
         Id = id;
     }
     
