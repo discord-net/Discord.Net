@@ -24,4 +24,9 @@ public enum ChannelFlags
     ///     Flag given to a media channel that hides the embedded media download options.
     /// </summary>
     HideMediaDownloadOption = 1 << 15,
+
+    /// <summary>
+    ///     Flag given to a channel that is marked as a spoiler channel, where users must opt in to view its contents.
+    /// </summary>
+    IsSpoilerChannel = 1 << 21,
 }
