@@ -43,9 +43,9 @@ internal class Program
 
     private static AudioMode SelectMode()
     {
-        Console.WriteLine("Selecciona el modo de audio:");
-        Console.WriteLine("[1] Reproducir");
-        Console.WriteLine("[2] Grabar");
+        Console.WriteLine("Select the audio mode:");
+        Console.WriteLine("[1] Play");
+        Console.WriteLine("[2] Record");
 
         ConsoleKey key = Console.ReadKey(true).Key;
 
