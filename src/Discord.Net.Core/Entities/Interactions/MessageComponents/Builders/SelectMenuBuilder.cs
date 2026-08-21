@@ -438,7 +438,17 @@ public class SelectMenuBuilder : IInteractableComponentBuilder
     {
         var options = Options?.Select(x => x.Build()).ToList();
 
-        return new SelectMenuComponent(CustomId, options, Placeholder, MinValues, MaxValues, IsRequired, IsDisabled, Type, Id, ChannelTypes, DefaultValues);
+        if (Type == ComponentType.SelectMenu)
+        {
+            if (options is null)
+                throw new ArgumentNullException(nameof(Options), "Options must have a value.");
+
+            Preconditions.AtLeast(options.Count, 1, nameof(Options));
+            Preconditions.AtMost(options.Count, MaxOptionCount, nameof(Options));
+        }
+
+        return new SelectMenuComponent(CustomId, options, Placeholder, MinValues, MaxValues, IsRequired, IsDisabled,
+            Type, Id, ChannelTypes, DefaultValues);
     }
 
     /// <inheritdoc/>
