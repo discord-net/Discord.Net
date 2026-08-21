@@ -438,6 +438,12 @@ public class SelectMenuBuilder : IInteractableComponentBuilder
     {
         var options = Options?.Select(x => x.Build()).ToList();
 
+        if (options == null)
+            throw new ArgumentNullException(nameof(Options), "Options must have a value.");
+
+        if (options.Count is 0 or > MaxOptionCount)
+            throw new ArgumentOutOfRangeException(nameof(Options), $"Number of select menu options must be in range [1, {MaxOptionCount}]");
+
         return new SelectMenuComponent(CustomId, options, Placeholder, MinValues, MaxValues, IsRequired, IsDisabled, Type, Id, ChannelTypes, DefaultValues);
     }
 
