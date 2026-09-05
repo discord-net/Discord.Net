@@ -155,7 +155,7 @@ namespace Discord.Rest
             {
                 PremiumTier.Tier2 => 50,
                 PremiumTier.Tier3 => 100,
-                _ => 25
+                _ => 20
             };
 
             // 1 << 20 = 2 pow 20
