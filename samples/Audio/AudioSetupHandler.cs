@@ -34,11 +34,15 @@ internal class AudioSetupHandler
         if (!RequestUserPermission(dependenciesToInstall))
             return false;
 
+        Console.WriteLine("Downloading dependencies...");
+
         using HttpClient httpClient = new HttpClient();
         IEnumerable<Task> installTasks = dependenciesToInstall
             .Select(dependency => dependency.DownloadAsync(httpClient));
 
         await Task.WhenAll(installTasks);
+
+        Console.WriteLine("All dependencies downloaded");
 
         return true;
     }
@@ -62,7 +66,7 @@ internal class AudioSetupHandler
             if (response.Key == ConsoleKey.Y)
             {
                 allowed = true;
-                Console.WriteLine("\nDownloading dependencies...");
+                Console.WriteLine();
             }
             else if (response.Key == ConsoleKey.N)
             {
