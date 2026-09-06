@@ -1,3 +1,4 @@
+using AsyncKeyedLock;
 using Newtonsoft.Json.Bson;
 using System;
 using System.Collections.Concurrent;
@@ -16,7 +17,7 @@ namespace Discord.Net.Queue
         public event Func<BucketId, RateLimitInfo?, string, Task> RateLimitTriggered;
 
         private readonly ConcurrentDictionary<BucketId, object> _buckets;
-        private readonly SemaphoreSlim _tokenLock;
+        private readonly AsyncNonKeyedLocker _tokenLock;
         private readonly CancellationTokenSource _cancelTokenSource; //Dispose token
         private CancellationTokenSource _clearToken;
         private CancellationToken _parentToken;
@@ -28,7 +29,7 @@ namespace Discord.Net.Queue
 
         public RequestQueue()
         {
-            _tokenLock = new SemaphoreSlim(1, 1);
+            _tokenLock = new();
 
             _clearToken = new CancellationTokenSource();
             _cancelTokenSource = new CancellationTokenSource();
@@ -42,29 +43,21 @@ namespace Discord.Net.Queue
 
         public async Task SetCancelTokenAsync(CancellationToken cancelToken)
         {
-            await _tokenLock.WaitAsync().ConfigureAwait(false);
-            try
-            {
-                _parentToken = cancelToken;
-                _requestCancelTokenSource?.Dispose();
-                _requestCancelTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancelToken, _clearToken.Token);
-                _requestCancelToken = _requestCancelTokenSource.Token;
-            }
-            finally { _tokenLock.Release(); }
+            using var _ = await _tokenLock.LockAsync().ConfigureAwait(false);
+            _parentToken = cancelToken;
+            _requestCancelTokenSource?.Dispose();
+            _requestCancelTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancelToken, _clearToken.Token);
+            _requestCancelToken = _requestCancelTokenSource.Token;
         }
         public async Task ClearAsync()
         {
-            await _tokenLock.WaitAsync().ConfigureAwait(false);
-            try
-            {
-                _clearToken?.Cancel();
-                _clearToken?.Dispose();
-                _clearToken = new CancellationTokenSource();
-                _requestCancelTokenSource?.Dispose();
-                _requestCancelTokenSource = CancellationTokenSource.CreateLinkedTokenSource(_clearToken.Token, _parentToken);
-                _requestCancelToken = _requestCancelTokenSource.Token;
-            }
-            finally { _tokenLock.Release(); }
+            using var _ = await _tokenLock.LockAsync().ConfigureAwait(false);
+            _clearToken?.Cancel();
+            _clearToken?.Dispose();
+            _clearToken = new CancellationTokenSource();
+            _requestCancelTokenSource?.Dispose();
+            _requestCancelTokenSource = CancellationTokenSource.CreateLinkedTokenSource(_clearToken.Token, _parentToken);
+            _requestCancelToken = _requestCancelTokenSource.Token;
         }
 
         public async Task<Stream> SendAsync(RestRequest request)

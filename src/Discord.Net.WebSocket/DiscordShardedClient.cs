@@ -1,3 +1,4 @@
+using AsyncKeyedLock;
 using Discord.API;
 using Discord.Rest;
 using System;
@@ -20,13 +21,7 @@ namespace Discord.WebSocket
         private DiscordSocketClient[] _shards;
         private ImmutableArray<StickerPack<SocketSticker>> _defaultStickers;
         private int _totalShards;
-        private SemaphoreSlim[] _identifySemaphores;
-#if NET9_0_OR_GREATER
-        private readonly Lock _semaphoreResetLock;
-#else
-        private readonly object _semaphoreResetLock;
-#endif
-        private Task _semaphoreResetTask;
+        private StripedAsyncKeyedLocker<int> _identifySemaphores;
 
         private bool _isDisposed;
 
@@ -84,7 +79,6 @@ namespace Discord.WebSocket
             if (ids != null && config.TotalShards == null)
                 throw new ArgumentException($"Custom ids are not supported when {nameof(config.TotalShards)} is not specified.");
 
-            _semaphoreResetLock = new();
             _shardIdsToIndex = new Dictionary<int, int>();
             config.DisplayInitialLog = false;
             _baseConfig = config;
@@ -97,9 +91,7 @@ namespace Discord.WebSocket
                 _totalShards = config.TotalShards.Value;
                 _shardIds = ids ?? Enumerable.Range(0, _totalShards).ToArray();
                 _shards = new DiscordSocketClient[_shardIds.Length];
-                _identifySemaphores = new SemaphoreSlim[config.IdentifyMaxConcurrency];
-                for (int i = 0; i < config.IdentifyMaxConcurrency; i++)
-                    _identifySemaphores[i] = new SemaphoreSlim(1, 1);
+                _identifySemaphores = new(config.IdentifyMaxConcurrency);
                 for (int i = 0; i < _shardIds.Length; i++)
                 {
                     _shardIdsToIndex.Add(_shardIds[i], i);
@@ -114,31 +106,9 @@ namespace Discord.WebSocket
             => new DiscordSocketApiClient(config.RestClientProvider, config.WebSocketProvider, DiscordRestConfig.UserAgent, config.GatewayHost,
                 useSystemClock: config.UseSystemClock, defaultRatelimitCallback: config.DefaultRatelimitCallback);
 
-        internal Task AcquireIdentifyLockAsync(int shardId, CancellationToken token)
+        internal ValueTask<IDisposable> AcquireIdentifyLockAsync(int shardId, bool condition, CancellationToken token)
         {
-            int semaphoreIdx = shardId % _baseConfig.IdentifyMaxConcurrency;
-            return _identifySemaphores[semaphoreIdx].WaitAsync(token);
-        }
-
-        internal void ReleaseIdentifyLock()
-        {
-            lock (_semaphoreResetLock)
-            {
-                if (_semaphoreResetTask == null)
-                    _semaphoreResetTask = ResetSemaphoresAsync();
-            }
-        }
-
-        private async Task ResetSemaphoresAsync()
-        {
-            await Task.Delay(5000).ConfigureAwait(false);
-            lock (_semaphoreResetLock)
-            {
-                foreach (var semaphore in _identifySemaphores)
-                    if (semaphore.CurrentCount == 0)
-                        semaphore.Release();
-                _semaphoreResetTask = null;
-            }
+            return _identifySemaphores.ConditionalLockAsync(shardId, condition, token);
         }
 
         internal override async Task OnLoginAsync(TokenType tokenType, string token)
@@ -151,9 +121,7 @@ namespace Discord.WebSocket
                 _shards = new DiscordSocketClient[_shardIds.Length];
                 int maxConcurrency = botGateway.SessionStartLimit.MaxConcurrency;
                 _baseConfig.IdentifyMaxConcurrency = maxConcurrency;
-                _identifySemaphores = new SemaphoreSlim[maxConcurrency];
-                for (int i = 0; i < maxConcurrency; i++)
-                    _identifySemaphores[i] = new SemaphoreSlim(1, 1);
+                _identifySemaphores = new(maxConcurrency);
                 for (int i = 0; i < _shardIds.Length; i++)
                 {
                     _shardIdsToIndex.Add(_shardIds[i], i);

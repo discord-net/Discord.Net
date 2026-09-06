@@ -1,3 +1,4 @@
+using AsyncKeyedLock;
 using Discord.API;
 using Discord.API.Gateway;
 using Discord.Logging;
@@ -5,10 +6,8 @@ using Discord.Net.Converters;
 using Discord.Net.Udp;
 using Discord.Net.WebSockets;
 using Discord.Rest;
-using Discord.Utils;
 
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 using System;
 using System.Collections.Concurrent;
@@ -36,7 +35,7 @@ namespace Discord.WebSocket
         private readonly ConcurrentQueue<long> _heartbeatTimes;
         private readonly ConnectionManager _connection;
         private readonly Logger _gatewayLogger;
-        private readonly SemaphoreSlim _stateLock;
+        private readonly AsyncNonKeyedLocker _stateLock;
 
         private string _sessionId;
         private int _lastSeq;
@@ -169,7 +168,7 @@ namespace Discord.WebSocket
             _gatewayIntents = config.GatewayIntents;
             _defaultStickers = ImmutableArray.Create<StickerPack<SocketSticker>>();
 
-            _stateLock = new SemaphoreSlim(1, 1);
+            _stateLock = new();
             _gatewayLogger = LogManager.CreateLogger(ShardId == 0 && TotalShards == 1 ? "Gateway" : $"Shard #{ShardId}");
             _connection = new ConnectionManager(_stateLock, _gatewayLogger, config.ConnectionTimeout,
                 OnConnectingAsync, OnDisconnectingAsync, x => ApiClient.Disconnected += x);
@@ -297,13 +296,7 @@ namespace Discord.WebSocket
 
         private async Task OnConnectingAsync()
         {
-            bool locked = false;
-            if (_shardedClient != null && _sessionId == null)
-            {
-                await _shardedClient.AcquireIdentifyLockAsync(ShardId, _connection.CancelToken).ConfigureAwait(false);
-                locked = true;
-            }
-            try
+            using (await _shardedClient.AcquireIdentifyLockAsync(ShardId, _shardedClient != null && _sessionId == null, _connection.CancelToken).ConfigureAwait(false))
             {
                 await _gatewayLogger.DebugAsync("Connecting ApiClient").ConfigureAwait(false);
                 await ApiClient.ConnectAsync().ConfigureAwait(false);
@@ -318,11 +311,6 @@ namespace Discord.WebSocket
                     await _gatewayLogger.DebugAsync("Identifying").ConfigureAwait(false);
                     await ApiClient.SendIdentifyAsync(shardID: ShardId, totalShards: TotalShards, gatewayIntents: _gatewayIntents, presence: BuildCurrentStatus()).ConfigureAwait(false);
                 }
-            }
-            finally
-            {
-                if (locked)
-                    _shardedClient.ReleaseIdentifyLock();
             }
 
             //Wait for READY

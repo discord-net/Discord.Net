@@ -1,3 +1,4 @@
+using AsyncKeyedLock;
 using Discord.Interactions.Builders;
 using Discord.Logging;
 using Discord.Rest;
@@ -100,7 +101,7 @@ namespace Discord.Interactions
         private readonly TypeMap<ModalComponentTypeConverter, IComponentInteractionData> _modalInputTypeConverterMap;
         private readonly ConcurrentDictionary<Type, IAutocompleteHandler> _autocompleteHandlers = new();
         private readonly ConcurrentDictionary<Type, ModalInfo> _modalInfos = new();
-        private readonly SemaphoreSlim _lock;
+        private readonly AsyncNonKeyedLocker _lock;
         internal readonly Logger _cmdLogger;
         internal readonly LogManager _logManager;
         internal readonly Func<DiscordRestClient> _getRestClient;
@@ -165,7 +166,7 @@ namespace Discord.Interactions
         {
             config ??= new InteractionServiceConfig();
 
-            _lock = new SemaphoreSlim(1, 1);
+            _lock = new();
             _typedModuleDefs = new ConcurrentDictionary<Type, ModuleInfo>();
             _moduleDefs = new HashSet<ModuleInfo>();
 
@@ -258,21 +259,14 @@ namespace Discord.Interactions
         {
             services ??= EmptyServiceProvider.Instance;
 
-            await _lock.WaitAsync().ConfigureAwait(false);
-            try
-            {
-                var builder = new ModuleBuilder(this, name);
-                buildFunc(builder);
+            using var _ = await _lock.LockAsync().ConfigureAwait(false);
+            var builder = new ModuleBuilder(this, name);
+            buildFunc(builder);
 
-                var moduleInfo = builder.Build(this, services);
-                LoadModuleInternal(moduleInfo);
+            var moduleInfo = builder.Build(this, services);
+            LoadModuleInternal(moduleInfo);
 
-                return moduleInfo;
-            }
-            finally
-            {
-                _lock.Release();
-            }
+            return moduleInfo;
         }
 
         /// <summary>
@@ -287,24 +281,16 @@ namespace Discord.Interactions
         {
             services ??= EmptyServiceProvider.Instance;
 
-            await _lock.WaitAsync().ConfigureAwait(false);
+            using var _ = await _lock.LockAsync().ConfigureAwait(false);
+            var types = await ModuleClassBuilder.SearchAsync(assembly, this);
+            var moduleDefs = await ModuleClassBuilder.BuildAsync(types, this, services);
 
-            try
+            foreach (var info in moduleDefs)
             {
-                var types = await ModuleClassBuilder.SearchAsync(assembly, this);
-                var moduleDefs = await ModuleClassBuilder.BuildAsync(types, this, services);
-
-                foreach (var info in moduleDefs)
-                {
-                    _typedModuleDefs[info.Key] = info.Value;
-                    LoadModuleInternal(info.Value);
-                }
-                return moduleDefs.Values;
+                _typedModuleDefs[info.Key] = info.Value;
+                LoadModuleInternal(info.Value);
             }
-            finally
-            {
-                _lock.Release();
-            }
+            return moduleDefs.Values;
         }
 
         /// <summary>
@@ -345,32 +331,24 @@ namespace Discord.Interactions
 
             services ??= EmptyServiceProvider.Instance;
 
-            await _lock.WaitAsync().ConfigureAwait(false);
+            using var _ = await _lock.LockAsync().ConfigureAwait(false);
+            var typeInfo = type.GetTypeInfo();
 
-            try
-            {
-                var typeInfo = type.GetTypeInfo();
+            if (_typedModuleDefs.ContainsKey(typeInfo))
+                throw new ArgumentException("Module definition for this type already exists.");
 
-                if (_typedModuleDefs.ContainsKey(typeInfo))
-                    throw new ArgumentException("Module definition for this type already exists.");
+            var moduleDef = (await ModuleClassBuilder.BuildAsync(new List<TypeInfo> { typeInfo }, this, services).ConfigureAwait(false)).FirstOrDefault();
 
-                var moduleDef = (await ModuleClassBuilder.BuildAsync(new List<TypeInfo> { typeInfo }, this, services).ConfigureAwait(false)).FirstOrDefault();
+            if (moduleDef.Value == default)
+                throw new InvalidOperationException($"Could not build the module {typeInfo.FullName}, did you pass an invalid type?");
 
-                if (moduleDef.Value == default)
-                    throw new InvalidOperationException($"Could not build the module {typeInfo.FullName}, did you pass an invalid type?");
+            if (!_typedModuleDefs.TryAdd(type, moduleDef.Value))
+                throw new ArgumentException("Module definition for this type already exists.");
 
-                if (!_typedModuleDefs.TryAdd(type, moduleDef.Value))
-                    throw new ArgumentException("Module definition for this type already exists.");
+            _typedModuleDefs[moduleDef.Key] = moduleDef.Value;
+            LoadModuleInternal(moduleDef.Value);
 
-                _typedModuleDefs[moduleDef.Key] = moduleDef.Value;
-                LoadModuleInternal(moduleDef.Value);
-
-                return moduleDef.Value;
-            }
-            finally
-            {
-                _lock.Release();
-            }
+            return moduleDef.Value;
         }
 
         /// <summary>
@@ -641,19 +619,11 @@ namespace Discord.Interactions
         /// </returns>
         public async Task<bool> RemoveModuleAsync(Type type)
         {
-            await _lock.WaitAsync().ConfigureAwait(false);
+            using var _ = await _lock.LockAsync().ConfigureAwait(false);
+            if (!_typedModuleDefs.TryRemove(type, out var module))
+                return false;
 
-            try
-            {
-                if (!_typedModuleDefs.TryRemove(type, out var module))
-                    return false;
-
-                return RemoveModuleInternal(module);
-            }
-            finally
-            {
-                _lock.Release();
-            }
+            return RemoveModuleInternal(module);
         }
 
         /// <summary>
@@ -666,21 +636,13 @@ namespace Discord.Interactions
         /// </returns>
         public async Task<bool> RemoveModuleAsync(ModuleInfo module)
         {
-            await _lock.WaitAsync().ConfigureAwait(false);
+            using var _ = await _lock.LockAsync().ConfigureAwait(false);
+            var typeModulePair = _typedModuleDefs.FirstOrDefault(x => x.Value.Equals(module));
 
-            try
-            {
-                var typeModulePair = _typedModuleDefs.FirstOrDefault(x => x.Value.Equals(module));
+            if (!typeModulePair.Equals(default(KeyValuePair<Type, ModuleInfo>)))
+                _typedModuleDefs.TryRemove(typeModulePair.Key, out var _);
 
-                if (!typeModulePair.Equals(default(KeyValuePair<Type, ModuleInfo>)))
-                    _typedModuleDefs.TryRemove(typeModulePair.Key, out var _);
-
-                return RemoveModuleInternal(module);
-            }
-            finally
-            {
-                _lock.Release();
-            }
+            return RemoveModuleInternal(module);
         }
 
         /// <summary>
