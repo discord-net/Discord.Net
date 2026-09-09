@@ -1,3 +1,4 @@
+using System.Linq;
 using Newtonsoft.Json;
 
 namespace Discord.API;
@@ -22,10 +23,13 @@ internal class FileUploadComponent : IInteractableComponent
     [JsonProperty("required")]
     public Optional<bool> IsRequired { get; set; }
 
+    [JsonProperty("file_types")]
+    public Optional<string[]> FileTypes { get; set; }
+
     [JsonProperty("values")]
     public Optional<string[]> Values { get; set; }
 
-    public FileUploadComponent() {}
+    public FileUploadComponent() { }
 
     public FileUploadComponent(Discord.FileUploadComponent component)
     {
@@ -35,6 +39,7 @@ internal class FileUploadComponent : IInteractableComponent
         MinValues = component.MinValues ?? Optional<int>.Unspecified;
         MaxValues = component.MaxValues ?? Optional<int>.Unspecified;
         IsRequired = component.IsRequired;
+        FileTypes = component.FileTypes?.ToArray() ?? Optional<string[]>.Unspecified;
     }
 
     [JsonIgnore]

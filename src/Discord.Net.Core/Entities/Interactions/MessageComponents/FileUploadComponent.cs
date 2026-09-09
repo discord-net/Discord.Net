@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using System.Collections.Immutable;
+
 namespace Discord;
 
 /// <summary>
@@ -33,13 +36,19 @@ public class FileUploadComponent : IInteractableComponent
     /// </summary>
     public bool IsRequired { get; }
 
-    internal FileUploadComponent(int? id, string customId, int? minValues, int? maxValues, bool isRequired)
+    /// <summary>
+    ///     Gets the allowed file types for this component.
+    /// </summary>
+    public IReadOnlyCollection<string> FileTypes { get; }
+
+    internal FileUploadComponent(int? id, string customId, int? minValues, int? maxValues, bool isRequired, IEnumerable<string> fileTypes)
     {
         Id = id;
         CustomId = customId;
         MinValues = minValues;
         MaxValues = maxValues;
         IsRequired = isRequired;
+        FileTypes = fileTypes?.ToImmutableArray() ?? ImmutableArray<string>.Empty;
     }
 
     /// <inheritdoc cref="IMessageComponent.ToBuilder"/>

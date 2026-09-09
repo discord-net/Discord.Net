@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Discord.Interactions;
 
 /// <summary>
@@ -15,9 +17,15 @@ public class FileUploadComponentInfo : InputComponentInfo
     /// </summary>
     public int MaxValues { get; }
 
+    /// <summary>
+    ///     Gets the allowed file types for this component.
+    /// </summary>
+    public IReadOnlyCollection<string> FileTypes { get; }
+
     internal FileUploadComponentInfo(Builders.FileUploadComponentBuilder builder, ModalInfo modal) : base(builder, modal)
     {
         MinValues = builder.MinValues;
         MaxValues = builder.MaxValues;
+        FileTypes = builder.FileTypes;
     }
 }

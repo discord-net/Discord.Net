@@ -824,6 +824,9 @@ namespace Discord.Interactions.Builders
                         builder.Label = inputLabel.Label;
                         builder.Description = inputLabel.Description;
                         break;
+                    case ModalFileTypeAttribute fileType:
+                        builder.AddFileType(fileType.FileType);
+                        break;
                     default:
                         builder.WithAttributes(attribute);
                         break;

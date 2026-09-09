@@ -22,16 +22,34 @@ public class FileComponent : IMessageComponent
     public bool? IsSpoiler { get; }
 
     /// <summary>
+    ///      Gets the name of this file.
+    /// </summary>
+    /// <remarks>
+    ///      This property is only available when the component is received from Discord. It will be <see langword="null"/> when creating a new component.
+    /// </remarks>
+    public string Name { get; }
+
+    /// <summary>
+    ///     Gets the size of this file in bytes.
+    /// </summary>
+    /// <remarks>
+    ///      This property is only available when the component is received from Discord. It will be <see langword="null"/> when creating a new component.
+    /// </remarks>
+    public ulong? Size { get; }
+
+    /// <summary>
     ///     Converts a <see cref="FileComponent"/> to a <see cref="FileComponentBuilder"/>.
     /// </summary>
     public FileComponentBuilder ToBuilder()
         => new(this);
 
-    internal FileComponent(UnfurledMediaItem file, bool? isSpoiler, int? id = null)
+    internal FileComponent(UnfurledMediaItem file, bool? isSpoiler, int? id = null, string name = null, ulong? size = null)
     {
         File = file;
         IsSpoiler = isSpoiler;
         Id = id;
+        Name = name;
+        Size = size;
     }
 
     /// <inheritdoc />

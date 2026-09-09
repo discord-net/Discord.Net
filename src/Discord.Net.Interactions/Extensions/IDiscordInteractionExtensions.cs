@@ -116,7 +116,7 @@ namespace Discord.Interactions
                         break;
                     case FileUploadComponentInfo fileUploadComponent:
                         {
-                            var inputBuilder = new FileUploadComponentBuilder(fileUploadComponent.CustomId, fileUploadComponent.MinValues, fileUploadComponent.MaxValues, fileUploadComponent.IsRequired, fileUploadComponent.Id);
+                            var inputBuilder = new FileUploadComponentBuilder(fileUploadComponent.CustomId, fileUploadComponent.MinValues, fileUploadComponent.MaxValues, fileUploadComponent.IsRequired, fileUploadComponent.Id, fileUploadComponent.FileTypes);
 
                             var instanceValue = modalInstance is not null ? fileUploadComponent.Getter(modalInstance) : null;
                             await fileUploadComponent.TypeConverter.WriteAsync(inputBuilder, interaction, fileUploadComponent, instanceValue);

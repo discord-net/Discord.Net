@@ -7,6 +7,7 @@ internal class FileComponent : IMessageComponent
 {
     [JsonProperty("type")]
     public ComponentType Type { get; set; }
+
     [JsonProperty("id")]
     public Optional<int> Id { get; set; }
 
@@ -15,6 +16,12 @@ internal class FileComponent : IMessageComponent
 
     [JsonProperty("spoiler")]
     public Optional<bool> IsSpoiler { get; set; }
+
+    [JsonProperty("name")]
+    public Optional<string> Name { get; set; }
+
+    [JsonProperty("size")]
+    public Optional<ulong> Size { get; set; }
 
     public FileComponent() { }
 
