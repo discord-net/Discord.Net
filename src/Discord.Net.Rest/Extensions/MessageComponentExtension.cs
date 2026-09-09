@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Immutable;
 using System.Linq;
 
@@ -180,7 +181,7 @@ internal static class MessageComponentExtension
             case ComponentType.File:
             {
                 var parsed = (API.FileComponent)component;
-                return new FileComponent(parsed.File.ToEntity(), parsed.IsSpoiler.ToNullable(), parsed.Id.ToNullable());
+                return new FileComponent(parsed.File.ToEntity(), parsed.IsSpoiler.ToNullable(), parsed.Id.ToNullable(), parsed.Name.GetValueOrDefault(null), parsed.Size.ToNullable());
             }
 
             case ComponentType.Container:
@@ -205,7 +206,8 @@ internal static class MessageComponentExtension
                     parsed.CustomId,
                     parsed.MaxValues.ToNullable(),
                     parsed.MaxValues.ToNullable(),
-                    parsed.IsRequired.GetValueOrDefault(false));
+                    parsed.IsRequired.GetValueOrDefault(false),
+                    parsed.FileTypes.GetValueOrDefault(Array.Empty<string>()));
             }
 
             case ComponentType.RadioGroup:

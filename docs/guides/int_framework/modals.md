@@ -112,9 +112,13 @@ Additionally for Channel Select components, channel type constraints can be defi
 ## File Uploads
 File upload components allow users to upload files as part of their modal submission. A single file upload can take up to 10 attachments. The size limit for the uploaded files is determined by Discord's limits for the current context (e.g., server boost level, user's nitro status). 
 The file upload component is defined using the `ModalFileUpload` attribute. The attribute can be used on a property of type `IAttachment` or `IAttachment[]`.
+Up to 10 file extension filters can be defined for a file upload component using the `ModalFileType` attribute. The attribute can be used on the same property as the `ModalFileUpload` attribute. The filters can be defined using either file extensions (e.g., `.jpg`, `.png`, `.mp4`) or predefined sets of file types (e.g., `image`, `video`, `audio`). If no filters are defined, all file types will be accepted.
 
 ```csharp
 [ModalFileUpload("file-upload-id", maxValues: 5)]
+[ModalFileType("image")]
+[ModalFileType("video")]
+[ModalFileType(".avi")]
 public IAttachment[] FileUploads { get; set; }
 ```
 ![File upload](images/modals/file-upload.png)

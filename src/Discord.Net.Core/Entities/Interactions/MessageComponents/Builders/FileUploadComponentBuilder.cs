@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Discord;
 
@@ -11,6 +13,11 @@ public class FileUploadComponentBuilder : IInteractableComponentBuilder
     ///     The maximum number of values for the <see cref="FileUploadComponentBuilder.MinValues"/> and <see cref="FileUploadComponentBuilder.MaxValues"/> properties.
     /// </summary>
     public const int MaxFileCount = 10;
+
+    /// <summary>
+    ///     The maximum number of file types for the <see cref="FileUploadComponentBuilder.FileTypes"/> property.
+    /// </summary>
+    public const int MaxFileTypeCount = 10;
 
     /// <inheritdoc/>
     public ComponentType Type => ComponentType.FileUpload;
@@ -25,7 +32,7 @@ public class FileUploadComponentBuilder : IInteractableComponentBuilder
     /// <exception cref="ArgumentException" accessor="set"><see cref="CustomId"/> length subceeds 1.</exception>
     public string CustomId
     {
-        get => _customId;
+        get;
         set
         {
             if (value is not null)
@@ -34,7 +41,7 @@ public class FileUploadComponentBuilder : IInteractableComponentBuilder
                 Preconditions.AtMost(value.Length, ModalComponentBuilder.MaxCustomIdLength, nameof(CustomId));
             }
 
-            _customId = value;
+            field = value;
         }
     }
 
@@ -45,7 +52,7 @@ public class FileUploadComponentBuilder : IInteractableComponentBuilder
     /// <exception cref="ArgumentException" accessor="set"><see cref="MinValues"/> length subceeds 0.</exception>
     public int? MinValues
     {
-        get => _minValues;
+        get;
         set
         {
             if (value is not null)
@@ -54,7 +61,7 @@ public class FileUploadComponentBuilder : IInteractableComponentBuilder
                 Preconditions.AtMost(value.Value, MaxFileCount, nameof(MinValues));
             }
 
-            _minValues = value;
+            field = value;
         }
     }
 
@@ -64,7 +71,7 @@ public class FileUploadComponentBuilder : IInteractableComponentBuilder
     /// <exception cref="ArgumentException" accessor="set"><see cref="MaxValues"/> exceeds <see cref="MaxFileCount"/>.</exception>
     public int? MaxValues
     {
-        get => _maxValues;
+        get;
         set
         {
             if (value is not null)
@@ -72,9 +79,15 @@ public class FileUploadComponentBuilder : IInteractableComponentBuilder
                 Preconditions.AtMost(value.Value, MaxFileCount, nameof(MaxValues));
             }
 
-            _maxValues = value;
+            field = value;
         }
     }
+
+    /// <summary>
+    ///     Gets or sets the allowed file types for the current file upload. Can be <c>image</c>, <c>video</c>, <c>audio</c>, or a file extension (e.g. <c>.png</c>).
+    ///     If no file types are specified, all file types are allowed.
+    /// </summary>
+    public List<string> FileTypes { get; set; } = [];
 
     /// <summary>
     ///     Gets or sets a value indicating whether the current file upload requires files to be uploaded before submitting the modal (defaults to <see langword="true"></see>).
@@ -134,14 +147,51 @@ public class FileUploadComponentBuilder : IInteractableComponentBuilder
         return this;
     }
 
-    private string _customId;
-    private int? _minValues;
-    private int? _maxValues;
+    /// <summary>
+    ///     Sets the allowed file types for the current file upload. Can be <c>image</c>, <c>video</c>, <c>audio</c>, or a file extension (e.g. <c>.png</c>).
+    /// </summary>
+    /// <param name="fileTypes">The allowed file types.</param>
+    /// <returns>
+    ///     The current builder.
+    /// </returns>
+    public FileUploadComponentBuilder WithFileTypes(IEnumerable<string> fileTypes)
+    {
+        FileTypes = fileTypes?.ToList();
+        return this;
+    }
+
+    /// <summary>
+    ///     Adds a allowed file type for the current file upload. Can be <c>image</c>, <c>video</c>, <c>audio</c>, or a dot prefixed file extension (e.g. <c>.png</c>).
+    /// </summary>
+    /// <param name="fileType">The allowed file type.</param>
+    /// <returns>
+    ///     The current builder.
+    /// </returns>
+    public FileUploadComponentBuilder AddFileType(string fileType)
+    {
+        FileTypes ??= [];
+        FileTypes.Add(fileType);
+        return this;
+    }
+
+    /// <summary>
+    ///     Adds the allowed file types for the current file upload. Can be <c>image</c>, <c>video</c>, <c>audio</c>, or a dot prefixed file extension (e.g. <c>.png</c>).
+    /// </summary>
+    /// <param name="fileTypes">The allowed file types.</param>
+    /// <returns>
+    ///     The current builder.
+    /// </returns>
+    public FileUploadComponentBuilder AddFileTypes(params IEnumerable<string> fileTypes)
+    {
+        FileTypes ??= [];
+        FileTypes.AddRange(fileTypes);
+        return this;
+    }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="FileUploadComponentBuilder"/>.
     /// </summary>
-    public FileUploadComponentBuilder() {}
+    public FileUploadComponentBuilder() { }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="FileUploadComponentBuilder"/>.
@@ -151,13 +201,15 @@ public class FileUploadComponentBuilder : IInteractableComponentBuilder
     /// <param name="maxValues">the maximum number of items that can be uploaded (defaults to 1).</param>
     /// <param name="isRequired">Whether the current file upload requires files to be uploaded before submitting the modal.</param>
     /// <param name="id">The id for the component.</param>
-    public FileUploadComponentBuilder(string customId, int? minValues = null, int? maxValues = null, bool isRequired = true, int? id = null)
+    /// <param name="fileTypes">The allowed file types.</param>
+    public FileUploadComponentBuilder(string customId, int? minValues = null, int? maxValues = null, bool isRequired = true, int? id = null, IEnumerable<string> fileTypes = null)
     {
         CustomId = customId;
         MinValues = minValues;
         MaxValues = maxValues;
         IsRequired = isRequired;
         Id = id;
+        FileTypes = fileTypes?.ToList();
     }
 
     /// <summary>
@@ -171,6 +223,7 @@ public class FileUploadComponentBuilder : IInteractableComponentBuilder
         MaxValues = fileUpload.MaxValues;
         IsRequired = fileUpload.IsRequired;
         Id = fileUpload.Id;
+        FileTypes = fileUpload.FileTypes?.ToList();
     }
 
     /// <inheritdoc cref="IMessageComponentBuilder.Build" />
@@ -184,7 +237,18 @@ public class FileUploadComponentBuilder : IInteractableComponentBuilder
         Preconditions.AtMost(MinValues ?? 0, MaxFileCount, nameof(MinValues));
         Preconditions.AtMost(MaxValues ?? 0, MaxFileCount, nameof(MaxValues));
 
-        return new FileUploadComponent(Id, CustomId, MinValues, MaxValues, IsRequired);
+        Preconditions.AtMost(FileTypes?.Count ?? 0, MaxFileTypeCount, nameof(FileTypes));
+
+        foreach (var fileType in FileTypes ?? [])
+        {
+            if (fileType != "image" &&
+                fileType != "video" &&
+                fileType != "audio" &&
+                !fileType.StartsWith('.'))
+                throw new ArgumentException($"Invalid file type: {fileType}. Must be 'image', 'video', 'audio', or start with a '.'", nameof(FileTypes));
+        }
+
+        return new FileUploadComponent(Id, CustomId, MinValues, MaxValues, IsRequired, FileTypes);
     }
 
     /// <inheritdoc/>

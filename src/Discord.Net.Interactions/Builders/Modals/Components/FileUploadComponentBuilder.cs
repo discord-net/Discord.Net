@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Discord.Interactions.Builders;
 
 /// <summary>
@@ -6,6 +8,7 @@ namespace Discord.Interactions.Builders;
 public class FileUploadComponentBuilder : InputComponentBuilder<FileUploadComponentInfo, FileUploadComponentBuilder>
 {
     protected override FileUploadComponentBuilder Instance => this;
+    private readonly List<string> _fileTypes = [];
 
     /// <summary>
     ///     Gets and sets the minimum number of files that can be uploaded.
@@ -16,6 +19,11 @@ public class FileUploadComponentBuilder : InputComponentBuilder<FileUploadCompon
     ///     Gets and sets the maximum number of files that can be uploaded.
     /// </summary>
     public int MaxValues { get; set; } = 1;
+
+    /// <summary>
+    ///     Gets the allowed file types for this component.
+    /// </summary>
+    public IReadOnlyCollection<string> FileTypes => _fileTypes.AsReadOnly();
 
     /// <summary>
     ///     Initializes a new <see cref="FileUploadComponentBuilder"/>.
@@ -46,6 +54,19 @@ public class FileUploadComponentBuilder : InputComponentBuilder<FileUploadCompon
     public FileUploadComponentBuilder WithMaxValues(int maxValues)
     {
         MaxValues = maxValues;
+        return this;
+    }
+
+    /// <summary>
+    ///     Adds a file type to <see cref="FileTypes"/>.
+    /// </summary>
+    /// <param name="fileType">The file type to add.</param>
+    /// <returns>
+    ///     The builder instance.
+    /// </returns>
+    public FileUploadComponentBuilder AddFileType(string fileType)
+    {
+        _fileTypes.Add(fileType);
         return this;
     }
 
