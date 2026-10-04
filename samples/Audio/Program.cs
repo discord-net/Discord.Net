@@ -1,16 +1,24 @@
 using Discord;
 using Discord.Audio;
 using Discord.WebSocket;
-using System.Diagnostics;
 
 namespace Audio;
 
 internal class Program
 {
+    public enum AudioMode
+    {
+        Playback,
+        Recording
+    }
+
     private static DiscordSocketClient _client = null!;
+    private static AudioMode _audioMode;
 
     static async Task Main(string[] args)
     {
+        _audioMode = SelectMode();
+
         AudioSetupHandler audioSetup = new AudioSetupHandler();
 
         if (!await audioSetup.PrepareAsync())
@@ -31,6 +39,22 @@ internal class Program
         await _client.StartAsync();
 
         await Task.Delay(Timeout.Infinite);
+    }
+
+    private static AudioMode SelectMode()
+    {
+        Console.WriteLine("Select the audio mode:");
+        Console.WriteLine("[1] Play");
+        Console.WriteLine("[2] Record");
+
+        ConsoleKey key = Console.ReadKey(true).Key;
+
+        return key switch
+        {
+            ConsoleKey.D1 or ConsoleKey.NumPad1 => AudioMode.Playback,
+            ConsoleKey.D2 or ConsoleKey.NumPad2 => AudioMode.Recording,
+            _ => AudioMode.Playback
+        };
     }
 
     private static async Task OnReadyAsync()
@@ -75,22 +99,22 @@ internal class Program
             return Task.CompletedTask;
         };
 
-        await PlayAudioAsync(audioClient);
+        await StartAsync(voiceChannel, audioClient);
     }
 
-    private static async Task PlayAudioAsync(IAudioClient audioClient)
+    private static async Task StartAsync(SocketVoiceChannel voiceChannel, IAudioClient audioClient)
     {
-        const string audioUrl = "https://github.com/ShivamJoker/sample-songs/raw/refs/heads/master/Faded.mp3";
-        Process ffmpeg = Process.Start(new ProcessStartInfo
+        switch (_audioMode)
         {
-            FileName = "ffmpeg",
-            Arguments = $"-i {audioUrl} -ac 2 -f s16le -ar 48000 pipe:1",
-            RedirectStandardOutput = true,
-            CreateNoWindow = true
-        })!;
+            case AudioMode.Playback:
+                Player player = new Player();
+                await player.PlayAsync(audioClient);
+                break;
 
-        AudioOutStream audioStream = audioClient.CreatePCMStream(AudioApplication.Music);
-        await ffmpeg.StandardOutput.BaseStream.CopyToAsync(audioStream);
-        await audioStream.FlushAsync();
+            case AudioMode.Recording:
+                Recorder recorder = new Recorder();
+                await recorder.RecordAsync(voiceChannel, audioClient);
+                break;
+        }
     }
 }
