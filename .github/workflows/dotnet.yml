@@ -105,7 +105,10 @@ jobs:
           if: env.IsTagBuild != 'true'
           run: echo "Suffix=-nightly.$(date +'%Y%m%d').${{ github.run_number }}" >> $GITHUB_ENV
           
-        - name: setup NuGet
+        - name: Install Mono
+          run: sudo apt-get update && sudo apt-get install -y mono-complete
+
+        - name: Setup NuGet
           uses: nuget/setup-nuget@v4
           with:
             nuget-version: '6.x'
