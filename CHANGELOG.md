@@ -1,5 +1,20 @@
 # Changelog
 
+## [3.20.2] - 2026-10-08
+### Added
+- #3280 Add attachment flags and fix container spoiler state (d550c75)
+- #3282 Add IsSpoilerChannel flag (bdecf12)
+- #3286 Add file type filters support for file upload components #3286 (d34a50e)
+
+### Fixed
+- #3279 Fix ModifyOriginalResponseAsync rejecting null content with attachments (9c78ee0)
+
+### Misc
+- #3283 Add audio recording sample (bd4a42c)
+- #3284 Give some extra info when no selectmenu options are given (911efb4)
+- #3285 Change default attachment size limit to 20MiB (247b1e5)
+
+
 ## [3.20.1] - 2026-06-07
 ### Fixed
 - #3276 Handle null VoiceChannel in SocketVoiceState constructor (61ed916)
