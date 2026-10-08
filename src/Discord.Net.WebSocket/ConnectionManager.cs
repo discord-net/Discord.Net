@@ -1,3 +1,4 @@
+using AsyncKeyedLock;
 using Discord.Logging;
 using Discord.Net;
 using System;
@@ -14,7 +15,8 @@ namespace Discord
         public event Func<Exception, bool, Task> Disconnected { add { _disconnectedEvent.Add(value); } remove { _disconnectedEvent.Remove(value); } }
         private readonly AsyncEvent<Func<Exception, bool, Task>> _disconnectedEvent = new AsyncEvent<Func<Exception, bool, Task>>();
 
-        private readonly SemaphoreSlim _stateLock;
+        private readonly AsyncNonKeyedLocker _stateLock;
+        private IDisposable _stateLockReleaser = null;
         private readonly Logger _logger;
         private readonly int _connectionTimeout;
         private readonly Func<Task> _onConnecting;
@@ -29,7 +31,7 @@ namespace Discord
         public ConnectionState State { get; private set; }
         public CancellationToken CancelToken { get; private set; }
 
-        internal ConnectionManager(SemaphoreSlim stateLock, Logger logger, int connectionTimeout,
+        internal ConnectionManager(AsyncNonKeyedLocker stateLock, Logger logger, int connectionTimeout,
             Func<Task> onConnecting, Func<Exception, Task> onDisconnecting, Action<Func<Exception, Task>> clientDisconnectHandler)
         {
             _stateLock = stateLock;
@@ -114,7 +116,7 @@ namespace Discord
                         }
                     }
                 }
-                finally { _stateLock.Release(); }
+                finally { _stateLockReleaser.Dispose(); }
             });
         }
         public virtual Task StopAsync()
@@ -214,8 +216,11 @@ namespace Discord
             while (true)
             {
                 await StopAsync().ConfigureAwait(false);
-                if (await _stateLock.WaitAsync(0).ConfigureAwait(false))
+
+                if (await _stateLock.LockOrNullAsync(0).ConfigureAwait(false) is not null)
+                {
                     break;
+                }
             }
         }
 

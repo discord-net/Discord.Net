@@ -1,3 +1,4 @@
+using AsyncKeyedLock;
 using Discord.API.Voice;
 using Discord.Audio.Streams;
 using Discord.LibDave;
@@ -42,7 +43,7 @@ namespace Discord.Audio
         private readonly Logger _audioLogger;
         private readonly JsonSerializer _serializer;
         private readonly ConnectionManager _connection;
-        private readonly SemaphoreSlim _stateLock;
+        private readonly AsyncNonKeyedLocker _stateLock;
         private readonly ConcurrentQueue<long> _heartbeatTimes;
         private readonly ConcurrentQueue<KeyValuePair<ulong, int>> _keepaliveTimes;
         private readonly SsrcMap _ssrcMap;
@@ -90,7 +91,7 @@ namespace Discord.Audio
             ApiClient.ReceivedPacket += ProcessPacketAsync;
             ApiClient.ReceivedBinaryEvent += ProcessBinaryEvent;
 
-            _stateLock = new SemaphoreSlim(1, 1);
+            _stateLock = new();
             _connection = new ConnectionManager(_stateLock, _audioLogger, ConnectionTimeoutMs,
                 OnConnectingAsync, OnDisconnectingAsync, x => ApiClient.Disconnected += x);
             _connection.Connected += () => _connectedEvent.InvokeAsync();

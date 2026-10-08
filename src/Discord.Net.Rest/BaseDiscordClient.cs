@@ -1,3 +1,4 @@
+using AsyncKeyedLock;
 using Discord.Logging;
 using System;
 using System.Collections.Generic;
@@ -28,7 +29,7 @@ namespace Discord.Rest
         public event Func<string, string, double, Task> SentRequest { add { _sentRequest.Add(value); } remove { _sentRequest.Remove(value); } }
 
         internal readonly Logger _restLogger;
-        private readonly SemaphoreSlim _stateLock;
+        private readonly AsyncNonKeyedLocker _stateLock;
         private bool _isFirstLogin, _isDisposed;
 
         internal API.DiscordRestApiClient ApiClient { get; }
@@ -54,7 +55,7 @@ namespace Discord.Rest
             LogManager = new LogManager(config.LogLevel);
             LogManager.Message += async msg => await _logEvent.InvokeAsync(msg).ConfigureAwait(false);
 
-            _stateLock = new SemaphoreSlim(1, 1);
+            _stateLock = new();
             _restLogger = LogManager.CreateLogger("Rest");
             _isFirstLogin = config.DisplayInitialLog;
 
@@ -75,12 +76,8 @@ namespace Discord.Rest
 
         public async Task LoginAsync(TokenType tokenType, string token, bool validateToken = true)
         {
-            await _stateLock.WaitAsync().ConfigureAwait(false);
-            try
-            {
-                await LoginInternalAsync(tokenType, token, validateToken).ConfigureAwait(false);
-            }
-            finally { _stateLock.Release(); }
+            using var _ = await _stateLock.LockAsync().ConfigureAwait(false);
+            await LoginInternalAsync(tokenType, token, validateToken).ConfigureAwait(false);
         }
         internal virtual async Task LoginInternalAsync(TokenType tokenType, string token, bool validateToken)
         {
@@ -128,12 +125,8 @@ namespace Discord.Rest
 
         public async Task LogoutAsync()
         {
-            await _stateLock.WaitAsync().ConfigureAwait(false);
-            try
-            {
-                await LogoutInternalAsync().ConfigureAwait(false);
-            }
-            finally { _stateLock.Release(); }
+            using var _ = await _stateLock.LockAsync().ConfigureAwait(false);
+            await LogoutInternalAsync().ConfigureAwait(false);
         }
         internal virtual async Task LogoutInternalAsync()
         {
