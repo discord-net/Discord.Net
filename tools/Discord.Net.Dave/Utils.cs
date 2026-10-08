@@ -25,9 +25,11 @@ internal static class Utils
         var ptr = (byte*)NativeMemory.Alloc(SnowflakeMaxCStringLength);
         var span = new Span<byte>(ptr, SnowflakeMaxCStringLength);
 
-        if (!id.TryFormat(span, out var sz))
+        // reserve the last byte for the null terminator; libdave reads these as C strings
+        if (!id.TryFormat(span[..^1], out var sz))
             throw new InvalidOperationException();
 
+        span[sz] = 0;
         str = new(ptr, sz);
 
         return new((IntPtr)ptr);
