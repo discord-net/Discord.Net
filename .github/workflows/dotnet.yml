@@ -14,16 +14,16 @@ on:
 jobs:
     build:
         name: Build and Test
-        runs-on: ubuntu-22.04
+        runs-on: ubuntu-24.04
         env:
           ArtifactStagingDirectory: "artifacts"
           IsTagBuild: false
           DOTNET_INSTALL_DIR: "/usr/share/dotnet"
         steps:
-          - uses: actions/checkout@v5
+          - uses: actions/checkout@v7
           
           - name: Setup .NET
-            uses: actions/setup-dotnet@v5
+            uses: actions/setup-dotnet@v6
             with:
               dotnet-version: 10.0.x
 
@@ -70,22 +70,26 @@ jobs:
 #              dotnet pack "experiment\Discord.Net.BuildOverrides\Discord.Net.BuildOverrides.csproj" --no-restore --no-build -v minimal -c Release -o ${{ env.ArtifactStagingDirectory }} /p:BuildNumber=${{ env.Suffix }} /p:IsTagBuild=${{ env.IsTagBuild }}
           
           - name: Publish Artifacts
-            uses: actions/upload-artifact@v5
+            uses: actions/upload-artifact@v7
             with:
               name: discord-net
               path: ${{ env.ArtifactStagingDirectory }}/*
     
     deploy:
       name: Deploy
-      runs-on: ubuntu-22.04
+      runs-on: ubuntu-24.04
       needs: [build]
       if: github.event_name != 'pull_request'
+      permissions:
+        contents: read
+        packages: write
+        id-token: write
       env:
         IsTagBuild: false
         ArtifactStagingDirectory: "artifacts"
         REPOSITORY_URL: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
       steps:
-        - uses: actions/checkout@v5
+        - uses: actions/checkout@v7
         
         - name: Is Tag Build
           if: startsWith(github.ref, 'refs/tags/')
@@ -102,12 +106,12 @@ jobs:
           run: echo "Suffix=-nightly.$(date +'%Y%m%d').${{ github.run_number }}" >> $GITHUB_ENV
           
         - name: setup NuGet
-          uses: nuget/setup-nuget@v2
+          uses: nuget/setup-nuget@v4
           with:
             nuget-version: '6.x'
 
         - name: Download artifacts
-          uses: actions/download-artifact@v6
+          uses: actions/download-artifact@v8
           with:
             name: discord-net
             path: ${{ env.ArtifactStagingDirectory }}
@@ -117,7 +121,6 @@ jobs:
 
         - name: Set API Keys
           run: |
-            nuget setApiKey ${{ secrets.NUGET_API_KEY }} -Source https://api.nuget.org/v3/index.json
             nuget setApiKey ${{ secrets.NIGHTLY_FEED_API_KEY }} -Source ${{ vars.NIGHTLY_FEED }}
             nuget setApiKey ${{ secrets.GITHUB_TOKEN }} -Source ${{ env.REPOSITORY_URL }}
 
@@ -125,10 +128,17 @@ jobs:
           if: vars.PUSH_NIGHTLY_CUSTOM == 'true'
           run: nuget push "${{ env.ArtifactStagingDirectory }}/*.nupkg" -SkipDuplicate -Source ${{ vars.NIGHTLY_FEED }}
 
-        - name: Push Nightly to GitHub Pacakges
+        - name: Push Nightly to GitHub Packages
           if: vars.PUSH_NIGHTLY_GITHUB == 'true'            
           run: nuget push "${{ env.ArtifactStagingDirectory }}/*.nupkg" -SkipDuplicate -Source ${{ env.REPOSITORY_URL }}
 
+        - name: NuGet login (OIDC)
+          if: env.IsTagBuild == 'true' && vars.PUSH_NUGET == 'true'
+          uses: NuGet/login@v1
+          id: login
+          with:
+            user: ${{ secrets.NUGET_USER }}
+
         - name: Push Release
           if: env.IsTagBuild == 'true' && vars.PUSH_NUGET == 'true'
-          run: nuget push "${{ env.ArtifactStagingDirectory }}/*.nupkg" -SkipDuplicate -Source https://api.nuget.org/v3/index.json
+          run: nuget push "${{ env.ArtifactStagingDirectory }}/*.nupkg" -SkipDuplicate -ApiKey ${{ steps.login.outputs.NUGET_API_KEY }} -Source https://api.nuget.org/v3/index.json
