@@ -62,7 +62,7 @@ namespace Discord.Webhook
                 args.Poll = poll.ToModel();
 
 
-            var model = await client.ApiClient.CreateWebhookMessageAsync(client.Webhook.Id, args, options: options, threadId: threadId).ConfigureAwait(false);
+            var model = await client.ApiClient.CreateWebhookMessageAsync(client.WebhookId, args, options: options, threadId: threadId).ConfigureAwait(false);
             return model.Id;
         }
 
@@ -114,7 +114,7 @@ namespace Discord.Webhook
                     Components = args.Components.IsSpecified ? args.Components.Value?.Components.Select(x => x.ToModel()).ToArray() : Optional<IMessageComponent[]>.Unspecified,
                 };
 
-                return client.ApiClient.ModifyWebhookMessageAsync(client.Webhook.Id, messageId, apiArgs, options, threadId);
+                return client.ApiClient.ModifyWebhookMessageAsync(client.WebhookId, messageId, apiArgs, options, threadId);
             }
             else
             {
@@ -133,12 +133,12 @@ namespace Discord.Webhook
                     MessageComponents = args.Components.IsSpecified ? args.Components.Value?.Components.Select(x => x.ToModel()).ToArray() : Optional<IMessageComponent[]>.Unspecified,
                 };
 
-                return client.ApiClient.ModifyWebhookMessageAsync(client.Webhook.Id, messageId, apiArgs, options, threadId);
+                return client.ApiClient.ModifyWebhookMessageAsync(client.WebhookId, messageId, apiArgs, options, threadId);
             }
         }
 
         public static Task DeleteMessageAsync(DiscordWebhookClient client, ulong messageId, RequestOptions options, ulong? threadId)
-            => client.ApiClient.DeleteWebhookMessageAsync(client.Webhook.Id, messageId, options, threadId);
+            => client.ApiClient.DeleteWebhookMessageAsync(client.WebhookId, messageId, options, threadId);
 
         public static async Task<ulong> SendFileAsync(DiscordWebhookClient client, string filePath, string text, bool isTTS,
             IEnumerable<Embed> embeds, string username, string avatarUrl, AllowedMentions allowedMentions, RequestOptions options,
@@ -215,7 +215,7 @@ namespace Discord.Webhook
                 AppliedTags = appliedTags,
                 Poll = poll?.ToModel() ?? Optional<CreatePollParams>.Unspecified
             };
-            var msg = await client.ApiClient.UploadWebhookFileAsync(client.Webhook.Id, args, options, threadId).ConfigureAwait(false);
+            var msg = await client.ApiClient.UploadWebhookFileAsync(client.WebhookId, args, options, threadId).ConfigureAwait(false);
             return msg.Id;
         }
 
@@ -229,13 +229,10 @@ namespace Discord.Webhook
                 Name = args.Name
             };
 
-            if (!apiArgs.Avatar.IsSpecified && client.Webhook.AvatarId != null)
-                apiArgs.Avatar = new ImageModel(client.Webhook.AvatarId);
-
-            return client.ApiClient.ModifyWebhookAsync(client.Webhook.Id, apiArgs, options);
+            return client.ApiClient.ModifyWebhookAsync(client.WebhookId, apiArgs, options);
         }
 
         public static Task DeleteAsync(DiscordWebhookClient client, RequestOptions options)
-            => client.ApiClient.DeleteWebhookAsync(client.Webhook.Id, options);
+            => client.ApiClient.DeleteWebhookAsync(client.WebhookId, options);
     }
 }
