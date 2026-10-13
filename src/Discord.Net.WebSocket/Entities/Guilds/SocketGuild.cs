@@ -386,7 +386,7 @@ namespace Discord.WebSocket
         ///         </para>
         ///         <para>
         ///             Otherwise, you may need to enable <see cref="DiscordSocketConfig.AlwaysDownloadUsers"/> to fetch
-        ///             the full user list upon startup, or use <see cref="DownloadUsersAsync"/> to manually download
+        ///             the full user list upon startup, or use <see cref="DownloadUsersAsync()"/> to manually download
         ///             the users.
         ///         </para>
         ///     </note>
@@ -966,7 +966,7 @@ namespace Discord.WebSocket
         public Task<IReadOnlyCollection<RestVoiceRegion>> GetVoiceRegionsAsync(RequestOptions options = null)
             => GuildHelper.GetVoiceRegionsAsync(this, Discord, options);
         #endregion
-        
+
         #region Integrations
         public Task<IReadOnlyCollection<RestIntegration>> GetIntegrationsAsync(RequestOptions options = null)
             => GuildHelper.GetIntegrationsAsync(this, Discord, options);
@@ -1322,6 +1322,19 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public Task DownloadUsersAsync()
             => Discord.DownloadUsersAsync(new[] { this });
+
+        /// <inheritdoc />
+        public async Task<List<ulong>> DownloadUsersAsync(IEnumerable<ulong> userIds)
+        {
+            using var cts = new CancellationTokenSource(DiscordConfig.DefaultRequestTimeout);
+            return await DownloadUsersAsync(userIds, cts.Token).ConfigureAwait(false);
+        }
+
+        /// <inheritdoc />
+        public Task<List<ulong>> DownloadUsersAsync(IEnumerable<ulong> userIds, CancellationToken cancelToken)
+        {
+            return Discord.DownloadUsersAsync(this, userIds, cancelToken);
+        }
 
         internal void CompleteDownloadUsers()
         {

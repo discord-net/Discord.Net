@@ -37,6 +37,7 @@ namespace Discord.WebSocket
         private readonly ConnectionManager _connection;
         private readonly Logger _gatewayLogger;
         private readonly SemaphoreSlim _stateLock;
+        private readonly ConcurrentDictionary<string, TaskCompletionSource<ulong[]>> _guildMembersRequestTasks;
 
         private string _sessionId;
         private int _lastSeq;
@@ -51,6 +52,7 @@ namespace Discord.WebSocket
         private GatewayIntents _gatewayIntents;
         private ImmutableArray<StickerPack<SocketSticker>> _defaultStickers;
         private SocketSelfUser _previousSessionUser;
+        private long _guildMembersRequestCounter;
 
         /// <summary>
         ///     Provides access to a REST-only client with a shared state from this client.
@@ -186,6 +188,8 @@ namespace Discord.WebSocket
                 _gatewayLogger.WarningAsync("Serializer Error", e.ErrorContext.Error).GetAwaiter().GetResult();
                 e.ErrorContext.Handled = true;
             };
+
+            _guildMembersRequestTasks = new ConcurrentDictionary<string, TaskCompletionSource<ulong[]>>();
 
             ApiClient.SentGatewayMessage += async opCode => await _gatewayLogger.DebugAsync($"Sent {opCode}").ConfigureAwait(false);
             ApiClient.ReceivedGatewayEvent += ProcessMessageAsync;
@@ -706,29 +710,49 @@ namespace Discord.WebSocket
         {
             var cachedGuilds = guilds.ToImmutableArray();
 
-            const short batchSize = 1;
-            ulong[] batchIds = new ulong[Math.Min(batchSize, cachedGuilds.Length)];
-            Task[] batchTasks = new Task[batchIds.Length];
-            int batchCount = (cachedGuilds.Length + (batchSize - 1)) / batchSize;
-
-            for (int i = 0, k = 0; i < batchCount; i++)
+            foreach (var guild in cachedGuilds)
             {
-                bool isLast = i == batchCount - 1;
-                int count = isLast ? (cachedGuilds.Length - (batchCount - 1) * batchSize) : batchSize;
+                await ApiClient.SendRequestMembersAsync(guild.Id).ConfigureAwait(false);
+                await guild.DownloaderPromise.ConfigureAwait(false);
+            }
+        }
 
-                for (int j = 0; j < count; j++, k++)
+        /// <inheritdoc />
+        public override async Task<List<ulong>> DownloadUsersAsync(IGuild guild, IEnumerable<ulong> userIds, CancellationToken cancelToken = default)
+        {
+            if (ConnectionState == ConnectionState.Connected)
+            {
+                var notFound = new List<ulong>();
+                var socketGuild = GetGuild(guild.Id);
+                if (socketGuild != null)
                 {
-                    var guild = cachedGuilds[k];
-                    batchIds[j] = guild.Id;
-                    batchTasks[j] = guild.DownloaderPromise;
+                    foreach (var chunk in userIds.Chunk(DiscordConfig.MaxRequestedUserIdsPerRequestGuildMembersChunk))
+                    {
+                        notFound.AddRange(await ProcessUserDownloadsAsync(socketGuild, chunk, cancelToken).ConfigureAwait(false));
+                    }
                 }
 
-                await ApiClient.SendRequestMembersAsync(batchIds).ConfigureAwait(false);
+                return notFound;
+            }
 
-                if (isLast && batchCount > 1)
-                    await Task.WhenAll(batchTasks.Take(count)).ConfigureAwait(false);
-                else
-                    await Task.WhenAll(batchTasks).ConfigureAwait(false);
+            throw new InvalidOperationException("Client not connected");
+        }
+
+
+        private async Task<ulong[]> ProcessUserDownloadsAsync(SocketGuild guild, IEnumerable<ulong> userIds, CancellationToken cancelToken = default)
+        {
+            var nonce = Interlocked.Increment(ref _guildMembersRequestCounter).ToString();
+            var tcs = new TaskCompletionSource<ulong[]>();
+            await using var registration = cancelToken.Register(() => tcs.TrySetCanceled());
+            _guildMembersRequestTasks.TryAdd(nonce, tcs);
+            try
+            {
+                await ApiClient.SendRequestMembersAsync(guild.Id, userIds, nonce).ConfigureAwait(false);
+                return await tcs.Task.ConfigureAwait(false);
+            }
+            finally
+            {
+                _guildMembersRequestTasks.TryRemove(nonce, out _);
             }
         }
 
