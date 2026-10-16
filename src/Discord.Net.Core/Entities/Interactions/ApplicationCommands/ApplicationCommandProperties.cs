@@ -39,7 +39,7 @@ namespace Discord
                 {
                     foreach (var (locale, name) in value)
                     {
-                        if (!Regex.IsMatch(locale, @"^\w{2}(?:-\w{2})?$"))
+                        if (!Regex.IsMatch(locale, @"^\w{2,3}(?:-[\w-]{2,})?$"))
                             throw new ArgumentException($"Invalid locale: {locale}", nameof(locale));
 
                         Preconditions.AtLeast(name.Length, 1, nameof(name));
@@ -66,7 +66,7 @@ namespace Discord
                 {
                     foreach (var (locale, description) in value)
                     {
-                        if (!Regex.IsMatch(locale, @"^\w{2}(?:-\w{2})?$"))
+                        if (!Regex.IsMatch(locale, @"^\w{2,3}(?:-[\w-]{2,})?$"))
                             throw new ArgumentException($"Invalid locale: {locale}", nameof(locale));
 
                         Preconditions.AtLeast(description.Length, 1, nameof(description));

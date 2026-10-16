@@ -61,7 +61,7 @@ namespace Discord
                 {
                     foreach (var (locale, name) in value)
                     {
-                        if (!Regex.IsMatch(locale, @"^\w{2}(?:-\w{2})?$"))
+                        if (!Regex.IsMatch(locale, @"^\w{2,3}(?:-[\w-]{2,})?$"))
                             throw new ArgumentException($"Key values of the dictionary must be valid language codes. Locale: \"{locale}\"");
 
                         Preconditions.AtLeast(name.Length, 1, nameof(name), msg: $"Name value of locale {locale} cannot be empty.");

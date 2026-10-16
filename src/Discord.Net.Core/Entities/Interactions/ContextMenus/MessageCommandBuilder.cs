@@ -133,7 +133,7 @@ namespace Discord
 
             foreach (var (locale, name) in nameLocalizations)
             {
-                if (!Regex.IsMatch(locale, @"^\w{2}(?:-\w{2})?$"))
+                if (!Regex.IsMatch(locale, @"^\w{2,3}(?:-[\w-]{2,})?$"))
                     throw new ArgumentException($"Invalid locale: {locale}", nameof(locale));
 
                 EnsureValidCommandName(name);
@@ -175,7 +175,7 @@ namespace Discord
         /// <exception cref="ArgumentException">Thrown if <paramref name="locale"/> is an invalid locale string.</exception>
         public MessageCommandBuilder AddNameLocalization(string locale, string name)
         {
-            if (!Regex.IsMatch(locale, @"^\w{2}(?:-\w{2})?$"))
+            if (!Regex.IsMatch(locale, @"^\w{2,3}(?:-[\w-]{2,})?$"))
                 throw new ArgumentException($"Invalid locale: {locale}", nameof(locale));
 
             EnsureValidCommandName(name);

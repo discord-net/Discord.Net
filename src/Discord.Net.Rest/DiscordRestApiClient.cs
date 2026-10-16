@@ -1352,7 +1352,7 @@ namespace Discord.API
 
             if (locale is not null)
             {
-                if (!System.Text.RegularExpressions.Regex.IsMatch(locale, @"^\w{2}(?:-\w{2})?$"))
+                if (!System.Text.RegularExpressions.Regex.IsMatch(locale, @"^\w{2,3}(?:-[\w-]{2,})?$"))
                     throw new ArgumentException($"{locale} is not a valid locale.", nameof(locale));
 
                 options.RequestHeaders["X-Discord-Locale"] = new[] { locale };
@@ -1437,7 +1437,7 @@ namespace Discord.API
 
             if (locale is not null)
             {
-                if (!System.Text.RegularExpressions.Regex.IsMatch(locale, @"^\w{2}(?:-\w{2})?$"))
+                if (!System.Text.RegularExpressions.Regex.IsMatch(locale, @"^\w{2,3}(?:-[\w-]{2,})?$"))
                     throw new ArgumentException($"{locale} is not a valid locale.", nameof(locale));
 
                 options.RequestHeaders["X-Discord-Locale"] = new[] { locale };
