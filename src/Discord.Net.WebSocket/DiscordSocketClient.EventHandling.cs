@@ -610,6 +610,13 @@ public partial class DiscordSocketClient
                                     guild.CompleteDownloadUsers();
                                     await TimedInvokeAsync(_guildMembersDownloadedEvent, nameof(GuildMembersDownloaded), guild).ConfigureAwait(false);
                                 }
+
+                                if (data.Nonce.IsSpecified
+                                    && data.ChunkIndex + 1 >= data.ChunkCount
+                                    && _guildMembersRequestTasks.TryRemove(data.Nonce.Value, out var tcs))
+                                {
+                                    tcs.TrySetResult(data.NotFound.IsSpecified ? data.NotFound.Value : []);
+                                }
                             }
                             else
                             {
