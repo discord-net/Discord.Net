@@ -139,7 +139,8 @@ internal sealed class DaveSessionManager : IDisposable
         ReadOnlyMemory<byte> payload
     )
     {
-        using var welcomeResult = _session.ProcessWelcome(payload, _decryptors.Keys);
+        // libdave verifies every roster member of the welcome, including ourselves
+        using var welcomeResult = _session.ProcessWelcome(payload, GetRecognizedUserIds());
 
         if (welcomeResult.IsNull)
         {
@@ -151,6 +152,9 @@ internal sealed class DaveSessionManager : IDisposable
             await PrepareProtocolTransitionAsync(transitionId, _session.ProtocolVersion);
         }
     }
+
+    private HashSet<ulong> GetRecognizedUserIds()
+        => [.._decryptors.Keys, SelfUserId];
 
     private async Task OnMLSExternalSenderAsync(ReadOnlyMemory<byte> payload)
     {
@@ -170,7 +174,7 @@ internal sealed class DaveSessionManager : IDisposable
 
         using var result = _session.ProcessProposals(
             payload,
-            _decryptors.Keys
+            GetRecognizedUserIds()
         );
 
         await _logger.DebugAsync($"Processed dave MLS proposals, has data?: {result.HasData}");
