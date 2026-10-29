@@ -11,12 +11,36 @@ To start using the Interaction Service, you need to create a service instance.
 Optionally you can provide the [InteractionService] constructor with a
 [InteractionServiceConfig] to change the services behaviour to suit your needs.
 
+The following is based on the [Text-based Command starter code](xref:Guides.TextCommands.Intro#get-started)
 ```csharp
 ...
-// _client here is DiscordSocketClient.
-// A different approach to passing in a restclient is also possible.
-var _interactionService = new InteractionService(_client.Rest);
+public class Program
+{
+    private DiscordSocketClient _bot = new();
+    private InteractionService _svc = new(_bot);
 
+    private static async Task SlashCmdExecutedHandler(SocketSlashCommand cmd)
+    {
+        var ctx = new SocketInteractionContext(_bot, cmd);
+        await _svc_.ExecuteCommandAsync(ctx, null);  // Magically executes SayHiAsync (Or other SlashCommand you defined)
+    }
+
+    // Call me in some other init methods to register all cmd handler classes!
+    public async Task InitServiceAsync()
+    {
+        _bot.SlashCommandExecuted += SlashCmdExecutedHandler;
+        await _svc.AddModulesAsync(Assembly.GetEntryAssembly(), null);
+    }
+}
+
+public class CmdHandlers : InteractionModuleBase
+{
+    [SlashCommand("Hi", "Say hi")]
+    public async Task SayHiAsync()
+    {
+        await RespondAsync("Hi");
+    }
+}
 ...
 ```
 
