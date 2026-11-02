@@ -1696,11 +1696,7 @@ namespace Discord.Rest
             throw new NotSupportedException();
         /// <inheritdoc />
         /// <exception cref="NotSupportedException">Downloading users is not supported for a REST-based guild.</exception>
-        Task<List<ulong>> IGuild.DownloadUsersAsync(IEnumerable<ulong> userIds) =>
-            throw new NotSupportedException();
-        /// <inheritdoc />
-        /// <exception cref="NotSupportedException">Downloading users is not supported for a REST-based guild.</exception>
-        Task<List<ulong>> IGuild.DownloadUsersAsync(IEnumerable<ulong> userIds, CancellationToken cancelToken) =>
+        Task<IReadOnlyCollection<ulong>> IGuild.DownloadUsersAsync(IEnumerable<ulong> userIds, CancellationToken cancelToken) =>
             throw new NotSupportedException();
         /// <inheritdoc />
         async Task<IReadOnlyCollection<IGuildUser>> IGuild.SearchUsersAsync(string query, int limit, CacheMode mode, RequestOptions options)

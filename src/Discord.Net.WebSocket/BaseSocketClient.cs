@@ -257,7 +257,7 @@ namespace Discord.WebSocket
         ///     A task that represents the asynchronous download operation.
         ///     The task result contains a list of user IDs that have been requested but have not been found in the guild.
         /// </returns>
-        public abstract Task<List<ulong>> DownloadUsersAsync(IGuild guild, IEnumerable<ulong> userIds, CancellationToken cancelToken = default);
+        public abstract Task<IReadOnlyCollection<ulong>> DownloadUsersAsync(IGuild guild, IEnumerable<ulong> userIds, CancellationToken cancelToken = default);
 
         /// <summary>
         ///     Creates a guild for the logged-in user who is in less than 10 active guilds.

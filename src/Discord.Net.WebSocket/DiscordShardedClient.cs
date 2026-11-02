@@ -384,7 +384,7 @@ namespace Discord.WebSocket
 
         /// <inheritdoc />
         /// <exception cref="ArgumentNullException"><paramref name="guild"/> or <paramref name="userIds"/> is <see langword="null"/></exception>
-        public override async Task<List<ulong>> DownloadUsersAsync(IGuild guild, IEnumerable<ulong> userIds, CancellationToken cancelToken = default)
+        public override Task<IReadOnlyCollection<ulong>> DownloadUsersAsync(IGuild guild, IEnumerable<ulong> userIds, CancellationToken cancelToken = default)
         {
             ArgumentNullException.ThrowIfNull(guild);
             ArgumentNullException.ThrowIfNull(userIds);
@@ -392,10 +392,10 @@ namespace Discord.WebSocket
             var shard = GetShardFor(guild);
             if (shard != null)
             {
-                return await shard.DownloadUsersAsync(guild, userIds, cancelToken).ConfigureAwait(false);
+                return shard.DownloadUsersAsync(guild, userIds, cancelToken);
             }
 
-            return [];
+            throw new InvalidOperationException("No shard found for the specified guild.");
         }
 
         private int GetLatency()

@@ -1324,16 +1324,13 @@ namespace Discord.WebSocket
             => Discord.DownloadUsersAsync(new[] { this });
 
         /// <inheritdoc />
-        public async Task<List<ulong>> DownloadUsersAsync(IEnumerable<ulong> userIds)
+        public async Task<IReadOnlyCollection<ulong>> DownloadUsersAsync(IEnumerable<ulong> userIds, CancellationToken cancelToken = default)
         {
-            using var cts = new CancellationTokenSource(DiscordConfig.DefaultRequestTimeout);
-            return await DownloadUsersAsync(userIds, cts.Token).ConfigureAwait(false);
-        }
+            if (cancelToken != CancellationToken.None)
+                return await Discord.DownloadUsersAsync(this, userIds, cancelToken).ConfigureAwait(false);
 
-        /// <inheritdoc />
-        public Task<List<ulong>> DownloadUsersAsync(IEnumerable<ulong> userIds, CancellationToken cancelToken)
-        {
-            return Discord.DownloadUsersAsync(this, userIds, cancelToken);
+            using var cts = new CancellationTokenSource(DiscordConfig.DefaultRequestTimeout);
+            return await Discord.DownloadUsersAsync(this, userIds, cts.Token).ConfigureAwait(false);
         }
 
         internal void CompleteDownloadUsers()

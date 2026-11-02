@@ -718,7 +718,7 @@ namespace Discord.WebSocket
         }
 
         /// <inheritdoc />
-        public override async Task<List<ulong>> DownloadUsersAsync(IGuild guild, IEnumerable<ulong> userIds, CancellationToken cancelToken = default)
+        public override async Task<IReadOnlyCollection<ulong>> DownloadUsersAsync(IGuild guild, IEnumerable<ulong> userIds, CancellationToken cancelToken = default)
         {
             if (ConnectionState == ConnectionState.Connected)
             {
