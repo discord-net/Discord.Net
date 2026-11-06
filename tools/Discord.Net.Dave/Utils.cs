@@ -28,7 +28,8 @@ internal static class Utils
         if (!id.TryFormat(span, out var sz))
             throw new InvalidOperationException();
 
-        str = new(ptr, sz);
+        ptr[sz] = 0;             // Null-Terminator für nativen C-Code (libdave)
+        str = new(ptr, sz + 1); // Fix: war sz (kein Null-Byte) → jetzt sz+1
 
         return new((IntPtr)ptr);
     }
