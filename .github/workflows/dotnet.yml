@@ -25,7 +25,7 @@ jobs:
           - name: Setup .NET
             uses: actions/setup-dotnet@v6
             with:
-              dotnet-version: 10.0.x
+              dotnet-version: 11.x
 
           - name: Is Tag Build
             if: startsWith(github.ref, 'refs/tags/')
