@@ -247,6 +247,11 @@ namespace Discord
         public const int MaxApplicationTagCount = 5;
 
         /// <summary>
+        ///     Returns the max number of user IDs that can be requested in a single Request Guild Members event.
+        /// </summary>
+        public const int MaxRequestedUserIdsPerRequestGuildMembersChunk = 100;
+
+        /// <summary>
         ///     Returns the factor to reduce the heartbeat interval.
         /// </summary>
         /// <remarks>

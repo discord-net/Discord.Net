@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Globalization;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Discord
@@ -1079,6 +1080,19 @@ namespace Discord
         ///     A task that represents the asynchronous download operation.
         /// </returns>
         Task DownloadUsersAsync();
+        /// <summary>
+        ///     Downloads specific users for this guild.
+        /// </summary>
+        /// <remarks>
+        ///     This method downloads all users specified in <paramref name="userIds" /> through the Gateway and caches them.
+        /// </remarks>
+        /// <param name="userIds">The list of Discord user IDs to download.</param>
+        /// <param name="token">The cancellation token used to cancel the task.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous download operation.
+        ///     The task result contains a list of user IDs that have been requested but have not been found in the guild.
+        /// </returns>
+        Task<IReadOnlyCollection<ulong>> DownloadUsersAsync(IEnumerable<ulong> userIds, CancellationToken token = default);
         /// <summary>
         ///     Prunes inactive users.
         /// </summary>
