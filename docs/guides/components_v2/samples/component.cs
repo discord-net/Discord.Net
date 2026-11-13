@@ -39,16 +39,16 @@ private static ComponentBuilderV2 BuildComponentUnsafe(Recipe recipe, Units unit
             options:[
                 new SelectMenuOptionBuilder(
                     "Metric",
-                    "1",
+                    "0",
                     isDefault: units == Units.Metric),
-                    new SelectMenuOptionBuilder(
-                        "Imperial",
-                        "2",
-                        isDefault: units == Units.Imperial),
-                        new SelectMenuOptionBuilder(
-                            "Kelvin",
-                            "0",
-                            isDefault: units == Units.Si)
+                new SelectMenuOptionBuilder(
+                    "Imperial",
+                    "1",
+                    isDefault: units == Units.Imperial),
+                new SelectMenuOptionBuilder(
+                    "Kelvin",
+                    "2",
+                    isDefault: units == Units.Si)
             ],
             id: RecipeUnitSelectMenu
         )
