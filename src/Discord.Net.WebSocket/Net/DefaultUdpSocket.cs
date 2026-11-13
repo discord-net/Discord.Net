@@ -1,3 +1,4 @@
+using AsyncKeyedLock;
 using System;
 using System.Net;
 using System.Net.Sockets;
@@ -10,7 +11,7 @@ namespace Discord.Net.Udp
     {
         public event Func<byte[], int, int, Task> ReceivedDatagram;
 
-        private readonly SemaphoreSlim _lock;
+        private readonly AsyncNonKeyedLocker _lock;
         private UdpClient _udp;
         private IPEndPoint _destination;
         private CancellationTokenSource _stopCancelTokenSource, _cancelTokenSource;
@@ -22,7 +23,7 @@ namespace Discord.Net.Udp
 
         public DefaultUdpSocket()
         {
-            _lock = new SemaphoreSlim(1, 1);
+            _lock = new();
             _stopCancelTokenSource = new CancellationTokenSource();
         }
         private void Dispose(bool disposing)
@@ -47,15 +48,8 @@ namespace Discord.Net.Udp
 
         public async Task StartAsync()
         {
-            await _lock.WaitAsync().ConfigureAwait(false);
-            try
-            {
-                await StartInternalAsync(_cancelToken).ConfigureAwait(false);
-            }
-            finally
-            {
-                _lock.Release();
-            }
+            using var _ = await _lock.LockAsync().ConfigureAwait(false);
+            await StartInternalAsync(_cancelToken).ConfigureAwait(false);
         }
         public async Task StartInternalAsync(CancellationToken cancelToken)
         {
@@ -75,15 +69,8 @@ namespace Discord.Net.Udp
         }
         public async Task StopAsync()
         {
-            await _lock.WaitAsync().ConfigureAwait(false);
-            try
-            {
-                await StopInternalAsync().ConfigureAwait(false);
-            }
-            finally
-            {
-                _lock.Release();
-            }
+            using var _ = await _lock.LockAsync().ConfigureAwait(false);
+            await StopInternalAsync().ConfigureAwait(false);
         }
         public async Task StopInternalAsync(bool isDisposing = false)
         {

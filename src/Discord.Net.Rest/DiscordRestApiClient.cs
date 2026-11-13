@@ -1,3 +1,4 @@
+using AsyncKeyedLock;
 using Discord.API.Rest;
 using Discord.Net;
 using Discord.Net.Converters;
@@ -34,7 +35,7 @@ namespace Discord.API
         private readonly AsyncEvent<Func<string, string, double, Task>> _sentRequestEvent = new AsyncEvent<Func<string, string, double, Task>>();
 
         protected readonly JsonSerializer _serializer;
-        protected readonly SemaphoreSlim _stateLock;
+        protected readonly AsyncNonKeyedLocker _stateLock;
         private readonly RestClientProvider _restClientProvider;
 
         protected bool _isDisposed;
@@ -66,7 +67,7 @@ namespace Discord.API
             DefaultRatelimitCallback = defaultRatelimitCallback;
 
             RequestQueue = new RequestQueue();
-            _stateLock = new SemaphoreSlim(1, 1);
+            _stateLock = new();
 
             SetBaseUrl(DiscordConfig.APIUrl);
         }
@@ -129,12 +130,8 @@ namespace Discord.API
 
         public async Task LoginAsync(TokenType tokenType, string token, RequestOptions options = null)
         {
-            await _stateLock.WaitAsync().ConfigureAwait(false);
-            try
-            {
-                await LoginInternalAsync(tokenType, token, options).ConfigureAwait(false);
-            }
-            finally { _stateLock.Release(); }
+            using var _ = await _stateLock.LockAsync().ConfigureAwait(false);
+            await LoginInternalAsync(tokenType, token, options).ConfigureAwait(false);
         }
         private async Task LoginInternalAsync(TokenType tokenType, string token, RequestOptions options = null)
         {
@@ -167,12 +164,8 @@ namespace Discord.API
 
         public async Task LogoutAsync()
         {
-            await _stateLock.WaitAsync().ConfigureAwait(false);
-            try
-            {
-                await LogoutInternalAsync().ConfigureAwait(false);
-            }
-            finally { _stateLock.Release(); }
+            using var _ = await _stateLock.LockAsync().ConfigureAwait(false);
+            await LogoutInternalAsync().ConfigureAwait(false);
         }
         private async Task LogoutInternalAsync()
         {

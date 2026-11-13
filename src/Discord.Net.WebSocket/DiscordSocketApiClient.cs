@@ -197,12 +197,8 @@ namespace Discord.API
 
         public async Task ConnectAsync()
         {
-            await _stateLock.WaitAsync().ConfigureAwait(false);
-            try
-            {
-                await ConnectInternalAsync().ConfigureAwait(false);
-            }
-            finally { _stateLock.Release(); }
+            using var _ = await _stateLock.LockAsync().ConfigureAwait(false);
+            await ConnectInternalAsync().ConfigureAwait(false);
         }
         /// <exception cref="InvalidOperationException">The client must be logged in before connecting.</exception>
         /// <exception cref="NotSupportedException">This client is not configured with WebSocket support.</exception>
@@ -262,12 +258,8 @@ namespace Discord.API
 
         public async Task DisconnectAsync(Exception ex = null)
         {
-            await _stateLock.WaitAsync().ConfigureAwait(false);
-            try
-            {
-                await DisconnectInternalAsync(ex).ConfigureAwait(false);
-            }
-            finally { _stateLock.Release(); }
+            using var _ = await _stateLock.LockAsync().ConfigureAwait(false);
+            await DisconnectInternalAsync(ex).ConfigureAwait(false);
         }
         /// <exception cref="NotSupportedException">This client is not configured with WebSocket support.</exception>
         internal override async Task DisconnectInternalAsync(Exception ex = null)

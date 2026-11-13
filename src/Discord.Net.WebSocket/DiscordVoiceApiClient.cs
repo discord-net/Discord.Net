@@ -1,3 +1,4 @@
+using AsyncKeyedLock;
 using Discord.API;
 using Discord.API.Voice;
 using Discord.Net.Converters;
@@ -41,7 +42,7 @@ namespace Discord.Audio
         private readonly AsyncEvent<Func<Exception, Task>> _disconnectedEvent = new AsyncEvent<Func<Exception, Task>>();
 
         private readonly JsonSerializer _serializer;
-        private readonly SemaphoreSlim _connectionLock;
+        private readonly AsyncNonKeyedLocker _connectionLock;
         private readonly IUdpSocket _udp;
         private CancellationTokenSource _connectCancelToken;
         private bool _isDisposed;
@@ -56,7 +57,7 @@ namespace Discord.Audio
         internal DiscordVoiceAPIClient(ulong guildId, WebSocketProvider webSocketProvider, UdpSocketProvider udpSocketProvider, JsonSerializer serializer = null)
         {
             GuildId = guildId;
-            _connectionLock = new SemaphoreSlim(1, 1);
+            _connectionLock = new();
             _udp = udpSocketProvider();
             _udp.ReceivedDatagram += (data, index, count) =>
             {
@@ -200,12 +201,8 @@ namespace Discord.Audio
 
         public async Task ConnectAsync(string url)
         {
-            await _connectionLock.WaitAsync().ConfigureAwait(false);
-            try
-            {
-                await ConnectInternalAsync(url).ConfigureAwait(false);
-            }
-            finally { _connectionLock.Release(); }
+            using var _ = await _connectionLock.LockAsync().ConfigureAwait(false);
+            await ConnectInternalAsync(url).ConfigureAwait(false);
         }
 
         private async Task ConnectInternalAsync(string url)
@@ -234,12 +231,8 @@ namespace Discord.Audio
 
         public async Task DisconnectAsync()
         {
-            await _connectionLock.WaitAsync().ConfigureAwait(false);
-            try
-            {
-                await DisconnectInternalAsync().ConfigureAwait(false);
-            }
-            finally { _connectionLock.Release(); }
+            using var _ = await _connectionLock.LockAsync().ConfigureAwait(false);
+            await DisconnectInternalAsync().ConfigureAwait(false);
         }
         private async Task DisconnectInternalAsync()
         {
