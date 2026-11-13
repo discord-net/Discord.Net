@@ -28,10 +28,10 @@ namespace Discord.API
     internal class DiscordRestApiClient : IDisposable, IAsyncDisposable
     {
         #region DiscordRestApiClient
-        private static readonly ConcurrentDictionary<string, Func<BucketIds, BucketId>> _bucketIdGenerators = new ConcurrentDictionary<string, Func<BucketIds, BucketId>>();
+        private static readonly ConcurrentDictionary<string, Func<BucketIds, BucketId>> _bucketIdGenerators = new ();
 
         public event Func<string, string, double, Task> SentRequest { add { _sentRequestEvent.Add(value); } remove { _sentRequestEvent.Remove(value); } }
-        private readonly AsyncEvent<Func<string, string, double, Task>> _sentRequestEvent = new AsyncEvent<Func<string, string, double, Task>>();
+        private readonly AsyncEvent<Func<string, string, double, Task>> _sentRequestEvent = new ();
 
         protected readonly JsonSerializer _serializer;
         protected readonly SemaphoreSlim _stateLock;
@@ -136,6 +136,7 @@ namespace Discord.API
             }
             finally { _stateLock.Release(); }
         }
+
         private async Task LoginInternalAsync(TokenType tokenType, string token, RequestOptions options = null)
         {
             if (LoginState != LoginState.LoggedOut)

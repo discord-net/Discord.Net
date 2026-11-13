@@ -13,7 +13,7 @@ namespace Discord.Webhook;
 /// <summary>
 ///     A client responsible for connecting as a Webhook.
 /// </summary>
-public class DiscordWebhookClient : IDisposable
+public class DiscordWebhookClient : IAsyncDisposable, IDisposable
 {
     public event Func<LogMessage, Task> Log
     {
@@ -21,74 +21,24 @@ public class DiscordWebhookClient : IDisposable
         remove => _logEvent.Remove(value);
     }
 
-    internal readonly AsyncEvent<Func<LogMessage, Task>> _logEvent = new AsyncEvent<Func<LogMessage, Task>>();
+    internal readonly AsyncEvent<Func<LogMessage, Task>> _logEvent = new();
 
-    private readonly ulong _webhookId;
-    internal IWebhook Webhook;
+    internal ulong WebhookId;
     internal readonly Logger _restLogger;
 
     internal API.DiscordRestApiClient ApiClient { get; }
     internal LogManager LogManager { get; }
 
-    /// <summary>
-    ///     Creates a new Webhook Discord client.
-    /// </summary>
-    public DiscordWebhookClient(IWebhook webhook)
-        : this(webhook.Id, webhook.Token, new DiscordRestConfig()) { }
-
-    /// <summary>
-    ///     Creates a new Webhook Discord client.
-    /// </summary>
-    public DiscordWebhookClient(ulong webhookId, string webhookToken)
-        : this(webhookId, webhookToken, new DiscordRestConfig()) { }
-
-    /// <summary>
-    ///     Creates a new Webhook Discord client.
-    /// </summary>
-    public DiscordWebhookClient(string webhookUrl)
-        : this(webhookUrl, new DiscordRestConfig()) { }
-
     // regex pattern to match webhook urls
-    private static Regex WebhookUrlRegex = new Regex(@"^.*(discord|discordapp)\.com\/api\/webhooks\/([\d]+)\/([a-z0-9_-]+)$", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+    private static Regex WebhookUrlRegex = new(@"^.*(discord|discordapp)\.com\/api\/webhooks\/([\d]+)\/([a-z0-9_-]+)$", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
 
     /// <summary>
     ///     Creates a new Webhook Discord client.
     /// </summary>
-    public DiscordWebhookClient(ulong webhookId, string webhookToken, DiscordRestConfig config)
-        : this(config)
+    public DiscordWebhookClient(DiscordRestConfig config = null)
     {
-        _webhookId = webhookId;
-        ApiClient.LoginAsync(TokenType.Webhook, webhookToken).GetAwaiter().GetResult();
-        Webhook = WebhookClientHelper.GetWebhookAsync(this, webhookId).GetAwaiter().GetResult();
-    }
-    
-    /// <summary>
-    ///     Creates a new Webhook Discord client.
-    /// </summary>
-    public DiscordWebhookClient(IWebhook webhook, DiscordRestConfig config)
-        : this(config)
-    {
-        Webhook = webhook;
-        _webhookId = Webhook.Id;
-        ApiClient.LoginAsync(TokenType.Webhook, webhook.Token).GetAwaiter().GetResult();
-    }
+        config ??= new DiscordRestConfig();
 
-    /// <summary>
-    ///     Creates a new Webhook Discord client.
-    /// </summary>
-    /// <param name="webhookUrl">The url of the webhook.</param>
-    /// <param name="config">The configuration options to use for this client.</param>
-    /// <exception cref="ArgumentException">Thrown if the <paramref name="webhookUrl"/> is an invalid format.</exception>
-    /// <exception cref="ArgumentNullException">Thrown if the <paramref name="webhookUrl"/> is null or whitespace.</exception>
-    public DiscordWebhookClient(string webhookUrl, DiscordRestConfig config) : this(config)
-    {
-        ParseWebhookUrl(webhookUrl, out _webhookId, out string token);
-        ApiClient.LoginAsync(TokenType.Webhook, token).GetAwaiter().GetResult();
-        Webhook = WebhookClientHelper.GetWebhookAsync(this, _webhookId).GetAwaiter().GetResult();
-    }
-
-    private DiscordWebhookClient(DiscordRestConfig config)
-    {
         ApiClient = CreateApiClient(config);
         LogManager = new LogManager(config.LogLevel);
         LogManager.Message += async msg => await _logEvent.InvokeAsync(msg).ConfigureAwait(false);
@@ -104,9 +54,30 @@ public class DiscordWebhookClient : IDisposable
         };
         ApiClient.SentRequest += async (method, endpoint, millis) => await _restLogger.VerboseAsync($"{method} {endpoint}: {millis} ms").ConfigureAwait(false);
     }
+
+    public async Task LoginAsync(ulong webhookId, string webhookToken)
+    {
+        WebhookId = webhookId;
+
+        await ApiClient.LoginAsync(TokenType.Webhook, webhookToken).ConfigureAwait(false);
+    }
+
+    public async Task LoginAsync(IWebhook webhook)
+    {
+        WebhookId = webhook.Id;
+
+        await ApiClient.LoginAsync(TokenType.Webhook, webhook.Token).ConfigureAwait(false);
+    }
+
+    public async Task LoginAsync(string webhookUrl)
+    {
+        ParseWebhookUrl(webhookUrl, out WebhookId, out var webhookToken);
+        await ApiClient.LoginAsync(TokenType.Webhook, webhookToken).ConfigureAwait(false);
+    }
+
     private static API.DiscordRestApiClient CreateApiClient(DiscordRestConfig config)
-        => new API.DiscordRestApiClient(config.RestClientProvider, DiscordRestConfig.UserAgent, useSystemClock: config.UseSystemClock, defaultRatelimitCallback: config.DefaultRatelimitCallback);
-        
+        => new(config.RestClientProvider, DiscordConfig.UserAgent, useSystemClock: config.UseSystemClock, defaultRatelimitCallback: config.DefaultRatelimitCallback);
+
     /// <summary>
     ///     Sends a message to the channel for this webhook.
     /// </summary>
@@ -161,7 +132,7 @@ public class DiscordWebhookClient : IDisposable
         string threadName = null, ulong[] appliedTags = null, PollProperties poll = null)
         => WebhookClientHelper.SendFileAsync(this, filePath, text, isTTS, embeds, username, avatarUrl,
             allowedMentions, options, isSpoiler, components, flags, threadId, threadName, appliedTags, poll);
-            
+
     /// <summary> 
     ///     Sends a message to the channel for this webhook with an attachment. 
     /// </summary>
@@ -202,21 +173,13 @@ public class DiscordWebhookClient : IDisposable
     ///     Modifies the properties of this webhook.
     /// </summary>
     public Task ModifyWebhookAsync(Action<WebhookProperties> func, RequestOptions options = null)
-        => Webhook.ModifyAsync(func, options);
+        => WebhookClientHelper.ModifyAsync(this, func, options);
 
     /// <summary> 
     ///     Deletes this webhook from Discord and disposes the client.
     /// </summary>
-    public async Task DeleteWebhookAsync(RequestOptions options = null)
-    {
-        await Webhook.DeleteAsync(options).ConfigureAwait(false);
-        Dispose();
-    }
-
-    public void Dispose()
-    {
-        ApiClient?.Dispose();
-    }
+    public Task DeleteWebhookAsync(RequestOptions options = null)
+        => WebhookClientHelper.DeleteAsync(this, options);
 
     internal static void ParseWebhookUrl(string webhookUrl, out ulong webhookId, out string webhookToken)
     {
@@ -225,7 +188,7 @@ public class DiscordWebhookClient : IDisposable
 
         // thrown when groups are not populated/valid, or when there is no match
         ArgumentException ex(string reason = null)
-            => new ($"The given webhook Url was not in a valid format. {reason}", nameof(webhookUrl));
+            => new($"The given webhook Url was not in a valid format. {reason}", nameof(webhookUrl));
 
         var match = WebhookUrlRegex.Match(webhookUrl);
 
@@ -243,4 +206,12 @@ public class DiscordWebhookClient : IDisposable
         else
             throw ex();
     }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (ApiClient != null)
+            await ApiClient.DisposeAsync();
+    }
+
+    public void Dispose() => ApiClient?.Dispose();
 }
