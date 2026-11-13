@@ -29,13 +29,9 @@ namespace Discord.Net.Rest
             _baseUrl = baseUrl;
 
 #pragma warning disable IDISP014
-            _client = new HttpClient(new HttpClientHandler
-            {
-                AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
-                UseCookies = false,
-                UseProxy = useProxy,
-                Proxy = webProxy
-            });
+            var handler = new HttpClientHandler { AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate, UseCookies = false, UseProxy = useProxy };
+            if (useProxy) handler.Proxy = webProxy;
+            _client = new HttpClient(handler);
 #pragma warning restore IDISP014
             SetHeader("accept-encoding", "gzip, deflate");
 

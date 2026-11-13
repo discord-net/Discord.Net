@@ -61,10 +61,27 @@ namespace Discord.Net
                 DateTimeOffset.TryParse(temp, CultureInfo.InvariantCulture, DateTimeStyles.None, out var date) ? DateTimeOffset.UtcNow - date : (TimeSpan?)null;
         }
 
-        internal Ratelimit ReadRatelimitPayload(Stream response)
+        internal Ratelimit ReadRatelimitPayload(RestResponse restResponse)
         {
-            if (response != null && response.Length != 0)
+            var response = restResponse.Stream;
+            if (response != null && response.Length != 0 && response.CanRead)
             {
+                var pos = response.Position;
+                using (TextReader text = new StreamReader(response))
+                {
+                    if (text.ReadToEnd().StartsWith("<"))
+                    {
+                        return new Ratelimit
+                        {
+                            Global = true,
+                            Message = "Cloudflare HTML limit",
+                            RetryAfter = restResponse.Headers.TryGetValue("Retry-After", out var retry) ? float.Parse(retry) : 60 * 30 // 30 mins
+                        };
+                    }
+                }
+
+                response.Position = pos;
+
                 using (TextReader text = new StreamReader(response))
                 using (JsonReader reader = new JsonTextReader(text))
                 {

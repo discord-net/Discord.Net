@@ -161,7 +161,7 @@ namespace Discord.Net.Queue
                 }*/
                 finally
                 {
-                    UpdateRateLimit(id, request, info, response.StatusCode == (HttpStatusCode)429, body: response.Stream);
+                    UpdateRateLimit(id, request, info, response.StatusCode == (HttpStatusCode)429, restResponse: response);
 #if DEBUG_LIMITS
                     Debug.WriteLine($"[{id}] Stop");
 #endif
@@ -320,7 +320,7 @@ namespace Discord.Net.Queue
             }
         }
 
-        private void UpdateRateLimit(int id, IRequest request, RateLimitInfo info, bool is429, bool redirected = false, Stream body = null)
+        private void UpdateRateLimit(int id, IRequest request, RateLimitInfo info, bool is429, bool redirected = false, RestResponse restResponse = default)
         {
             if (WindowCount == 0)
                 return;
@@ -390,7 +390,7 @@ namespace Discord.Net.Queue
                     _semaphore = 0;
 
                     // use the payload reset after value
-                    var payload = info.ReadRatelimitPayload(body);
+                    var payload = info.ReadRatelimitPayload(restResponse);
 
                     // fallback on stored ratelimit info when payload is null, https://github.com/discord-net/Discord.Net/issues/2123
                     resetTick = DateTimeOffset.UtcNow.Add(TimeSpan.FromSeconds(payload?.RetryAfter ?? info.ResetAfter?.TotalSeconds ?? 0));
