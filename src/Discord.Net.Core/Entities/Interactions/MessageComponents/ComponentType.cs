@@ -108,12 +108,11 @@ namespace Discord
         /// <summary>
         ///     A component that allows users to select from an overflow menu.
         /// </summary>
-        OverflowMenu = 24,
+        OverflowMenu = 25,
 
-        
         /// <summary>
-        ///     
+        ///     An action item inside an <see cref="OverflowMenu"/>.
         /// </summary>
-        MenuActionItem = 25,
+        MenuActionItem = 26,
     }
 }

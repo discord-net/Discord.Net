@@ -58,6 +58,12 @@ internal static class MessageComponentExtension
             case CheckboxComponent checkbox:
                 return new API.CheckboxComponent(checkbox);
 
+            case OverflowMenuComponent overflowMenu:
+                return new API.OverflowMenuComponent(overflowMenu);
+
+            case MenuActionItemComponent menuActionItem:
+                return new API.MenuActionItemComponent(menuActionItem);
+
             case UnknownComponent unknown:
                 return new API.UnknownComponent { RawType = unknown.RawType, RawJson = unknown.RawJson, Id = unknown.Id ?? Optional<int>.Unspecified };
         }
@@ -236,6 +242,36 @@ internal static class MessageComponentExtension
                 return  new CheckboxComponent(parsed.Id.ToNullable(),
                     parsed.CustomId,
                     parsed.DefaultState.ToNullable());
+            }
+
+            case ComponentType.OverflowMenu:
+            {
+                var parsed = (API.OverflowMenuComponent)component;
+                return new OverflowMenuComponent(
+                    parsed.Id.ToNullable(),
+                    parsed.Groups?
+                        .Select(x => new OverflowMenuGroup(
+                            x.Label.GetValueOrDefault(null),
+                            x.Components?.Select(y => (MenuActionItemComponent)y.ToEntity()).ToImmutableArray()))
+                        .ToImmutableArray());
+            }
+
+            case ComponentType.MenuActionItem:
+            {
+                var parsed = (API.MenuActionItemComponent)component;
+                return new MenuActionItemComponent(
+                    parsed.Id.ToNullable(),
+                    parsed.CustomId.GetValueOrDefault(),
+                    parsed.Label,
+                    parsed.Style,
+                    parsed.Description.GetValueOrDefault(null),
+                    parsed.Url.GetValueOrDefault(null),
+                    parsed.Emoji.IsSpecified
+                        ? parsed.Emoji.Value.Id.HasValue
+                            ? new Emote(parsed.Emoji.Value.Id.Value, parsed.Emoji.Value.Name, parsed.Emoji.Value.Animated.GetValueOrDefault())
+                            : new Emoji(parsed.Emoji.Value.Name)
+                        : null,
+                    parsed.IsDisabled.GetValueOrDefault(false));
             }
 
             default:

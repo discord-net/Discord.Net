@@ -34,6 +34,38 @@ internal class MenuActionItemComponent : IInteractableComponent
 
     public MenuActionItemComponent() { }
 
+    public MenuActionItemComponent(Discord.MenuActionItemComponent component)
+    {
+        Type = component.Type;
+        Id = component.Id ?? Optional<int>.Unspecified;
+        CustomId = component.CustomId ?? Optional<string>.Unspecified;
+        Label = component.Label;
+        Style = component.Style;
+        Description = component.Description ?? Optional<string>.Unspecified;
+        Url = component.Url ?? Optional<string>.Unspecified;
+        IsDisabled = component.IsDisabled;
+
+        if (component.Emote != null)
+        {
+            if (component.Emote is Emote e)
+            {
+                Emoji = new Emoji
+                {
+                    Name = e.Name,
+                    Animated = e.Animated,
+                    Id = e.Id
+                };
+            }
+            else
+            {
+                Emoji = new Emoji
+                {
+                    Name = component.Emote.Name
+                };
+            }
+        }
+    }
+
     [JsonIgnore]
     string IInteractableComponent.CustomId => CustomId.GetValueOrDefault();
 

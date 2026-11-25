@@ -11,7 +11,7 @@ namespace Discord;
 public class ComponentBuilderV2 : IStaticComponentContainer
 {
     /// <inheritdoc />
-    public ImmutableArray<ComponentType> SupportedComponentTypes { get; } =
+    public static ImmutableArray<ComponentType> SupportedComponentTypes { get; } =
     [
         ComponentType.ActionRow,
         ComponentType.Section,
@@ -19,7 +19,7 @@ public class ComponentBuilderV2 : IStaticComponentContainer
         ComponentType.Separator,
         ComponentType.Container,
         ComponentType.File,
-        ComponentType.TextDisplay
+        ComponentType.TextDisplay,
     ];
 
     /// <summary>
@@ -27,17 +27,15 @@ public class ComponentBuilderV2 : IStaticComponentContainer
     /// </summary>
     public const int MaxChildCount = 40;
 
-    private List<IMessageComponentBuilder> _components = new();
-
     /// <inheritdoc/>
     public List<IMessageComponentBuilder> Components
     {
-        get => _components;
+        get;
         set
         {
-            _components = value ?? throw new ArgumentNullException(nameof(value), $"{nameof(Components)} cannot be null.");
+            field = value ?? throw new ArgumentNullException(nameof(value), $"{nameof(Components)} cannot be null.");
         }
-    }
+    } = [];
 
     /// <summary>
     ///     Initializes a new instance of <see cref="ComponentBuilderV2"/>.

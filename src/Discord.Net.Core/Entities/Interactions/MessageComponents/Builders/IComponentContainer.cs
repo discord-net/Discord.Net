@@ -11,7 +11,7 @@ public interface IComponentContainer
     /// <summary>
     ///     Gets the types of child components supported by this container.
     /// </summary>
-    ImmutableArray<ComponentType> SupportedComponentTypes { get; }
+    static abstract ImmutableArray<ComponentType> SupportedComponentTypes { get; }
 
     /// <summary>
     ///     Gets the maximum number of components allowed in the container.

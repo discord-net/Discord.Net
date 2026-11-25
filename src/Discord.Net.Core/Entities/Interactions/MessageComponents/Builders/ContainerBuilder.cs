@@ -10,7 +10,7 @@ namespace Discord;
 public class ContainerBuilder : IMessageComponentBuilder, IStaticComponentContainer
 {
     /// <inheritdoc />
-    public ImmutableArray<ComponentType> SupportedComponentTypes { get; } =
+    public static ImmutableArray<ComponentType> SupportedComponentTypes { get; } =
     [
         ComponentType.ActionRow,
         ComponentType.Section,
@@ -19,7 +19,7 @@ public class ContainerBuilder : IMessageComponentBuilder, IStaticComponentContai
         ComponentType.Separator,
         ComponentType.File,
         ComponentType.SelectMenu,
-        ComponentType.TextDisplay
+        ComponentType.TextDisplay,
     ];
 
     /// <inheritdoc />

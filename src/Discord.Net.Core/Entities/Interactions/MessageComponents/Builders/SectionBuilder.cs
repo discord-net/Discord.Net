@@ -11,7 +11,7 @@ namespace Discord;
 public class SectionBuilder : IMessageComponentBuilder, IStaticComponentContainer
 {
     /// <inheritdoc />
-    public ImmutableArray<ComponentType> SupportedComponentTypes { get; } =
+    public static ImmutableArray<ComponentType> SupportedComponentTypes { get; } =
     [
         ComponentType.TextDisplay
     ];
@@ -131,8 +131,8 @@ public class SectionBuilder : IMessageComponentBuilder, IStaticComponentContaine
         if (Accessory is null)
             throw new ArgumentNullException(nameof(Accessory), "A section must have an accessory.");
 
-        if (Accessory is not ButtonBuilder and not ThumbnailBuilder)
-            throw new InvalidOperationException($"Accessory component can only be {nameof(ButtonBuilder)} or {nameof(ThumbnailBuilder)}.");
+        if (Accessory is not ButtonBuilder and not ThumbnailBuilder and not OverflowMenuBuilder)
+            throw new InvalidOperationException($"Accessory component can only be {nameof(ButtonBuilder)}, {nameof(ThumbnailBuilder)} or {nameof(OverflowMenuBuilder)}.");
 
         return new(Id, Components.Select(x => x.Build()).ToImmutableArray(), Accessory?.Build());
     }
