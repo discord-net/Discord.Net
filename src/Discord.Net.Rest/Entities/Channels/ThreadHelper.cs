@@ -146,7 +146,7 @@ namespace Discord.Rest
                 Preconditions.AtMost(stickers.Length, 3, nameof(stickers), "A max of 3 stickers are allowed.");
             }
 
-            if (components?.Components?.Any(x => x.Type != ComponentType.ActionRow) ?? false)
+            if (Preconditions.IsComponentsV2(components?.Components))
                 flags |= MessageFlags.ComponentsV2;
             Preconditions.ValidateMessageFlags(flags);
 
@@ -211,7 +211,7 @@ namespace Discord.Rest
                 Preconditions.AtMost(stickers.Length, 3, nameof(stickers), "A max of 3 stickers are allowed.");
             }
 
-            if (components?.Components?.Any(x => x.Type != ComponentType.ActionRow) ?? false)
+            if (Preconditions.IsComponentsV2(components?.Components))
                 flags |= MessageFlags.ComponentsV2;
 
             Preconditions.ValidateMessageFlags(flags);

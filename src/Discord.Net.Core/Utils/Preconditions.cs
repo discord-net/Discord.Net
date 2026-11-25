@@ -477,5 +477,52 @@ namespace Discord
                 !flags.HasFlag(MessageFlags.Ephemeral))
                 throw new ArgumentException("The only valid MessageFlags are Ephemeral, SuppressEmbeds, SuppressNotification, ComponentsV2 and None.", nameof(flags));
         }
+
+        #region Components
+
+        /// <summary>
+        ///     Determines whether a component of the given <paramref name="type"/> is part of the legacy component set,
+        ///     which can be sent without the <see cref="MessageFlags.ComponentsV2"/> flag.
+        /// </summary>
+        public static bool IsLegacyComponentType(ComponentType type)
+            => type is ComponentType.ActionRow
+                or ComponentType.Button
+                or ComponentType.TextInput
+                or ComponentType.SelectMenu
+                or ComponentType.UserSelect
+                or ComponentType.RoleSelect
+                or ComponentType.MentionableSelect
+                or ComponentType.ChannelSelect;
+
+        /// <summary>
+        ///     Determines whether the given component set requires the <see cref="MessageFlags.ComponentsV2"/> flag.
+        /// </summary>
+        public static bool IsComponentsV2(IEnumerable<IMessageComponent> components)
+            => IsComponentsV2(components, static x => x.Type, static x => (x as INestedComponent)?.Components);
+
+        /// <inheritdoc cref="IsComponentsV2(IEnumerable{IMessageComponent})"/>
+        public static bool IsComponentsV2<T>(IEnumerable<T> components, Func<T, ComponentType> typeSelector,
+            Func<T, IEnumerable<T>> childrenSelector)
+            where T : class
+        {
+            if (components is null)
+                return false;
+
+            foreach (var component in components)
+            {
+                if (component is null)
+                    continue;
+
+                if (!IsLegacyComponentType(typeSelector(component)))
+                    return true;
+
+                if (IsComponentsV2(childrenSelector(component), typeSelector, childrenSelector))
+                    return true;
+            }
+
+            return false;
+        }
+
+        #endregion
     }
 }

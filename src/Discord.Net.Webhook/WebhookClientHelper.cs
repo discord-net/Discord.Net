@@ -29,7 +29,7 @@ namespace Discord.Webhook
             MessageFlags flags, ulong? threadId = null, string threadName = null, ulong[] appliedTags = null,
             PollProperties poll = null)
         {
-            if (components?.Components.Any(x => x.Type is not ComponentType.ActionRow) ?? false)
+            if (Preconditions.IsComponentsV2(components?.Components))
                 flags |= MessageFlags.ComponentsV2;
 
             Preconditions.ValidateMessageFlags(flags);
@@ -196,7 +196,7 @@ namespace Discord.Webhook
                 }
             }
 
-            if (components?.Components.Any(x => x.Type is not ComponentType.ActionRow) ?? false)
+            if (Preconditions.IsComponentsV2(components?.Components))
                 flags |= MessageFlags.ComponentsV2;
 
             Preconditions.ValidateMessageFlags(flags);
