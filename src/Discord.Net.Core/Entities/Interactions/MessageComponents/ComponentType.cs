@@ -104,5 +104,16 @@ namespace Discord
         ///     A checkbox.
         /// </summary>
         Checkbox = 23,
+
+        /// <summary>
+        ///     A component that allows users to select from an overflow menu.
+        /// </summary>
+        OverflowMenu = 24,
+
+        
+        /// <summary>
+        ///     
+        /// </summary>
+        MenuActionItem = 25,
     }
 }
