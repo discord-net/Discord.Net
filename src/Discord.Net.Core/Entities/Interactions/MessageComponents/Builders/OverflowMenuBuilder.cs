@@ -9,9 +9,23 @@ namespace Discord;
 /// <summary>
 ///     Represents a class used to build <see cref="OverflowMenuComponent"/>'s.
 /// </summary>
+/// <remarks>
+///     An overflow menu can only be used as the accessory of a <see cref="SectionBuilder"/> or inside an
+///     <see cref="ActionRowBuilder"/>; it is not supported by <see cref="ComponentBuilderV2"/>.
+/// </remarks>
 [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
 public class OverflowMenuBuilder : IMessageComponentBuilder
 {
+    /// <summary>
+    ///     The maximum number of groups an overflow menu can contain.
+    /// </summary>
+    public const int MaxGroupCount = 8;
+
+    /// <summary>
+    ///     The maximum number of action items an overflow menu can contain in total, across all of its groups.
+    /// </summary>
+    public const int MaxItemCount = 8;
+
     /// <inheritdoc/>
     public ComponentType Type => ComponentType.OverflowMenu;
 
@@ -98,10 +112,14 @@ public class OverflowMenuBuilder : IMessageComponentBuilder
     }
 
     /// <inheritdoc cref="IMessageComponentBuilder.Build"/>
+    /// <exception cref="ArgumentException">An overflow menu must contain between 1 and <see cref="MaxGroupCount"/> groups.</exception>
+    /// <exception cref="ArgumentException">An overflow menu cannot contain more than <see cref="MaxItemCount"/> action items in total.</exception>
     public OverflowMenuComponent Build()
     {
         Preconditions.NotNull(Groups, nameof(Groups));
         Preconditions.AtLeast(Groups.Count, 1, nameof(Groups), "An overflow menu must contain at least 1 group.");
+        Preconditions.AtMost(Groups.Count, MaxGroupCount, nameof(Groups), $"An overflow menu can only contain {MaxGroupCount} groups.");
+        Preconditions.AtMost(Groups.Sum(x => x.Components.Count), MaxItemCount, nameof(Groups), $"An overflow menu can only contain {MaxItemCount} action items in total.");
 
         return new OverflowMenuComponent(Id, Groups.Select(x => x.Build()).ToImmutableArray());
     }

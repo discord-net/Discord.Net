@@ -11,9 +11,32 @@ namespace Discord;
 public class OverflowMenuGroupBuilder
 {
     /// <summary>
+    ///     The maximum length of the group label.
+    /// </summary>
+    public const int MaxLabelLength = 80;
+
+    /// <summary>
+    ///     The maximum number of action items a group can contain.
+    /// </summary>
+    public const int MaxChildCount = 8;
+
+    /// <summary>
     ///     Gets or sets the label of this group.
     /// </summary>
-    public string Label { get; set; }
+    /// <exception cref="ArgumentException" accessor="set"><see cref="Label"/> length exceeds <see cref="MaxLabelLength"/>.</exception>
+    public string Label
+    {
+        get;
+        set
+        {
+            if (value is not null)
+            {
+                Preconditions.AtMost(value.Length, MaxLabelLength, nameof(Label));
+            }
+
+            field = value;
+        }
+    }
 
     /// <summary>
     ///     Gets or sets the action items in this group.
@@ -140,11 +163,14 @@ public class OverflowMenuGroupBuilder
     ///     Builds this builder into an <see cref="OverflowMenuGroup"/>.
     /// </summary>
     /// <returns>An <see cref="OverflowMenuGroup"/>.</returns>
-    /// <exception cref="ArgumentException">A group must contain at least 1 action item.</exception>
+    /// <exception cref="ArgumentException">A group must contain between 1 and <see cref="MaxChildCount"/> action items.</exception>
+    /// <exception cref="ArgumentException"><see cref="Label"/> exceeds <see cref="MaxLabelLength"/>.</exception>
     public OverflowMenuGroup Build()
     {
         Preconditions.NotNull(Components, nameof(Components));
         Preconditions.AtLeast(Components.Count, 1, nameof(Components), "An overflow menu group must contain at least 1 action item.");
+        Preconditions.AtMost(Components.Count, MaxChildCount, nameof(Components), $"An overflow menu group can only contain {MaxChildCount} action items.");
+        Preconditions.AtMost(Label?.Length ?? 0, MaxLabelLength, nameof(Label));
 
         return new OverflowMenuGroup(Label, Components.Select(x => x.Build()).ToImmutableArray());
     }

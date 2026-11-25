@@ -9,6 +9,16 @@ namespace Discord;
 /// </summary>
 public class MenuActionItemBuilder : IInteractableComponentBuilder
 {
+    /// <summary>
+    ///     The maximum length of the label.
+    /// </summary>
+    public const int MaxLabelLength = 80;
+
+    /// <summary>
+    ///     The maximum length of the description.
+    /// </summary>
+    public const int MaxDescriptionLength = 100;
+
     /// <inheritdoc/>
     public ComponentType Type => ComponentType.MenuActionItem;
 
@@ -38,7 +48,20 @@ public class MenuActionItemBuilder : IInteractableComponentBuilder
     /// <summary>
     ///     Gets or sets the label of the current action item.
     /// </summary>
-    public string Label { get; set; }
+    /// <exception cref="ArgumentException" accessor="set"><see cref="Label"/> length exceeds <see cref="MaxLabelLength"/>.</exception>
+    public string Label
+    {
+        get;
+        set
+        {
+            if (value is not null)
+            {
+                Preconditions.AtMost(value.Length, MaxLabelLength, nameof(Label));
+            }
+
+            field = value;
+        }
+    }
 
     /// <summary>
     ///     Gets or sets the <see cref="MenuActionItemStyle"/> of the current action item.
@@ -48,7 +71,20 @@ public class MenuActionItemBuilder : IInteractableComponentBuilder
     /// <summary>
     ///     Gets or sets the description of the current action item.
     /// </summary>
-    public string Description { get; set; }
+    /// <exception cref="ArgumentException" accessor="set"><see cref="Description"/> length exceeds <see cref="MaxDescriptionLength"/>.</exception>
+    public string Description
+    {
+        get;
+        set
+        {
+            if (value is not null)
+            {
+                Preconditions.AtMost(value.Length, MaxDescriptionLength, nameof(Description));
+            }
+
+            field = value;
+        }
+    }
 
     /// <summary>
     ///     Gets or sets the url of the current action item.
@@ -207,12 +243,15 @@ public class MenuActionItemBuilder : IInteractableComponentBuilder
     /// </summary>
     /// <returns>A <see cref="MenuActionItemComponent"/>.</returns>
     /// <exception cref="ArgumentNullException">A menu action item must have a label.</exception>
+    /// <exception cref="ArgumentException"><see cref="Label"/> or <see cref="Description"/> exceeds the maximum length.</exception>
     /// <exception cref="InvalidOperationException">A non-link action item must contain a <see cref="CustomId"/>.</exception>
     /// <exception cref="InvalidOperationException">A link action item must contain a <see cref="Url"/>.</exception>
     /// <exception cref="InvalidOperationException">An action item cannot contain both a <see cref="Url"/> and a <see cref="CustomId"/>.</exception>
     public MenuActionItemComponent Build()
     {
         Preconditions.NotNullOrWhitespace(Label, nameof(Label));
+        Preconditions.AtMost(Label.Length, MaxLabelLength, nameof(Label));
+        Preconditions.AtMost(Description?.Length ?? 0, MaxDescriptionLength, nameof(Description));
 
         switch (Style)
         {
