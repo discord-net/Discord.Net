@@ -370,6 +370,10 @@ namespace Discord.WebSocket
                 if (guild.IsAvailable)
                     await GuildUnavailableAsync(guild).ConfigureAwait(false);
             }
+
+            foreach (var requestTask in _guildMembersRequestTasks)
+                 requestTask.Value.TrySetException(new InvalidOperationException("Client disconnected before it could complete the request."));
+            _guildMembersRequestTasks.Clear();
         }
 
         /// <inheritdoc />
@@ -720,22 +724,20 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public override async Task<IReadOnlyCollection<ulong>> DownloadUsersAsync(IGuild guild, IEnumerable<ulong> userIds, CancellationToken cancelToken = default)
         {
-            if (ConnectionState == ConnectionState.Connected)
-            {
-                var notFound = new List<ulong>();
-                var socketGuild = GetGuild(guild.Id);
-                if (socketGuild != null)
-                {
-                    foreach (var chunk in userIds.Chunk(DiscordConfig.MaxRequestedUserIdsPerRequestGuildMembersChunk))
-                    {
-                        notFound.AddRange(await ProcessUserDownloadsAsync(socketGuild, chunk, cancelToken).ConfigureAwait(false));
-                    }
-                }
+            if (ConnectionState != ConnectionState.Connected)
+                throw new InvalidOperationException("Client not connected");
 
-                return notFound;
+            var notFound = new List<ulong>();
+            var socketGuild = GetGuild(guild.Id);
+            if (socketGuild != null)
+            {
+                foreach (var chunk in userIds.Chunk(DiscordConfig.MaxRequestedUserIdsPerRequestGuildMembersChunk))
+                {
+                    notFound.AddRange(await ProcessUserDownloadsAsync(socketGuild, chunk, cancelToken).ConfigureAwait(false));
+                }
             }
 
-            throw new InvalidOperationException("Client not connected");
+            return notFound;
         }
 
 
