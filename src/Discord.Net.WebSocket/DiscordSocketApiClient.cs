@@ -385,10 +385,23 @@ namespace Discord.API
             return SendGatewayAsync(GatewayOpCode.PresenceUpdate, args, options: options);
         }
 
-        public Task SendRequestMembersAsync(IEnumerable<ulong> guildIds, RequestOptions options = null)
+        public Task SendRequestMembersAsync(ulong guildId, RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
-            return SendGatewayAsync(GatewayOpCode.RequestGuildMembers, new RequestMembersParams { GuildIds = guildIds, Query = "", Limit = 0 }, options: options);
+            return SendGatewayAsync(GatewayOpCode.RequestGuildMembers, new RequestMembersParams { GuildId = guildId, Query = "", Limit = 0 }, options: options);
+        }
+
+        public Task SendRequestMembersAsync(ulong guildId, IEnumerable<ulong> userIds, string nonce, RequestOptions options = null)
+        {
+            var payload = new RequestMembersParams
+            {
+                GuildId = guildId,
+                Limit = 0,
+                UserIds = new Optional<IEnumerable<ulong>>(userIds),
+                Nonce = nonce
+            };
+            options = RequestOptions.CreateOrClone(options);
+            return SendGatewayAsync(GatewayOpCode.RequestGuildMembers, payload, options: options);
         }
 
         public Task SendVoiceStateUpdateAsync(ulong guildId, ulong? channelId, bool selfDeaf, bool selfMute, RequestOptions options = null)
