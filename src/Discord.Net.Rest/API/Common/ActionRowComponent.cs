@@ -29,6 +29,7 @@ namespace Discord.API
                     ComponentType.RoleSelect => new SelectMenuComponent(x as Discord.SelectMenuComponent),
                     ComponentType.MentionableSelect => new SelectMenuComponent(x as Discord.SelectMenuComponent),
                     ComponentType.TextInput => new TextInputComponent(x as Discord.TextInputComponent),
+                    ComponentType.OverflowMenu => new OverflowMenuComponent(x as Discord.OverflowMenuComponent),
                     _ => null
                 };
             }).ToArray();

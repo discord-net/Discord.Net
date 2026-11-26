@@ -77,6 +77,12 @@ namespace Discord.Net.Converters
                 case ComponentType.Checkbox:
                     messageComponent = new API.CheckboxComponent();
                     break;
+                case ComponentType.OverflowMenu:
+                    messageComponent = new API.OverflowMenuComponent();
+                    break;
+                case ComponentType.MenuActionItem:
+                    messageComponent = new API.MenuActionItemComponent();
+                    break;
                 default:
                     messageComponent = new API.UnknownComponent { RawType = typeProperty, RawJson = jsonObject.ToString() };
                     break;

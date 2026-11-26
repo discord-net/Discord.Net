@@ -65,7 +65,7 @@ namespace Discord.API.Rest
             if (MessageComponents.IsSpecified)
             {
                 data["components"] = MessageComponents.Value;
-                if (MessageComponents.Value.Any(x => x.Type is not ComponentType.ActionRow))
+                if (MessageComponents.Value.IsComponentsV2())
                     extraFlags |= MessageFlags.ComponentsV2;
             }
 

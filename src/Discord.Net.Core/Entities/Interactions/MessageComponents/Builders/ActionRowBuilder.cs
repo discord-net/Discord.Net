@@ -15,7 +15,7 @@ namespace Discord;
 public class ActionRowBuilder : IMessageComponentBuilder, IInteractableComponentContainer
 {
     /// <inheritdoc />
-    public ImmutableArray<ComponentType> SupportedComponentTypes { get; } =
+    public static ImmutableArray<ComponentType> SupportedComponentTypes { get; } =
     [
         ComponentType.Button,
         ComponentType.SelectMenu,
@@ -23,7 +23,8 @@ public class ActionRowBuilder : IMessageComponentBuilder, IInteractableComponent
         ComponentType.RoleSelect,
         ComponentType.ChannelSelect,
         ComponentType.MentionableSelect,
-        ComponentType.TextInput
+        ComponentType.TextInput,
+        ComponentType.OverflowMenu,
     ];
 
     /// <inheritdoc />
@@ -245,6 +246,7 @@ public class ActionRowBuilder : IMessageComponentBuilder, IInteractableComponent
             case ComponentType.ActionRow:
                 return false;
             case ComponentType.Button:
+            case ComponentType.OverflowMenu:
                 if (Components.Any(x => x.Type.IsSelectType()))
                     return false;
                 else

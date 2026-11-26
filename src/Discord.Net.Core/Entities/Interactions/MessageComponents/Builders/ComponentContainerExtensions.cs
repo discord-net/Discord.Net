@@ -518,6 +518,46 @@ public static class ComponentContainerExtensions
     }
 
     /// <summary>
+    ///     Adds an <see cref="OverflowMenuBuilder"/> to the container.
+    /// </summary>
+    /// <returns>
+    ///     The current container.
+    /// </returns>
+    public static BuilderT WithOverflowMenu<BuilderT>(this BuilderT container, OverflowMenuBuilder overflowMenu)
+        where BuilderT : class, IComponentContainer
+    {
+        container.AddComponent(overflowMenu);
+        return container;
+    }
+
+    /// <summary>
+    ///     Adds an <see cref="OverflowMenuBuilder"/> to the container.
+    /// </summary>
+    /// <returns>
+    ///     The current container.
+    /// </returns>
+    public static BuilderT WithOverflowMenu<BuilderT>(this BuilderT container,
+        IEnumerable<OverflowMenuGroupBuilder> groups,
+        int? id = null)
+        where BuilderT : class, IComponentContainer
+        => container.WithOverflowMenu(new OverflowMenuBuilder(groups, id));
+
+    /// <summary>
+    ///     Adds an <see cref="OverflowMenuBuilder"/> to the container.
+    /// </summary>
+    /// <returns>
+    ///     The current container.
+    /// </returns>
+    public static BuilderT WithOverflowMenu<BuilderT>(this BuilderT container,
+        Action<OverflowMenuBuilder> options)
+        where BuilderT : class, IComponentContainer
+    {
+        var comp = new OverflowMenuBuilder();
+        options(comp);
+        return container.WithOverflowMenu(comp);
+    }
+
+    /// <summary>
     ///     Finds the first <see cref="IMessageComponentBuilder"/> in the <see cref="IComponentContainer"/>
     ///     or any of its child <see cref="IComponentContainer"/>s with matching id.
     /// </summary>

@@ -117,7 +117,7 @@ namespace Discord.WebSocket
                     throw new ArgumentException("The Roles flag is mutually exclusive with the list of Role Ids.", nameof(allowedMentions));
                 }
             }
-            if (components?.Components?.Any(x => x.Type != ComponentType.ActionRow) ?? false)
+            if (Preconditions.IsComponentsV2(components?.Components))
                 flags |= MessageFlags.ComponentsV2;
             if (ephemeral)
                 flags |= MessageFlags.Ephemeral;
@@ -192,7 +192,7 @@ namespace Discord.WebSocket
                 }
             }
 
-            if (components?.Components?.Any(x => x.Type != ComponentType.ActionRow) ?? false)
+            if (Preconditions.IsComponentsV2(components?.Components))
                 flags |= MessageFlags.ComponentsV2;
             if (ephemeral)
                 flags |= MessageFlags.Ephemeral;
@@ -355,7 +355,7 @@ namespace Discord.WebSocket
             Preconditions.AtMost(embeds.Length, 10, nameof(embeds), "A max of 10 embeds are allowed.");
             Preconditions.ValidatePoll(poll);
 
-            if (components?.Components?.Any(x => x.Type != ComponentType.ActionRow) ?? false)
+            if (Preconditions.IsComponentsV2(components?.Components))
                 flags |= MessageFlags.ComponentsV2;
             if (ephemeral)
                 flags |= MessageFlags.Ephemeral;
@@ -423,7 +423,7 @@ namespace Discord.WebSocket
                 }
             }
 
-            if (components?.Components?.Any(x => x.Type != ComponentType.ActionRow) ?? false)
+            if (Preconditions.IsComponentsV2(components?.Components))
                 flags |= MessageFlags.ComponentsV2;
             if (ephemeral)
                 flags |= MessageFlags.Ephemeral;
